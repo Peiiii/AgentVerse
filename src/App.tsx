@@ -2,7 +2,7 @@ import { ChatArea } from "@/components/chat/chat-area";
 import { DiscussionController } from "@/components/discussion/control/discussion-controller";
 import { DiscussionList } from "@/components/discussion/discussion-list";
 import { MemberList } from "@/components/discussion/member/member-list";
-import { Header } from "@/components/layout/header";
+import { Header } from "@/components/layout/Header";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { ResponsiveContainer } from "@/components/layout/responsive-container";
 import { useBreakpointContext } from "@/contexts/breakpoint-context";
