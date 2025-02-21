@@ -79,7 +79,9 @@ export class LocalStorageProvider<T extends { id: string }>
 
   async list(): Promise<T[]> {
     let items = this.getStoredItems();
+    console.log("[STORAGE] list", this.storageKey, "before sort", items);
     items = this.sortItems(items);
+    console.log("[STORAGE] list", this.storageKey, "after sort", items);
     return this.options.maxItems
       ? items.slice(0, this.options.maxItems)
       : items;
