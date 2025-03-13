@@ -151,6 +151,8 @@ export function ChatArea({
         }
       }
 
+      console.log("准备添加的成员:", membersToAdd);
+
       // 批量添加所有成员
       if (membersToAdd.length > 0) {
         console.log(`批量添加 ${membersToAdd.length} 个成员...`);

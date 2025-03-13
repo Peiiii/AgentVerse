@@ -1,5 +1,6 @@
 import { Capability } from "@/lib/capabilities";
 import { Agent } from "@/types/agent";
+import { ActionResultMessage } from "@/types/discussion";
 
 // @ 相关的规则和提示词统一管理
 export const MentionRules = {
@@ -76,10 +77,14 @@ export function generateCapabilityPrompt(capabilities: Capability[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <capability-system>
   <capabilities>
-    ${capabilities.map((cap) => `<capability>
+    ${capabilities
+      .map(
+        (cap) => `<capability>
       <name>${cap.name}</name>
       <description><![CDATA[${cap.description}]]></description>
-    </capability>`).join("\n    ")}
+    </capability>`
+      )
+      .join("\n    ")}
   </capabilities>
 
   <action-syntax>
@@ -156,7 +161,12 @@ export function generateCapabilityPrompt(capabilities: Capability[]): string {
 // 基础角色设定
 export const createRolePrompt = (agent: Agent, memberAgents: Agent[]) => {
   const anchors = memberAgents
-    .map((m) => `<member><name>${m.name}</name><role>${m.role}</role><expertise>${m.expertise.join("/")}</expertise></member>`)
+    .map(
+      (m) =>
+        `<member><name>${m.name}</name><role>${
+          m.role
+        }</role><expertise>${m.expertise.join("/")}</expertise></member>`
+    )
     .join("\n    ");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -207,7 +217,7 @@ export const createRolePrompt = (agent: Agent, memberAgents: Agent[]) => {
 
   <mention-rules>
     <participants>
-      <list>${memberAgents.map(a => a.name).join("、")}</list>
+      <list>${memberAgents.map((a) => a.name).join("、")}</list>
     </participants>
     <rule>直接引用：讨论他人观点时直接使用名字</rule>
     <rule>@ 使用：仅在需要对方立即回应时使用</rule>
@@ -219,14 +229,14 @@ export const createRolePrompt = (agent: Agent, memberAgents: Agent[]) => {
     </auto-reply-notice>
     ${
       agent.role === "moderator"
-      ? `<moderator-mention-rules>
+        ? `<moderator-mention-rules>
         <rule>合理分配发言机会</rule>
         <rule>一次只 @ 一位成员</rule>
         <rule>等待当前成员回应后再邀请下一位</rule>
         <rule>确保讨论有序进行</rule>
         <rule>注意识别哪些成员需要被明确邀请才会发言</rule>
       </moderator-mention-rules>`
-      : `<participant-mention-rules>
+        : `<participant-mention-rules>
         <rule>保持克制，避免过度使用 @</rule>
         <rule>优先使用直接引用而非 @</rule>
         <rule>确有必要时才使用 @ 请求回应</rule>
@@ -245,7 +255,7 @@ export const createRolePrompt = (agent: Agent, memberAgents: Agent[]) => {
     </members>
   </context>
 </agent-prompt>`;
-}
+};
 
 export function simpleHash(str: string) {
   let hash = 0;
@@ -263,7 +273,12 @@ export const getCoreModeratorSettingPrompt = (
   members: Agent[]
 ) => {
   const anchors = members
-    .map((m) => `<member><name>${m.name}</name><role>${m.role}</role><expertise>${m.expertise.join("/")}</expertise></member>`)
+    .map(
+      (m) =>
+        `<member><name>${m.name}</name><role>${
+          m.role
+        }</role><expertise>${m.expertise.join("/")}</expertise></member>`
+    )
     .join("\n    ");
   return `<?xml version="1.0" encoding="UTF-8"?>
 <agent-prompt>
@@ -304,7 +319,7 @@ export const getCoreModeratorSettingPrompt = (
 
   <mention-rules>
     <participants>
-      <list>${members.map(a => a.name).join("、")}</list>
+      <list>${members.map((a) => a.name).join("、")}</list>
     </participants>
     <rule>直接引用：讨论他人观点时直接使用名字</rule>
     <rule>@ 使用：仅在需要对方立即回应时使用</rule>
@@ -348,10 +363,13 @@ export const formatMessage = (
 };
 
 // Action 结果格式化
-export const formatActionResult = (results: unknown) =>
-  `<?xml version="1.0" encoding="UTF-8"?>
-<system-event>
-  <action-result>
-    <content><![CDATA[${JSON.stringify(results, null, 2)}]]></content>
-  </action-result>
-</system-event>`;
+export const formatActionResult = (results: ActionResultMessage["results"]) => {
+  return `[The System]:
+  ${results
+    .map(
+      (r) => `<action-result>
+      ${JSON.stringify(r, null, 2)}
+  </action-result>`
+    )
+    .join("\n")}`;
+};

@@ -1,6 +1,7 @@
 import { Agent } from "@/types/agent";
 // 导入新角色
 import { META_COGNITIVE_ORCHESTRATOR } from "./moderators/meta-cognitive-orchestrator";
+import { STRUCTURED_THINKING_MODERATOR } from "./moderators/structured-thinking-moderator";
 import { COGNITIVE_DETECTIVE } from "./top-agents/cognitive-detective";
 import { CONCEPT_ALCHEMIST } from "./top-agents/concept-alchemist";
 import { DECISION_GARDENER } from "./top-agents/decision-gardener";
@@ -28,7 +29,8 @@ export type AgentCombinationType =
   | "cognitiveTeam"
   | "emotionalDecision"
   | "narrativeExploration"
-  | "practicalTeam"; // 新增认知团队组合和情绪决策团队，以及叙事探索团队，新增实践执行团队
+  | "practicalTeam"
+  | "experimentalThinking"; // 新增实验性思考团队
 
 // 定义参与者 ID
 export const PARTICIPANT_IDS = {
@@ -64,6 +66,7 @@ export const PARTICIPANT_IDS = {
   IMPLEMENTATION_ARCHITECT: "implementation-architect",
   DATA_INTERPRETER: "data-interpreter",
   STARTUP_NAVIGATOR: "startup-navigator",
+  STRUCTURED_THINKER: "structured-thinker",
 } as const;
 
 // 定义主持人 ID
@@ -75,6 +78,7 @@ export const MODERATOR_IDS = {
   AGENT_DESIGNER: "agent-designer",
   DISCUSSION_MODERATOR: "discussion-moderator",
   META_COGNITIVE_ORCHESTRATOR: "meta-cognitive-orchestrator", // 新增
+  STRUCTURED_THINKING_MODERATOR: "structured-thinking-moderator",
 } as const;
 
 // 参与者映射
@@ -611,6 +615,7 @@ export const MODERATORS_MAP: Record<string, Omit<Agent, "id">> = {
     responseStyle: "清晰、引导性、务实",
   },
   [MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR]: META_COGNITIVE_ORCHESTRATOR,
+  [MODERATOR_IDS.STRUCTURED_THINKING_MODERATOR]: STRUCTURED_THINKING_MODERATOR,
 };
 
 // 组合配置
@@ -771,13 +776,26 @@ export const AGENT_COMBINATIONS = {
 
   practicalTeam: {
     name: "实践执行团队",
-    description: "专注于将创意转化为可执行计划的实用团队",
-    moderator: MODERATORS_MAP[MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR],
+    description: "专注于实际执行和项目落地的专业团队",
+    moderator: MODERATORS_MAP[MODERATOR_IDS.BUSINESS_MODERATOR],
     participants: [
       PARTICIPANTS_MAP[PARTICIPANT_IDS.IMPLEMENTATION_ARCHITECT],
-      PARTICIPANTS_MAP[PARTICIPANT_IDS.DATA_INTERPRETER],
       PARTICIPANTS_MAP[PARTICIPANT_IDS.STARTUP_NAVIGATOR],
-      PARTICIPANTS_MAP[PARTICIPANT_IDS.DECISION_GARDENER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.PROJECT_MANAGER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TECH_ARCHITECT],
+    ],
+  },
+
+  // 添加实验性思考团队
+  experimentalThinking: {
+    name: "结构化思考团队",
+    description: "使用结构化思考框架解决问题的实验性团队",
+    moderator: MODERATORS_MAP[MODERATOR_IDS.STRUCTURED_THINKING_MODERATOR],
+    participants: [
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.STRUCTURED_THINKER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.SYSTEM_THINKER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.LOGIC_ANALYZER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE],
     ],
   },
 } as const;

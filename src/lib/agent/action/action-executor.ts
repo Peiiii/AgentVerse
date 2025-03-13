@@ -8,6 +8,8 @@ export interface ActionExecutionResult {
   result?: unknown;
   error?: string;
   status: "success" | "parse_error" | "execution_error" | "invalid_action";
+  startTime?: number;
+  endTime?: number;
 }
 
 export abstract class BaseActionExecutor {
@@ -23,6 +25,7 @@ export class DefaultActionExecutor extends BaseActionExecutor {
     registry: CapabilityRegistry
   ): Promise<ActionExecutionResult[]> {
     const results: ActionExecutionResult[] = [];
+    const startTime = Date.now();
 
     for (const action of actions) {
       if (!action.parsed) {
@@ -46,6 +49,8 @@ export class DefaultActionExecutor extends BaseActionExecutor {
           params,
           result,
           status: "success",
+          startTime,
+          endTime: Date.now(),
         });
       } catch (executionError) {
         results.push({
@@ -56,6 +61,8 @@ export class DefaultActionExecutor extends BaseActionExecutor {
             executionError instanceof Error
               ? executionError.message
               : String(executionError),
+          startTime,
+          endTime: Date.now(),
         });
       }
     }

@@ -93,6 +93,8 @@ export class ChatAgent extends MessageHandlingAgent {
               result: result.result,
               description: action.description,
               error: result.error,
+              startTime: result.startTime,
+              endTime: result.endTime,
             };
           }),
         };

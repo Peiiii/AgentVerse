@@ -53,7 +53,7 @@ export class PromptBuilder {
       if (msg.type === "action_result") {
         return {
           role: "system" as const,
-          content: formatActionResult(msg.results),
+          content: formatActionResult((msg as ActionResultMessage).results),
         };
       }
 

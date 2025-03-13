@@ -31,6 +31,8 @@ export interface ActionResultMessage extends BaseMessage {
     status: 'success' | 'error';
     result?: unknown;
     error?: string;
+    startTime?: number;
+    endTime?: number;
   }>;
 }
 

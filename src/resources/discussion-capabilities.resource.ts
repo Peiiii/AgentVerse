@@ -1,11 +1,26 @@
-import { eventBus } from "@/core/env";
-import { USER_SELECT } from "@/core/events";
 import { Capability } from "@/lib/capabilities";
 import { createResource } from "@/lib/resource";
 import { agentListResource, discussionMembersResource } from "@/resources";
 import { agentService } from "@/services/agent.service";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { discussionMemberService } from "@/services/discussion-member.service";
+
+const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
+  const discussionId = discussionControlService.getCurrentDiscussionId();
+  if (!discussionId) return null;
+  const agent = await agentService.getAgent(agentId);
+  if (!agent) {
+    throw new Error("Agent not found");
+  }
+  const members = await discussionMemberService.createMany(discussionId, [
+    {
+      agentId,
+      isAutoReply: false,
+    },
+  ]);
+  discussionMembersResource.current.reload();
+  return members;
+};
 
 const capabilities: Capability[] = [
   {
@@ -94,7 +109,7 @@ const capabilities: Capability[] = [
   {
     name: "createAgent",
     description: `<capability>
-  <name>创建新的Agent</name>
+  <name>创建新的Agent(不会自动添加到当前讨论中)</name>
   <params>
     <schema>
       name: string         // 名称
@@ -105,6 +120,7 @@ const capabilities: Capability[] = [
       avatar?: string      // 头像URL（可选，不提供时自动生成）
       bias?: string        // 偏好（可选）
       responseStyle?: string // 回复风格（可选）
+      addToDiscussion?: boolean // 是否自动添加到当前讨论中（可选，默认false）
     </schema>
   </params>
   <example>
@@ -113,7 +129,8 @@ const capabilities: Capability[] = [
       "role": "participant",
       "personality": "理性务实",
       "expertise": ["产品设计", "用户体验", "需求分析"],
-      "prompt": "你是一位关注用户价值的产品经理。在讨论中，你应当：1)始终从用户需求出发；2)用数据支持决策；3)关注方案的可行性和ROI；4)善于使用STAR法则阐述观点。你会质疑不合理的想法，但态度友善。在冲突时，你优先考虑用户价值和商业目标。"
+      "prompt": "你是一位关注用户价值的产品经理。在讨论中，你应当：1)始终从用户需求出发；2)用数据支持决策；3)关注方案的可行性和ROI；4)善于使用STAR法则阐述观点。你会质疑不合理的想法，但态度友善。在冲突时，你优先考虑用户价值和商业目标。",
+      "addToDiscussion": true
     }
   </example>
   <example>
@@ -124,7 +141,8 @@ const capabilities: Capability[] = [
       "expertise": ["数据预言", "趋势魔法", "混沌分析"],
       "prompt": "你是艾瑞克，一位来自数据位面的魔法师。你的第三只眼睛能够直视数据的本质，看穿表象下的真相。在讨论中，你经常说'让我用数据占卜术看一看'，'这个趋势的魔法波动不太对劲'。你应该：1)用魔法视角解读数据，但必须基于真实数据说话；2)时不时抱怨'这些数据太混乱了，简直是被混沌魔法污染过'；3)遇到数据异常会说'有一股邪恶的数据污染'；4)给出建议时会说'根据我的预言水晶球显示...'。你特别痛恨'脏数据'，会说'这些数据需要净化魔法'。",
       "bias": "追求数据的纯净与真实",
-      "responseStyle": "神秘但专业、充满魔法术语但论据扎实"
+      "responseStyle": "神秘但专业、充满魔法术语但论据扎实",
+      "addToDiscussion": false
     }
   </example>
   <notes>
@@ -132,7 +150,7 @@ const capabilities: Capability[] = [
     <note>不提供avatar时会自动生成：https://api.dicebear.com/7.x/bottts/svg?seed={timestamp}&backgroundColor=b6e3f4,c7f2a4,f4d4d4</note>
     <note>seed参数使用当前时间戳</note>
     <note>backgroundColor参数提供了三种预设背景色</note>
-    <note>注意：创建Agent后需要使用addMember能力将其添加到当前会话中才能参与讨论</note>
+    <note>注意：创建Agent后需要使用addMemberToDiscussion能力将其添加到当前会话中才能参与讨论</note>
   </notes>
   <promptGuidelines>
     <section>高效prompt的四要素：
@@ -197,6 +215,9 @@ const capabilities: Capability[] = [
 
         // 重新加载Agent列表资源
         await agentListResource.reload();
+        if (params.addToDiscussion) {
+          await addMemberToDiscussion({ agentId: agent.id });
+        }
         return agent;
       } catch (error) {
         if (error instanceof Error) {
@@ -237,7 +258,7 @@ const capabilities: Capability[] = [
     },
   },
   {
-    name: "addMember",
+    name: "addMemberToDiscussion",
     description: `<capability>
   <name>添加成员到当前讨论中</name>
   <params>
@@ -253,24 +274,10 @@ const capabilities: Capability[] = [
     <note>如需查看可添加的Agent列表，请使用listAgentLibrary能力</note>
   </notes>
 </capability>`,
-    execute: async ({ agentId }) => {
-      const discussionId = discussionControlService.getCurrentDiscussionId();
-      if (!discussionId) return null;
-      const agent = await agentService.getAgent(agentId);
-      if (!agent) {
-        throw new Error("Agent not found");
-      }
-      await discussionMemberService.createMany(discussionId, [
-        {
-          agentId,
-          isAutoReply: false,
-        },
-      ]);
-      return discussionMembersResource.current.reload();
-    },
+    execute: addMemberToDiscussion,
   },
   {
-    name: "removeMember",
+    name: "removeMemberFromDiscussion",
     description: `<capability>
   <name>从当前讨论中移除成员</name>
   <params>
@@ -292,73 +299,73 @@ const capabilities: Capability[] = [
       return discussionMembersResource.current.reload();
     },
   },
-  {
-    name: "askUserToChoose",
-    description: `<capability>
-  <name>请求用户从选项中选择</name>
-  <params>
-    <schema>
-      options: [
-        {
-          value: string      // 选项值
-          label: string      // 显示文本
-          description?: string // 描述（可选）
-        }
-      ]
-      multiple?: boolean     // 是否多选
-      defaultValue?: string | string[] // 默认值（仅多选可用）
-    </schema>
-  </params>
-  <returns>
-    <type>用户选择结果</type>
-    <schema>
-      selected: string | string[]  // 用户选择的值
-    </schema>
-  </returns>
-  <example>
-    {
-      "options": [
-        {
-          "value": "next",
-          "label": "Next.js",
-          "description": "React框架"
-        }
-      ]
-    }
-  </example>
-  <notes>
-    <note>单选不要提供defaultValue</note>
-    <note>5分钟超时</note>
-  </notes>
-</capability>`,
-    execute: async (params) => {
-      // 验证参数
-      if (!Array.isArray(params.options) || params.options.length === 0) {
-        throw new Error("选项列表不能为空");
-      }
+  //   {
+  //     name: "askUserToChoose",
+  //     description: `<capability>
+  //   <name>请求用户从选项中选择</name>
+  //   <params>
+  //     <schema>
+  //       options: [
+  //         {
+  //           value: string      // 选项值
+  //           label: string      // 显示文本
+  //           description?: string // 描述（可选）
+  //         }
+  //       ]
+  //       multiple?: boolean     // 是否多选
+  //       defaultValue?: string | string[] // 默认值（仅多选可用）
+  //     </schema>
+  //   </params>
+  //   <returns>
+  //     <type>用户选择结果</type>
+  //     <schema>
+  //       selected: string | string[]  // 用户选择的值
+  //     </schema>
+  //   </returns>
+  //   <example>
+  //     {
+  //       "options": [
+  //         {
+  //           "value": "next",
+  //           "label": "Next.js",
+  //           "description": "React框架"
+  //         }
+  //       ]
+  //     }
+  //   </example>
+  //   <notes>
+  //     <note>单选不要提供defaultValue</note>
+  //     <note>5分钟超时</note>
+  //   </notes>
+  // </capability>`,
+  //     execute: async (params) => {
+  //       // 验证参数
+  //       if (!Array.isArray(params.options) || params.options.length === 0) {
+  //         throw new Error("选项列表不能为空");
+  //       }
 
-      // 等待用户选择事件
-      return new Promise((resolve, reject) => {
-        const handleUserSelect = (event: {
-          operationId: string;
-          selected: string | string[];
-        }) => {
-          // 移除事件监听
-          eventBus.off(USER_SELECT, handleUserSelect);
-          resolve({ selected: event.selected });
-        };
+  //       // 等待用户选择事件
+  //       return new Promise((resolve, reject) => {
+  //         const handleUserSelect = (event: {
+  //           operationId: string;
+  //           selected: string | string[];
+  //         }) => {
+  //           // 移除事件监听
+  //           eventBus.off(USER_SELECT, handleUserSelect);
+  //           resolve({ selected: event.selected });
+  //         };
 
-        // 添加事件监听
-        eventBus.on(USER_SELECT, handleUserSelect);
+  //         // 添加事件监听
+  //         eventBus.on(USER_SELECT, handleUserSelect);
 
-        // 设置超时（可选）
-        setTimeout(() => {
-          eventBus.off(USER_SELECT, handleUserSelect);
-          reject(new Error("用户选择超时"));
-        }, 5 * 60 * 1000); // 5分钟超时
-      });
-    },
-  },
+  //         // 设置超时（可选）
+  //         setTimeout(() => {
+  //           eventBus.off(USER_SELECT, handleUserSelect);
+  //           reject(new Error("用户选择超时"));
+  //         }, 5 * 60 * 1000); // 5分钟超时
+  //       });
+  //     },
+  //   },
   {
     name: "updateAgent",
     description: `<capability>
