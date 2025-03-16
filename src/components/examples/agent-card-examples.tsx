@@ -1,9 +1,9 @@
-import React, { useState } from "react";
 import { AgentCard } from "@/components/agent/cards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Agent } from "@/types/agent";
 import { QUANTUM_ADVISOR } from "@/config/agents/top-agents/quantum-advisor";
+import { Agent } from "@/types/agent";
+import { useState } from "react";
 
 // 示例Agent数据
 const exampleAgent: Agent = {

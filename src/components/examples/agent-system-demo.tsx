@@ -1,20 +1,32 @@
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { 
-  AgentCard, 
-  AgentSelectCard, 
-  AgentChatCard, 
+import { useState } from "react";
+import {
+  AgentCombinationType,
+  MODERATOR_IDS,
+  MODERATORS_MAP,
+  PARTICIPANT_IDS,
+  PARTICIPANTS_MAP,
+} from "../../config/agents/index";
+import { Agent } from "../../types/agent";
+import {
+  AddAgentDialog,
+  AgentCard,
+  AgentChatCard,
+  AgentCombinationList,
   AgentGroupCard,
   AgentList,
+  AgentSelectCard,
   AgentSelectList,
-  AgentCombinationList,
-  AddAgentDialog,
-  EditAgentDialog
+  EditAgentDialog,
 } from "../agent";
-import { Agent } from "../../types/agent";
-import { AgentCombinationType, PARTICIPANTS_MAP, MODERATORS_MAP, PARTICIPANT_IDS, MODERATOR_IDS } from "../../config/agents/index";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export function AgentSystemDemo() {
   // 示例Agent数据
@@ -27,29 +39,29 @@ export function AgentSystemDemo() {
     personality: "好奇、开放、思维跳跃",
     expertise: ["量子思维", "概率分析", "决策理论", "系统思考"],
     bias: "倾向于看到多种可能性而非单一答案",
-    responseStyle: "科学与哲学并重，使用概率语言，提供多元视角"
+    responseStyle: "科学与哲学并重，使用概率语言，提供多元视角",
   };
-  
+
   // 示例Agent列表
   const exampleAgents: Agent[] = [
     {
       id: PARTICIPANT_IDS.QUANTUM_ADVISOR,
-      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.QUANTUM_ADVISOR]
+      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.QUANTUM_ADVISOR],
     },
     {
       id: PARTICIPANT_IDS.COGNITIVE_DETECTIVE,
-      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE]
+      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE],
     },
     {
       id: PARTICIPANT_IDS.EMOTION_METEOROLOGIST,
-      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.EMOTION_METEOROLOGIST]
+      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.EMOTION_METEOROLOGIST],
     },
     {
       id: MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR,
-      ...MODERATORS_MAP[MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR]
-    }
+      ...MODERATORS_MAP[MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR],
+    },
   ];
-  
+
   // 示例组合
   const exampleCombinations = [
     {
@@ -58,22 +70,22 @@ export function AgentSystemDemo() {
       description: "专注于概念转化和模式识别的高级思维团队",
       moderator: {
         id: MODERATOR_IDS.THINKING_MODERATOR,
-        ...MODERATORS_MAP[MODERATOR_IDS.THINKING_MODERATOR]
+        ...MODERATORS_MAP[MODERATOR_IDS.THINKING_MODERATOR],
       },
       participants: [
         {
           id: PARTICIPANT_IDS.CONCEPT_ALCHEMIST,
-          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.CONCEPT_ALCHEMIST]
+          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.CONCEPT_ALCHEMIST],
         },
         {
           id: PARTICIPANT_IDS.PATTERN_LINGUIST,
-          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.PATTERN_LINGUIST]
+          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.PATTERN_LINGUIST],
         },
         {
           id: PARTICIPANT_IDS.COGNITIVE_DETECTIVE,
-          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE]
-        }
-      ]
+          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE],
+        },
+      ],
     },
     {
       type: "emotionalDecision" as AgentCombinationType,
@@ -81,53 +93,53 @@ export function AgentSystemDemo() {
       description: "结合情感智能和决策分析的专业团队",
       moderator: {
         id: MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR,
-        ...MODERATORS_MAP[MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR]
+        ...MODERATORS_MAP[MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR],
       },
       participants: [
         {
           id: PARTICIPANT_IDS.EMOTION_METEOROLOGIST,
-          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.EMOTION_METEOROLOGIST]
+          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.EMOTION_METEOROLOGIST],
         },
         {
           id: PARTICIPANT_IDS.DECISION_GARDENER,
-          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.DECISION_GARDENER]
-        }
-      ]
-    }
+          ...PARTICIPANTS_MAP[PARTICIPANT_IDS.DECISION_GARDENER],
+        },
+      ],
+    },
   ];
-  
+
   // 状态
   const [selectedAgentIds, setSelectedAgentIds] = useState<string[]>([]);
-  
+
   // 处理Agent选择
   const handleAgentSelect = (agent: Agent, selected: boolean) => {
     if (selected) {
-      setSelectedAgentIds(prev => [...prev, agent.id]);
+      setSelectedAgentIds((prev) => [...prev, agent.id]);
     } else {
-      setSelectedAgentIds(prev => prev.filter(id => id !== agent.id));
+      setSelectedAgentIds((prev) => prev.filter((id) => id !== agent.id));
     }
   };
-  
+
   // 处理组合选择
   const handleCombinationSelect = (type: AgentCombinationType) => {
     alert(`选择了组合: ${type}`);
   };
-  
+
   // 对话框钩子
   const { openAddAgentDialog } = AddAgentDialog.useAddAgentDialog();
   const { openEditAgentDialog } = EditAgentDialog.useEditAgentDialog();
-  
+
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-8">Agent组件系统示例</h1>
-      
+
       <Tabs defaultValue="cards">
         <TabsList className="mb-4">
           <TabsTrigger value="cards">卡片组件</TabsTrigger>
           <TabsTrigger value="lists">列表组件</TabsTrigger>
           <TabsTrigger value="dialogs">对话框</TabsTrigger>
         </TabsList>
-        
+
         {/* 卡片组件 */}
         <TabsContent value="cards">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -145,7 +157,7 @@ export function AgentSystemDemo() {
                     description="这是一个Agent的简要描述"
                   />
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium mb-2">详情模式</h3>
                   <AgentCard
@@ -154,7 +166,7 @@ export function AgentSystemDemo() {
                     defaultExpanded={false}
                   />
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium mb-2">管理模式</h3>
                   <AgentCard
@@ -166,7 +178,7 @@ export function AgentSystemDemo() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>选择卡片</CardTitle>
@@ -178,33 +190,37 @@ export function AgentSystemDemo() {
                   <AgentSelectCard
                     agent={exampleAgent}
                     selected={false}
-                    onSelect={(agent, selected) => alert(`选择状态: ${selected}`)}
+                    onSelect={(_, selected) =>
+                      alert(`选择状态: ${selected}`)
+                    }
                     description="可选择的Agent卡片"
                   />
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium mb-2">已选择状态</h3>
                   <AgentSelectCard
                     agent={exampleAgent}
                     selected={true}
-                    onSelect={(agent, selected) => alert(`选择状态: ${selected}`)}
+                    onSelect={(_, selected) =>
+                      alert(`选择状态: ${selected}`)
+                    }
                     description="已选择的Agent卡片"
                   />
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium mb-2">禁用状态</h3>
                   <AgentSelectCard
                     agent={exampleAgent}
                     disabled={true}
-                    onSelect={(agent, selected) => alert(`选择状态: ${selected}`)}
+                    onSelect={(_, selected) => alert(`选择状态: ${selected}`)}
                     description="禁用的Agent卡片"
                   />
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>聊天卡片</CardTitle>
@@ -222,7 +238,7 @@ export function AgentSystemDemo() {
                     onClick={() => alert("点击聊天卡片")}
                   />
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium mb-2">非活跃状态</h3>
                   <AgentChatCard
@@ -235,7 +251,7 @@ export function AgentSystemDemo() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>组合卡片</CardTitle>
@@ -247,21 +263,21 @@ export function AgentSystemDemo() {
                   description="专注于概念转化和模式识别的高级思维团队"
                   moderator={{
                     id: MODERATOR_IDS.THINKING_MODERATOR,
-                    ...MODERATORS_MAP[MODERATOR_IDS.THINKING_MODERATOR]
+                    ...MODERATORS_MAP[MODERATOR_IDS.THINKING_MODERATOR],
                   }}
                   participants={[
                     {
                       id: PARTICIPANT_IDS.CONCEPT_ALCHEMIST,
-                      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.CONCEPT_ALCHEMIST]
+                      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.CONCEPT_ALCHEMIST],
                     },
                     {
                       id: PARTICIPANT_IDS.PATTERN_LINGUIST,
-                      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.PATTERN_LINGUIST]
+                      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.PATTERN_LINGUIST],
                     },
                     {
                       id: PARTICIPANT_IDS.COGNITIVE_DETECTIVE,
-                      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE]
-                    }
+                      ...PARTICIPANTS_MAP[PARTICIPANT_IDS.COGNITIVE_DETECTIVE],
+                    },
                   ]}
                   onClick={() => alert("选择组合")}
                 />
@@ -269,7 +285,7 @@ export function AgentSystemDemo() {
             </Card>
           </div>
         </TabsContent>
-        
+
         {/* 列表组件 */}
         <TabsContent value="lists">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -288,7 +304,7 @@ export function AgentSystemDemo() {
                 />
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Agent选择列表</CardTitle>
@@ -304,7 +320,7 @@ export function AgentSystemDemo() {
                 />
               </CardContent>
             </Card>
-            
+
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle>组合列表</CardTitle>
@@ -320,7 +336,7 @@ export function AgentSystemDemo() {
             </Card>
           </div>
         </TabsContent>
-        
+
         {/* 对话框 */}
         <TabsContent value="dialogs">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -335,7 +351,7 @@ export function AgentSystemDemo() {
                 </Button>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>编辑Agent对话框</CardTitle>
@@ -352,4 +368,4 @@ export function AgentSystemDemo() {
       </Tabs>
     </div>
   );
-} 
+}

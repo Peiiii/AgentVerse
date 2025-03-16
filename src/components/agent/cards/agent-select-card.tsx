@@ -42,6 +42,11 @@ export const AgentSelectCard: React.FC<AgentSelectCardProps> = ({
     }
   };
   
+  // 阻止额外信息区域的点击事件冒泡
+  const handleExtraInfoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+  
   return (
     <div 
       className={cn(
@@ -83,8 +88,12 @@ export const AgentSelectCard: React.FC<AgentSelectCardProps> = ({
         )}
       </div>
       
-      {/* 渲染额外信息 */}
-      {renderExtraInfo && renderExtraInfo(agent)}
+      {/* 渲染额外信息 - 添加点击事件阻止冒泡 */}
+      {renderExtraInfo && (
+        <div onClick={handleExtraInfoClick}>
+          {renderExtraInfo(agent)}
+        </div>
+      )}
     </div>
   );
 }; 

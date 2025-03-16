@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { WelcomeHeader } from "./welcome-header";
-import { InitialInput } from "./initial-input";
-import { TeamDetailsDialog } from "./team-details-dialog";
-import { cn } from "@/lib/utils";
+import { CustomTeamDialog } from "@/components/agent/dialogs/custom-team-dialog";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/config/agents";
 import { useAgents } from "@/hooks/useAgents";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useState } from "react";
 import { AgentPopover } from "./agent-popover";
-import { CustomTeamDialog } from "@/components/agent/dialogs/custom-team-dialog";
+import { InitialInput } from "./initial-input";
+import { TeamDetailsDialog } from "./team-details-dialog";
+import { WelcomeHeader } from "./welcome-header";
 
 interface InitialExperienceProps {
   onStart: (
@@ -45,33 +45,31 @@ export function InitialExperience({
       const combinationMembers = [
         combination.moderator,
         ...combination.participants,
-      ].map((role) => {
-        const agent = agents.find((a) => a.name === role.name);
-        return agent
-          ? {
-              agentId: agent.id,
-              isAutoReply: agent.name === combination.moderator.name,
-            }
-          : null;
-      }).filter(Boolean) as { agentId: string; isAutoReply: boolean }[];
+      ]
+        .map((role) => {
+          const agent = agents.find((a) => a.name === role.name);
+          return agent
+            ? {
+                agentId: agent.id,
+                isAutoReply: agent.name === combination.moderator.name,
+              }
+            : null;
+        })
+        .filter(Boolean) as { agentId: string; isAutoReply: boolean }[];
 
       onStart(inputTopic, combinationMembers);
     }
   };
 
   const { openCustomTeamDialog } = CustomTeamDialog.useCustomTeamDialog();
-  
+
   const handleCustomTeamClick = () => {
-    openCustomTeamDialog(
-      agents,
-      customMembers,
-      (selected) => {
-        setCustomMembers(selected);
-        if (topic && selected.length > 0) {
-          onStart(topic, selected);
-        }
+    openCustomTeamDialog(agents, customMembers, (selected) => {
+      setCustomMembers(selected);
+      if (topic && selected.length > 0) {
+        onStart(topic, selected);
       }
-    );
+    });
   };
 
   // 处理组合选择

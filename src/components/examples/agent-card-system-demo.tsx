@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  AgentCard, 
-  AgentSelectCard, 
-  AgentChatCard, 
-  AgentGroupCard 
+import {
+  AgentCard,
+  AgentChatCard,
+  AgentGroupCard,
+  AgentSelectCard
 } from "@/components/agent/cards";
 import {
-  AgentSelectList,
-  AgentCombinationList
+  AgentCombinationList,
+  AgentSelectList
 } from "@/components/agent/lists";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AgentCombinationType, MODERATOR_IDS, MODERATORS_MAP, PARTICIPANT_IDS, PARTICIPANTS_MAP } from "@/config/agents/index";
 import { Agent } from "@/types/agent";
-import { AgentCombinationType, PARTICIPANTS_MAP, MODERATORS_MAP, PARTICIPANT_IDS, MODERATOR_IDS } from "@/config/agents/index";
+import { useState } from "react";
 
 export function AgentCardSystemDemo() {
   // 示例Agent数据
@@ -184,21 +184,21 @@ export function AgentCardSystemDemo() {
                 <AgentSelectCard
                   agent={exampleAgent}
                   selected={false}
-                  onSelect={(agent, selected) => alert(`选择状态: ${selected}`)}
+                  onSelect={(_, selected) => alert(`选择状态: ${selected}`)}
                   description="可选择的Agent卡片"
                 />
                 
                 <AgentSelectCard
                   agent={exampleAgent}
                   selected={true}
-                  onSelect={(agent, selected) => alert(`选择状态: ${selected}`)}
+                  onSelect={(_, selected) => alert(`选择状态: ${selected}`)}
                   description="已选择的Agent卡片"
                 />
                 
                 <AgentSelectCard
                   agent={exampleAgent}
                   disabled={true}
-                  onSelect={(agent, selected) => alert(`选择状态: ${selected}`)}
+                  onSelect={(_, selected) => alert(`选择状态: ${selected}`)}
                   description="禁用的Agent卡片"
                 />
               </div>
