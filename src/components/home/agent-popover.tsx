@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { AgentCard } from "./agent-card";
+import { AgentCard } from "@/components/agent/cards";
 import {
   Popover,
   PopoverContent,
@@ -67,10 +67,13 @@ export const AgentPopover: React.FC<AgentPopoverProps> = ({
       </PopoverTrigger>
       <PopoverContent className={cn("w-80 p-0", className)} align="start">
         <AgentCard
-          name={name}
-          avatar={safeAvatar}
-          role={role}
-          expertise={expertise}
+          agent={{
+            name,
+            avatar: safeAvatar,
+            role,
+            expertise
+          }}
+          mode="preview"
           description={description}
         />
       </PopoverContent>

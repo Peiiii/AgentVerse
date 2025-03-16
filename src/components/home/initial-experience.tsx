@@ -5,13 +5,9 @@ import { InitialInput } from "./initial-input";
 import { TeamDetailsDialog } from "./team-details-dialog";
 import { cn } from "@/lib/utils";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/config/agents";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Check, Search, X } from "lucide-react";
 import { useAgents } from "@/hooks/useAgents";
-import { useModal } from "@/components/ui/modal";
-import { Agent } from "@/types/agent";
 import { AgentPopover } from "./agent-popover";
+import { CustomTeamDialog } from "@/components/agent/dialogs/custom-team-dialog";
 
 interface InitialExperienceProps {
   onStart: (
@@ -22,156 +18,6 @@ interface InitialExperienceProps {
   onChangeTeam?: (key: AgentCombinationType) => void;
   className?: string;
 }
-
-// 自定义团队选择器组件的Props类型
-interface CustomTeamSelectorProps {
-  agents: Agent[];
-  getAgentName: (id: string) => string;
-  getAgentAvatar: (id: string) => string;
-  initialSelected: { agentId: string; isAutoReply: boolean }[];
-  onConfirm: (selected: { agentId: string; isAutoReply: boolean }[]) => void;
-  onCancel: () => void;
-}
-
-// 自定义团队选择器组件
-const CustomTeamSelector: React.FC<CustomTeamSelectorProps> = ({
-  agents,
-  getAgentName,
-  getAgentAvatar,
-  initialSelected,
-  onConfirm,
-  onCancel,
-}) => {
-  const [selectedMembers, setSelectedMembers] =
-    useState<{ agentId: string; isAutoReply: boolean }[]>(initialSelected);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // 过滤代理列表
-  const filteredAgents = agents.filter((agent) => {
-    if (!searchQuery) return true;
-    const name = getAgentName(agent.id).toLowerCase();
-    const query = searchQuery.toLowerCase();
-    return (
-      name.includes(query) || agent.personality?.toLowerCase().includes(query)
-    );
-  });
-
-  return (
-    <div className="space-y-4">
-      {/* 搜索框 */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="搜索专家..."
-          className="pl-9"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery && (
-          <button
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            onClick={() => setSearchQuery("")}
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 max-h-[60vh] overflow-y-auto">
-        {filteredAgents.map((agent) => {
-          const isSelected = selectedMembers.some(
-            (m) => m.agentId === agent.id
-          );
-          return (
-            <div
-              key={agent.id}
-              className={cn(
-                "p-4 rounded-lg border cursor-pointer transition-colors",
-                isSelected
-                  ? "border-primary bg-primary/5"
-                  : "hover:border-primary/50"
-              )}
-              onClick={() => {
-                const newMembers = [...selectedMembers];
-                const existingIndex = newMembers.findIndex(
-                  (m) => m.agentId === agent.id
-                );
-
-                if (existingIndex >= 0) {
-                  newMembers.splice(existingIndex, 1);
-                } else {
-                  newMembers.push({ agentId: agent.id, isAutoReply: true });
-                }
-
-                setSelectedMembers(newMembers);
-                console.log("已选择成员:", newMembers.length, newMembers);
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
-                  <img
-                    src={getAgentAvatar(agent.id)}
-                    alt={getAgentName(agent.id)}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // 如果头像加载失败，使用默认头像
-                      (e.target as HTMLImageElement).src =
-                        "/avatars/default.png";
-                    }}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-medium text-sm md:text-base">
-                      {getAgentName(agent.id)}
-                    </h3>
-                    <span className="text-xs text-muted-foreground capitalize whitespace-nowrap">
-                      {agent.role}
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-1">
-                    {agent.personality}
-                  </p>
-                </div>
-                {isSelected && (
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex justify-between gap-2 pt-2">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setSelectedMembers([]);
-            console.log("已清空选择");
-          }}
-        >
-          清空选择
-        </Button>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onCancel}>
-            取消
-          </Button>
-          <Button
-            onClick={() => onConfirm(selectedMembers)}
-            disabled={selectedMembers.length === 0}
-            className={
-              selectedMembers.length > 0
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : ""
-            }
-          >
-            确认选择
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export function InitialExperience({
   onStart,
@@ -187,7 +33,6 @@ export function InitialExperience({
   const [selectedCombinationKey, setSelectedCombinationKey] =
     useState<AgentCombinationType>("thinkingTeam");
   const { agents, getAgentName, getAgentAvatar } = useAgents();
-  const modal = useModal();
 
   const handleInputSubmit = (inputTopic: string) => {
     setTopic(inputTopic);
@@ -214,28 +59,19 @@ export function InitialExperience({
     }
   };
 
+  const { openCustomTeamDialog } = CustomTeamDialog.useCustomTeamDialog();
+  
   const handleCustomTeamClick = () => {
-    modal.show({
-      title: "自定义专家团队",
-      content: (
-        <CustomTeamSelector
-          agents={agents}
-          getAgentName={getAgentName}
-          getAgentAvatar={getAgentAvatar}
-          initialSelected={customMembers}
-          onConfirm={(selected) => {
-            setCustomMembers(selected);
-            if (topic && selected.length > 0) {
-              onStart(topic, selected);
-            }
-            modal.close();
-          }}
-          onCancel={() => modal.close()}
-        />
-      ),
-      className: "max-w-4xl",
-      showFooter: false,
-    });
+    openCustomTeamDialog(
+      agents,
+      customMembers,
+      (selected) => {
+        setCustomMembers(selected);
+        if (topic && selected.length > 0) {
+          onStart(topic, selected);
+        }
+      }
+    );
   };
 
   // 处理组合选择
