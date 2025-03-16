@@ -1,5 +1,8 @@
-import { AgentForm } from "@/components/agent/agent-form";
-import { AgentList } from "@/components/agent/lists/agent-list";
+import React from "react";
+import { useCallback } from "react";
+import { useModal } from "@/components/ui/modal";
+import { AgentForm } from "../agent-form";
+import { AgentList } from "../lists/agent-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAgentForm } from "@/hooks/useAgentForm";
@@ -7,7 +10,10 @@ import { useAgents } from "@/hooks/useAgents";
 import { Loader2, PlusCircle, Search } from "lucide-react";
 import match from "pinyin-match";
 import { useMemo, useState } from "react";
+import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { cn } from "@/lib/utils";
 
+// 对话框内容组件
 export function AddAgentDialogContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const { agents, isLoading, addAgent, updateAgent, deleteAgent } = useAgents();
@@ -18,6 +24,8 @@ export function AddAgentDialogContent() {
     handleEditAgent,
     handleSubmit,
   } = useAgentForm(agents, updateAgent);
+  
+  const { isMobile } = useBreakpointContext();
 
   // 使用 useMemo 优化搜索过滤逻辑
   const filteredAgents = useMemo(() => {
@@ -44,27 +52,42 @@ export function AddAgentDialogContent() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* 固定的头部搜索区域 */}
       <div className="flex-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex items-center gap-4 p-4">
+        <div className={cn("flex items-center gap-4", isMobile ? "p-3" : "p-4")}>
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <Search className={cn(
+              "absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/50",
+              isMobile ? "h-3.5 w-3.5" : "h-4 w-4"
+            )} />
             <Input
               placeholder="搜索 Agent..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 bg-muted/20 border-border/50 focus:bg-background/60"
+              className={cn(
+                "pl-9 bg-muted/20 border-border/50 focus:bg-background/60",
+                isMobile ? "h-8 text-sm" : "h-9"
+              )}
             />
           </div>
           <Button
             onClick={addAgent}
             variant="default"
-            size="sm"
+            size={isMobile ? "sm" : "default"}
             disabled={isLoading}
-            className="h-9 px-4 shrink-0"
+            className={cn(
+              "px-4 shrink-0",
+              isMobile ? "h-8 text-xs" : "h-9"
+            )}
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className={cn(
+                "mr-2 animate-spin",
+                isMobile ? "w-3 h-3" : "w-4 h-4"
+              )} />
             ) : (
-              <PlusCircle className="w-4 h-4 mr-2" />
+              <PlusCircle className={cn(
+                "mr-2",
+                isMobile ? "w-3 h-3" : "w-4 h-4"
+              )} />
             )}
             添加 Agent
           </Button>
@@ -73,7 +96,7 @@ export function AddAgentDialogContent() {
 
       {/* 可滚动的内容区域 */}
       <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
+        <div className={cn(isMobile ? "p-3" : "p-4")}>
           <AgentList
             agents={filteredAgents}
             loading={isLoading}
@@ -91,4 +114,36 @@ export function AddAgentDialogContent() {
       />
     </div>
   );
-} 
+}
+
+// 钩子函数，用于打开对话框
+export function useAddAgentDialog() {
+  const modal = useModal();
+  const { isMobile } = useBreakpointContext();
+
+  const openAddAgentDialog = useCallback(() => {
+    modal.show({
+      title: "Agent 管理",
+      content: <AddAgentDialogContent />,
+      // 使用 className 来控制样式
+      className: cn(
+        "overflow-hidden",
+        isMobile 
+          ? "w-[95vw] h-[90vh]" 
+          : "sm:max-w-3xl sm:h-[85vh]"
+      ),
+      // 不需要底部按钮
+      showFooter: false
+    });
+  }, [modal, isMobile]);
+
+  return {
+    openAddAgentDialog
+  };
+}
+
+// 导出组件
+export const AddAgentDialog = {
+  Content: AddAgentDialogContent,
+  useAddAgentDialog
+}; 
