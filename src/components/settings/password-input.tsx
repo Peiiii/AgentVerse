@@ -10,7 +10,7 @@ interface PasswordInputProps {
 }
 
 export function PasswordInput({ value, onChange, placeholder }: PasswordInputProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible] = useState(false);
 
   return (
     <div className="relative">
@@ -26,7 +26,7 @@ export function PasswordInput({ value, onChange, placeholder }: PasswordInputPro
         variant="ghost"
         size="icon"
         className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-        onClick={() => setIsVisible(!isVisible)}
+        // onClick={() => setIsVisible(!isVisible)}
         tabIndex={-1} // 防止 Tab 键聚焦
       >
         {isVisible ? (

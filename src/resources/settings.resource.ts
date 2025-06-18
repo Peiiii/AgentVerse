@@ -4,7 +4,7 @@ import { createResource } from "@/lib/resource";
 import { aiService } from "@/services/ai.service";
 import { settingsService } from "@/services/settings.service";
 import { SupportedAIProvider } from "@/types/ai";
-import { AIProviderSettingSchema, SettingItem } from "@/types/settings";
+import { AIProviderSettingSchema, AutoFillStrategy, SettingItem } from "@/types/settings";
 
 const getDefaultAiProviderConfig: () => AIProviderSettingSchema = () => {
   const providerName = BasicAIConfig.AI_PROVIDER_NAME;
@@ -16,6 +16,16 @@ const getDefaultAiProviderConfig: () => AIProviderSettingSchema = () => {
     model: provider.model,
   };
 };
+
+export const autoFillStrategies: AutoFillStrategy[] = Object.entries(AI_PROVIDER_CONFIG).map(([key, value]) => ({
+  settingKey: SETTING_KYES.AI.PROVIDER.ID,
+  whenValueSatisfies: key as SupportedAIProvider,
+  fillItems: [
+    { settingKey: SETTING_KYES.AI.PROVIDER.API_URL, value: value.baseUrl },
+    { settingKey: SETTING_KYES.AI.PROVIDER.API_KEY, value: value.apiKey },
+    { settingKey: SETTING_KYES.AI.PROVIDER.MODEL, value: value.model },
+  ],
+}));
 
 // 默认设置
 const defaultSettings: Omit<SettingItem, "id">[] = [
@@ -78,6 +88,8 @@ const defaultSettings: Omit<SettingItem, "id">[] = [
     },
   },
 ];
+
+
 
 export const recoverDefaultSettings = async () => {
   const settings = await settingsService.listSettings();

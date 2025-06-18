@@ -3,6 +3,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useEffect, useMemo, useState } from "react";
 import { SettingsList } from "./settings-list";
 import { CategoryList } from "./category-list";
+import { autoFillStrategies } from "@/resources/settings.resource";
 
 export const SettingsPanel: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>();
@@ -34,7 +35,11 @@ export const SettingsPanel: React.FC = () => {
 
       <div className="flex-1 p-4 overflow-auto">
         {activeCategory ? (
-          <SettingsList settings={currentSettings} onUpdate={updateSetting} />
+          <SettingsList
+            settings={currentSettings}
+            autoFillStrategies={autoFillStrategies}
+            onUpdate={updateSetting}
+          />
         ) : (
           <div className="text-center text-muted-foreground">
             请选择设置分类

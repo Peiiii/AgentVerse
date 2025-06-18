@@ -33,3 +33,12 @@ export interface SettingCategory {
   icon?: string;
   order?: number;
 }
+
+export interface AutoFillStrategy<TValue = unknown> {
+  settingKey: string;
+  whenValueSatisfies: TValue;
+  fillItems: {
+    settingKey: string;
+    value: unknown;
+  }[];
+}
