@@ -1,1 +1,0 @@
-# ossutil64 cp -r -u dist oss://agentverse -c ./.ossutilconfig2.local
