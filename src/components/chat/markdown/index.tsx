@@ -44,11 +44,12 @@ export function DiscussionMarkdown({
   );
 
   const finalRehypePlugins = useMemo(
-    () => [
-      rehypeHighlight as unknown as Plugin<[], Node>,
-      ...rehypePlugins,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ] as any[],
+    () =>
+      [
+        rehypeHighlight as unknown as Plugin<[], Node>,
+        ...rehypePlugins,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ] as any[],
     [rehypePlugins]
   );
 
@@ -61,7 +62,7 @@ export function DiscussionMarkdown({
         try {
           const data = JSON.parse(node.properties.value);
           // 使用 key 来帮助 React 识别和复用组件实例
-          const actionKey = `action-${JSON.stringify(data)}`; 
+          const actionKey = `action-${JSON.stringify(data)}`;
           return <ActionComponent key={actionKey} data={data} />;
         } catch (error) {
           console.error("Failed to parse action data:", error);
@@ -82,7 +83,6 @@ export function DiscussionMarkdown({
     />
   );
 }
-
 export type {
   ActionComponentProps,
   ActionData,
@@ -90,4 +90,3 @@ export type {
   DiscussionMarkdownProps,
   MarkdownActionResults,
 };
-

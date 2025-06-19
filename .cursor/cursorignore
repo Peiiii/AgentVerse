@@ -1,0 +1,73 @@
+# CursorRIPER Framework ignore patterns
+# This file helps control which files are processed by Cursor's AI features
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Build artifacts
+build/
+dist/
+out/
+.next/
+.nuxt/
+.output/
+.cache/
+.parcel-cache/
+.webpack/
+.rollup.cache/
+
+# Dependency directories
+node_modules/
+bower_components/
+jspm_packages/
+vendor/
+.pnp/
+.pnp.js
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Debug files
+.nyc_output/
+coverage/
+.coverage/
+.coverage.*
+htmlcov/
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# IDE & editor directories
+.idea/
+.vscode/
+.vs/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.vim/
+.DS_Store
+
+# Framework specific (uncomment as needed)
+# .cursor/rules/archive/
+# memory-bank/backups/
