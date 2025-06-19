@@ -38,7 +38,16 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   build: {
+    minify: false,
     rollupOptions: {
+      external: (id) => {
+        // 排除测试文件
+        return id.includes('__tests__') || 
+               id.includes('.test.') || 
+               id.includes('.spec.') ||
+               id.includes('jest') ||
+               id.includes('@testing-library');
+      },
       output: {
         manualChunks(id) {
           // 处理第三方依赖
@@ -49,6 +58,12 @@ export default defineConfig({
                 return `vendor-${name}`;
               }
             }
+            
+            // RxJS 相关依赖保持在一起，避免模块导入问题
+            if (id.includes('rxjs') || id.includes('scheduler')) {
+              return 'vendor-main';
+            }
+            
             // 其他第三方依赖
             return 'vendor-others';
           }
