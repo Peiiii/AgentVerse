@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useAgents } from "@/hooks/useAgents";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { useModal } from "@/components/ui/modal";
 import { cn, formatTime } from "@/lib/utils";
@@ -15,6 +14,7 @@ import { Download, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { DiscussionItemProps } from "./types";
 import { DiscussionMember } from "@/types/discussion-member";
+import { DiscussionAvatar } from "./discussion-avatar";
 
 export function DiscussionItem({
   discussion,
@@ -23,7 +23,6 @@ export function DiscussionItem({
   onRename,
   onDelete,
 }: DiscussionItemProps) {
-  const { agents, getAgentName, getAgentAvatar } = useAgents();
   const { getMembersForDiscussion } = useDiscussionMembers();
   const [members, setMembers] = useState<DiscussionMember[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -101,40 +100,7 @@ export function DiscussionItem({
       }}
     >
       {/* 群组头像 */}
-      <div className={cn(
-        "w-[30px] h-[30px] bg-muted/40 rounded-[3px] shrink-0 overflow-hidden",
-        "shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]",
-        members.length > 1 ? "grid grid-cols-2 gap-[1px] p-[1px]" : "flex items-center justify-center"
-      )}>
-        {members.length > 0 ? (
-          members.length === 1 ? (
-            // 单人头像
-            <img
-              src={getAgentAvatar(members[0].agentId)}
-              alt={getAgentName(members[0].agentId)}
-              className="w-[28px] h-[28px] rounded-[2px] object-cover"
-            />
-          ) : (
-            // 多人头像网格
-            members.slice(0, 4).map((member) => {
-              const agent = agents.find((a) => a.id === member.agentId);
-              if (!agent) return null;
-              return (
-                <div key={member.id} className="relative aspect-square">
-                  <img
-                    src={getAgentAvatar(agent.id)}
-                    alt={getAgentName(agent.id)}
-                    className="w-full h-full rounded-[1px] object-cover"
-                  />
-                </div>
-              );
-            })
-          )
-        ) : (
-          // 空状态
-          <div className="w-[28px] h-[28px] rounded-[2px] bg-muted/30" />
-        )}
-      </div>
+      <DiscussionAvatar members={members} size="sm" />
 
       {/* 内容区 */}
       <div className="flex-1 min-w-0 ml-2">
