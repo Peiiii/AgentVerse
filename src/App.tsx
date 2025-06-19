@@ -6,7 +6,7 @@ import { DiscussionController } from "@/components/discussion/control/discussion
 import { DiscussionList } from "@/components/discussion/list/discussion-list";
 import { MemberList } from "@/components/discussion/member/member-list";
 import { MobileMemberDrawer } from "@/components/discussion/member/mobile-member-drawer";
-import { ActivityBar } from "@/components/layout/activity-bar";
+import { ActivityBarComponent } from "@/components/layout/activity-bar";
 import { MobileBottomBar } from "@/components/layout/mobile-bottom-bar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { ResponsiveContainer } from "@/components/layout/responsive-container";
@@ -235,7 +235,7 @@ function AppContent() {
       <div className="fixed inset-0 flex flex-col" style={{ height }}>
         <div className={cn(rootClassName, "flex flex-col h-full")}>
           <div className="flex-1 min-h-0 flex">
-            <ActivityBar className="flex" />
+            <ActivityBarComponent className="flex" />
             <div className="flex-1 flex justify-center w-full">
               <div className="w-full max-w-[1920px]">
                 <ResponsiveContainer

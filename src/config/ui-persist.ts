@@ -5,6 +5,8 @@ export const UI_PERSIST_KEYS = {
     MEMBER_PANEL_VISIBLE: 'discussion:member_panel_visible',
     SETTINGS_PANEL_VISIBLE: 'discussion:settings_panel_visible',
   },
+  // 活动栏相关
+  ACTIVITY_BAR_EXPANDED: 'activity_bar:expanded',
   // 其他功能模块
   // CHAT: {
   //   SIDEBAR_VISIBLE: 'chat:sidebar_visible',
@@ -16,6 +18,7 @@ export const UI_PERSIST_KEYS = {
 export const UI_PERSIST_VERSIONS = {
   [UI_PERSIST_KEYS.DISCUSSION.MEMBER_PANEL_VISIBLE]: 1,
   [UI_PERSIST_KEYS.DISCUSSION.SETTINGS_PANEL_VISIBLE]: 1,
+  [UI_PERSIST_KEYS.ACTIVITY_BAR_EXPANDED]: 1,
 } as const;
 
 /**
