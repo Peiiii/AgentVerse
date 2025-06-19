@@ -14,7 +14,7 @@ interface ActivityBarProps {
 export function ActivityBarComponent({ className }: ActivityBarProps) {
   const { openAddAgentDialog } = useAddAgentDialog();
   const { openSettingsDialog } = useSettingsDialog();
-  const [expanded, setExpanded] = usePersistedState(true, {
+  const [expanded, setExpanded] = usePersistedState(false, {
     key: UI_PERSIST_KEYS.ACTIVITY_BAR_EXPANDED,
     version: 1,
   });

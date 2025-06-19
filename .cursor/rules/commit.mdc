@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 不要未经授权就commit
 如果用户需要commit，请使用英文message， 默认git add .
