@@ -21,29 +21,35 @@ export function ResponsiveContainer({
   const { isLessThan } = useBreakpointContext();
 
   return (
-    <div className={cn("h-full w-full overflow-hidden flex", className)}>
+    <div className={cn("h-full w-full overflow-hidden flex", className)} data-component="responsive-container">
       {sidebarContent && (
         <>
+          {/* 移动端遮罩 */}
+          {isLessThan("lg") && showMobileSidebar && (
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm z-40"
+              onClick={() => onMobileSidebarChange?.(false)}
+            />
+          )}
+          
+          {/* Sidebar */}
           <div
+            data-component="sidebar-wrapper"
             className={cn(
-              "w-[280px] h-full border-r border-border bg-card",
-              "fixed lg:relative inset-y-0 left-0 z-50",
-              "transform transition-transform duration-300 ease-in-out",
-              showMobileSidebar
-                ? "translate-x-0"
-                : "-translate-x-full lg:translate-x-0"
+              "w-[280px] h-full border-r border-border bg-card flex-shrink-0",
+              "transition-transform duration-300 ease-in-out",
+              // 移动端：隐藏或显示
+              isLessThan("lg") && !showMobileSidebar ? "-translate-x-full" : "translate-x-0",
+              // 桌面端：始终显示
+              "lg:translate-x-0"
             )}
           >
             {sidebarContent}
           </div>
-          {isLessThan("lg") && showMobileSidebar && (
-            <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-              onClick={() => onMobileSidebarChange?.(false)}
-            />
-          )}
         </>
       )}
+      
+      {/* 主内容区域 */}
       <div className="flex-1 min-h-0 flex flex-col overflow-auto">
         {mainContent}
       </div>
