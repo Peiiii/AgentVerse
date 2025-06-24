@@ -1,11 +1,11 @@
 import { useAddAgentDialog } from "@/components/agent/add-agent-dialog/use-add-agent-dialog";
-import { useSettingsDialog } from "@/components/settings/settings-dialog";
 import { ThemeToggle } from "@/components/common/theme";
-import { ActivityBar } from "composite-kit";
-import { cn } from "@/lib/utils";
-import { Github, MessageSquare, Settings, Users } from "lucide-react";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSettingsDialog } from "@/components/settings/settings-dialog";
 import { UI_PERSIST_KEYS } from "@/config/ui-persist";
+import { usePersistedState } from "@/hooks/usePersistedState";
+import { cn } from "@/lib/utils";
+import { ActivityBar } from "composite-kit";
+import { Github, MessageSquare, Settings, Users } from "lucide-react";
 
 interface ActivityBarProps {
   className?: string;
@@ -27,7 +27,9 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     setExpanded(newExpanded);
   };
 
+
   const handleActiveChange = (activeId: string) => {
+    console.log("[handleActiveChange] activeId", activeId);
     // 根据活动项执行相应操作
     switch (activeId) {
       case "agents":
@@ -60,15 +62,15 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
 
       <ActivityBar.GroupList>
         <ActivityBar.Group title="主要功能">
-          <ActivityBar.Item 
-            id="chat" 
-            icon={<MessageSquare className="w-4 h-4" />} 
-            label="聊天" 
+          <ActivityBar.Item
+            id="chat"
+            icon={<MessageSquare className="w-4 h-4" />}
+            label="聊天"
           />
-          <ActivityBar.Item 
-            id="agents" 
-            icon={<Users className="w-4 h-4" />} 
-            label="智能体" 
+          <ActivityBar.Item
+            id="agents"
+            icon={<Users className="w-4 h-4" />}
+            label="智能体"
           />
         </ActivityBar.Group>
       </ActivityBar.GroupList>
@@ -76,15 +78,15 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       <ActivityBar.Footer>
         <ActivityBar.Separator />
         <ActivityBar.Group>
-          <ActivityBar.Item 
-            id="settings" 
-            icon={<Settings className="w-4 h-4" />} 
-            label="设置" 
+          <ActivityBar.Item
+            id="settings"
+            icon={<Settings className="w-4 h-4" />}
+            label="设置"
           />
-          <ActivityBar.Item 
-            id="github" 
-            icon={<Github className="w-4 h-4" />} 
-            label="GitHub" 
+          <ActivityBar.Item
+            id="github"
+            icon={<Github className="w-4 h-4" />}
+            label="GitHub"
             title="访问 GitHub 仓库"
           />
         </ActivityBar.Group>
