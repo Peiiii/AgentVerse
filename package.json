@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "pnpm build && ossutil64 cp -r -u dist oss://apps-eiooie-com/muti-chat -c ./.ossutilconfig.local",
     "deploy2": "pnpm build && ossutilmac64 cp -r -u dist oss://agentverse -c ./.ossutilconfig2.local",
@@ -60,7 +60,8 @@
     "rx-nested-bean": "workspace:*",
     "rxjs": "^7.8.1",
     "tailwind-merge": "^2.5.5",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.25.9",

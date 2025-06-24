@@ -1,55 +1,47 @@
-import { useAddAgentDialog } from "@/components/agent/add-agent-dialog/use-add-agent-dialog";
 import { ThemeToggle } from "@/components/common/theme";
-import { useSettingsDialog } from "@/components/settings/settings-dialog";
-import { UI_PERSIST_KEYS } from "@/config/ui-persist";
-import { usePersistedState } from "@/hooks/usePersistedState";
 import { cn } from "@/lib/utils";
 import { ActivityBar } from "composite-kit";
 import { Github, MessageSquare, Settings, Users } from "lucide-react";
+import { useActivityBarService } from "@/services/activity-bar.service";
+import { ActivityItem } from "@/stores/activity-bar.store";
 
 interface ActivityBarProps {
   className?: string;
 }
 
 export function ActivityBarComponent({ className }: ActivityBarProps) {
-  const { openAddAgentDialog } = useAddAgentDialog();
-  const { openSettingsDialog } = useSettingsDialog();
-  const [expanded, setExpanded] = usePersistedState(false, {
-    key: UI_PERSIST_KEYS.ACTIVITY_BAR_EXPANDED,
-    version: 1,
-  });
+  const {
+    expanded,
+    setExpanded,
+    activeId,
+    handleItemClick,
+    items,
+  } = useActivityBarService();
 
-  const handleGithubClick = () => {
-    window.open("https://github.com/Peiiii/AgentVerse", "_blank");
+  // 从items中按组筛选，避免重复订阅
+  const mainGroupItems = items.filter(item => item.group === '主要功能');
+  const footerItems = items.filter(item => item.group === 'footer');
+
+  // 图标映射
+  const iconMap = {
+    chat: <MessageSquare className="w-4 h-4" />,
+    agents: <Users className="w-4 h-4" />,
+    settings: <Settings className="w-4 h-4" />,
+    github: <Github className="w-4 h-4" />,
   };
 
   const handleExpandedChange = (newExpanded: boolean) => {
     setExpanded(newExpanded);
   };
 
-
   const handleActiveChange = (activeId: string) => {
-    console.log("[handleActiveChange] activeId", activeId);
-    // 根据活动项执行相应操作
-    switch (activeId) {
-      case "agents":
-        openAddAgentDialog();
-        break;
-      case "settings":
-        openSettingsDialog();
-        break;
-      case "github":
-        handleGithubClick();
-        break;
-      default:
-        break;
-    }
+    handleItemClick(activeId);
   };
 
   return (
     <ActivityBar.Root
       expanded={expanded}
-      defaultActiveId="chat"
+      defaultActiveId={activeId}
       onExpandedChange={handleExpandedChange}
       onActiveChange={handleActiveChange}
       className={cn("flex-shrink-0", className)}
@@ -62,33 +54,30 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
 
       <ActivityBar.GroupList>
         <ActivityBar.Group title="主要功能">
-          <ActivityBar.Item
-            id="chat"
-            icon={<MessageSquare className="w-4 h-4" />}
-            label="聊天"
-          />
-          <ActivityBar.Item
-            id="agents"
-            icon={<Users className="w-4 h-4" />}
-            label="智能体"
-          />
+          {mainGroupItems.map((item: ActivityItem) => (
+            <ActivityBar.Item
+              key={item.id}
+              id={item.id}
+              icon={item.icon || iconMap[item.id as keyof typeof iconMap]}
+              label={item.label}
+              title={item.title}
+            />
+          ))}
         </ActivityBar.Group>
       </ActivityBar.GroupList>
 
       <ActivityBar.Footer>
         <ActivityBar.Separator />
         <ActivityBar.Group>
-          <ActivityBar.Item
-            id="settings"
-            icon={<Settings className="w-4 h-4" />}
-            label="设置"
-          />
-          <ActivityBar.Item
-            id="github"
-            icon={<Github className="w-4 h-4" />}
-            label="GitHub"
-            title="访问 GitHub 仓库"
-          />
+          {footerItems.map((item: ActivityItem) => (
+            <ActivityBar.Item
+              key={item.id}
+              id={item.id}
+              icon={item.icon || iconMap[item.id as keyof typeof iconMap]}
+              label={item.label}
+              title={item.title}
+            />
+          ))}
         </ActivityBar.Group>
         <ActivityBar.Separator />
         <div className="px-3 py-2">
