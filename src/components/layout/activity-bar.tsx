@@ -1,10 +1,10 @@
 import { ThemeToggle } from "@/components/common/theme";
 import { cn } from "@/lib/utils";
 import { ActivityBar } from "composite-kit";
-import { Github, MessageSquare, Settings, Users } from "lucide-react";
+import { IconRegistry } from "@/components/common/icon-registry";
 import { useActivityBarService } from "@/services/activity-bar.service";
 import { ActivityItem } from "@/stores/activity-bar.store";
-
+import {LayoutDashboard } from "lucide-react"
 interface ActivityBarProps {
   className?: string;
 }
@@ -22,13 +22,6 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
   const mainGroupItems = items.filter(item => item.group === '主要功能');
   const footerItems = items.filter(item => item.group === 'footer');
 
-  // 图标映射
-  const iconMap = {
-    chat: <MessageSquare className="w-4 h-4" />,
-    agents: <Users className="w-4 h-4" />,
-    settings: <Settings className="w-4 h-4" />,
-    github: <Github className="w-4 h-4" />,
-  };
 
   const handleExpandedChange = (newExpanded: boolean) => {
     setExpanded(newExpanded);
@@ -47,7 +40,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       className={cn("flex-shrink-0", className)}
     >
       <ActivityBar.Header
-        icon={<MessageSquare className="w-5 h-5" />}
+        icon={<LayoutDashboard className="w-5 h-5" />}
         title="AgentVerse"
         showSearch={false}
       />
@@ -58,7 +51,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
             <ActivityBar.Item
               key={item.id}
               id={item.id}
-              icon={item.icon || iconMap[item.id as keyof typeof iconMap]}
+              icon={<IconRegistry id={item.icon} />}
               label={item.label}
               title={item.title}
             />
@@ -73,7 +66,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
             <ActivityBar.Item
               key={item.id}
               id={item.id}
-              icon={item.icon || iconMap[item.id as keyof typeof iconMap]}
+              icon={<IconRegistry id={item.icon} />}
               label={item.label}
               title={item.title}
             />

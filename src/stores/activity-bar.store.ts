@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface ActivityItem {
   id: string;
-  icon?: React.ReactNode;
+  icon: string;
   label: string;
   title?: string;
   group?: string;
@@ -41,91 +41,89 @@ const defaultItems: ActivityItem[] = [
     label: '聊天',
     group: '主要功能',
     isActive: true,
+    icon: "message"
   },
   {
     id: 'agents',
     label: '智能体',
     group: '主要功能',
+    icon: "bot"
   },
   {
     id: 'settings',
     label: '设置',
     group: 'footer',
+    icon: "settings"
   },
   {
     id: 'github',
     label: 'GitHub',
     title: '访问 GitHub 仓库',
     group: 'footer',
+    icon: "github"
   },
 ];
 
 export const useActivityBarStore = create<ActivityBarState>()(
-  persist(
-    (set) => ({
-      items: defaultItems,
-      activeId: 'chat',
-      expanded: false,
+  (set) => ({
+    items: defaultItems,
+    activeId: 'chat',
+    expanded: false,
 
-      addItem: (item: ActivityItem) => {
-        set((state) => ({
-          items: [...state.items, item],
+    addItem: (item: ActivityItem) => {
+      set((state) => ({
+        items: [...state.items, item],
+      }));
+    },
+
+    removeItem: (id: string) => {
+      set((state) => ({
+        items: state.items.filter((item) => item.id !== id),
+        // 如果删除的是当前激活项，则激活第一个可用项
+        activeId: state.activeId === id
+          ? state.items.find(item => item.id !== id)?.id || 'chat'
+          : state.activeId,
+      }));
+    },
+
+    updateItem: (id: string, updates: Partial<ActivityItem>) => {
+      set((state) => ({
+        items: state.items.map((item) =>
+          item.id === id ? { ...item, ...updates } : item
+        ),
+      }));
+    },
+
+    setActiveId: (id: string) => {
+      set((state) => {
+        // 在一个set操作中同时更新activeId和items
+        const updatedItems = state.items.map((item) => ({
+          ...item,
+          isActive: item.id === id,
         }));
-      },
+        return {
+          activeId: id,
+          items: updatedItems,
+        };
+      });
+    },
 
-      removeItem: (id: string) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
-          // 如果删除的是当前激活项，则激活第一个可用项
-          activeId: state.activeId === id 
-            ? state.items.find(item => item.id !== id)?.id || 'chat'
-            : state.activeId,
-        }));
-      },
+    toggleExpanded: () => {
+      set((state) => ({ expanded: !state.expanded }));
+    },
 
-      updateItem: (id: string, updates: Partial<ActivityItem>) => {
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id ? { ...item, ...updates } : item
-          ),
-        }));
-      },
+    setExpanded: (expanded: boolean) => {
+      set({ expanded });
+    },
 
-      setActiveId: (id: string) => {
-        set((state) => {
-          // 在一个set操作中同时更新activeId和items
-          const updatedItems = state.items.map((item) => ({
-            ...item,
-            isActive: item.id === id,
-          }));
-          return {
-            activeId: id,
-            items: updatedItems,
-          };
-        });
-      },
-
-      toggleExpanded: () => {
-        set((state) => ({ expanded: !state.expanded }));
-      },
-
-      setExpanded: (expanded: boolean) => {
-        set({ expanded });
-      },
-
-      reset: () => {
-        set({
-          items: defaultItems,
-          activeId: 'chat',
-          expanded: false,
-        });
-      },
-    }),
-    {
-      name: 'activity-bar-storage',
-      version: 1,
-    }
-  )
+    reset: () => {
+      set({
+        items: defaultItems,
+        activeId: 'chat',
+        expanded: false,
+      });
+    },
+  }),
 );
 
 // 选择器hooks
@@ -134,7 +132,7 @@ export const useActiveId = () => useActivityBarStore((state) => state.activeId);
 export const useExpanded = () => useActivityBarStore((state) => state.expanded);
 
 // 按组获取活动项
-export const useActivityItemsByGroup = (group: string) => 
+export const useActivityItemsByGroup = (group: string) =>
   useActivityBarStore((state) => state.items.filter(item => item.group === group));
 
 // 获取主要功能组
