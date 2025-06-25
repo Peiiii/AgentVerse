@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const STARTUP_NAVIGATOR: Omit<Agent, "id"> = {
   name: "创业导航员",

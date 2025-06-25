@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { Check } from "lucide-react";
 
 export interface AgentSelectCardProps {

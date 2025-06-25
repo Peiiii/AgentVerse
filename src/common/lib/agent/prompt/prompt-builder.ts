@@ -1,12 +1,12 @@
 import { IAgentConfig } from "@/common/lib/agent";
 import { ChatMessage } from "@/common/lib/ai-service";
 import { Capability } from "@/common/lib/capabilities";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import {
   ActionResultMessage,
   AgentMessage,
   NormalMessage,
-} from "@/types/discussion";
+} from "@/common/types/discussion";
 import {
   createRolePrompt,
   formatActionResult,

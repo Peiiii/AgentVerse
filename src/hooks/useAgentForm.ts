@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export function useAgentForm(agents: Agent[], updateAgent: (agentId: string, agentData: Partial<Omit<Agent, "id">>) => void) {
   const [isFormOpen, setIsFormOpen] = useState(false);

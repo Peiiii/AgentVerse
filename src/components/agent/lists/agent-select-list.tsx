@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { AgentSelectCard } from "../cards/agent-select-card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";

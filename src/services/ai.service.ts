@@ -8,8 +8,8 @@ import {
   StandardProvider,
 } from "@/common/lib/ai-service";
 import { filterNormalMessages } from "@/services/message.util";
-import { SupportedAIProvider } from "@/types/ai";
-import { AgentMessage } from "@/types/discussion";
+import { SupportedAIProvider } from "@/common/types/ai";
+import { AgentMessage } from "@/common/types/discussion";
 import { Observable } from "rxjs";
 // 核心服务类
 export class AIService {

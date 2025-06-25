@@ -1,5 +1,5 @@
 import { RxEvent } from "@/common/lib/rx-event";
-import { AgentMessage } from "@/types/discussion";
+import { AgentMessage } from "@/common/types/discussion";
 import { createNestedBean, createProxyBean } from "rx-nested-bean";
 
 export interface SpeakRequest {

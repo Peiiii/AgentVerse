@@ -1,4 +1,4 @@
-import { AgentMessage } from "@/types/discussion";
+import { AgentMessage } from "@/common/types/discussion";
 import { SpeakRequest, SpeakScheduler } from "./speak-scheduler";
 import { createKey, EnvironmentBus, IEnvironmentBus } from "../typed-bus";
 

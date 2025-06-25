@@ -9,7 +9,7 @@ import {
   ActionResultMessage,
   AgentMessage,
   NormalMessage,
-} from "@/types/discussion";
+} from "@/common/types/discussion";
 import { MessageHandlingAgent } from "./message-handling-agent";
 
 /**

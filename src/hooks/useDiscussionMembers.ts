@@ -1,6 +1,6 @@
 import { discussionMembersResource } from "@/resources";
 import { discussionMemberService } from "@/services/discussion-member.service";
-import { DiscussionMember } from "@/types/discussion-member";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { useMemoizedFn } from "ahooks";
 import { useResourceState } from "@/common/lib/resource";
 import { discussionControlService } from "@/services/discussion-control.service";

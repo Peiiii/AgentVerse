@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const PSYCHE_TIME_TRAVELER: Omit<Agent, "id"> = {
   name: "心理时间旅行家",

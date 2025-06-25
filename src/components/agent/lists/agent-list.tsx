@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { cn } from "@/common/lib/utils";
 import { Loader2 } from "lucide-react";
 import { AgentCard } from "../cards";

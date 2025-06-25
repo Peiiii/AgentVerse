@@ -3,7 +3,7 @@ import {
   AgentMessage,
   MessageWithResults,
   NormalMessage,
-} from "@/types/discussion";
+} from "@/common/types/discussion";
 
 // 定义消息合并的时间阈值（毫秒）
 const MESSAGE_MERGE_THRESHOLD = 3 * 60 * 1000; // 3分钟

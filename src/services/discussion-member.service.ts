@@ -1,6 +1,6 @@
 import { MockHttpProvider } from "@/common/lib/storage";
-import { DiscussionMember } from "@/types/discussion-member";
-import { DiscussionMemberDataProvider } from "@/types/storage";
+import { DiscussionMember } from "@/common/types/discussion-member";
+import { DiscussionMemberDataProvider } from "@/common/types/storage";
 import { STORAGE_CONFIG } from "@/config/storage";
 import { nanoid } from "nanoid";
 

@@ -1,5 +1,5 @@
 import PasswordInput from "@/components/settings/password-input";
-import { SettingItem } from "@/types/settings";
+import { SettingItem } from "@/common/types/settings";
 import { Input } from "../ui/input";
 import {
   Select,

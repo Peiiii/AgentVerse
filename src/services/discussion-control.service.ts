@@ -12,7 +12,7 @@ import { typingIndicatorService } from "@/services/typing-indicator.service";
 import {
   AgentMessage,
   NormalMessage
-} from "@/types/discussion";
+} from "@/common/types/discussion";
 import {
   DiscussionError,
   DiscussionErrorType,

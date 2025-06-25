@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/common/lib/utils";
-import { GuideScenario } from "@/types/guide";
+import { GuideScenario } from "@/common/types/guide";
 import { MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 

@@ -13,7 +13,7 @@ import { cn, formatTime } from "@/common/lib/utils";
 import { Download, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { DiscussionItemProps } from "./types";
-import { DiscussionMember } from "@/types/discussion-member";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { DiscussionAvatar } from "./discussion-avatar";
 
 export function DiscussionItem({

@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCopy } from "@/hooks/use-copy";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
-import { MessageWithResults } from "@/types/discussion";
+import { MessageWithResults } from "@/common/types/discussion";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { MessageMarkdownContent } from "../agent-action-display";

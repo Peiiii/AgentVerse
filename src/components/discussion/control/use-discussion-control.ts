@@ -1,5 +1,5 @@
 import { discussionControlService } from "@/services/discussion-control.service";
-import { AgentMessage } from "@/types/discussion";
+import { AgentMessage } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 import { ITypingIndicator, typingIndicatorService } from "@/services/typing-indicator.service";

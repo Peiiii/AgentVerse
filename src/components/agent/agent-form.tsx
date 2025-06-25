@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { useEffect, useState } from "react";
 
 interface AgentFormProps {

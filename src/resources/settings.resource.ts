@@ -3,8 +3,8 @@ import { SETTING_KYES } from "@/config/settings";
 import { createResource } from "@/common/lib/resource";
 import { aiService } from "@/services/ai.service";
 import { settingsService } from "@/services/settings.service";
-import { SupportedAIProvider } from "@/types/ai";
-import { AIProviderSettingSchema, AutoFillStrategy, SettingItem } from "@/types/settings";
+import { SupportedAIProvider } from "@/common/types/ai";
+import { AIProviderSettingSchema, AutoFillStrategy, SettingItem } from "@/common/types/settings";
 
 const getDefaultAiProviderConfig: () => AIProviderSettingSchema = () => {
   const providerName = BasicAIConfig.AI_PROVIDER_NAME;

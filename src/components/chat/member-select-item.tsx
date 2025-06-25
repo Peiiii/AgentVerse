@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SelectItem } from "@/components/ui/select";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { User } from "lucide-react";
 
 interface MemberSelectItemProps {

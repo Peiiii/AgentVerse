@@ -6,8 +6,8 @@ import {
 } from "@/common/lib/discussion/discussion-env";
 import { RxEvent } from "@/common/lib/rx-event";
 import { agentListResource } from "@/resources";
-import { AgentMessage } from "@/types/discussion";
-import { DiscussionMember } from "@/types/discussion-member";
+import { AgentMessage } from "@/common/types/discussion";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { createNestedBean, createProxyBean } from "packages/rx-nested-bean/src";
 
 export class TimeoutManager {

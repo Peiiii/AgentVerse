@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const DATA_INTERPRETER: Omit<Agent, "id"> = {
   name: "数据洞察师",

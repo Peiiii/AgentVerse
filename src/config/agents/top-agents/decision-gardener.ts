@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const DECISION_GARDENER: Omit<Agent, "id"> = {
   name: "决策树园丁",

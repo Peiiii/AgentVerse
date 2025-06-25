@@ -23,7 +23,7 @@ import { usePersistedState } from "@/hooks/usePersistedState";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
 import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/services/discussion-control.service";
-import { Discussion } from "@/types/discussion";
+import { Discussion } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 

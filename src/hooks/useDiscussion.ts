@@ -1,4 +1,4 @@
-import { Discussion } from "@/types/discussion";
+import { Discussion } from "@/common/types/discussion";
 import { useState } from "react";
 
 export function useDiscussion() {

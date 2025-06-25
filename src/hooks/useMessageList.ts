@@ -1,5 +1,5 @@
 import { reorganizeMessages } from "@/common/lib/discussion/message-utils";
-import { AgentMessage, MessageWithResults } from "@/types/discussion";
+import { AgentMessage, MessageWithResults } from "@/common/types/discussion";
 import { useEffect, useRef, useState } from "react";
 import { ScrollableLayoutRef } from "@/components/layouts/scrollable-layout";
 

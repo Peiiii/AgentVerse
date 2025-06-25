@@ -1,7 +1,7 @@
 import { STORAGE_CONFIG } from "@/config/storage";
 import { MockHttpProvider } from "@/common/lib/storage";
-import { AgentMessage, Discussion } from "@/types/discussion";
-import { DiscussionDataProvider } from "@/types/storage";
+import { AgentMessage, Discussion } from "@/common/types/discussion";
+import { DiscussionDataProvider } from "@/common/types/storage";
 
 export class DiscussionService {
   constructor(private provider: DiscussionDataProvider) {}

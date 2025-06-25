@@ -1,4 +1,4 @@
-import { ProviderConfigs, SupportedAIProvider } from "@/types/ai";
+import { ProviderConfigs, SupportedAIProvider } from "@/common/types/ai";
 
 // 默认配置
 export const AI_PROVIDER_CONFIG: ProviderConfigs = {

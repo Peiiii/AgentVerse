@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 // 导入新角色
 import { META_COGNITIVE_ORCHESTRATOR } from "./moderators/meta-cognitive-orchestrator";
 import { STRUCTURED_THINKING_MODERATOR } from "./moderators/structured-thinking-moderator";

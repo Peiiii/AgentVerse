@@ -2,7 +2,7 @@ import { useResourceState } from "@/common/lib/resource";
 import { messagesResource } from "@/resources";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { messageService } from "@/services/message.service";
-import { AgentMessage, NormalMessage } from "@/types/discussion";
+import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 import { useMemoizedFn } from "ahooks";
 import { nanoid } from "nanoid";
 import { useProxyBeanState } from "packages/rx-nested-bean/src";

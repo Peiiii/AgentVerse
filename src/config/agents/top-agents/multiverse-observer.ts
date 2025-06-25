@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const MULTIVERSE_OBSERVER: Omit<Agent, "id"> = {
   name: "多元宇宙观察员",

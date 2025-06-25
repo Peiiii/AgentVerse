@@ -1,6 +1,6 @@
 import { useAgents } from "@/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
-import { DiscussionMember } from "@/types/discussion-member";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { Users } from "lucide-react";
 
 interface DiscussionAvatarProps {

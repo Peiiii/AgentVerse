@@ -5,8 +5,8 @@ import { discussionControlService } from "@/services/discussion-control.service"
 import { discussionMemberService } from "@/services/discussion-member.service";
 import { discussionService } from "@/services/discussion.service";
 import { messageService } from "@/services/message.service";
-import { Discussion } from "@/types/discussion";
-import { DiscussionMember } from "@/types/discussion-member";
+import { Discussion } from "@/common/types/discussion";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { filter, firstValueFrom, switchMap } from "rxjs";
 
 // 应用级资源

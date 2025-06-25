@@ -2,7 +2,7 @@ import { DataProvider } from "@/common/lib/storage/types";
 import { Agent } from "./agent";
 import { Discussion } from "./discussion";
 import { AgentMessage } from "./discussion";
-import { DiscussionMember } from "@/types/discussion-member";
+import { DiscussionMember } from "@/common/types/discussion-member";
 
 export type AgentDataProvider = DataProvider<Agent>;
 export type DiscussionDataProvider = DataProvider<Discussion>;

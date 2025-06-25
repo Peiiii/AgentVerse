@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const INSPIRATION_ARCHAEOLOGIST: Omit<Agent, "id"> = {
   name: "灵感考古学家",

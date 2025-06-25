@@ -1,4 +1,4 @@
-import { SettingCategory } from "@/types/settings";
+import { SettingCategory } from "@/common/types/settings";
 import { cn } from "@/common/lib/utils";
 
 interface CategoryListProps {

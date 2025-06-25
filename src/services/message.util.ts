@@ -1,4 +1,4 @@
-import { AgentMessage, NormalMessage } from "@/types/discussion";
+import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
 export const filterNormalMessages = (
   messages: AgentMessage[]

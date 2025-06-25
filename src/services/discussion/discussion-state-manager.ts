@@ -1,7 +1,7 @@
 import { DEFAULT_SETTINGS } from "@/config/settings";
 import { BaseStateManager, BaseDiscussionState } from "./base-state-manager";
-import { AgentMessage, DiscussionSettings } from "@/types/discussion";
-import { DiscussionMember } from "@/types/discussion-member";
+import { AgentMessage, DiscussionSettings } from "@/common/types/discussion";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { Observable } from "rxjs";
 
 export interface DiscussionState extends BaseDiscussionState {

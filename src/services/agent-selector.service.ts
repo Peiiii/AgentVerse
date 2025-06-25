@@ -1,5 +1,5 @@
 import { aiService } from "./ai.service";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export class AgentSelectorService {
   async selectAgents(

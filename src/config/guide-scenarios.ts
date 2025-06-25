@@ -1,4 +1,4 @@
-import { GuideScenario } from "@/types/guide";
+import { GuideScenario } from "@/common/types/guide";
 
 export const DEFAULT_SCENARIOS: GuideScenario[] = [
   {

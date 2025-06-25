@@ -2,7 +2,7 @@ import { discussionsResource, messagesResource } from "@/resources";
 import { discussionService } from "@/services/discussion.service";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { messageService } from "@/services/message.service";
-import { Discussion } from "@/types/discussion";
+import { Discussion } from "@/common/types/discussion";
 import { useMemoizedFn } from "ahooks";
 import { useResourceState } from "@/common/lib/resource";
 import { useOptimisticUpdate } from "./useOptimisticUpdate";

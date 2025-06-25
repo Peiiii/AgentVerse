@@ -1,4 +1,4 @@
-import { AgentMessage } from "@/types/discussion";
+import { AgentMessage } from "@/common/types/discussion";
 import { forwardRef } from "react";
 import { MessageListDesktop } from "./message-list-desktop";
 import { MessageListMobile } from "./message-list-mobile";

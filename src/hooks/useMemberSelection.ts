@@ -1,5 +1,5 @@
 import { discussionControlService } from "@/services/discussion-control.service";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { useEffect, useMemo, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 import { useAgents } from "./useAgents";

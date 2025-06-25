@@ -16,7 +16,7 @@ import {
   ActionResultMessage,
   AgentMessage,
   NormalMessage,
-} from "@/types/discussion";
+} from "@/common/types/discussion";
 
 /**
  * 消息处理层

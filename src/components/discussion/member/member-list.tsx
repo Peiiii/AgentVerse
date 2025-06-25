@@ -6,7 +6,7 @@ import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { AddMemberDialog } from "./add-member-dialog";
 import { useKeyboardExpandableList } from "@/hooks/useKeyboardExpandableList";
-import type { DiscussionMember } from "@/types/discussion-member";
+import type { DiscussionMember } from "@/common/types/discussion-member";
 import { MemberItem } from "./member-item";
 import { MemberSkeleton } from "./member-skeleton";
 import { QuickMemberSelector } from "./quick-member-selector";

@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

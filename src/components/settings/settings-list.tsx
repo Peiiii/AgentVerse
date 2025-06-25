@@ -1,4 +1,4 @@
-import { AutoFillStrategy, SettingItem } from "@/types/settings";
+import { AutoFillStrategy, SettingItem } from "@/common/types/settings";
 import { SettingField } from "./setting-field";
 
 interface SettingsListProps {

@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const META_COGNITIVE_ORCHESTRATOR: Omit<Agent, "id"> = {
   name: "元认知协调者",

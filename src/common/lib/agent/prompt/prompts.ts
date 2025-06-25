@@ -1,6 +1,6 @@
 import { Capability } from "@/common/lib/capabilities";
-import { Agent } from "@/types/agent";
-import { ActionResultMessage } from "@/types/discussion";
+import { Agent } from "@/common/types/agent";
+import { ActionResultMessage } from "@/common/types/discussion";
 
 // @ 相关的规则和提示词统一管理
 export const MentionRules = {

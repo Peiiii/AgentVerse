@@ -1,7 +1,7 @@
 import { STORAGE_CONFIG } from "@/config/storage";
 import { MockHttpProvider } from "@/common/lib/storage";
-import { AgentMessage } from "@/types/discussion";
-import { MessageDataProvider } from "@/types/storage";
+import { AgentMessage } from "@/common/types/discussion";
+import { MessageDataProvider } from "@/common/types/storage";
 import { discussionService } from "./discussion.service";
 
 export class MessageService {

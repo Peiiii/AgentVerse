@@ -1,4 +1,4 @@
-import { DiscussionSettings } from "@/types/discussion";
+import { DiscussionSettings } from "@/common/types/discussion";
 import { SettingSelect } from "./setting-select";
 import { SettingSlider } from "./setting-slider";
 import { SettingSwitch } from "./setting-switch";

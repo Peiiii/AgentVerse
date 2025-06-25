@@ -1,4 +1,4 @@
-import { Discussion } from "@/types/discussion";
+import { Discussion } from "@/common/types/discussion";
 
 export interface DiscussionListProps {
   className?: string;

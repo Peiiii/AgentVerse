@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Member } from "@/hooks/useMemberSelection";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { MemberSelectItem } from "./member-select-item";
 
 interface MemberSelectorProps {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { AgentSelectList } from "../lists/agent-select-list";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";

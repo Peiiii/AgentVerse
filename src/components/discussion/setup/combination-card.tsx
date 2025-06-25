@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 

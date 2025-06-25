@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const IMPLEMENTATION_ARCHITECT: Omit<Agent, "id"> = {
   name: "实施架构师",

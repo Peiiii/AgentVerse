@@ -6,7 +6,7 @@ import { useDiscussions } from "@/hooks/useDiscussions";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
 import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/services/discussion-control.service";
-import { AgentMessage } from "@/types/discussion";
+import { AgentMessage } from "@/common/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { ChatEmptyGuide } from "./chat-empty-guide";

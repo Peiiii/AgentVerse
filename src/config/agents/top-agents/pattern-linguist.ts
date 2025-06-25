@@ -1,4 +1,4 @@
-import { Agent } from "@/types/agent";
+import { Agent } from "@/common/types/agent";
 
 export const PATTERN_LINGUIST: Omit<Agent, "id"> = {
   name: "模式语言翻译家",

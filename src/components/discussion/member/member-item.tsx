@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/types/agent";
-import { DiscussionMember } from "@/types/discussion-member";
+import { Agent } from "@/common/types/agent";
+import { DiscussionMember } from "@/common/types/discussion-member";
 import { ChevronRight, UserX, Settings, Briefcase, Lightbulb, Target } from "lucide-react";
 
 interface MemberItemProps {
