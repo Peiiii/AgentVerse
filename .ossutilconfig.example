@@ -1,0 +1,6 @@
+[Credentials]
+language=CH
+Region=cn-hangzhou
+endpoint=oss-cn-hangzhou.aliyuncs.com
+accessKeyID=your-accessKeyID
+accessKeySecret=your-accessKeySecret
