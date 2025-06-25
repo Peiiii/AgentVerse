@@ -1,7 +1,10 @@
 import { useActivityBarStore } from "@/stores/activity-bar.store";
 import { useIconStore } from "@/stores/icon.store";
+import { useRouteTreeStore } from "@/stores/route-tree.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
+import { ChatPage } from "../pages/chat-page";
+import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 
 export const chatExtension = defineExtension({
     manifest: {
@@ -24,5 +27,18 @@ export const chatExtension = defineExtension({
             icon: "message",
             order: 10,
         })))
+
+        useRouteTreeStore.getState().addRoute({
+            id: "chat",
+            path: "/chat",
+            element: <ChatPage />,
+        })
+
+        subscriptions.push(Disposable.from(connectRouterWithActivityBar([
+            {
+                activityKey: "chat",
+                routerPath: "/chat",
+            },
+        ])))
     },
 })

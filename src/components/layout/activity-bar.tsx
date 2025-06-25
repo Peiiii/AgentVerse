@@ -46,7 +46,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       />
 
       <ActivityBar.GroupList>
-        <ActivityBar.Group title="主要功能">
+        <ActivityBar.Group title="main">
           {mainGroupItems.map((item: ActivityItem) => (
             <ActivityBar.Item
               key={item.id}

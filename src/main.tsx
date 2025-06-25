@@ -11,6 +11,7 @@ import { discussionMemberService } from "@/services/discussion-member.service.ts
 import { discussionService } from "@/services/discussion.service.ts";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
+import { HashRouter } from "react-router-dom";
 import { App } from "./App.tsx";
 import { AppLoading } from "./components/app/app-loading.tsx";
 import "./index.css";
@@ -28,7 +29,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Suspense fallback={<AppLoading />}>
       <TooltipProvider>
         <BreakpointProvider>
-          <App />
+          <HashRouter>
+            <App />
+          </HashRouter>
         </BreakpointProvider>
       </TooltipProvider>
     </Suspense>

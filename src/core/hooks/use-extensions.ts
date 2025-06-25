@@ -1,6 +1,6 @@
 import { ExtensionDefinition } from "@cardos/extension";
 import { useEffect } from "react";
-import { extensionManager } from "./extension-manager";
+import { extensionManager } from "../extension-manager";
 
 export const useExtensions = (extensions: ExtensionDefinition<any>[]) => {
 

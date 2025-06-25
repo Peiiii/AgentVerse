@@ -2,14 +2,11 @@ import { AddAgentDialogContent } from "@/components/agent/add-agent-dialog/add-a
 import { ChatArea } from "@/components/chat/chat-area";
 import { ThemeProvider, useTheme } from "@/components/common/theme";
 import { ThemeToggle } from "@/components/common/theme-toggle";
-import { DiscussionController } from "@/components/discussion/control/discussion-controller";
 import { DiscussionList } from "@/components/discussion/list/discussion-list";
-import { MemberList } from "@/components/discussion/member/member-list";
 import { MobileMemberDrawer } from "@/components/discussion/member/mobile-member-drawer";
 import { ActivityBarComponent } from "@/components/layout/activity-bar";
 import { MobileBottomBar } from "@/components/layout/mobile-bottom-bar";
 import { MobileHeader } from "@/components/layout/mobile-header";
-import { ResponsiveContainer } from "@/components/layout/responsive-container";
 import { useSettingsDialog } from "@/components/settings/settings-dialog";
 import { Button } from "@/components/ui/button";
 import { ModalProvider } from "@/components/ui/modal";
@@ -26,7 +23,8 @@ import { discussionControlService } from "@/services/discussion-control.service"
 import { Discussion } from "@/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
-import { useExtensions } from "./core/use-extensions";
+import { PluginRouter } from "./components/common/plugin-router";
+import { useSetupApp } from "./core/hooks/use-setup-app";
 import { agentsExtension } from "./features/agents/extensions";
 import { chatExtension } from "./features/chat/extensions";
 import { githubExtension } from "./features/github/extensions";
@@ -36,14 +34,15 @@ import { settingsExtension } from "./features/settings/extensions";
 type Scene = "discussions" | "chat" | "agents" | "settings";
 
 function AppContent() {
-  useExtensions([chatExtension, agentsExtension, settingsExtension, githubExtension]);
+  useSetupApp({
+    extensions: [chatExtension, agentsExtension, settingsExtension, githubExtension],
+  });
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();
   const { getAgentName, getAgentAvatar } = useAgents();
   const { messages, addMessage } = useMessages();
   const { currentDiscussion, clearMessages } = useDiscussions();
   const [currentScene, setCurrentScene] = useState<Scene>("chat");
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
     false,
     {
@@ -51,8 +50,6 @@ function AppContent() {
       version: 1,
     }
   );
-  const [isInitialState, setIsInitialState] = useState(false);
-  const showDesktopMembers = isDesktop && showMembersForDesktop && !isInitialState;
   const { data: currentDiscussionId } = useProxyBeanState(
     discussionControlService.store,
     "currentDiscussionId"
@@ -100,10 +97,24 @@ function AppContent() {
 
   const handleSelectDiscussion = () => {
     if (!isDesktop) {
-      setShowMobileSidebar(false);
       setCurrentScene("chat");
     }
   };
+
+
+  // 桌面端布局
+  if (isDesktop) {
+    return (
+      <div className="fixed inset-0 flex flex-col" style={{ height }}>
+        <div className={cn(rootClassName, "flex flex-col h-full")}>
+          <div className="flex-1 min-h-0 flex">
+            <ActivityBarComponent className="flex" />
+            <PluginRouter />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 渲染当前场景内容
   const renderSceneContent = () => {
@@ -235,61 +246,6 @@ function AppContent() {
     );
   };
 
-  // 桌面端布局
-  if (isDesktop) {
-    return (
-      <div className="fixed inset-0 flex flex-col" style={{ height }}>
-        <div className={cn(rootClassName, "flex flex-col h-full")}>
-          <div className="flex-1 min-h-0 flex">
-            <ActivityBarComponent className="flex" />
-            <div className="flex-1 flex justify-center w-full">
-              <div className="w-full max-w-[1920px]">
-                <ResponsiveContainer
-                  sidebarContent={
-                    <div className="h-full bg-card">
-                      <DiscussionList
-                        onSelectDiscussion={handleSelectDiscussion}
-                      />
-                    </div>
-                  }
-                  mainContent={
-                    <div className="flex flex-col h-full">
-                      {!isInitialState && (
-                        <DiscussionController
-                          status={status}
-                          onToggleMembers={handleToggleMembers}
-                          enableSettings={false}
-                        />
-                      )}
-                      <div className="flex-1 min-h-0">
-                        <ChatArea
-                          key={currentDiscussionId}
-                          messages={messages}
-                          onSendMessage={handleMessage}
-                          getAgentName={getAgentName}
-                          getAgentAvatar={getAgentAvatar}
-                          onInitialStateChange={setIsInitialState}
-                        />
-                      </div>
-                    </div>
-                  }
-                  showMobileSidebar={showMobileSidebar}
-                  onMobileSidebarChange={setShowMobileSidebar}
-                />
-              </div>
-            </div>
-            {showDesktopMembers && (
-              <div className="w-80 flex-none border-l border-border bg-card">
-                <div className="p-4 h-full">
-                  <MemberList />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // 移动端布局
   return (
