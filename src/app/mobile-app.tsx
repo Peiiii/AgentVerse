@@ -1,12 +1,10 @@
 import { AddAgentDialogContent } from "@/components/agent/add-agent-dialog/add-agent-dialog-content";
 import { ChatArea } from "@/components/chat/chat-area";
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
-import { PluginRouter } from "@/components/common/plugin-router";
 import { useTheme } from "@/components/common/theme";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { DiscussionList } from "@/components/discussion/list/discussion-list";
 import { MobileMemberDrawer } from "@/components/discussion/member/mobile-member-drawer";
-import { ActivityBarComponent } from "@/components/layout/activity-bar";
 import { MobileBottomBar } from "@/components/layout/mobile-bottom-bar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { useSettingsDialog } from "@/components/settings/settings-dialog";
@@ -100,20 +98,6 @@ export function MobileApp() {
     }
   };
 
-
-  // 桌面端布局
-  if (isDesktop) {
-    return (
-      <div className="fixed inset-0 flex flex-col" style={{ height }}>
-        <div className={cn(rootClassName, "flex flex-col h-full")}>
-          <div className="flex-1 min-h-0 flex">
-            <ActivityBarComponent className="flex" />
-            <PluginRouter />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // 渲染当前场景内容
   const renderSceneContent = () => {
