@@ -1,6 +1,6 @@
 import { InitialExperience } from "@/components/home/initial-experience";
-import { AGENT_COMBINATIONS, AgentCombinationType } from "@/config/agents";
-import { DEFAULT_SCENARIOS } from "@/config/guide-scenarios";
+import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
+import { DEFAULT_SCENARIOS } from "@/core/config/guide-scenarios";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { useDiscussions } from "@/hooks/useDiscussions";
 import { useViewportHeight } from "@/hooks/useViewportHeight";

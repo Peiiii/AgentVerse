@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { UI_PERSIST_KEYS, createUIPersistOptions } from "@/config/ui-persist";
+import { UI_PERSIST_KEYS, createUIPersistOptions } from "@/core/config/ui-persist";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { cn } from "@/common/lib/utils";

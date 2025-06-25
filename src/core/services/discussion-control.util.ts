@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@/config/settings";
+import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { BaseAgent, ChatAgent } from "@/common/lib/agent";
 import {
   DiscussionEnvBus,

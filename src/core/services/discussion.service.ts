@@ -1,4 +1,4 @@
-import { STORAGE_CONFIG } from "@/config/storage";
+import { STORAGE_CONFIG } from "@/core/config/storage";
 import { MockHttpProvider } from "@/common/lib/storage";
 import { AgentMessage, Discussion } from "@/common/types/discussion";
 import { DiscussionDataProvider } from "@/common/types/storage";

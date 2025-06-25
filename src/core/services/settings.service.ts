@@ -1,4 +1,4 @@
-import { STORAGE_CONFIG } from "@/config/storage";
+import { STORAGE_CONFIG } from "@/core/config/storage";
 import { DataProvider, MockHttpProvider } from "@/common/lib/storage";
 import { SettingItem } from "@/common/types/settings";
 

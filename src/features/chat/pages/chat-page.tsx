@@ -12,7 +12,7 @@ import { ResponsiveContainer } from "@/components/layout/responsive-container";
 import { useSettingsDialog } from "@/components/settings/settings-dialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { UI_PERSIST_KEYS } from "@/config/ui-persist";
+import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { useAgents } from "@/hooks/useAgents";
 import { useDiscussions } from "@/hooks/useDiscussions";

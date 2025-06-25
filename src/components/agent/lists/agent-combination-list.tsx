@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
 import { AgentGroupCard, AgentGroupCardProps } from "../cards/agent-group-card";
-import { AgentCombinationType } from "@/config/agents";
+import { AgentCombinationType } from "@/core/config/agents";
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 
 export interface AgentCombinationListProps {

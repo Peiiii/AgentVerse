@@ -10,7 +10,7 @@ import { MobileHeader } from "@/components/layout/mobile-header";
 import { useSettingsDialog } from "@/components/settings/settings-dialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { UI_PERSIST_KEYS } from "@/config/ui-persist";
+import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { agentsExtension } from "@/features/agents/extensions";
 import { chatExtension } from "@/features/chat/extensions";

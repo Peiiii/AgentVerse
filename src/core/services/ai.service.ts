@@ -1,4 +1,4 @@
-import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/config/ai";
+import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/core/config/ai";
 import {
   BaseConfig,
   ChatMessage,

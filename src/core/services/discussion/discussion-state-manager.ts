@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@/config/settings";
+import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { BaseStateManager, BaseDiscussionState } from "./base-state-manager";
 import { AgentMessage, DiscussionSettings } from "@/common/types/discussion";
 import { DiscussionMember } from "@/common/types/discussion-member";

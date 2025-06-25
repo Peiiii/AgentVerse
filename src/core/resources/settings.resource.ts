@@ -1,5 +1,5 @@
-import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/config/ai";
-import { SETTING_KYES } from "@/config/settings";
+import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/core/config/ai";
+import { SETTING_KYES } from "@/core/config/settings";
 import { createResource } from "@/common/lib/resource";
 import { aiService } from "@/core/services/ai.service";
 import { settingsService } from "@/core/services/settings.service";

@@ -1,5 +1,5 @@
 import { CustomTeamDialog } from "@/components/agent/dialogs/custom-team-dialog";
-import { AGENT_COMBINATIONS, AgentCombinationType } from "@/config/agents";
+import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
 import { useAgents } from "@/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
 import { motion } from "framer-motion";

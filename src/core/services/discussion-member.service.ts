@@ -1,7 +1,7 @@
 import { MockHttpProvider } from "@/common/lib/storage";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { DiscussionMemberDataProvider } from "@/common/types/storage";
-import { STORAGE_CONFIG } from "@/config/storage";
+import { STORAGE_CONFIG } from "@/core/config/storage";
 import { nanoid } from "nanoid";
 
 class DiscussionMemberError extends Error {
