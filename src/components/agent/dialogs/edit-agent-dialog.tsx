@@ -1,6 +1,6 @@
 import { useModal } from "@/components/ui/modal";
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
-import { useAgents } from "@/hooks/useAgents";
+import { useAgents } from "@/core/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
 import { Agent } from "@/common/types/agent";
 import { useCallback } from "react";

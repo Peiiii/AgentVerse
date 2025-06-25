@@ -1,4 +1,4 @@
-import { useWindowSize } from "@/hooks/useWindowSize";
+import { useWindowSize } from "@/core/hooks/useWindowSize";
 import { createContext, ReactNode, useContext, useMemo } from "react";
 
 /**

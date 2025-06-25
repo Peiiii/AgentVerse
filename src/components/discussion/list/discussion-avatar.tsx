@@ -1,4 +1,4 @@
-import { useAgents } from "@/hooks/useAgents";
+import { useAgents } from "@/core/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { Users } from "lucide-react";

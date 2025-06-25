@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Member } from "@/hooks/useMemberSelection";
+import { Member } from "@/core/hooks/useMemberSelection";
 import { Agent } from "@/common/types/agent";
 import { MemberSelectItem } from "./member-select-item";
 

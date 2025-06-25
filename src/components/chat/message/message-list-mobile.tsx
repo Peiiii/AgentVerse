@@ -7,7 +7,7 @@ import { ArrowDown } from "lucide-react";
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, useRef } from "react";
 import { MessageCapture } from "./message-capture";
 import { MessageItem } from "./message-item";
-import { useMessageList, type MessageListRef } from "@/hooks/useMessageList";
+import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 
 /**
  * 移动端消息列表设计：

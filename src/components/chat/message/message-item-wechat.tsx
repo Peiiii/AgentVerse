@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCopy } from "@/hooks/use-copy";
-import { useToast } from "@/hooks/use-toast";
+import { useCopy } from "@/core/hooks/use-copy";
+import { useToast } from "@/core/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
 import { MessageWithResults } from "@/common/types/discussion";
 import { Check, Copy } from "lucide-react";

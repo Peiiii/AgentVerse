@@ -1,9 +1,9 @@
 import { InitialExperience } from "@/components/home/initial-experience";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
 import { DEFAULT_SCENARIOS } from "@/core/config/guide-scenarios";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
-import { useDiscussions } from "@/hooks/useDiscussions";
-import { useViewportHeight } from "@/hooks/useViewportHeight";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+import { useDiscussions } from "@/core/hooks/useDiscussions";
+import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { AgentMessage } from "@/common/types/discussion";
@@ -12,7 +12,7 @@ import { useEffect, useRef } from "react";
 import { ChatEmptyGuide } from "./chat-empty-guide";
 import { MessageList, MessageListRef } from "./message";
 import { MessageInput, MessageInputRef } from "./message-input";
-import { useAgents } from "@/hooks/useAgents";
+import { useAgents } from "@/core/hooks/useAgents";
 
 interface ChatAreaProps {
   messages: AgentMessage[];

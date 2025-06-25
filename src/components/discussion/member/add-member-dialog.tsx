@@ -6,8 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useAgents } from "@/hooks/useAgents";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
+import { useAgents } from "@/core/hooks/useAgents";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import { Agent } from "@/common/types/agent";
 import { Check, Search } from "lucide-react";

@@ -1,7 +1,7 @@
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { cn } from "@/common/lib/utils";
 import { forwardRef } from "react";
-import { useMessageInput, type MessageInputRef } from "@/hooks/useMessageInput";
+import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageInput";
 
 /**
  * 微信PC端消息输入框设计：

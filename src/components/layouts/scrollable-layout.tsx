@@ -1,4 +1,4 @@
-import { useAutoScroll } from "@/hooks/useAutoScroll";
+import { useAutoScroll } from "@/core/hooks/useAutoScroll";
 import { cn } from "@/common/lib/utils";
 import {
   forwardRef,

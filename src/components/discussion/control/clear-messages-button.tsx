@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal";
-import { useDiscussions } from "@/hooks/useDiscussions";
+import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { cn } from "@/common/lib/utils";
 import { Eraser } from "lucide-react";
 

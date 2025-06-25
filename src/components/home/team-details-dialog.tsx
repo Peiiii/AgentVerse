@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AGENT_COMBINATIONS } from "@/core/config/agents";
-import { useAgents } from "@/hooks/useAgents";
+import { useAgents } from "@/core/hooks/useAgents";
 
 // 定义TeamMember和TeamConfig接口
 interface TeamMember {

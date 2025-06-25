@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
-import { useAgents } from "@/hooks/useAgents";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
+import { useAgents } from "@/core/hooks/useAgents";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/core/hooks/use-toast";
 
 interface QuickMemberSelectorProps {
   onSelect?: () => void;

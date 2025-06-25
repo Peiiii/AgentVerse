@@ -7,7 +7,7 @@ import { ArrowDown } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
-import { useMessageList, type MessageListRef } from "@/hooks/useMessageList";
+import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 
 /**
  * 微信PC端消息列表设计：

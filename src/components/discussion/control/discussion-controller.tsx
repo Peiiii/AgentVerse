@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { UI_PERSIST_KEYS, createUIPersistOptions } from "@/core/config/ui-persist";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { cn } from "@/common/lib/utils";
 import { agentListResource } from "@/core/resources";
 import { ITypingIndicator } from "@/core/services/typing-indicator.service";

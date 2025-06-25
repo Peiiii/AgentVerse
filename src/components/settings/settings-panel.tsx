@@ -1,5 +1,5 @@
-import { useSettingCategories } from "@/hooks/useSettingCategories";
-import { useSettings } from "@/hooks/useSettings";
+import { useSettingCategories } from "@/core/hooks/useSettingCategories";
+import { useSettings } from "@/core/hooks/useSettings";
 import { useEffect, useMemo, useState } from "react";
 import { SettingsList } from "./settings-list";
 import { CategoryList } from "./category-list";

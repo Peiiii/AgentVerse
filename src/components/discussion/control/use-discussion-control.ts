@@ -3,7 +3,7 @@ import { AgentMessage } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 import { ITypingIndicator, typingIndicatorService } from "@/core/services/typing-indicator.service";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 
 interface UseDiscussionControlProps {
   status: "active" | "paused" | "completed";

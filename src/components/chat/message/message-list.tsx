@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import { MessageListDesktop } from "./message-list-desktop";
 import { MessageListMobile } from "./message-list-mobile";
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
-import { MessageListRef } from "@/hooks/useMessageList";
+import { MessageListRef } from "@/core/hooks/useMessageList";
 
 interface MessageListProps {
   discussionId?: string;

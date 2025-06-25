@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
-import { useAgents } from "@/hooks/useAgents";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+import { useAgents } from "@/core/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { AddMemberDialog } from "./add-member-dialog";
-import { useKeyboardExpandableList } from "@/hooks/useKeyboardExpandableList";
+import { useKeyboardExpandableList } from "@/core/hooks/useKeyboardExpandableList";
 import type { DiscussionMember } from "@/common/types/discussion-member";
 import { MemberItem } from "./member-item";
 import { MemberSkeleton } from "./member-skeleton";
 import { QuickMemberSelector } from "./quick-member-selector";
-import { useAgentForm } from "@/hooks/useAgentForm";
+import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { AgentForm } from "@/components/agent/agent-form";
 
 interface MemberListProps {

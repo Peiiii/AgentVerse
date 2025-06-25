@@ -3,7 +3,7 @@ import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { cn } from "@/common/lib/utils";
 import { Send } from "lucide-react";
 import { forwardRef } from "react";
-import { useMessageInput, type MessageInputRef } from "@/hooks/useMessageInput";
+import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageInput";
 
 /**
  * 微信移动端消息输入框设计（简化版）：

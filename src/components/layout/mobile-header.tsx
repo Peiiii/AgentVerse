@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import {
   Menu,

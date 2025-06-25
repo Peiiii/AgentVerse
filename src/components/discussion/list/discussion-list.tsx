@@ -1,5 +1,5 @@
-import { useAgents } from "@/hooks/useAgents";
-import { useDiscussions } from "@/hooks/useDiscussions";
+import { useAgents } from "@/core/hooks/useAgents";
+import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { cn } from "@/common/lib/utils";
 import { discussionsResource, messagesResource } from "@/core/resources";
 import { DEFAULT_DISCUSSION_TITLE } from "@/core/services/common.util";

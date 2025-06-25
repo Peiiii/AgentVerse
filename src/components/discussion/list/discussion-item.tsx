@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { useModal } from "@/components/ui/modal";
 import { cn, formatTime } from "@/common/lib/utils";
 import { Download, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
