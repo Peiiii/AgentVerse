@@ -47,19 +47,19 @@ export function IconStoreDemo() {
           <div className="p-4 border rounded">
             <h3 className="font-semibold mb-2">使用 IconRegistry（配置化）</h3>
             <div className="flex gap-2 items-center">
-              <IconRegistry icon="message" />
+              <IconRegistry id="message" />
               <span>Message</span>
             </div>
             <div className="flex gap-2 items-center">
-              <IconRegistry icon="settings" />
+              <IconRegistry id="settings" />
               <span>Settings</span>
             </div>
             <div className="flex gap-2 items-center">
-              <IconRegistry icon="users" />
+              <IconRegistry id="users" />
               <span>Users</span>
             </div>
             <div className="flex gap-2 items-center">
-              <IconRegistry icon="github" />
+              <IconRegistry id="github" />
               <span>GitHub</span>
             </div>
           </div>

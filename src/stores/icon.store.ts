@@ -1,56 +1,56 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { 
-  Github, 
-  MessageSquare, 
-  Settings, 
-  Users, 
-  Home,
-  Search,
-  FileText,
-  Folder,
-  Calendar,
-  Star,
-  Heart,
+import {
+  AlertCircle,
+  AlertTriangle,
+  Bell,
   Bookmark,
-  Download,
-  Upload,
-  Share,
-  Edit,
-  Trash,
-  Plus,
-  Minus,
+  Bot,
+  Calendar,
   Check,
-  X,
+  CheckCircle,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  ChevronDown,
+  Cog,
+  Download,
+  Edit,
+  FileText,
+  Folder,
+  Github,
+  Heart,
+  HelpCircle,
+  Home,
+  Info,
+  LogOut,
   Menu,
+  MessageSquare,
+  Minus,
+  Monitor,
+  Moon,
   MoreHorizontal,
   MoreVertical,
+  Plus,
+  Search,
+  Settings,
+  Share,
+  Star,
   Sun,
-  Moon,
-  Monitor,
-  Bell,
+  Trash,
+  Upload,
   User,
-  LogOut,
-  Cog,
-  HelpCircle,
-  Info,
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle,
+  Users,
+  X,
   XCircle,
-  Bot,
   type LucideIcon
 } from 'lucide-react';
+import { create } from 'zustand';
 
 export interface IconState {
   // 图标映射
   icons: Record<string, LucideIcon>;
   // 添加图标
-  addIcon: (id: string, icon: LucideIcon) => void;
+  addIcon: (id: string, icon: LucideIcon) => () => void;
+  addIcons: (icons: Record<string, LucideIcon>) => () => void;
   // 移除图标
   removeIcon: (id: string) => void;
   // 获取图标
@@ -116,45 +116,57 @@ const defaultIcons: Record<string, LucideIcon> = {
   'x-circle': XCircle,
 };
 
+
 export const useIconStore = create<IconState>()(
-  persist(
-    (set, get) => ({
-      icons: defaultIcons,
+  (set, get) => ({
+    icons: defaultIcons,
 
-      addIcon: (id: string, icon: LucideIcon) => {
-        set((state) => ({
-          icons: {
-            ...state.icons,
-            [id]: icon,
-          },
-        }));
-      },
+    addIcon: (id: string, icon: LucideIcon) => {
+      set((state) => ({
+        icons: {
+          ...state.icons,
+          [id]: icon,
+        },
+      }));
+      return () => {
+        get().removeIcon(id);
+      }
+    },
 
-      removeIcon: (id: string) => {
-        set((state) => {
-          const newIcons = { ...state.icons };
-          delete newIcons[id];
-          return {
-            icons: newIcons,
-          };
+    addIcons: (icons: Record<string, LucideIcon>) => () => {
+      set((state) => ({
+        icons: {
+          ...state.icons,
+          ...icons,
+        },
+      }));
+      return () => {
+        Object.keys(icons).forEach((key) => {
+          get().removeIcon(key);
         });
-      },
+      }
+    },
 
-      getIcon: (id: string) => {
-        return get().icons[id];
-      },
+    removeIcon: (id: string) => {
+      set((state) => {
+        const newIcons = { ...state.icons };
+        delete newIcons[id];
+        return {
+          icons: newIcons,
+        };
+      });
+    },
 
-      reset: () => {
-        set({
-          icons: defaultIcons,
-        });
-      },
-    }),
-    {
-      name: 'icon-store',
-      version: 1,
-    }
-  )
+    getIcon: (id: string) => {
+      return get().icons[id];
+    },
+
+    reset: () => {
+      set({
+        icons: defaultIcons,
+      });
+    },
+  }),
 );
 
 // 选择器hooks

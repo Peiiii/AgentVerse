@@ -1,7 +1,7 @@
-import { useActivityBarStore, ActivityItem, useMainGroupItems, useFooterItems } from '@/stores/activity-bar.store';
 import { useAddAgentDialog } from '@/components/agent/add-agent-dialog/use-add-agent-dialog';
 import { useSettingsDialog } from '@/components/settings/settings-dialog';
-import { useCallback } from 'react';
+import { useActivityBarStore } from '@/stores/activity-bar.store';
+import { useCallback, useMemo } from 'react';
 
 export class ActivityBarService {
   private static instance: ActivityBarService;
@@ -16,7 +16,7 @@ export class ActivityBarService {
   // 处理活动项点击事件
   handleItemClick(activeId: string) {
     console.log("[ActivityBarService] handleItemClick", activeId);
-    
+
     // 根据活动项执行相应操作
     switch (activeId) {
       case "agents":
@@ -53,54 +53,6 @@ export class ActivityBarService {
     window.open("https://github.com/Peiiii/AgentVerse", "_blank");
   }
 
-  // 添加自定义活动项
-  addCustomItem(item: Omit<ActivityItem, 'id'> & { id?: string }) {
-    const id = item.id || `custom-${Date.now()}`;
-    const newItem: ActivityItem = {
-      ...item,
-      id,
-    };
-    
-    useActivityBarStore.getState().addItem(newItem);
-    return id;
-  }
-
-  // 移除活动项
-  removeItem(id: string) {
-    useActivityBarStore.getState().removeItem(id);
-  }
-
-  // 更新活动项
-  updateItem(id: string, updates: Partial<ActivityItem>) {
-    useActivityBarStore.getState().updateItem(id, updates);
-  }
-
-  // 设置激活项
-  setActiveItem(id: string) {
-    useActivityBarStore.getState().setActiveId(id);
-  }
-
-  // 获取当前激活项
-  getActiveItem() {
-    const { activeId, items } = useActivityBarStore.getState();
-    return items.find(item => item.id === activeId);
-  }
-
-  // 获取所有活动项
-  getAllItems() {
-    return useActivityBarStore.getState().items;
-  }
-
-  // 按组获取活动项
-  getItemsByGroup(group: string) {
-    const { items } = useActivityBarStore.getState();
-    return items.filter(item => item.group === group);
-  }
-
-  // 重置到默认状态
-  reset() {
-    useActivityBarStore.getState().reset();
-  }
 }
 
 // 导出单例实例
@@ -114,8 +66,7 @@ export function useActivityBarService() {
 
   // 使用useCallback避免重复创建函数
   const handleItemClick = useCallback((activeId: string) => {
-    console.log("[useActivityBarService] handleItemClick", activeId);
-    
+
     switch (activeId) {
       case "agents":
         openAddAgentDialog();
@@ -132,16 +83,18 @@ export function useActivityBarService() {
         console.warn(`[useActivityBarService] Unknown activity item: ${activeId}`);
         break;
     }
-    
+
     // 更新激活状态
     store.setActiveId(activeId);
   }, [openAddAgentDialog, openSettingsDialog, store]);
 
+  const items = useMemo(() => {
+    return store.items.sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [store.items]);
+
   return {
     ...store,
+    items,
     handleItemClick,
   };
 }
-
-// 重新导出store中的hooks
-export { useMainGroupItems, useFooterItems }; 

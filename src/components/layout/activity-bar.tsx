@@ -1,10 +1,10 @@
+import { IconRegistry } from "@/components/common/icon-registry";
 import { ThemeToggle } from "@/components/common/theme";
 import { cn } from "@/lib/utils";
-import { ActivityBar } from "composite-kit";
-import { IconRegistry } from "@/components/common/icon-registry";
 import { useActivityBarService } from "@/services/activity-bar.service";
 import { ActivityItem } from "@/stores/activity-bar.store";
-import {LayoutDashboard } from "lucide-react"
+import { ActivityBar } from "composite-kit";
+import { LayoutDashboard } from "lucide-react";
 interface ActivityBarProps {
   className?: string;
 }
@@ -19,7 +19,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
   } = useActivityBarService();
 
   // 从items中按组筛选，避免重复订阅
-  const mainGroupItems = items.filter(item => item.group === '主要功能');
+  const mainGroupItems = items.filter(item => item.group === 'main');
   const footerItems = items.filter(item => item.group === 'footer');
 
 

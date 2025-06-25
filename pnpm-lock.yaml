@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@cardos/extension':
+        specifier: 0.2.0-beta.3
+        version: 0.2.0-beta.3(rxjs@7.8.1)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.4
         version: 1.1.5(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -885,6 +888,11 @@ packages:
 
   '@braintree/sanitize-url@7.1.1':
     resolution: {integrity: sha512-i1L7noDNxtFyL5DmZafWy1wRVhGehQmzZaz1HiN5e7iylJMSZR7ekOV7NsIqa5qBldlLrsKv4HbgFUVlQrz8Mw==}
+
+  '@cardos/extension@0.2.0-beta.3':
+    resolution: {integrity: sha512-iZ6bUkH/Qexn3g6StKKmrWjAwbpjteBU7+2m4HGpud+0Rf7ZekDjasyIsDg8uCZnxsYvO9Rq7D7+3lNni9PjPA==}
+    peerDependencies:
+      rxjs: ^7.8.1
 
   '@chevrotain/cst-dts-gen@11.0.3':
     resolution: {integrity: sha512-BvIKpRLeS/8UbfxXxgC33xOumsacaeCKAjAeLyOn7Pcp95HiRbrpl14S+9vaZLolnbssPIUuiUd8IvgkRyt6NQ==}
@@ -6240,6 +6248,10 @@ snapshots:
   '@bcoe/v8-coverage@0.2.3': {}
 
   '@braintree/sanitize-url@7.1.1': {}
+
+  '@cardos/extension@0.2.0-beta.3(rxjs@7.8.1)':
+    dependencies:
+      rxjs: 7.8.1
 
   '@chevrotain/cst-dts-gen@11.0.3':
     dependencies:

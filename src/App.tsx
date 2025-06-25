@@ -26,11 +26,17 @@ import { discussionControlService } from "@/services/discussion-control.service"
 import { Discussion } from "@/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
+import { useExtensions } from "./core/use-extensions";
+import { agentsExtension } from "./features/agents/extensions";
+import { chatExtension } from "./features/chat/extensions";
+import { githubExtension } from "./features/github/extensions";
+import { settingsExtension } from "./features/settings/extensions";
 
 // 场景类型
 type Scene = "discussions" | "chat" | "agents" | "settings";
 
 function AppContent() {
+  useExtensions([chatExtension, agentsExtension, settingsExtension, githubExtension]);
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();
   const { getAgentName, getAgentAvatar } = useAgents();

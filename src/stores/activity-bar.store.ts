@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export interface ActivityItem {
   id: string;
@@ -7,6 +6,8 @@ export interface ActivityItem {
   label: string;
   title?: string;
   group?: string;
+  /** the order of the item in the group , smaller is higher priority  */
+  order?: number;
   isActive?: boolean;
   isDisabled?: boolean;
   onClick?: () => void;
@@ -20,7 +21,7 @@ export interface ActivityBarState {
   // 是否展开
   expanded: boolean;
   // 添加活动项
-  addItem: (item: ActivityItem) => void;
+  addItem: (item: ActivityItem) => ()=>void;
   // 移除活动项
   removeItem: (id: string) => void;
   // 更新活动项
@@ -36,32 +37,35 @@ export interface ActivityBarState {
 }
 
 const defaultItems: ActivityItem[] = [
-  {
-    id: 'chat',
-    label: '聊天',
-    group: '主要功能',
-    isActive: true,
-    icon: "message"
-  },
-  {
-    id: 'agents',
-    label: '智能体',
-    group: '主要功能',
-    icon: "bot"
-  },
-  {
-    id: 'settings',
-    label: '设置',
-    group: 'footer',
-    icon: "settings"
-  },
-  {
-    id: 'github',
-    label: 'GitHub',
-    title: '访问 GitHub 仓库',
-    group: 'footer',
-    icon: "github"
-  },
+  // {
+  //   id: 'chat',
+  //   label: '聊天',
+  //   group: '主要功能',
+  //   isActive: true,
+  //   icon: "message"
+  // },
+  // {
+  //   id: 'agents',
+  //   label: '智能体',
+  //   group: 'main',
+  //   icon: "bot",
+  //   order: 100,
+  // },
+  // {
+  //   id: 'settings',
+  //   label: '设置',
+  //   group: 'footer',
+  //   icon: "settings",
+  //   order: 200,
+  // },
+  // {
+  //   id: 'github',
+  //   label: 'GitHub',
+  //   title: '访问 GitHub 仓库',
+  //   group: 'footer',
+  //   icon: "github",
+  //   order: 300,
+  // },
 ];
 
 export const useActivityBarStore = create<ActivityBarState>()(
@@ -74,6 +78,11 @@ export const useActivityBarStore = create<ActivityBarState>()(
       set((state) => ({
         items: [...state.items, item],
       }));
+      return () => {
+        set((state) => ({
+          items: state.items.filter((it) => it.id !== item.id),
+        }));
+      }
     },
 
     removeItem: (id: string) => {
@@ -134,8 +143,3 @@ export const useExpanded = () => useActivityBarStore((state) => state.expanded);
 // 按组获取活动项
 export const useActivityItemsByGroup = (group: string) =>
   useActivityBarStore((state) => state.items.filter(item => item.group === group));
-
-// 获取主要功能组
-export const useMainGroupItems = () => useActivityItemsByGroup('主要功能');
-// 获取footer组
-export const useFooterItems = () => useActivityItemsByGroup('footer'); 
