@@ -5,6 +5,9 @@ import { ExtensionDefinition } from "@cardos/extension";
 export const useSetupApp = (options: {
     extensions: ExtensionDefinition[]
 }) => {
-    useExtensions(options.extensions);
     useConnectNavigationStore();
+    const { initialized } = useExtensions(options.extensions);
+    return {
+        initialized,
+    }
 }

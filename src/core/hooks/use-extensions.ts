@@ -1,9 +1,10 @@
 import { ExtensionDefinition } from "@cardos/extension";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { extensionManager } from "../extension-manager";
 
 export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
 
+    const [initialized, setInitialized] = useState(false);
     useEffect(() => {
         extensions.forEach((extension) => {
            if(!extensionManager.getExtension(extension.manifest.id)) {
@@ -17,6 +18,7 @@ export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
         extensions.forEach((extension) => {
             extensionManager.activateExtension(extension.manifest.id);
         });
+        setInitialized(true);
     }, []);
 
     useEffect(() => {
@@ -26,4 +28,7 @@ export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
             });
         }
     }, []);
+    return {
+        initialized,
+    }
 }

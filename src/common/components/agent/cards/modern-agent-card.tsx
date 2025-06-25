@@ -1,23 +1,22 @@
-import React, { useState } from "react";
-import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardContent } from "@/common/components/ui/card";
-import { 
-  Edit, 
-  Trash2, 
-  Brain, 
-  MessageCircle, 
-  Star, 
-  Sparkles,
-  Heart,
-  Zap,
+import { cn } from "@/common/lib/utils";
+import { Agent } from "@/common/types/agent";
+import {
+  Brain,
+  Edit,
   Eye,
-  MoreHorizontal
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Sparkles,
+  Star,
+  Trash2,
+  Zap
 } from "lucide-react";
-import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
+import React, { useState } from "react";
 
 export interface ModernAgentCardProps {
   agent: Agent;
@@ -40,7 +39,7 @@ const getAgentGradient = (agentId: string) => {
     "from-teal-500/20 via-cyan-500/20 to-blue-500/20",
     "from-rose-500/20 via-pink-500/20 to-purple-500/20",
   ];
-  
+
   const index = agentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % gradients.length;
   return gradients[index];
 };
@@ -85,8 +84,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const { isMobile } = useBreakpointContext();
-  
+
   const safeAvatar = agent.avatar || "/avatars/default.png";
   const safeName = agent.name || "未命名";
   const nameInitial = safeName.length > 0 ? safeName[0] : "?";
@@ -128,18 +126,18 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-sm truncate flex-1 min-w-0">{safeName}</h3>
-                <Badge 
-                  variant="outline" 
+                <Badge
+                  variant="outline"
                   className="text-xs px-2 py-0 whitespace-nowrap flex-shrink-0"
                 >
                   {roleConfig.label}
                 </Badge>
               </div>
-              
+
               <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
                 {agent.personality || "未设置性格"}
               </p>
-              
+
               {agent.expertise && agent.expertise.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {agent.expertise.slice(0, 2).map((expertise, index) => (
@@ -209,7 +207,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
         "bg-gradient-to-br from-white/5 to-transparent",
         isHovered && "opacity-100"
       )} />
-      
+
       <CardContent className="p-6 relative flex flex-col h-full">
         {/* 头部区域 */}
         <div className="flex items-start justify-between mb-4">
@@ -225,7 +223,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                   {nameInitial}
                 </AvatarFallback>
               </Avatar>
-              
+
               {/* 角色标识 */}
               <div className={cn(
                 "absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center",
@@ -241,8 +239,8 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="text-lg font-bold truncate flex-1 min-w-0">{safeName}</h3>
-                <Badge 
-                  variant="outline" 
+                <Badge
+                  variant="outline"
                   className={cn(
                     "text-xs px-3 py-1 border-2 whitespace-nowrap flex-shrink-0",
                     roleConfig.borderColor, roleConfig.bgColor
@@ -251,7 +249,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                   {roleConfig.label}
                 </Badge>
               </div>
-              
+
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {agent.personality || "未设置性格特征"}
               </p>
@@ -306,14 +304,14 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
         <div className="mt-auto pt-4">
           {/* 分割线 */}
           <div className="border-t border-white/20 mb-3" />
-          
+
           {/* 操作按钮和提示 */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Eye className="w-3 h-3" />
               <span>点击查看详情</span>
             </div>
-            
+
             {/* 操作按钮组 */}
             {showActions && (
               <div className={cn(
@@ -326,8 +324,8 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                   onClick={() => setIsLiked(!isLiked)}
                   className={cn(
                     "h-7 w-7 p-0 transition-all duration-300",
-                    isLiked 
-                      ? "text-red-500 hover:text-red-600" 
+                    isLiked
+                      ? "text-red-500 hover:text-red-600"
                       : "text-muted-foreground hover:text-red-500"
                   )}
                 >

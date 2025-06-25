@@ -28,11 +28,11 @@ export const desktopChatExtension = defineExtension({
             order: 10,
         })))
 
-        useRouteTreeStore.getState().addRoute({
+        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoute({
             id: "chat",
             path: "/chat",
             element: <ChatPage />,
-        })
+        })))
 
         subscriptions.push(Disposable.from(connectRouterWithActivityBar([
             {

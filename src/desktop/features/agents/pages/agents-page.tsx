@@ -1,14 +1,13 @@
-import React, { useState, useMemo } from "react";
-import { PageContainer } from "@/common/components/layout/page-container";
-import { ModernAgentCard } from "@/common/components/agent/cards/modern-agent-card";
 import { AgentForm } from "@/common/components/agent/agent-form";
+import { ModernAgentCard } from "@/common/components/agent/cards/modern-agent-card";
+import { PageContainer } from "@/common/components/layout/page-container";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { useAgents } from "@/core/hooks/useAgents";
-import { Sparkles, Filter, Grid, List, Users, Brain, MessageCircle } from "lucide-react";
+import { Brain, MessageCircle, Sparkles, Users } from "lucide-react";
 import match from "pinyin-match";
-import { cn } from "@/common/lib/utils";
+import { useMemo, useState } from "react";
 
 export function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState("");

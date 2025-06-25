@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { HashRouter } from "react-router-dom";
 
 export function DesktopAppInner() {
-  useSetupApp({
+  const { initialized } = useSetupApp({
     extensions: [desktopChatExtension, desktopAgentsExtension, settingsExtension, githubExtension],
   });
   const { rootClassName } = useTheme();
@@ -29,6 +29,7 @@ export function DesktopAppInner() {
 
 
   return (
+    !initialized ? <div>Loading...</div> :
     <div className="fixed inset-0 flex flex-col" style={{ height }}>
       <div className={cn(rootClassName, "flex flex-col h-full")}>
         <div className="flex-1 min-h-0 flex">

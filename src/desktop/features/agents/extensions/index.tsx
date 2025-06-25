@@ -28,11 +28,11 @@ export const desktopAgentsExtension = defineExtension({
             icon: "bot",
             order: 20,
         })))
-        useRouteTreeStore.getState().addRoute({
+        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoute({
             id: "agents",
             path: "/agents",
             element: <AgentsPage />,
-        })
+        })))
         subscriptions.push(Disposable.from(connectRouterWithActivityBar([
             {
                 activityKey: "agents",
