@@ -1,8 +1,9 @@
-@import "tailwindcss";
 @import "composite-kit/dist/index.css";
+@import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -119,3 +120,4 @@
     @apply bg-background text-foreground;
   }
 }
+

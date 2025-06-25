@@ -72,8 +72,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       composite-kit:
-        specifier: ^0.5.6
-        version: 0.5.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
+        specifier: ^0.5.7
+        version: 0.5.7(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -3049,8 +3049,8 @@ packages:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
 
-  composite-kit@0.5.6:
-    resolution: {integrity: sha512-E+AEtsfDgjwfF9ajpK4ERajrcpTf1bW2OS/EruGjvHTNw49sIx1yQgMVYu6W0Wnq/XMrNBGYqe1lJ8nlCVlj1A==}
+  composite-kit@0.5.7:
+    resolution: {integrity: sha512-wFa/XNMnUWXmKGgy03cC/Mm/poZ+40xXUzgC0x/G2XjNPDG5CPZf0rAV1EFM+EL1qx44R3MLYt9XtcgGPcrzXA==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -8478,7 +8478,7 @@ snapshots:
 
   commander@8.3.0: {}
 
-  composite-kit@0.5.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)):
+  composite-kit@0.5.7(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)):
     dependencies:
       '@hookform/resolvers': 5.1.1(react-hook-form@7.58.1(react@19.1.0))
       '@radix-ui/react-avatar': 1.1.10(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
