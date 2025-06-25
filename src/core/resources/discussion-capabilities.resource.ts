@@ -1,6 +1,6 @@
 import { Capability } from "@/common/lib/capabilities";
 import { createResource } from "@/common/lib/resource";
-import { agentListResource, discussionMembersResource } from "@/resources";
+import { agentListResource, discussionMembersResource } from "@/core/resources";
 import { agentService } from "@/services/agent.service";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { discussionMemberService } from "@/services/discussion-member.service";

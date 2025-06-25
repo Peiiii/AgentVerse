@@ -1,6 +1,6 @@
 import { BaseAgent, ChatAgent, BaseAgentState } from "@/common/lib/agent";
 import { DiscussionEnvBus } from "@/common/lib/discussion/discussion-env";
-import { agentListResource } from "@/resources";
+import { agentListResource } from "@/core/resources";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { RxEvent } from "@/common/lib/rx-event";
 

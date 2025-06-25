@@ -1,4 +1,4 @@
-import { discussionMembersResource } from "@/resources";
+import { discussionMembersResource } from "@/core/resources";
 import { discussionMemberService } from "@/services/discussion-member.service";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { useMemoizedFn } from "ahooks";

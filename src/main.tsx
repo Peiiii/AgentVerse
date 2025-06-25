@@ -5,7 +5,7 @@ import {
   discussionMembersResource,
   discussionsResource,
   messagesResource,
-} from "@/resources/index.ts";
+} from "@/core/resources/index.ts";
 import { discussionControlService } from "@/services/discussion-control.service.ts";
 import { discussionMemberService } from "@/services/discussion-member.service.ts";
 import { discussionService } from "@/services/discussion.service.ts";

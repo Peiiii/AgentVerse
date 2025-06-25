@@ -5,7 +5,7 @@ import {
   DiscussionKeys,
 } from "@/common/lib/discussion/discussion-env";
 import { RxEvent } from "@/common/lib/rx-event";
-import { agentListResource } from "@/resources";
+import { agentListResource } from "@/core/resources";
 import { AgentMessage } from "@/common/types/discussion";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { createNestedBean, createProxyBean } from "packages/rx-nested-bean/src";

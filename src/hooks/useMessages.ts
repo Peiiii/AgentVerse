@@ -1,5 +1,5 @@
 import { useResourceState } from "@/common/lib/resource";
-import { messagesResource } from "@/resources";
+import { messagesResource } from "@/core/resources";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { messageService } from "@/services/message.service";
 import { AgentMessage, NormalMessage } from "@/common/types/discussion";

@@ -8,7 +8,7 @@ import {
   agentListResource,
   discussionMembersResource,
   messagesResource,
-} from "@/resources";
+} from "@/core/resources";
 import { aiService } from "@/services/ai.service";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { messageService } from "@/services/message.service";

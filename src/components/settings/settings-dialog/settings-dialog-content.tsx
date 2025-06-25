@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { recoverDefaultSettings, settingsResource } from "@/resources/settings.resource";
+import { recoverDefaultSettings, settingsResource } from "@/core/resources/settings.resource";
 
 export function SettingsDialogContent() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);

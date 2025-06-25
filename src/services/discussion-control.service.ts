@@ -4,8 +4,8 @@ import {
   DiscussionKeys,
 } from "@/common/lib/discussion/discussion-env";
 import { RxEvent } from "@/common/lib/rx-event";
-import { messagesResource } from "@/resources";
-import { discussionCapabilitiesResource } from "@/resources/discussion-capabilities.resource";
+import { messagesResource } from "@/core/resources";
+import { discussionCapabilitiesResource } from "@/core/resources/discussion-capabilities.resource";
 import { AgentManager } from "@/services/agent/agent-manager";
 import { messageService } from "@/services/message.service";
 import { typingIndicatorService } from "@/services/typing-indicator.service";

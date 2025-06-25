@@ -1,4 +1,4 @@
-import { discussionsResource, messagesResource } from "@/resources";
+import { discussionsResource, messagesResource } from "@/core/resources";
 import { discussionService } from "@/services/discussion.service";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { messageService } from "@/services/message.service";

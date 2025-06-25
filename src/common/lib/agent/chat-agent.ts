@@ -3,7 +3,7 @@ import { ActionDef, ActionParser } from "@/common/lib/agent/action/action-parser
 import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { DiscussionKeys, SpeakRequest } from "@/common/lib/discussion/discussion-env";
 import { generateId } from "@/common/lib/utils";
-import { messagesResource } from "@/resources";
+import { messagesResource } from "@/core/resources";
 import { messageService } from "@/services/message.service";
 import {
   ActionResultMessage,

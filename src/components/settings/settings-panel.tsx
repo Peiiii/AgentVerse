@@ -3,7 +3,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useEffect, useMemo, useState } from "react";
 import { SettingsList } from "./settings-list";
 import { CategoryList } from "./category-list";
-import { autoFillStrategies } from "@/resources/settings.resource";
+import { autoFillStrategies } from "@/core/resources/settings.resource";
 
 export const SettingsPanel: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>();
