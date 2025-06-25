@@ -17,7 +17,7 @@ import { AppLoading } from "./common/components/app/app-loading.tsx";
 import { ThemeProvider } from "./common/components/common/theme/context.tsx";
 import { ModalProvider } from "./common/components/ui/modal/provider.tsx";
 import "./index.css";
-import "./styles/theme.css";
+import "./core/styles/theme.css";
 
 (window as any).discussionService = discussionService;
 (window as any).discussionControlService = discussionControlService;
