@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { useModal } from "@/components/ui/modal";
-import { cn, formatTime } from "@/lib/utils";
+import { cn, formatTime } from "@/common/lib/utils";
 import { Download, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { DiscussionItemProps } from "./types";

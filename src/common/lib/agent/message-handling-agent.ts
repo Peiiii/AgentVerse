@@ -1,9 +1,9 @@
-import { BaseAgent, BaseAgentState } from "@/lib/agent/base-agent";
-import { PromptBuilder } from "@/lib/agent/prompt/prompt-builder";
-import { ChatMessage, ChatRole } from "@/lib/ai-service";
-import { CapabilityRegistry } from "@/lib/capabilities";
-import { DiscussionKeys } from "@/lib/discussion/discussion-env";
-import { SpeakReason, SpeakRequest } from "@/lib/discussion/speak-scheduler";
+import { BaseAgent, BaseAgentState } from "@/common/lib/agent/base-agent";
+import { PromptBuilder } from "@/common/lib/agent/prompt/prompt-builder";
+import { ChatMessage, ChatRole } from "@/common/lib/ai-service";
+import { CapabilityRegistry } from "@/common/lib/capabilities";
+import { DiscussionKeys } from "@/common/lib/discussion/discussion-env";
+import { SpeakReason, SpeakRequest } from "@/common/lib/discussion/speak-scheduler";
 import {
   agentListResource,
   discussionMembersResource,

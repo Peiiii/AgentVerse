@@ -1,4 +1,4 @@
-import { useResourceState } from "@/lib/resource";
+import { useResourceState } from "@/common/lib/resource";
 import { agentsResource } from "@/resources";
 import { agentService } from "@/services/agent.service";
 import { Agent } from "@/types/agent";

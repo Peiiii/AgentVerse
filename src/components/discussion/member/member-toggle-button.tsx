@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 interface MemberToggleButtonProps {
   onClick?: () => void;

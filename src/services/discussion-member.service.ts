@@ -1,4 +1,4 @@
-import { MockHttpProvider } from "@/lib/storage";
+import { MockHttpProvider } from "@/common/lib/storage";
 import { DiscussionMember } from "@/types/discussion-member";
 import { DiscussionMemberDataProvider } from "@/types/storage";
 import { STORAGE_CONFIG } from "@/config/storage";

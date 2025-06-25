@@ -1,7 +1,7 @@
 import { CustomTeamDialog } from "@/components/agent/dialogs/custom-team-dialog";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/config/agents";
 import { useAgents } from "@/hooks/useAgents";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { AgentPopover } from "./agent-popover";

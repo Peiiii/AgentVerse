@@ -1,5 +1,5 @@
 import { useMemoizedFn } from "ahooks";
-import { ReadyResourceState } from "@/lib/resource";
+import { ReadyResourceState } from "@/common/lib/resource";
 
 interface UseOptimisticUpdateOptions<T> {
   onChange?: (data: T) => void;

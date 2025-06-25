@@ -3,7 +3,7 @@ import {
   DiscussionKeys,
   IDiscussionEnvBus,
 } from "../discussion/discussion-env";
-import { RxEvent } from "@/lib/rx-event";
+import { RxEvent } from "@/common/lib/rx-event";
 
 /**
  * Agent的基础配置接口

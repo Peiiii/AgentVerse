@@ -1,5 +1,5 @@
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { ReactNode } from "react";
 
 interface ResponsiveContainerProps {

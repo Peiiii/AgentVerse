@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Settings2 } from "lucide-react";
 
 interface DiscussionSettingsButtonProps {

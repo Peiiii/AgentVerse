@@ -1,4 +1,4 @@
-import { useResourceState } from "@/lib/resource";
+import { useResourceState } from "@/common/lib/resource";
 import { messagesResource } from "@/resources";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { messageService } from "@/services/message.service";

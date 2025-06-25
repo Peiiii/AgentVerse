@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAgents } from "@/hooks/useAgents";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Agent } from "@/types/agent";
 import { Check, Search } from "lucide-react";
 import match from "pinyin-match";

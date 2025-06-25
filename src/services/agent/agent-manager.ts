@@ -1,8 +1,8 @@
-import { BaseAgent, ChatAgent, BaseAgentState } from "@/lib/agent";
-import { DiscussionEnvBus } from "@/lib/discussion/discussion-env";
+import { BaseAgent, ChatAgent, BaseAgentState } from "@/common/lib/agent";
+import { DiscussionEnvBus } from "@/common/lib/discussion/discussion-env";
 import { agentListResource } from "@/resources";
 import { DiscussionMember } from "@/types/discussion-member";
-import { RxEvent } from "@/lib/rx-event";
+import { RxEvent } from "@/common/lib/rx-event";
 
 export class AgentManager {
     private agents: Map<string, BaseAgent> = new Map();

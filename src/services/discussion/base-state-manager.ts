@@ -1,5 +1,5 @@
-import { RxEvent } from "@/lib/rx-event";
-import { WithState } from "@/lib/with-event";
+import { RxEvent } from "@/common/lib/rx-event";
+import { WithState } from "@/common/lib/with-event";
 
 export interface BaseDiscussionState {
   isPaused: boolean;

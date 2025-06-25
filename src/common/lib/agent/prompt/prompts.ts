@@ -1,4 +1,4 @@
-import { Capability } from "@/lib/capabilities";
+import { Capability } from "@/common/lib/capabilities";
 import { Agent } from "@/types/agent";
 import { ActionResultMessage } from "@/types/discussion";
 

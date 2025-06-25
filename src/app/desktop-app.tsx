@@ -8,7 +8,7 @@ import { githubExtension } from "@/features/github/extensions";
 import { settingsExtension } from "@/features/settings/extensions";
 import { useMessages } from "@/hooks/useMessages";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { useEffect } from "react";
 

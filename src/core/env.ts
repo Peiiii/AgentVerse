@@ -1,4 +1,4 @@
-import { EnvironmentBus } from "@/lib/typed-bus/implementations/environment-bus";
+import { EnvironmentBus } from "@/common/lib/typed-bus/implementations/environment-bus";
 
 // 创建全局环境总线实例
 export const env = new EnvironmentBus();

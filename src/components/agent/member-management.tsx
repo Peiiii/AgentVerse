@@ -1,6 +1,6 @@
 import { useAddAgentDialog } from "@/components/agent/add-agent-dialog";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Users } from "lucide-react";
 
 interface MemberManagementProps {

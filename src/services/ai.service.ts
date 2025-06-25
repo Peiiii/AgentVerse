@@ -6,7 +6,7 @@ import {
   LLMProvider,
   ProxyAPIAdapter,
   StandardProvider,
-} from "@/lib/ai-service";
+} from "@/common/lib/ai-service";
 import { filterNormalMessages } from "@/services/message.util";
 import { SupportedAIProvider } from "@/types/ai";
 import { AgentMessage } from "@/types/discussion";

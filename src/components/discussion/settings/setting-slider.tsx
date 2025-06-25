@@ -1,6 +1,6 @@
 import { Slider } from "@/components/ui/slider";
 import { SettingItem } from "./setting-item";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 export interface SettingSliderProps {
   label: string;

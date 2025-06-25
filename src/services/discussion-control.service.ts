@@ -1,9 +1,9 @@
-import { CapabilityRegistry } from "@/lib/capabilities";
+import { CapabilityRegistry } from "@/common/lib/capabilities";
 import {
   DiscussionEnvBus,
   DiscussionKeys,
-} from "@/lib/discussion/discussion-env";
-import { RxEvent } from "@/lib/rx-event";
+} from "@/common/lib/discussion/discussion-env";
+import { RxEvent } from "@/common/lib/rx-event";
 import { messagesResource } from "@/resources";
 import { discussionCapabilitiesResource } from "@/resources/discussion-capabilities.resource";
 import { AgentManager } from "@/services/agent/agent-manager";

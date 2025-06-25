@@ -1,4 +1,4 @@
-import { RxEvent } from "@/lib/rx-event";
+import { RxEvent } from "@/common/lib/rx-event";
 import { createNestedBean } from "packages/rx-nested-bean/src";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

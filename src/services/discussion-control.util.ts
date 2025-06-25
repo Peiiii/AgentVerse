@@ -1,10 +1,10 @@
 import { DEFAULT_SETTINGS } from "@/config/settings";
-import { BaseAgent, ChatAgent } from "@/lib/agent";
+import { BaseAgent, ChatAgent } from "@/common/lib/agent";
 import {
   DiscussionEnvBus,
   DiscussionKeys,
-} from "@/lib/discussion/discussion-env";
-import { RxEvent } from "@/lib/rx-event";
+} from "@/common/lib/discussion/discussion-env";
+import { RxEvent } from "@/common/lib/rx-event";
 import { agentListResource } from "@/resources";
 import { AgentMessage } from "@/types/discussion";
 import { DiscussionMember } from "@/types/discussion-member";

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import type { Root } from "mdast";
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";

@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Agent } from "@/types/agent";
 import { Check } from "lucide-react";
 

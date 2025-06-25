@@ -1,4 +1,4 @@
-import { CapabilityRegistry } from "@/lib/capabilities";
+import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { ActionDef, ActionParseResult } from "./action-parser";
 
 // action-executor.ts

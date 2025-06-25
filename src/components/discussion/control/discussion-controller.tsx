@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { UI_PERSIST_KEYS, createUIPersistOptions } from "@/config/ui-persist";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { usePersistedState } from "@/hooks/usePersistedState";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { agentListResource } from "@/resources";
 import { ITypingIndicator } from "@/services/typing-indicator.service";
 import { PauseCircle, PlayCircle } from "lucide-react";

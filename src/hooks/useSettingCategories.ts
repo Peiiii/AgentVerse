@@ -1,4 +1,4 @@
-import { useResourceState } from "@/lib/resource";
+import { useResourceState } from "@/common/lib/resource";
 import { settingsResource } from "@/resources/settings.resource";
 import { useMemo } from "react";
 

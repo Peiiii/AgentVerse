@@ -1,5 +1,5 @@
 import { useAutoScroll } from "@/hooks/useAutoScroll";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import {
   forwardRef,
   ReactNode,

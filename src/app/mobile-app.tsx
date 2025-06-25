@@ -21,7 +21,7 @@ import { useDiscussions } from "@/hooks/useDiscussions";
 import { useMessages } from "@/hooks/useMessages";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { Discussion } from "@/types/discussion";
 import { useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-import { RxEvent } from "@/lib/rx-event";
+import { RxEvent } from "@/common/lib/rx-event";
 
 export type TypingStatus = "typing" | "thinking" | null;
 

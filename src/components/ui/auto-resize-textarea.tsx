@@ -1,5 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import React, { useEffect, useRef } from "react";
 
 export interface AutoResizeTextareaProps

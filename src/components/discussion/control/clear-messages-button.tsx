@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal";
 import { useDiscussions } from "@/hooks/useDiscussions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Eraser } from "lucide-react";
 
 interface ClearMessagesButtonProps {

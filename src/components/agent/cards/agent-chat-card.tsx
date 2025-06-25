@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Agent } from "@/types/agent";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";

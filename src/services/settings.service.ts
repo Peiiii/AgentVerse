@@ -1,5 +1,5 @@
 import { STORAGE_CONFIG } from "@/config/storage";
-import { DataProvider, MockHttpProvider } from "@/lib/storage";
+import { DataProvider, MockHttpProvider } from "@/common/lib/storage";
 import { SettingItem } from "@/types/settings";
 
 export type SettingDataProvider = DataProvider<SettingItem>;

@@ -1,8 +1,8 @@
-import { BaseActionExecutor, DefaultActionExecutor } from "@/lib/agent/action";
-import { ActionDef, ActionParser } from "@/lib/agent/action/action-parser";
-import { CapabilityRegistry } from "@/lib/capabilities";
-import { DiscussionKeys, SpeakRequest } from "@/lib/discussion/discussion-env";
-import { generateId } from "@/lib/utils";
+import { BaseActionExecutor, DefaultActionExecutor } from "@/common/lib/agent/action";
+import { ActionDef, ActionParser } from "@/common/lib/agent/action/action-parser";
+import { CapabilityRegistry } from "@/common/lib/capabilities";
+import { DiscussionKeys, SpeakRequest } from "@/common/lib/discussion/discussion-env";
+import { generateId } from "@/common/lib/utils";
 import { messagesResource } from "@/resources";
 import { messageService } from "@/services/message.service";
 import {

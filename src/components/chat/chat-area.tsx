@@ -4,7 +4,7 @@ import { DEFAULT_SCENARIOS } from "@/config/guide-scenarios";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { useDiscussions } from "@/hooks/useDiscussions";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { AgentMessage } from "@/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";

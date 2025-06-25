@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 // 可复用的AgentCard组件，用于展示代理信息的Popover卡片
 interface AgentCardProps {

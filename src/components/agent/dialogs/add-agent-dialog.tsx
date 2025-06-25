@@ -4,7 +4,7 @@ import { useModal } from "@/components/ui/modal";
 import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { useAgentForm } from "@/hooks/useAgentForm";
 import { useAgents } from "@/hooks/useAgents";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Loader2, PlusCircle, Search } from "lucide-react";
 import match from "pinyin-match";
 import { useCallback, useMemo, useState } from "react";

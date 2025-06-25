@@ -1,5 +1,5 @@
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { forwardRef } from "react";
 import { useMessageInput, type MessageInputRef } from "@/hooks/useMessageInput";
 

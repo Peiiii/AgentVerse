@@ -4,7 +4,7 @@ import { discussionControlService } from "@/services/discussion-control.service"
 import { messageService } from "@/services/message.service";
 import { Discussion } from "@/types/discussion";
 import { useMemoizedFn } from "ahooks";
-import { useResourceState } from "@/lib/resource";
+import { useResourceState } from "@/common/lib/resource";
 import { useOptimisticUpdate } from "./useOptimisticUpdate";
 import { useToast } from "./use-toast";
 

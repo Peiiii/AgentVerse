@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 type Theme = 'light' | 'dark' | 'system';
 

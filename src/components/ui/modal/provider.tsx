@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ModalContext } from "./context";
 import { ModalOptions, ModalState } from "./types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 export function ModalProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ModalState>({

@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SettingItem } from "./setting-item";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 export interface Option<T extends string = string> {
   value: T;

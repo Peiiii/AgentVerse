@@ -1,6 +1,6 @@
 import { useAgents } from "@/hooks/useAgents";
 import { useDiscussions } from "@/hooks/useDiscussions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { discussionsResource, messagesResource } from "@/resources";
 import { DEFAULT_DISCUSSION_TITLE } from "@/services/common.util";
 import { filterNormalMessages } from "@/services/message.util";

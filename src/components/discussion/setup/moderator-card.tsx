@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Agent } from "@/types/agent";
 import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 
 export interface ModeratorCardProps {
   agent: Agent;

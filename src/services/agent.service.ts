@@ -1,5 +1,5 @@
 import { STORAGE_CONFIG } from "@/config/storage";
-import { MockHttpProvider } from "@/lib/storage";
+import { MockHttpProvider } from "@/common/lib/storage";
 import { Agent } from "@/types/agent";
 import { AgentDataProvider } from "@/types/storage";
 

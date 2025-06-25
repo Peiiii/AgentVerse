@@ -1,6 +1,6 @@
 import { IconRegistry } from "@/components/common/icon-registry";
 import { ThemeToggle } from "@/components/common/theme";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { useActivityBarService } from "@/services/activity-bar.service";
 import { ActivityItem } from "@/stores/activity-bar.store";
 import { ActivityBar } from "composite-kit";

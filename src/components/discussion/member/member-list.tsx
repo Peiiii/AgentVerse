@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
 import { useAgents } from "@/hooks/useAgents";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { AddMemberDialog } from "./add-member-dialog";

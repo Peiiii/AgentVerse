@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/common/lib/utils';
 import { useIcon } from '@/stores/icon.store';
 import { LucideIcon } from 'lucide-react';
 

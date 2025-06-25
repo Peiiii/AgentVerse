@@ -1,4 +1,4 @@
-import { Capability } from "@/lib/capabilities";
+import { Capability } from "@/common/lib/capabilities";
 
 // 类型定义
 interface DBIndex {

@@ -1,5 +1,5 @@
 import { DEFAULT_AGENTS } from "@/config/agents";
-import { createResource } from "@/lib/resource";
+import { createResource } from "@/common/lib/resource";
 import { agentService } from "@/services/agent.service";
 import { discussionControlService } from "@/services/discussion-control.service";
 import { discussionMemberService } from "@/services/discussion-member.service";

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Agent } from "@/types/agent";
 import { AgentSelectCard } from "../cards/agent-select-card";
 import { Input } from "@/components/ui/input";

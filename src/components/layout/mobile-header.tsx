@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import {
   Menu,
   MoreVertical,

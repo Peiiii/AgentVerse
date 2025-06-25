@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Settings, Eraser, Moon, Sun, X } from "lucide-react";
 import { useTheme } from "@/components/common/theme";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { useModal } from "@/components/ui/modal";
 import { useSettingsDialog } from "@/components/settings/settings-dialog";
 

@@ -1,4 +1,4 @@
-import { DataProvider } from "@/lib/storage/types";
+import { DataProvider } from "@/common/lib/storage/types";
 import { Agent } from "./agent";
 import { Discussion } from "./discussion";
 import { AgentMessage } from "./discussion";

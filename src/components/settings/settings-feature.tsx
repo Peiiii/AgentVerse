@@ -1,6 +1,6 @@
 import { useSettingsDialog } from "@/components/settings/settings-dialog";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Settings } from "lucide-react";
 
 interface SettingsFeatureProps {

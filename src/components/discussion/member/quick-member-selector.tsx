@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/config/agents";
 import { useAgents } from "@/hooks/useAgents";
 import { useDiscussionMembers } from "@/hooks/useDiscussionMembers";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";

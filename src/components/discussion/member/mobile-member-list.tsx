@@ -1,5 +1,5 @@
 import { SheetTitle } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { MemberList } from "./member-list";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";

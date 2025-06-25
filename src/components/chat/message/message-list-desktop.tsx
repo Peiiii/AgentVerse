@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollableLayout } from "@/components/layouts/scrollable-layout";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/lib/utils";
 import { AgentMessage } from "@/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";

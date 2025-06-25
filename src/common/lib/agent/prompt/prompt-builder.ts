@@ -1,6 +1,6 @@
-import { IAgentConfig } from "@/lib/agent";
-import { ChatMessage } from "@/lib/ai-service";
-import { Capability } from "@/lib/capabilities";
+import { IAgentConfig } from "@/common/lib/agent";
+import { ChatMessage } from "@/common/lib/ai-service";
+import { Capability } from "@/common/lib/capabilities";
 import { Agent } from "@/types/agent";
 import {
   ActionResultMessage,
