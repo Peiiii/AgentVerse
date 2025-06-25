@@ -10,20 +10,20 @@ import { MobileHeader } from "@/common/components/layout/mobile-header";
 import { useSettingsDialog } from "@/common/components/settings/settings-dialog";
 import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
-import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
-import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { agentsExtension } from "@/common/features/agents/extensions";
-import { chatExtension } from "@/common/features/chat/extensions";
 import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
+import { cn } from "@/common/lib/utils";
+import { Discussion } from "@/common/types/discussion";
+import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
+import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { useMessages } from "@/core/hooks/useMessages";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
-import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/core/services/discussion-control.service";
-import { Discussion } from "@/common/types/discussion";
+import { mobileChatExtension } from "@/mobile/features/chat/extensions";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 
@@ -32,7 +32,7 @@ type Scene = "discussions" | "chat" | "agents" | "settings";
 
 export function MobileApp() {
   useSetupApp({
-    extensions: [chatExtension, agentsExtension, settingsExtension, githubExtension],
+    extensions: [mobileChatExtension, agentsExtension, settingsExtension, githubExtension],
   });
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();

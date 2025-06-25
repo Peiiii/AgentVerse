@@ -6,7 +6,7 @@ import { MessageSquare } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 
-export const chatExtension = defineExtension({
+export const mobileChatExtension = defineExtension({
     manifest: {
         id: "chat",
         name: "Chat",

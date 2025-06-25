@@ -3,7 +3,7 @@ import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { agentsExtension } from "@/common/features/agents/extensions";
-import { chatExtension } from "@/common/features/chat/extensions";
+import { desktopChatExtension } from "@/desktop/features/chat/extensions";
 import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { useMessages } from "@/core/hooks/useMessages";
@@ -14,7 +14,7 @@ import { useEffect } from "react";
 
 export function DesktopApp() {
   useSetupApp({
-    extensions: [chatExtension, agentsExtension, settingsExtension, githubExtension],
+    extensions: [desktopChatExtension, agentsExtension, settingsExtension, githubExtension],
   });
   const { rootClassName } = useTheme();
   const { messages } = useMessages();
