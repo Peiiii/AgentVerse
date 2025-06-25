@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { RouteNode } from '../types/route';
+import type { RouteNode } from '@/common/types/route';
 
 export interface RouteTreeState {
   routes: RouteNode[];
