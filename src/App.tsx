@@ -1,5 +1,5 @@
-import { DesktopApp } from "@/app/desktop-app";
-import { MobileApp } from "@/app/mobile-app";
+import { DesktopApp } from "@/desktop/desktop-app";
+import { MobileApp } from "@/mobile/mobile-app";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 
 
