@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-shadow */
+ 
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
@@ -133,7 +133,7 @@ const setNodeData = (
   };
   taskManager.freeze();
   if (!path) {
-    // eslint-disable-next-line no-param-reassign
+     
     dataTree.data = value;
     notify(controlTree, value, prevValue);
   } else {
@@ -181,7 +181,7 @@ const setNodeData = (
         changedChildValue = realNewData;
       }
     }
-    // eslint-disable-next-line no-param-reassign
+     
     dataTree.data = changedChildValue;
 
     // from the upper level to the lower level, notify the subscribers
@@ -356,7 +356,7 @@ const createNestedBeanInner = <T extends Record<string, any>>(
         "namespaces",
       ]);
     },
-    // eslint-disable-next-line consistent-return
+     
     get(target: any, actionAndProp) {
       if (actionAndProp in target) {
         return target[actionAndProp];

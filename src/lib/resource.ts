@@ -6,7 +6,7 @@ export interface ResourceState<T> {
   isValidating: boolean; // 刷新状态
   error: Error | null;
   mutate: (
-    dataOrMutator?:
+    dataOrMutator?: 
       | T
       | null
       | ((prev: T | null) => T | null | Promise<T | null>),

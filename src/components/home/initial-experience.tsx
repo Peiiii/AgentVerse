@@ -14,14 +14,14 @@ interface InitialExperienceProps {
     topic: string,
     customMembers?: { agentId: string; isAutoReply: boolean }[]
   ) => void;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   onChangeTeam?: (key: AgentCombinationType) => void;
   className?: string;
 }
 
 export function InitialExperience({
   onStart,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   onChangeTeam,
   className,
 }: InitialExperienceProps) {
