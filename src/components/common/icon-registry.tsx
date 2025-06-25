@@ -1,5 +1,5 @@
 import { cn } from '@/common/lib/utils';
-import { useIcon } from '@/stores/icon.store';
+import { useIcon } from '@/core/stores/icon.store';
 import { LucideIcon } from 'lucide-react';
 
 interface IconRegistryProps {

@@ -1,5 +1,5 @@
-import { navigationStore } from "@/stores/navigation.store";
-import { useActivityBarStore } from "@/stores/activity-bar.store";
+import { navigationStore } from "@/core/stores/navigation.store";
+import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 
 /**
  * 路由配置示例：

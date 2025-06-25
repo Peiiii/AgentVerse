@@ -1,5 +1,5 @@
-import { useActivityBarStore } from "@/stores/activity-bar.store";
-import { useIconStore } from "@/stores/icon.store";
+import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { useIconStore } from "@/core/stores/icon.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Bot } from "lucide-react";
 

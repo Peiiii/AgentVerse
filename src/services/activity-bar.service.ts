@@ -1,6 +1,6 @@
 import { useAddAgentDialog } from '@/components/agent/add-agent-dialog/use-add-agent-dialog';
 import { useSettingsDialog } from '@/components/settings/settings-dialog';
-import { useActivityBarStore } from '@/stores/activity-bar.store';
+import { useActivityBarStore } from '@/core/stores/activity-bar.store';
 import { useCallback, useMemo } from 'react';
 
 export class ActivityBarService {

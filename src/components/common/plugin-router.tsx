@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { useRouteTreeStore } from '../../stores/route-tree.store';
+import { useRouteTreeStore } from '../../core/stores/route-tree.store';
 import type { RouteNode } from '../../types/route';
 
 function renderRoutes(nodes: RouteNode[]): React.ReactNode {

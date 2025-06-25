@@ -1,5 +1,5 @@
 import { IconRegistry } from '@/components/common/icon-registry';
-import { useIconStore } from '@/stores/icon.store';
+import { useIconStore } from '@/core/stores/icon.store';
 import { MessageCircle, Settings, Users, Github } from 'lucide-react';
 
 export function IconStoreDemo() {

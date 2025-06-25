@@ -1,6 +1,6 @@
-import { useActivityBarStore } from "@/stores/activity-bar.store";
-import { useIconStore } from "@/stores/icon.store";
-import { useRouteTreeStore } from "@/stores/route-tree.store";
+import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { useIconStore } from "@/core/stores/icon.store";
+import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";

@@ -1,4 +1,4 @@
-import { navigationStore } from "@/stores/navigation.store";
+import { navigationStore } from "@/core/stores/navigation.store";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
