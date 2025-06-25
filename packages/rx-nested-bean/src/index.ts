@@ -12,7 +12,6 @@ import React, {
   useState,
 } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
-
 export function useEffectOnce(effect: () => void | (() => void)): void {
   return useEffect(effect, []);
 }
