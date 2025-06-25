@@ -4,7 +4,7 @@ import { Agent } from "@/types/agent";
 import { AgentSelectCard } from "../cards/agent-select-card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 
 export interface AgentSelectListProps {
   // Agent列表

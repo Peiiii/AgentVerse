@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { AgentGroupCard, AgentGroupCardProps } from "../cards/agent-group-card";
 import { AgentCombinationType } from "@/config/agents";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 
 export interface AgentCombinationListProps {
   // 组合列表

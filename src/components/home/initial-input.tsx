@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 
 interface InitialInputProps {
   onSubmit: (topic: string) => void;

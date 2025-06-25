@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 
 // 定义卡片模式
 export type AgentCardMode = "preview" | "detail" | "management";

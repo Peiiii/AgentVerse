@@ -2,7 +2,7 @@ import { AgentMessage } from "@/types/discussion";
 import { forwardRef } from "react";
 import { MessageListDesktop } from "./message-list-desktop";
 import { MessageListMobile } from "./message-list-mobile";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { MessageListRef } from "@/hooks/useMessageList";
 
 interface MessageListProps {

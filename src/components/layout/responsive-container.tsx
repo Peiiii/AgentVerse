@@ -1,4 +1,4 @@
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 

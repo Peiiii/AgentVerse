@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { Loader2, Share2 } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
 

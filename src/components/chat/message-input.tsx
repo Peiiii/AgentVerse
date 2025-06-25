@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { MessageInputDesktop } from "./message-input-desktop";
 import { MessageInputMobile } from "./message-input-mobile";
 

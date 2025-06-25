@@ -4,7 +4,7 @@ import { Agent } from "@/types/agent";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 
 export interface AgentChatCardProps {
   // Agent数据

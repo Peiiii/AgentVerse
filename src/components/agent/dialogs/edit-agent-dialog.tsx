@@ -1,5 +1,5 @@
 import { useModal } from "@/components/ui/modal";
-import { useBreakpointContext } from "@/contexts/breakpoint-context";
+import { useBreakpointContext } from "@/components/common/breakpoint-provider";
 import { useAgents } from "@/hooks/useAgents";
 import { cn } from "@/lib/utils";
 import { Agent } from "@/types/agent";
