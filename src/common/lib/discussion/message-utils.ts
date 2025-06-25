@@ -1,4 +1,4 @@
-import { MarkdownActionResults } from "@/components/chat/markdown";
+import { MarkdownActionResults } from "@/common/components/chat/markdown";
 import {
   AgentMessage,
   MessageWithResults,

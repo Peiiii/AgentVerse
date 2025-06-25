@@ -1,5 +1,5 @@
-import { useAddAgentDialog } from '@/components/agent/add-agent-dialog/use-add-agent-dialog';
-import { useSettingsDialog } from '@/components/settings/settings-dialog';
+import { useAddAgentDialog } from '@/common/components/agent/add-agent-dialog/use-add-agent-dialog';
+import { useSettingsDialog } from '@/common/components/settings/settings-dialog';
 import { useActivityBarStore } from '@/core/stores/activity-bar.store';
 import { useCallback, useMemo } from 'react';
 

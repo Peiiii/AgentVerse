@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TooltipProvider } from "@/components/ui/tooltip.tsx";
-import { BreakpointProvider } from "@/components/common/breakpoint-provider.tsx";
+import { TooltipProvider } from "@/common/components/ui/tooltip.tsx";
+import { BreakpointProvider } from "@/common/components/common/breakpoint-provider.tsx";
 import {
   discussionMembersResource,
   discussionsResource,
@@ -13,9 +13,9 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import { App } from "./App.tsx";
-import { AppLoading } from "./components/app/app-loading.tsx";
-import { ThemeProvider } from "./components/common/theme/context.tsx";
-import { ModalProvider } from "./components/ui/modal/provider.tsx";
+import { AppLoading } from "./common/components/app/app-loading.tsx";
+import { ThemeProvider } from "./common/components/common/theme/context.tsx";
+import { ModalProvider } from "./common/components/ui/modal/provider.tsx";
 import "./index.css";
 import "./styles/theme.css";
 

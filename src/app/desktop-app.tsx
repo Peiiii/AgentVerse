@@ -1,6 +1,6 @@
-import { PluginRouter } from "@/components/common/plugin-router";
-import { useTheme } from "@/components/common/theme";
-import { ActivityBarComponent } from "@/components/layout/activity-bar";
+import { PluginRouter } from "@/common/components/common/plugin-router";
+import { useTheme } from "@/common/components/common/theme";
+import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { agentsExtension } from "@/features/agents/extensions";
 import { chatExtension } from "@/features/chat/extensions";
