@@ -1,9 +1,9 @@
 import { discussionMembersResource } from "@/core/resources";
-import { discussionMemberService } from "@/services/discussion-member.service";
+import { discussionMemberService } from "@/core/services/discussion-member.service";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { useMemoizedFn } from "ahooks";
 import { useResourceState } from "@/common/lib/resource";
-import { discussionControlService } from "@/services/discussion-control.service";
+import { discussionControlService } from "@/core/services/discussion-control.service";
 import { useCallback } from "react";
 import { useOptimisticUpdate } from "./useOptimisticUpdate";
 

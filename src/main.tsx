@@ -6,9 +6,9 @@ import {
   discussionsResource,
   messagesResource,
 } from "@/core/resources/index.ts";
-import { discussionControlService } from "@/services/discussion-control.service.ts";
-import { discussionMemberService } from "@/services/discussion-member.service.ts";
-import { discussionService } from "@/services/discussion.service.ts";
+import { discussionControlService } from "@/core/services/discussion-control.service.ts";
+import { discussionMemberService } from "@/core/services/discussion-member.service.ts";
+import { discussionService } from "@/core/services/discussion.service.ts";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";

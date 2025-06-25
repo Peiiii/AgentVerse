@@ -1,10 +1,10 @@
 import { DEFAULT_AGENTS } from "@/config/agents";
 import { createResource } from "@/common/lib/resource";
-import { agentService } from "@/services/agent.service";
-import { discussionControlService } from "@/services/discussion-control.service";
-import { discussionMemberService } from "@/services/discussion-member.service";
-import { discussionService } from "@/services/discussion.service";
-import { messageService } from "@/services/message.service";
+import { agentService } from "@/core/services/agent.service";
+import { discussionControlService } from "@/core/services/discussion-control.service";
+import { discussionMemberService } from "@/core/services/discussion-member.service";
+import { discussionService } from "@/core/services/discussion.service";
+import { messageService } from "@/core/services/message.service";
 import { Discussion } from "@/common/types/discussion";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { filter, firstValueFrom, switchMap } from "rxjs";

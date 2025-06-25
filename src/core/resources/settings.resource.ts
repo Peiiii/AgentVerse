@@ -1,8 +1,8 @@
 import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/config/ai";
 import { SETTING_KYES } from "@/config/settings";
 import { createResource } from "@/common/lib/resource";
-import { aiService } from "@/services/ai.service";
-import { settingsService } from "@/services/settings.service";
+import { aiService } from "@/core/services/ai.service";
+import { settingsService } from "@/core/services/settings.service";
 import { SupportedAIProvider } from "@/common/types/ai";
 import { AIProviderSettingSchema, AutoFillStrategy, SettingItem } from "@/common/types/settings";
 

@@ -9,9 +9,9 @@ import {
   discussionMembersResource,
   messagesResource,
 } from "@/core/resources";
-import { aiService } from "@/services/ai.service";
-import { discussionControlService } from "@/services/discussion-control.service";
-import { messageService } from "@/services/message.service";
+import { aiService } from "@/core/services/ai.service";
+import { discussionControlService } from "@/core/services/discussion-control.service";
+import { messageService } from "@/core/services/message.service";
 import {
   ActionResultMessage,
   AgentMessage,

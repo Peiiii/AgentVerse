@@ -1,9 +1,9 @@
 import { Capability } from "@/common/lib/capabilities";
 import { createResource } from "@/common/lib/resource";
 import { agentListResource, discussionMembersResource } from "@/core/resources";
-import { agentService } from "@/services/agent.service";
-import { discussionControlService } from "@/services/discussion-control.service";
-import { discussionMemberService } from "@/services/discussion-member.service";
+import { agentService } from "@/core/services/agent.service";
+import { discussionControlService } from "@/core/services/discussion-control.service";
+import { discussionMemberService } from "@/core/services/discussion-member.service";
 
 const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
   const discussionId = discussionControlService.getCurrentDiscussionId();

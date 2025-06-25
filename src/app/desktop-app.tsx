@@ -9,7 +9,7 @@ import { settingsExtension } from "@/features/settings/extensions";
 import { useMessages } from "@/hooks/useMessages";
 import { useViewportHeight } from "@/hooks/useViewportHeight";
 import { cn } from "@/common/lib/utils";
-import { discussionControlService } from "@/services/discussion-control.service";
+import { discussionControlService } from "@/core/services/discussion-control.service";
 import { useEffect } from "react";
 
 export function DesktopApp() {

@@ -1,7 +1,7 @@
 import { discussionsResource, messagesResource } from "@/core/resources";
-import { discussionService } from "@/services/discussion.service";
-import { discussionControlService } from "@/services/discussion-control.service";
-import { messageService } from "@/services/message.service";
+import { discussionService } from "@/core/services/discussion.service";
+import { discussionControlService } from "@/core/services/discussion-control.service";
+import { messageService } from "@/core/services/message.service";
 import { Discussion } from "@/common/types/discussion";
 import { useMemoizedFn } from "ahooks";
 import { useResourceState } from "@/common/lib/resource";

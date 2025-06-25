@@ -1,6 +1,6 @@
 import { useResourceState } from "@/common/lib/resource";
 import { settingsResource } from "@/core/resources/settings.resource";
-import { settingsService } from "@/services/settings.service";
+import { settingsService } from "@/core/services/settings.service";
 import { SettingItem } from "@/common/types/settings";
 import { useMemoizedFn } from "ahooks";
 import { useOptimisticUpdate } from "./useOptimisticUpdate";

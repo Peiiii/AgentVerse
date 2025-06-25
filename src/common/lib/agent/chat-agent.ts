@@ -4,7 +4,7 @@ import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { DiscussionKeys, SpeakRequest } from "@/common/lib/discussion/discussion-env";
 import { generateId } from "@/common/lib/utils";
 import { messagesResource } from "@/core/resources";
-import { messageService } from "@/services/message.service";
+import { messageService } from "@/core/services/message.service";
 import {
   ActionResultMessage,
   AgentMessage,

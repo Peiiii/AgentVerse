@@ -7,7 +7,7 @@ import {
   ProxyAPIAdapter,
   StandardProvider,
 } from "@/common/lib/ai-service";
-import { filterNormalMessages } from "@/services/message.util";
+import { filterNormalMessages } from "@/core/services/message.util";
 import { SupportedAIProvider } from "@/common/types/ai";
 import { AgentMessage } from "@/common/types/discussion";
 import { Observable } from "rxjs";

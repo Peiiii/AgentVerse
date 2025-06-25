@@ -6,9 +6,9 @@ import {
 import { RxEvent } from "@/common/lib/rx-event";
 import { messagesResource } from "@/core/resources";
 import { discussionCapabilitiesResource } from "@/core/resources/discussion-capabilities.resource";
-import { AgentManager } from "@/services/agent/agent-manager";
-import { messageService } from "@/services/message.service";
-import { typingIndicatorService } from "@/services/typing-indicator.service";
+import { AgentManager } from "@/core/services/agent/agent-manager";
+import { messageService } from "@/core/services/message.service";
+import { typingIndicatorService } from "@/core/services/typing-indicator.service";
 import {
   AgentMessage,
   NormalMessage

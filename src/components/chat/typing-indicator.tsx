@@ -3,7 +3,7 @@ import { cn } from "@/common/lib/utils";
 import {
   ITypingIndicator as TypingIndicatorType,
   TypingStatus
-} from "@/services/typing-indicator.service";
+} from "@/core/services/typing-indicator.service";
 
 export interface TypingIndicatorProps {
   /**

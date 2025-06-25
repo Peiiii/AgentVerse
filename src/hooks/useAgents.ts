@@ -1,6 +1,6 @@
 import { useResourceState } from "@/common/lib/resource";
 import { agentsResource } from "@/core/resources";
-import { agentService } from "@/services/agent.service";
+import { agentService } from "@/core/services/agent.service";
 import { Agent } from "@/common/types/agent";
 import { useMemoizedFn } from "ahooks";
 import { useOptimisticUpdate } from "./useOptimisticUpdate";
