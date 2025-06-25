@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ScrollableLayout } from "@/layouts/scrollable-layout";
+import { ScrollableLayout } from "@/components/layouts/scrollable-layout";
 import { cn } from "@/lib/utils";
 import { AgentMessage } from "@/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";

@@ -1,7 +1,7 @@
 import { reorganizeMessages } from "@/lib/discussion/message-utils";
 import { AgentMessage, MessageWithResults } from "@/types/discussion";
 import { useEffect, useRef, useState } from "react";
-import { ScrollableLayoutRef } from "@/layouts/scrollable-layout";
+import { ScrollableLayoutRef } from "@/components/layouts/scrollable-layout";
 
 export interface MessageListRef {
   scrollToBottom: (instant?: boolean) => void;

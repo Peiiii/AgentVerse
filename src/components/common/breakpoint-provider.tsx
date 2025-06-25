@@ -1,6 +1,22 @@
-import { BREAKPOINTS, type Breakpoint } from "@/constants/breakpoints";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { createContext, ReactNode, useContext, useMemo } from "react";
+
+/**
+ * 应用的断点配置
+ * 与 Tailwind CSS 的默认断点保持一致
+ * @see https://tailwindcss.com/docs/breakpoints
+ */
+export const BREAKPOINTS = {
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
+  '2xl': 1536,
+} as const;
+
+export type Breakpoint = keyof typeof BREAKPOINTS;
+
+
 
 interface BreakpointContextValue {
   breakpoint: Breakpoint;
