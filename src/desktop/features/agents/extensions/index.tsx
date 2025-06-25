@@ -1,10 +1,13 @@
 import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
+import { useRouteTreeStore } from "@/core/stores/route-tree.store";
+import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Bot } from "lucide-react";
+import { AgentsPage } from "../pages/agents-page";
 
 
-export const commonAgentsExtension = defineExtension({
+export const desktopAgentsExtension = defineExtension({
     manifest: {
         id: "agents",
         name: "Agents",
@@ -25,6 +28,16 @@ export const commonAgentsExtension = defineExtension({
             icon: "bot",
             order: 20,
         })))
-        
+        useRouteTreeStore.getState().addRoute({
+            id: "agents",
+            path: "/agents",
+            element: <AgentsPage />,
+        })
+        subscriptions.push(Disposable.from(connectRouterWithActivityBar([
+            {
+                activityKey: "agents",
+                routerPath: "/agents",
+            },
+        ])))
     },
 });

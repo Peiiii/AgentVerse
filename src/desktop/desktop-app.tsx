@@ -1,20 +1,21 @@
 import { PluginRouter } from "@/common/components/common/plugin-router";
 import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
-import { useSetupApp } from "@/core/hooks/use-setup-app";
-import { agentsExtension } from "@/common/features/agents/extensions";
-import { desktopChatExtension } from "@/desktop/features/chat/extensions";
 import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
+import { cn } from "@/common/lib/utils";
+import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useMessages } from "@/core/hooks/useMessages";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
-import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/core/services/discussion-control.service";
+import { desktopAgentsExtension } from "@/desktop/features/agents/extensions";
+import { desktopChatExtension } from "@/desktop/features/chat/extensions";
 import { useEffect } from "react";
+import { HashRouter } from "react-router-dom";
 
-export function DesktopApp() {
+export function DesktopAppInner() {
   useSetupApp({
-    extensions: [desktopChatExtension, agentsExtension, settingsExtension, githubExtension],
+    extensions: [desktopChatExtension, desktopAgentsExtension, settingsExtension, githubExtension],
   });
   const { rootClassName } = useTheme();
   const { messages } = useMessages();
@@ -37,6 +38,14 @@ export function DesktopApp() {
       </div>
     </div>
   );
-
 }
 
+
+export function DesktopApp() {
+  // 桌面端路由, 和mobile端不共享路由实例
+  return (
+    <HashRouter>
+      <DesktopAppInner />
+    </HashRouter>
+  );
+}

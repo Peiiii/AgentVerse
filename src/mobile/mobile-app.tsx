@@ -10,7 +10,7 @@ import { MobileHeader } from "@/common/components/layout/mobile-header";
 import { useSettingsDialog } from "@/common/components/settings/settings-dialog";
 import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
-import { agentsExtension } from "@/common/features/agents/extensions";
+import { commonAgentsExtension } from "@/common/features/agents/extensions";
 import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
@@ -25,14 +25,15 @@ import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { mobileChatExtension } from "@/mobile/features/chat/extensions";
 import { useEffect, useState } from "react";
+import { HashRouter } from "react-router-dom";
 import { useProxyBeanState } from "rx-nested-bean";
 
 // 场景类型
 type Scene = "discussions" | "chat" | "agents" | "settings";
 
-export function MobileApp() {
+export function MobileAppInner() {
   useSetupApp({
-    extensions: [mobileChatExtension, agentsExtension, settingsExtension, githubExtension],
+    extensions: [mobileChatExtension, commonAgentsExtension, settingsExtension, githubExtension],
   });
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();
@@ -241,5 +242,13 @@ export function MobileApp() {
         />
       </div>
     </div>
+  );
+}
+
+export function MobileApp() {
+  return (
+    <HashRouter>
+      <MobileAppInner />
+    </HashRouter>
   );
 }

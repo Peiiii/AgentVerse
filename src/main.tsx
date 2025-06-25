@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TooltipProvider } from "@/common/components/ui/tooltip.tsx";
 import { BreakpointProvider } from "@/common/components/common/breakpoint-provider.tsx";
+import { TooltipProvider } from "@/common/components/ui/tooltip.tsx";
 import {
   discussionMembersResource,
   discussionsResource,
@@ -11,13 +11,12 @@ import { discussionMemberService } from "@/core/services/discussion-member.servi
 import { discussionService } from "@/core/services/discussion.service.ts";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter } from "react-router-dom";
 import { App } from "./App.tsx";
 import { AppLoading } from "./common/components/app/app-loading.tsx";
 import { ThemeProvider } from "./common/components/common/theme/context.tsx";
 import { ModalProvider } from "./common/components/ui/modal/provider.tsx";
-import "./index.css";
 import "./core/styles/theme.css";
+import "./index.css";
 
 (window as any).discussionService = discussionService;
 (window as any).discussionControlService = discussionControlService;
@@ -31,13 +30,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Suspense fallback={<AppLoading />}>
       <TooltipProvider>
         <BreakpointProvider>
-          <HashRouter>
-            <ThemeProvider>
-              <ModalProvider>
-                <App />
-              </ModalProvider>
-            </ThemeProvider>
-          </HashRouter>
+          <ThemeProvider>
+            <ModalProvider>
+              <App />
+            </ModalProvider>
+          </ThemeProvider>
         </BreakpointProvider>
       </TooltipProvider>
     </Suspense>
