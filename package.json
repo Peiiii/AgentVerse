@@ -17,6 +17,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@agent-labs/agent-chat": "^1.5.0",
     "@cardos/extension": "0.2.0-beta.3",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-avatar": "^1.1.2",
