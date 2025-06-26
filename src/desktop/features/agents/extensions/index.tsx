@@ -5,6 +5,7 @@ import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-a
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Bot } from "lucide-react";
 import { AgentsPage } from "../pages/agents-page";
+import { AgentDetailPage } from "../pages/agent-detail-page";
 
 
 export const desktopAgentsExtension = defineExtension({
@@ -28,15 +29,22 @@ export const desktopAgentsExtension = defineExtension({
             icon: "bot",
             order: 20,
         })))
-        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoute({
-            id: "agents",
-            path: "/agents",
-            element: <AgentsPage />,
-        })))
+        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([
+            {
+                id: "agents",
+                path: "/agents",
+                element: <AgentsPage />,
+            },
+            {
+                id: "agent-detail",
+                path: "/agents/:agentId",
+                element: <AgentDetailPage />,
+            }
+        ])))
         subscriptions.push(Disposable.from(connectRouterWithActivityBar([
             {
                 activityKey: "agents",
-                routerPath: "/agents",
+                routerPaths: ["/agents", "/agents/:agentId"],
             },
         ])))
     },

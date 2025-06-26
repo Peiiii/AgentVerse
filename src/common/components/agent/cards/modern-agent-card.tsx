@@ -23,6 +23,7 @@ export interface ModernAgentCardProps {
   variant?: "default" | "compact";
   onEdit?: (agent: Agent) => void;
   onDelete?: (agentId: string) => void;
+  onView?: (agentId: string) => void;
   showActions?: boolean;
   className?: string;
 }
@@ -79,6 +80,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
   variant = "default",
   onEdit,
   onDelete,
+  onView,
   showActions = false,
   className,
 }) => {
@@ -96,13 +98,14 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
     return (
       <Card
         className={cn(
-          "group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]",
+          "group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
           "bg-gradient-to-br", gradientClass,
           "border-0 shadow-sm",
           className
         )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={() => onView?.(agent.id)}
       >
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
@@ -166,7 +169,10 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onEdit?.(agent)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(agent);
+                  }}
                   className="h-8 w-8 p-0 hover:bg-white/20 text-white/80 hover:text-white"
                 >
                   <Edit className="w-4 h-4" />
@@ -174,7 +180,10 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onDelete?.(agent.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete?.(agent.id);
+                  }}
                   className="h-8 w-8 p-0 hover:bg-red-500/20 text-white/80 hover:text-red-300"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -191,7 +200,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-[1.02]",
+        "group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer",
         "bg-gradient-to-br", gradientClass,
         "border-0 shadow-md backdrop-blur-sm",
         "hover:bg-gradient-to-br hover:from-opacity-30 hover:to-opacity-30",
@@ -200,6 +209,7 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onView?.(agent.id)}
     >
       {/* 背景装饰 */}
       <div className={cn(
@@ -321,7 +331,10 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setIsLiked(!isLiked)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLiked(!isLiked);
+                  }}
                   className={cn(
                     "h-7 w-7 p-0 transition-all duration-300",
                     isLiked
@@ -334,7 +347,10 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onEdit?.(agent)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(agent);
+                  }}
                   className="h-7 w-7 p-0 hover:bg-primary/20 hover:text-primary"
                 >
                   <Edit className="w-3 h-3" />
@@ -342,7 +358,10 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onDelete?.(agent.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete?.(agent.id);
+                  }}
                   className="h-7 w-7 p-0 hover:bg-red-500/20 hover:text-red-500"
                 >
                   <Trash2 className="w-3 h-3" />

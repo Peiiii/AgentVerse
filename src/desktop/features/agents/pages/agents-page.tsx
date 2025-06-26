@@ -8,8 +8,10 @@ import { useAgents } from "@/core/hooks/useAgents";
 import { Brain, MessageCircle, Sparkles, Users } from "lucide-react";
 import match from "pinyin-match";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function AgentsPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedRole, setSelectedRole] = useState<string>("");
@@ -23,6 +25,11 @@ export function AgentsPage() {
     handleEditAgent,
     handleSubmit,
   } = useAgentForm(agents, updateAgent);
+
+  // 处理查看智能体详情
+  const handleViewAgent = (agentId: string) => {
+    navigate(`/agents/${agentId}`);
+  };
 
   // 获取所有角色和专长用于筛选
   const allRoles = useMemo(() => {
@@ -86,6 +93,7 @@ export function AgentsPage() {
             variant="default"
             onEdit={handleEditAgent}
             onDelete={deleteAgent}
+            onView={handleViewAgent}
             showActions={true}
           />
         ))}
@@ -104,6 +112,7 @@ export function AgentsPage() {
             variant="compact"
             onEdit={handleEditAgent}
             onDelete={deleteAgent}
+            onView={handleViewAgent}
             showActions={true}
           />
         ))}
