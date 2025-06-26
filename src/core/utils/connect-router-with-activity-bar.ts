@@ -382,8 +382,7 @@ export function mapActivityBarToRouter(
   routes: RouteConfig[]
 ) {
   // 初始化时进行一次映射
-  const activeItemKey = useActivityBarStore.getState().activeId;
-  console.log("[mapActivityBarToRouter] activeItemKey", activeItemKey);
+  const activeItemKey = useActivityBarStore.getState().activeId;    
   if (activeItemKey) {
     updateRouterByActivityBar(activeItemKey, routes);
   }

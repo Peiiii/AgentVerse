@@ -5,6 +5,9 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
+import { RedirectToChat } from "@/common/components/common/redirect";
+
+// 重定向组件
 
 export const desktopChatExtension = defineExtension({
     manifest: {
@@ -28,11 +31,19 @@ export const desktopChatExtension = defineExtension({
             order: 10,
         })))
 
-        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoute({
+        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([{
             id: "chat",
             path: "/chat",
+            order: 0,
             element: <ChatPage />,
-        })))
+        },
+        {
+            id: "redirect",
+            path: "/",
+            order: 9999,
+            element: <RedirectToChat />,
+        }
+        ])))
 
         subscriptions.push(Disposable.from(connectRouterWithActivityBar([
             {

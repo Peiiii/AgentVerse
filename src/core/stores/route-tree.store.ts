@@ -4,6 +4,7 @@ import type { RouteNode } from '@/common/types/route';
 export interface RouteTreeState {
   routes: RouteNode[];
   addRoute: (route: RouteNode, parentId?: string) => () => void;
+  addRoutes: (routes: RouteNode[], parentId?: string) =>()=> void;
   removeRoute: (id: string) => void;
   updateRoute: (id: string, updates: Partial<RouteNode>) => void;
   getRoutes: () => RouteNode[];
@@ -21,6 +22,21 @@ function addRouteToTree(tree: RouteNode[], route: RouteNode, parentId?: string):
     }
     return node.children
       ? { ...node, children: addRouteToTree(node.children, route, parentId) }
+      : node;
+  });
+}
+
+function addRoutesToTree(tree: RouteNode[], routes: RouteNode[], parentId?: string): RouteNode[] {
+  if (!parentId) return [...tree, ...routes];
+  return tree.map(node => {
+    if (node.id === parentId) {
+      return {
+        ...node,
+        children: node.children ? [...node.children, ...routes] : routes,
+      };
+    }
+    return node.children
+      ? { ...node, children: addRoutesToTree(node.children, routes, parentId) }
       : node;
   });
 }
@@ -48,24 +64,36 @@ function updateRouteInTree(tree: RouteNode[], id: string, updates: Partial<Route
 
 export const useRouteTreeStore = create<RouteTreeState>()((set, get) => ({
   routes: [],
-  addRoute: (route, parentId) => {
-    set(state => ({
+  addRoute: (route: RouteNode, parentId?: string) => {
+    set((state: RouteTreeState) => ({
       routes: addRouteToTree(state.routes, route, parentId),
     }));
     // 返回unregister函数
     return () => {
-      set(state => ({
+      set((state: RouteTreeState) => ({
         routes: removeRouteFromTree(state.routes, route.id),
       }));
     };
   },
-  removeRoute: (id) => {
-    set(state => ({
+  addRoutes: (routes: RouteNode[], parentId?: string) => {
+    set((state: RouteTreeState) => ({
+      routes: addRoutesToTree(state.routes, routes, parentId),
+    }));
+    // 返回unregister函数
+    return () => {
+      set((state: RouteTreeState) => ({
+        routes: routes.reduce((currentRoutes, route) => 
+          removeRouteFromTree(currentRoutes, route.id), state.routes),
+      }));
+    };
+  },
+  removeRoute: (id: string) => {
+    set((state: RouteTreeState) => ({
       routes: removeRouteFromTree(state.routes, id),
     }));
   },
-  updateRoute: (id, updates) => {
-    set(state => ({
+  updateRoute: (id: string, updates: Partial<RouteNode>) => {
+    set((state: RouteTreeState) => ({
       routes: updateRouteInTree(state.routes, id, updates),
     }));
   },

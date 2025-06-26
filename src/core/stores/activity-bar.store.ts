@@ -17,7 +17,7 @@ export interface ActivityBarState {
   // 活动项列表
   items: ActivityItem[];
   // 当前激活的活动项ID
-  activeId: string;
+  activeId?: string;
   // 是否展开
   expanded: boolean;
   // 添加活动项
@@ -71,7 +71,7 @@ const defaultItems: ActivityItem[] = [
 export const useActivityBarStore = create<ActivityBarState>()(
   (set) => ({
     items: defaultItems,
-    activeId: 'chat',
+    activeId: undefined,
     expanded: false,
 
     addItem: (item: ActivityItem) => {

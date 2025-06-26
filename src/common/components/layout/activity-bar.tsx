@@ -34,7 +34,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
   return (
     <ActivityBar.Root
       expanded={expanded}
-      defaultActiveId={activeId}
+      activeId={activeId}
       onExpandedChange={handleExpandedChange}
       onActiveChange={handleActiveChange}
       className={cn("flex-shrink-0", className)}

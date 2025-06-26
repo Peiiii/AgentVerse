@@ -1,10 +1,11 @@
+import { RedirectToChat } from "@/common/components/common/redirect";
 import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
+import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
-import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 
 export const mobileChatExtension = defineExtension({
     manifest: {
@@ -28,11 +29,18 @@ export const mobileChatExtension = defineExtension({
             order: 10,
         })))
 
-        useRouteTreeStore.getState().addRoute({
+        useRouteTreeStore.getState().addRoutes([{
             id: "chat",
             path: "/chat",
             element: <ChatPage />,
-        })
+        },
+        {
+            id: "redirect",
+            path: "/",
+            order: 9999,
+            element: <RedirectToChat />,
+        }])
+
 
         subscriptions.push(Disposable.from(connectRouterWithActivityBar([
             {
