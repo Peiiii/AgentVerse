@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { AgentSelectCard } from "../cards/agent-select-card";
 import { Input } from "@/common/components/ui/input";
 import { Search } from "lucide-react";
@@ -8,13 +8,13 @@ import { useBreakpointContext } from "@/common/components/common/breakpoint-prov
 
 export interface AgentSelectListProps {
   // Agent列表
-  agents: Agent[];
+  agents: AgentDef[];
   
   // 已选择的Agent ID列表
   selectedIds?: string[];
   
   // 选择回调
-  onSelect?: (agent: Agent, selected: boolean) => void;
+  onSelect?: (agent: AgentDef, selected: boolean) => void;
   
   // 是否显示搜索框
   showSearch?: boolean;
@@ -35,10 +35,10 @@ export interface AgentSelectListProps {
   disabledIds?: string[];
   
   // Agent点击回调（可以覆盖默认的选择行为）
-  onAgentClick?: (agent: Agent) => void;
+  onAgentClick?: (agent: AgentDef) => void;
   
   // 渲染额外信息的函数
-  renderExtraInfo?: (agent: Agent) => React.ReactNode;
+  renderExtraInfo?: (agent: AgentDef) => React.ReactNode;
 }
 
 export const AgentSelectList: React.FC<AgentSelectListProps> = ({
@@ -88,7 +88,7 @@ export const AgentSelectList: React.FC<AgentSelectListProps> = ({
   }, [agents, searchQuery]);
   
   // 处理Agent选择
-  const handleAgentSelect = (agent: Agent, selected: boolean) => {
+  const handleAgentSelect = (agent: AgentDef, selected: boolean) => {
     if (onAgentClick) {
       onAgentClick(agent);
     } else if (onSelect) {

@@ -1,8 +1,8 @@
 import { ModernChatInput } from "@/common/components/chat/modern-chat-input";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
 interface AgentChatInputProps {
-  agent: Agent;
+  agent: AgentDef;
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;

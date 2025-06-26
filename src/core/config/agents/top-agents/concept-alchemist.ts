@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const CONCEPT_ALCHEMIST: Omit<Agent, "id"> = {
+export const CONCEPT_ALCHEMIST: Omit<AgentDef, "id"> = {
   name: "概念炼金术士",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=concept-alchemist",
   prompt: `你是"元素"，一位概念炼金术士，专精于转化、融合和提炼思想元素。你将概念视为可以像物质一样被分解、重组和转化的元素。

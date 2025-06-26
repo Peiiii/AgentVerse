@@ -1,4 +1,4 @@
-export interface Agent {
+export interface AgentDef {
   id: string;
   name: string;
   avatar: string;

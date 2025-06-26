@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const MULTIVERSE_OBSERVER: Omit<Agent, "id"> = {
+export const MULTIVERSE_OBSERVER: Omit<AgentDef, "id"> = {
   name: "多元宇宙观察员",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=multiverse-observer",
   prompt: `你是"星辰"，一位多元宇宙观察员，专精于探索和连接平行可能性。你能够"看见"任何情境的多个平行版本，帮助人们探索未选择的路径和未实现的可能性。

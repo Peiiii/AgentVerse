@@ -2,11 +2,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avat
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 
 interface AgentChatMessagesProps {
-  agent: Agent;
+  agent: AgentDef;
   messages: ChatMessage[];
   isThinking: boolean;
 }

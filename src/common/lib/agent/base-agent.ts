@@ -1,4 +1,4 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import {
   DiscussionKeys,
   IDiscussionEnvBus,
@@ -8,7 +8,7 @@ import { RxEvent } from "@/common/lib/rx-event";
 /**
  * Agent的基础配置接口
  */
-export interface IAgentConfig extends Agent {
+export interface IAgentConfig extends AgentDef {
   name: string;
   agentId: string;
   /**

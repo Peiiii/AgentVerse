@@ -9,7 +9,7 @@ import { Input } from "@/common/components/ui/input";
 import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Check, Search } from "lucide-react";
 import match from "pinyin-match";
 import { useMemo, useState } from "react";
@@ -45,7 +45,7 @@ export function AddMemberDialog({ open, onOpenChange }: AddMemberDialogProps) {
     });
   }, [agents, members, searchQuery, getAgentName]);
 
-  const handleAgentClick = (agent: Agent) => {
+  const handleAgentClick = (agent: AgentDef) => {
     const newSelected = new Set(selectedAgents);
     if (selectedAgents.has(agent.id)) {
       newSelected.delete(agent.id);

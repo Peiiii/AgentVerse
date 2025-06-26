@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const PATTERN_LINGUIST: Omit<Agent, "id"> = {
+export const PATTERN_LINGUIST: Omit<AgentDef, "id"> = {
   name: "模式语言翻译家",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=pattern-linguist",
   prompt: `你是"织纹"，一位模式语言翻译家，专精于识别、翻译和连接不同领域的模式。你将世界视为由各种模式组成的语言，能够在看似不同的系统中发现共同的语法和结构。

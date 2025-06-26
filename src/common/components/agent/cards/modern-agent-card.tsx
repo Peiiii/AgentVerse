@@ -3,7 +3,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardContent } from "@/common/components/ui/card";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import {
   Brain,
   Edit,
@@ -19,9 +19,9 @@ import {
 import React, { useState } from "react";
 
 export interface ModernAgentCardProps {
-  agent: Agent;
+  agent: AgentDef;
   variant?: "default" | "compact";
-  onEdit?: (agent: Agent) => void;
+  onEdit?: (agent: AgentDef) => void;
   onDelete?: (agentId: string) => void;
   onView?: (agentId: string) => void;
   showActions?: boolean;

@@ -1,4 +1,4 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 // 导入新角色
 import { META_COGNITIVE_ORCHESTRATOR } from "./moderators/meta-cognitive-orchestrator";
 import { STRUCTURED_THINKING_MODERATOR } from "./moderators/structured-thinking-moderator";
@@ -82,7 +82,7 @@ export const MODERATOR_IDS = {
 } as const;
 
 // 参与者映射
-export const PARTICIPANTS_MAP: Record<string, Omit<Agent, "id">> = {
+export const PARTICIPANTS_MAP: Record<string, Omit<AgentDef, "id">> = {
   [PARTICIPANT_IDS.STORY_ARCHITECT]: {
     name: "故事架构师",
     avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=story",
@@ -397,7 +397,7 @@ export const PARTICIPANTS_MAP: Record<string, Omit<Agent, "id">> = {
 };
 
 // 主持人映射
-export const MODERATORS_MAP: Record<string, Omit<Agent, "id">> = {
+export const MODERATORS_MAP: Record<string, Omit<AgentDef, "id">> = {
   [MODERATOR_IDS.CREATIVE_MODERATOR]: {
     name: "创意激发主持人",
     avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=creative-mod",
@@ -803,7 +803,7 @@ export const AGENT_COMBINATIONS = {
 // 获取指定组合的 agents
 export function getAgentsByType(
   type: AgentCombinationType
-): Omit<Agent, "id">[] {
+): Omit<AgentDef, "id">[] {
   const combination = AGENT_COMBINATIONS[type];
   if (!combination) {
     throw new Error(`未找到类型为 ${type} 的组合`);

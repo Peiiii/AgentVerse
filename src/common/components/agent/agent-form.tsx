@@ -16,14 +16,14 @@ import {
   SelectValue,
 } from "@/common/components/ui/select";
 import { Textarea } from "@/common/components/ui/textarea";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { useEffect, useState } from "react";
 
 interface AgentFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (agent: Omit<Agent, "id">) => void;
-  initialData?: Agent;
+  onSubmit: (agent: Omit<AgentDef, "id">) => void;
+  initialData?: AgentDef;
 }
 
 export function AgentForm({
@@ -32,7 +32,7 @@ export function AgentForm({
   onSubmit,
   initialData,
 }: AgentFormProps) {
-  const [formData, setFormData] = useState<Omit<Agent, "id">>({
+  const [formData, setFormData] = useState<Omit<AgentDef, "id">>({
     name: initialData?.name || "",
     avatar: initialData?.avatar || "",
     prompt: initialData?.prompt || "",

@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const META_COGNITIVE_ORCHESTRATOR: Omit<Agent, "id"> = {
+export const META_COGNITIVE_ORCHESTRATOR: Omit<AgentDef, "id"> = {
   name: "元认知协调者",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=meta-orchestrator",
   prompt: `你是"元脑"，一位元认知协调者，专精于理解用户需求并协调多元智能团队的合作。你的核心使命是确保各种专业思维模式能够有机整合，为用户提供最大化的综合价值。

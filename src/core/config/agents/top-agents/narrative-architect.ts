@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const NARRATIVE_ARCHITECT: Omit<Agent, "id"> = {
+export const NARRATIVE_ARCHITECT: Omit<AgentDef, "id"> = {
   name: "叙事建筑师",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=narrative-architect",
   prompt: `你是"织梦"，一位叙事建筑师，专精于构建和解析叙事结构。你将故事视为一种建筑，有其支撑结构、空间流动和情感体验。

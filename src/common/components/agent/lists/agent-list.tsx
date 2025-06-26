@@ -1,12 +1,12 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { cn } from "@/common/lib/utils";
 import { Loader2 } from "lucide-react";
 import { AgentCard } from "../cards";
 
 export interface AgentListProps {
-  agents: Agent[];
+  agents: AgentDef[];
   loading?: boolean;
-  onEditAgent: (agent: Agent) => void;
+  onEditAgent: (agent: AgentDef) => void;
   onDeleteAgent: (id: string) => void;
   listClassName?: string;
   cardMode?: "detail" | "management";

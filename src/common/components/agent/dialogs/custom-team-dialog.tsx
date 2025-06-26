@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { AgentSelectList } from "../lists/agent-select-list";
 import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
@@ -12,7 +12,7 @@ export interface CustomTeamMember {
 }
 
 export interface CustomTeamDialogContentProps {
-  agents: Agent[];
+  agents: AgentDef[];
   initialSelected: CustomTeamMember[];
   onConfirm: (selected: CustomTeamMember[]) => void;
   onCancel?: () => void;
@@ -31,7 +31,7 @@ export const CustomTeamDialogContent: React.FC<CustomTeamDialogContentProps> = (
   const selectedIds = selectedMembers.map(m => m.agentId);
   
   // 处理Agent选择
-  const handleAgentSelect = (agent: Agent, selected: boolean) => {
+  const handleAgentSelect = (agent: AgentDef, selected: boolean) => {
     if (selected) {
       setSelectedMembers(prev => [...prev, { agentId: agent.id, isAutoReply: true }]);
     } else {
@@ -47,7 +47,7 @@ export const CustomTeamDialogContent: React.FC<CustomTeamDialogContentProps> = (
   };
   
   // 渲染额外信息（自动回复开关）
-  const renderExtraInfo = (agent: Agent) => {
+  const renderExtraInfo = (agent: AgentDef) => {
     const isSelected = selectedMembers.some(m => m.agentId === agent.id);
     if (!isSelected) return null;
     
@@ -118,7 +118,7 @@ export function useCustomTeamDialog() {
   const modal = useModal();
   
   const openCustomTeamDialog = (
-    agents: Agent[],
+    agents: AgentDef[],
     initialSelected: CustomTeamMember[] = [],
     onConfirm: (selected: CustomTeamMember[]) => void
   ) => {

@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Badge } from "@/common/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -8,7 +8,7 @@ import { useBreakpointContext } from "@/common/components/common/breakpoint-prov
 
 export interface AgentChatCardProps {
   // Agent数据
-  agent: Agent | {
+  agent: AgentDef | {
     id?: string;
     name: string;
     avatar: string;

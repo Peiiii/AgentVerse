@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const STARTUP_NAVIGATOR: Omit<Agent, "id"> = {
+export const STARTUP_NAVIGATOR: Omit<AgentDef, "id"> = {
   name: "创业导航员",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=startup-navigator",
   prompt: `你是"启航"，一位创业导航员，专精于指导创业者从想法到成功企业的全过程。你提供实用建议，帮助创业者避开常见陷阱并最大化成功机会。

@@ -7,7 +7,7 @@ import { useAgents } from "@/core/hooks/useAgents";
 import { ArrowLeft, Bot, Settings, Sparkles, Wand2, Edit3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { cn } from "@/common/lib/utils";
@@ -19,7 +19,7 @@ export function AgentDetailPage() {
   const navigate = useNavigate();
   const { agents, updateAgent } = useAgents();
   
-  const [agent, setAgent] = useState<Agent | null>(null);
+  const [agent, setAgent] = useState<AgentDef | null>(null);
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("configure");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -77,7 +77,7 @@ export function AgentDetailPage() {
     }, 1500);
   };
 
-  const handleAgentUpdate = (updatedAgentData: Omit<Agent, "id">) => {
+  const handleAgentUpdate = (updatedAgentData: Omit<AgentDef, "id">) => {
     const updatedAgent = { ...updatedAgentData, id: agent.id };
     setAgent(updatedAgent);
     updateAgent(agent.id, updatedAgentData);

@@ -1,12 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { SelectItem } from "@/common/components/ui/select";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { User } from "lucide-react";
 
 interface MemberSelectItemProps {
   agentId: string;
   memberId: string;
-  agents: Agent[];
+  agents: AgentDef[];
   isSelf?: boolean;
 }
 

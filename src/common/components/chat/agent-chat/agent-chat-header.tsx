@@ -1,9 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Zap } from "lucide-react";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
 interface AgentChatHeaderProps {
-  agent: Agent;
+  agent: AgentDef;
 }
 
 export function AgentChatHeader({ agent }: AgentChatHeaderProps) {

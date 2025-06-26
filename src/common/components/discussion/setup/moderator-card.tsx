@@ -1,10 +1,10 @@
 import { Card } from "@/common/components/ui/card";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Check } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 
 export interface ModeratorCardProps {
-  agent: Agent;
+  agent: AgentDef;
   isSelected: boolean;
   onClick: () => void;
 }

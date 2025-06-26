@@ -2,14 +2,14 @@ import { useModal } from "@/common/components/ui/modal";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { useAgents } from "@/core/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { useCallback } from "react";
 import { AgentForm } from "../agent-form";
 
 // 对话框内容组件
 export interface EditAgentDialogContentProps {
-  agent: Agent;
-  onSubmit: (data: Partial<Agent>) => void;
+  agent: AgentDef;
+  onSubmit: (data: Partial<AgentDef>) => void;
   onClose: () => void;
 }
 
@@ -38,7 +38,7 @@ export function useEditAgentDialog() {
   const { updateAgent } = useAgents();
   const { isMobile } = useBreakpointContext();
 
-  const openEditAgentDialog = useCallback((agent: Agent) => {
+  const openEditAgentDialog = useCallback((agent: AgentDef) => {
     modal.show({
       title: "编辑 Agent",
       content: (

@@ -1,11 +1,11 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Check } from "lucide-react";
 
 export interface AgentSelectCardProps {
   // Agent数据
-  agent: Agent;
+  agent: AgentDef;
   
   // 是否已选择
   selected?: boolean;
@@ -14,7 +14,7 @@ export interface AgentSelectCardProps {
   disabled?: boolean;
   
   // 选择回调
-  onSelect?: (agent: Agent, selected: boolean) => void;
+  onSelect?: (agent: AgentDef, selected: boolean) => void;
   
   // 描述文本
   description?: string;
@@ -23,7 +23,7 @@ export interface AgentSelectCardProps {
   className?: string;
   
   // 渲染额外信息的函数
-  renderExtraInfo?: (agent: Agent) => React.ReactNode;
+  renderExtraInfo?: (agent: AgentDef) => React.ReactNode;
 }
 
 export const AgentSelectCard: React.FC<AgentSelectCardProps> = ({

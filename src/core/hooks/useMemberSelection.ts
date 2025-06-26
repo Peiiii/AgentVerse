@@ -1,5 +1,5 @@
 import { discussionControlService } from "@/core/services/discussion-control.service";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { useEffect, useMemo, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 import { useAgents } from "./useAgents";
@@ -18,7 +18,7 @@ const SELF_MEMBER: Member = {
   isSelf: true,
 };
 
-const SELF_AGENT: Agent = {
+const SELF_AGENT: AgentDef = {
   id: "user",
   name: "我",
   avatar: "",

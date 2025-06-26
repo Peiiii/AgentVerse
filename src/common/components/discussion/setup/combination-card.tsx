@@ -1,13 +1,13 @@
 import { Card } from "@/common/components/ui/card";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 
 export interface AgentCombinationCardProps {
   name: string;
   description: string;
-  moderator: Agent;
-  participants: Agent[];
+  moderator: AgentDef;
+  participants: AgentDef[];
   isSelected: boolean;
   onClick: () => void;
   isLoading?: boolean;

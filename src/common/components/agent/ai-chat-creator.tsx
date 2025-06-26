@@ -3,7 +3,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { 
   Bot, 
   Wand2, 
@@ -20,12 +20,12 @@ interface AiChatMessage {
   content: string;
   isUser: boolean;
   timestamp: Date;
-  agentPreview?: Partial<Agent>;
+  agentPreview?: Partial<AgentDef>;
   suggestions?: string[];
 }
 
 interface AiChatCreatorProps {
-  onAgentCreate: (agent: Omit<Agent, "id">) => void;
+  onAgentCreate: (agent: Omit<AgentDef, "id">) => void;
   className?: string;
 }
 
@@ -46,7 +46,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isThinking, setIsThinking] = useState(false);
-  const [createdAgent, setCreatedAgent] = useState<Partial<Agent> | null>(null);
+  const [createdAgent, setCreatedAgent] = useState<Partial<AgentDef> | null>(null);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -81,7 +81,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
 
   const handleCreateAgent = () => {
     if (createdAgent) {
-      const fullAgent: Omit<Agent, "id"> = {
+      const fullAgent: Omit<AgentDef, "id"> = {
         name: createdAgent.name || "新智能体",
         avatar: createdAgent.avatar || "",
         prompt: createdAgent.prompt || "",
@@ -101,7 +101,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
     
     if (messageCount === 1) {
       // 第一次用户输入，生成智能体预览
-      const agentPreview: Partial<Agent> = {
+      const agentPreview: Partial<AgentDef> = {
         name: "Python编程助手",
         avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=python-helper",
         personality: "专业、耐心、善于解释复杂概念",

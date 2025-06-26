@@ -1,10 +1,10 @@
 import { aiService } from "./ai.service";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
 export class AgentSelectorService {
   async selectAgents(
     topic: string,
-    availableAgents: Agent[]
+    availableAgents: AgentDef[]
   ): Promise<string[]> {
     const agentProfiles = availableAgents.map((agent) => ({
       id: agent.id,
@@ -19,7 +19,7 @@ export class AgentSelectorService {
 
   private async askAI(
     topic: string,
-    agents: Pick<Agent, "id" | "name" | "expertise" | "prompt">[]
+    agents: Pick<AgentDef, "id" | "name" | "expertise" | "prompt">[]
   ): Promise<string> {
     const prompt = `
 用户问题：${topic}

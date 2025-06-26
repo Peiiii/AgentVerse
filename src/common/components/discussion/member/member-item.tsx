@@ -2,13 +2,13 @@ import { Button } from "@/common/components/ui/button";
 import { Card } from "@/common/components/ui/card";
 import { Switch } from "@/common/components/ui/switch";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { ChevronRight, UserX, Settings, Briefcase, Lightbulb, Target } from "lucide-react";
 
 interface MemberItemProps {
   member: DiscussionMember;
-  agent: Agent;
+  agent: AgentDef;
   isExpanded: boolean;
   onExpand: () => void;
   onToggleAutoReply: () => void;

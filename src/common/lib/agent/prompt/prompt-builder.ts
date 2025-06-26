@@ -1,7 +1,7 @@
 import { IAgentConfig } from "@/common/lib/agent";
 import { ChatMessage } from "@/common/lib/ai-service";
 import { Capability } from "@/common/lib/capabilities";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import {
   ActionResultMessage,
   AgentMessage,
@@ -16,9 +16,9 @@ import {
 
 export class PromptBuilder {
   buildPrompt(context: {
-    currentAgent: Agent;
+    currentAgent: AgentDef;
     currentAgentConfig: IAgentConfig;
-    agents: Agent[];
+    agents: AgentDef[];
     messages: AgentMessage[];
     triggerMessage?: NormalMessage | ActionResultMessage;
     capabilities: Capability[];

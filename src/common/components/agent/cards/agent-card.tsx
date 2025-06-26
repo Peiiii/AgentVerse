@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
@@ -15,7 +15,7 @@ export type AgentCardMode = "preview" | "detail" | "management";
 // 统一的AgentCard组件属性
 export interface AgentCardProps {
   // 基础数据
-  agent: Agent | {
+  agent: AgentDef | {
     name: string;
     avatar: string;
     role?: string;
@@ -30,7 +30,7 @@ export interface AgentCardProps {
   mode?: AgentCardMode;
   
   // 交互回调
-  onEdit?: (agent: Agent) => void;
+  onEdit?: (agent: AgentDef) => void;
   onDelete?: (agentId: string) => void;
   
   // 样式
@@ -162,7 +162,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onEdit(agent as Agent)}
+                  onClick={() => onEdit(agent as AgentDef)}
                   className={cn(
                     "hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-950 dark:hover:text-purple-400",
                     isMobile ? "h-7 px-1.5 text-xs" : "h-8 px-2"

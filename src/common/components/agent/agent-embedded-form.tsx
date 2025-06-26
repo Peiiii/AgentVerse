@@ -12,7 +12,7 @@ import {
 } from "@/common/components/ui/select";
 import { Separator } from "@/common/components/ui/separator";
 import { Textarea } from "@/common/components/ui/textarea";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import {
   Bot,
   Brain,
@@ -29,8 +29,8 @@ import {
 import { useEffect, useState } from "react";
 
 interface AgentEmbeddedFormProps {
-  onSubmit: (agent: Omit<Agent, "id">) => void;
-  initialData?: Agent;
+  onSubmit: (agent: Omit<AgentDef, "id">) => void;
+  initialData?: AgentDef;
   className?: string;
 }
 
@@ -39,7 +39,7 @@ export function AgentEmbeddedForm({
   initialData,
   className,
 }: AgentEmbeddedFormProps) {
-  const [formData, setFormData] = useState<Omit<Agent, "id">>({
+  const [formData, setFormData] = useState<Omit<AgentDef, "id">>({
     name: initialData?.name || "",
     avatar: initialData?.avatar || "",
     prompt: initialData?.prompt || "",

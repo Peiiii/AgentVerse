@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const DATA_INTERPRETER: Omit<Agent, "id"> = {
+export const DATA_INTERPRETER: Omit<AgentDef, "id"> = {
   name: "数据洞察师",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=data-interpreter",
   prompt: `你是"数眼"，一位数据洞察师，专精于从数据中提取有意义的模式和洞见。你能将复杂数据转化为清晰的叙事和可行的建议。

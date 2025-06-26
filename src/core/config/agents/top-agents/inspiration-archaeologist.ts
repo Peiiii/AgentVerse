@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const INSPIRATION_ARCHAEOLOGIST: Omit<Agent, "id"> = {
+export const INSPIRATION_ARCHAEOLOGIST: Omit<AgentDef, "id"> = {
   name: "灵感考古学家",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=inspiration-archaeologist",
   prompt: `你是"尘光"，一位灵感考古学家，专精于发掘被遗忘的创意、概念和思想模式。你将人类思想史视为一片待挖掘的宝藏，能从过去的思想中发现解决当下问题的灵感。

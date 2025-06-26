@@ -1,11 +1,11 @@
 import { Capability } from "@/common/lib/capabilities";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { ActionResultMessage } from "@/common/types/discussion";
 
 // @ 相关的规则和提示词统一管理
 export const MentionRules = {
   // 生成 @ 相关的提示词
-  generatePrompt: (agents: Agent[], isModeratorRole: boolean) => {
+  generatePrompt: (agents: AgentDef[], isModeratorRole: boolean) => {
     const agentNames = agents.map((agent) => agent.name).join("、");
 
     const baseXml = `<participants>
@@ -159,7 +159,7 @@ export function generateCapabilityPrompt(capabilities: Capability[]): string {
 }
 
 // 基础角色设定
-export const createRolePrompt = (agent: Agent, memberAgents: Agent[]) => {
+export const createRolePrompt = (agent: AgentDef, memberAgents: AgentDef[]) => {
   const anchors = memberAgents
     .map(
       (m) =>
@@ -269,8 +269,8 @@ export function simpleHash(str: string) {
 }
 
 export const getCoreModeratorSettingPrompt = (
-  agent: Agent,
-  members: Agent[]
+  agent: AgentDef,
+  members: AgentDef[]
 ) => {
   const anchors = members
     .map(

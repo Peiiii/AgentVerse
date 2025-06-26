@@ -1,12 +1,12 @@
 import { useResourceState } from "@/common/lib/resource";
 import { agentsResource } from "@/core/resources";
 import { agentService } from "@/core/services/agent.service";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { useMemoizedFn } from "ahooks";
 import { useOptimisticUpdate } from "./useOptimisticUpdate";
 
 interface UseAgentsProps {
-  onChange?: (agents: Agent[]) => void;
+  onChange?: (agents: AgentDef[]) => void;
 }
 
 export function useAgents({ onChange }: UseAgentsProps = {}) {
@@ -28,7 +28,7 @@ export function useAgents({ onChange }: UseAgentsProps = {}) {
     );
   });
 
-  const updateAgent = useMemoizedFn(async (id: string, data: Partial<Agent>) => {
+  const updateAgent = useMemoizedFn(async (id: string, data: Partial<AgentDef>) => {
     return withOptimisticUpdate(
       // 乐观更新
       (agents) => agents.map((a) => (a.id === id ? { ...a, ...data } : a)),

@@ -1,20 +1,20 @@
 import { STORAGE_CONFIG } from "@/core/config/storage";
 import { MockHttpProvider } from "@/common/lib/storage";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { AgentDataProvider } from "@/common/types/storage";
 
 export class AgentService {
   constructor(private provider: AgentDataProvider) {}
 
-  async listAgents(): Promise<Agent[]> {
+  async listAgents(): Promise<AgentDef[]> {
     return this.provider.list();
   }
 
-  async getAgent(id: string): Promise<Agent> {
+  async getAgent(id: string): Promise<AgentDef> {
     return this.provider.get(id);
   }
 
-  async createAgent(data: Omit<Agent, "id">): Promise<Agent> {
+  async createAgent(data: Omit<AgentDef, "id">): Promise<AgentDef> {
     // 这里可以添加业务验证逻辑
     if (!data.name) {
       throw new Error("Agent name is required");
@@ -24,7 +24,7 @@ export class AgentService {
     return result;
   }
 
-  async updateAgent(id: string, data: Partial<Agent>): Promise<Agent> {
+  async updateAgent(id: string, data: Partial<AgentDef>): Promise<AgentDef> {
     const result = await this.provider.update(id, data);
     return result;
   }
@@ -33,7 +33,7 @@ export class AgentService {
     await this.provider.delete(id);
   }
   // 工具方法
-  createDefaultAgent(): Omit<Agent, "id"> {
+  createDefaultAgent(): Omit<AgentDef, "id"> {
     const seed = Date.now().toString();
     return {
       name: "新成员",
@@ -49,7 +49,7 @@ export class AgentService {
 }
 
 export const agentService = new AgentService(
-  new MockHttpProvider<Agent>(
+  new MockHttpProvider<AgentDef>(
     STORAGE_CONFIG.KEYS.AGENTS,
     { delay: STORAGE_CONFIG.MOCK_DELAY_MS }
   )

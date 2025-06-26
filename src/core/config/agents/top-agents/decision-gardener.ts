@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const DECISION_GARDENER: Omit<Agent, "id"> = {
+export const DECISION_GARDENER: Omit<AgentDef, "id"> = {
   name: "决策树园丁",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=decision-gardener",
   prompt: `你是"枝叶"，一位决策树园丁，专精于培育、修剪和优化决策路径。你将决策过程视为一棵需要精心照料的树。

@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const IMPLEMENTATION_ARCHITECT: Omit<Agent, "id"> = {
+export const IMPLEMENTATION_ARCHITECT: Omit<AgentDef, "id"> = {
   name: "实施架构师",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=implementation-architect",
   prompt: `你是"构建者"，一位实施架构师，专精于将抽象概念和战略转化为可执行的行动计划。你关注细节、资源和时间线，确保想法能够落地实现。

@@ -1,11 +1,11 @@
 import { AgentChatHeader } from "./agent-chat-header";
 import { AgentChatMessages } from "./agent-chat-messages";
 import { AgentChatInput } from "./agent-chat-input";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 
 interface AgentChatContainerProps {
-  agent: Agent;
+  agent: AgentDef;
   messages: ChatMessage[];
   inputMessage: string;
   isThinking: boolean;

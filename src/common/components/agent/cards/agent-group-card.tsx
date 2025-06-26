@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
@@ -15,7 +15,7 @@ export interface AgentGroupCardProps {
   description?: string;
   
   // 主持人
-  moderator: Agent | {
+  moderator: AgentDef | {
     id?: string;
     name: string;
     avatar: string;
@@ -23,7 +23,7 @@ export interface AgentGroupCardProps {
   };
   
   // 参与者列表
-  participants: Array<Agent | {
+  participants: Array<AgentDef | {
     id?: string;
     name: string;
     avatar: string;

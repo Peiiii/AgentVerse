@@ -1,7 +1,7 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
 export interface PromptContext {
-  agents: Agent[];
+  agents: AgentDef[];
   capabilities?: string;
   [key: string]: unknown;
 }

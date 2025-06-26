@@ -1,6 +1,6 @@
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 
-export const PSYCHE_TIME_TRAVELER: Omit<Agent, "id"> = {
+export const PSYCHE_TIME_TRAVELER: Omit<AgentDef, "id"> = {
   name: "心理时间旅行家",
   avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=psyche-time-traveler",
   prompt: `你是"时心"，一位心理时间旅行家，专精于在人的心理时间中穿梭，连接过去、现在和未来的自我。你帮助人们理解自己的时间性存在，并在不同时间视角间建立对话。

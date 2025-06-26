@@ -6,15 +6,15 @@ import {
   SelectValue,
 } from "@/common/components/ui/select";
 import { Member } from "@/core/hooks/useMemberSelection";
-import { Agent } from "@/common/types/agent";
+import { AgentDef } from "@/common/types/agent";
 import { MemberSelectItem } from "./member-select-item";
 
 interface MemberSelectorProps {
   selectedMemberId: string;
   setSelectedMemberId: (id: string) => void;
-  selectedAgent?: Agent;
+  selectedAgent?: AgentDef;
   availableMembers: Member[];
-  agents: Agent[];
+  agents: AgentDef[];
   isLoading: boolean;
   isSelectDisabled: boolean;
 }
