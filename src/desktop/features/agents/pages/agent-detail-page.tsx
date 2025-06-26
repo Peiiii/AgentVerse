@@ -1,6 +1,6 @@
 import { AgentEmbeddedForm } from "@/common/components/agent/agent-embedded-form";
 import { AiChatCreator } from "@/common/components/agent/ai-chat-creator";
-import { AgentChatContainer } from "@/common/components/chat/agent-chat-container";
+import { AgentChatContainer } from "@/common/components/chat/agent-chat";
 import { Button } from "@/common/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
 import { useAgents } from "@/core/hooks/useAgents";

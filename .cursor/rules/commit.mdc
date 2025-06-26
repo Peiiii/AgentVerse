@@ -4,4 +4,7 @@ globs:
 alwaysApply: true
 ---
 不要未经授权就commit
+不要自作主张就提交commit !!!
+不要自作主张就提交commit !!!
+不要自作主张就提交commit !!!
 如果用户需要commit，请使用英文message， 默认git add .
