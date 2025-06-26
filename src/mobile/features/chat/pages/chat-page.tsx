@@ -1,27 +1,22 @@
 import { AddAgentDialogContent } from "@/common/components/agent/add-agent-dialog/add-agent-dialog-content";
 import { ChatArea } from "@/common/components/chat/chat-area";
+import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { useTheme } from "@/common/components/common/theme";
 import { ThemeToggle } from "@/common/components/common/theme-toggle";
-import { DiscussionController } from "@/common/components/discussion/control/discussion-controller";
 import { DiscussionList } from "@/common/components/discussion/list/discussion-list";
-import { MemberList } from "@/common/components/discussion/member/member-list";
 import { MobileMemberDrawer } from "@/common/components/discussion/member/mobile-member-drawer";
 import { MobileBottomBar } from "@/common/components/layout/mobile-bottom-bar";
 import { MobileHeader } from "@/common/components/layout/mobile-header";
-import { ResponsiveContainer } from "@/common/components/layout/responsive-container";
 import { useSettingsDialog } from "@/common/components/settings/settings-dialog";
 import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
-import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
-import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
+import { cn } from "@/common/lib/utils";
+import { Discussion } from "@/common/types/discussion";
 import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { useMessages } from "@/core/hooks/useMessages";
-import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
-import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/core/services/discussion-control.service";
-import { Discussion } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 
@@ -29,22 +24,12 @@ import { useProxyBeanState } from "rx-nested-bean";
 type Scene = "discussions" | "chat" | "agents" | "settings";
 
 export function ChatPage() {
-    const { isDesktop, isMobile } = useBreakpointContext();
+    const { isMobile } = useBreakpointContext();
     const { rootClassName } = useTheme();
     const { getAgentName, getAgentAvatar } = useAgents();
     const { messages, addMessage } = useMessages();
     const { currentDiscussion, clearMessages } = useDiscussions();
     const [currentScene, setCurrentScene] = useState<Scene>("chat");
-    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-    const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
-        false,
-        {
-            key: UI_PERSIST_KEYS.DISCUSSION.MEMBER_PANEL_VISIBLE,
-            version: 1,
-        }
-    );
-    const [isInitialState, setIsInitialState] = useState(false);
-    const showDesktopMembers = isDesktop && showMembersForDesktop && !isInitialState;
     const { data: currentDiscussionId } = useProxyBeanState(
         discussionControlService.store,
         "currentDiscussionId"
@@ -57,6 +42,9 @@ export function ChatPage() {
     const { height } = useViewportHeight();
     const { openSettingsDialog } = useSettingsDialog();
     const [showMobileMemberDrawer, setShowMobileMemberDrawer] = useState(false);
+    const handleToggleMembers = () => {
+        setShowMobileMemberDrawer(!showMobileMemberDrawer);
+    };
 
     // 处理场景切换
     useEffect(() => {
@@ -67,14 +55,6 @@ export function ChatPage() {
 
     const handleStatusChange = (status: Discussion["status"]) => {
         setIsPaused(status === "paused");
-    };
-
-    const handleToggleMembers = () => {
-        if (isDesktop) {
-            setShowMembersForDesktop(!showMembersForDesktop);
-        } else {
-            setShowMobileMemberDrawer(true);
-        }
     };
 
     const handleMessage = async (content: string, agentId: string) => {
@@ -90,12 +70,6 @@ export function ChatPage() {
         discussionControlService.setMessages(messages);
     }, [messages]);
 
-    const handleSelectDiscussion = () => {
-        if (!isDesktop) {
-            setShowMobileSidebar(false);
-            setCurrentScene("chat");
-        }
-    };
 
     // 渲染当前场景内容
     const renderSceneContent = () => {
@@ -212,7 +186,7 @@ export function ChatPage() {
                             </div>
                         </div>
                     ) : (
-                        <DiscussionList onSelectDiscussion={handleSelectDiscussion} />
+                        <DiscussionList />
                     )}
                 </div>
                 {/* 只在主场景页面显示底部导航 */}
@@ -226,56 +200,6 @@ export function ChatPage() {
             </div>
         );
     };
-
-    // 桌面端布局
-    if (isDesktop) {
-        return (
-            <>
-                <div className="flex-1 flex justify-center w-full">
-                    <div className="w-full max-w-[1920px]">
-                        <ResponsiveContainer
-                            sidebarContent={
-                                <div className="h-full bg-card">
-                                    <DiscussionList
-                                        onSelectDiscussion={handleSelectDiscussion}
-                                    />
-                                </div>
-                            }
-                            mainContent={
-                                <div className="flex flex-col h-full">
-                                    {!isInitialState && (
-                                        <DiscussionController
-                                            status={status}
-                                            onToggleMembers={handleToggleMembers}
-                                            enableSettings={false}
-                                        />
-                                    )}
-                                    <div className="flex-1 min-h-0">
-                                        <ChatArea
-                                            key={currentDiscussionId}
-                                            messages={messages}
-                                            onSendMessage={handleMessage}
-                                            getAgentName={getAgentName}
-                                            getAgentAvatar={getAgentAvatar}
-                                            onInitialStateChange={setIsInitialState}
-                                        />
-                                    </div>
-                                </div>
-                            }
-                            showMobileSidebar={showMobileSidebar}
-                            onMobileSidebarChange={setShowMobileSidebar}
-                        />
-                    </div>
-                </div>
-                {showDesktopMembers && (
-                    <div className="w-80 flex-none border-l border-border bg-card">
-                        <div className="p-4 h-full">
-                            <MemberList />
-                        </div>
-                    </div>
-                )}</>
-        );
-    }
 
     // 移动端布局
     return (
