@@ -2,13 +2,11 @@ import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { 
   Send, 
-  Paperclip, 
   Mic, 
   Smile, 
-  Square,
   ArrowUp,
   Sparkles,
-  Zap
+  Plus
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -41,7 +39,7 @@ export function ModernChatInput({
     if (textarea) {
       textarea.style.height = 'auto';
       const scrollHeight = textarea.scrollHeight;
-      const maxHeight = 200; // 最大高度
+      const maxHeight = 120; // 减少最大高度，更紧凑
       textarea.style.height = Math.min(scrollHeight, maxHeight) + 'px';
     }
   }, [value]);
@@ -61,53 +59,58 @@ export function ModernChatInput({
 
   return (
     <div className={cn("relative", className)}>
-      {/* 主输入区域 */}
+      {/* 顶部提示信息 - 始终可见但很轻量 */}
+      <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground/60">
+        <div className="flex items-center gap-4">
+          <span>按 Enter 发送消息</span>
+          <span>Shift + Enter 换行</span>
+        </div>
+        {(isFocused || isNearLimit) && (
+          <div className={cn(
+            "transition-colors duration-200",
+            isNearLimit ? "text-orange-500" : "text-muted-foreground/50",
+            charCount > maxLength && "text-red-500"
+          )}>
+            {charCount}/{maxLength}
+          </div>
+        )}
+      </div>
+
+      {/* 主输入区域 - 固定布局，不会因为focus改变高度 */}
       <div className={cn(
-        "relative bg-background/80 backdrop-blur-xl border-2 rounded-2xl transition-all duration-300 ease-out",
-        "shadow-lg hover:shadow-xl",
+        "relative bg-background/90 backdrop-blur-sm border rounded-xl transition-all duration-200 ease-out",
+        "shadow-sm hover:shadow-md",
         isFocused 
-          ? "border-primary/50 shadow-primary/10 bg-background/90" 
-          : "border-border/50 hover:border-border/80",
+          ? "border-primary/40 shadow-primary/5" 
+          : "border-border/40 hover:border-border/60",
         disabled && "opacity-50 cursor-not-allowed"
       )}>
-        {/* 渐变背景装饰 */}
+        {/* 装饰性渐变边框 */}
         <div className={cn(
-          "absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300",
-          "bg-gradient-to-r from-primary/5 via-transparent to-primary/5",
+          "absolute inset-0 rounded-xl opacity-0 transition-opacity duration-200",
+          "bg-gradient-to-r from-primary/10 via-transparent to-primary/10",
           isFocused && "opacity-100"
         )} />
 
-        {/* 输入容器 */}
-        <div className="relative flex items-end gap-2 p-3">
-          {/* 左侧工具按钮 */}
-          <div className="flex items-center gap-1 pb-2">
+        {/* 输入容器 - Discord/微信风格的紧凑布局 */}
+        <div className="relative flex items-end gap-3 p-3">
+          {/* 左侧工具按钮组 */}
+          <div className="flex items-center">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                "w-8 h-8 p-0 rounded-full transition-all duration-200",
-                "hover:bg-primary/10 hover:text-primary hover:scale-110",
+                "w-8 h-8 p-0 rounded-lg transition-all duration-200",
+                "hover:bg-primary/10 hover:text-primary hover:scale-105",
                 "active:scale-95"
               )}
               disabled={disabled}
             >
-              <Paperclip className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "w-8 h-8 p-0 rounded-full transition-all duration-200",
-                "hover:bg-primary/10 hover:text-primary hover:scale-110",
-                "active:scale-95"
-              )}
-              disabled={disabled}
-            >
-              <Smile className="w-4 h-4" />
+              <Plus className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* 文本输入区域 */}
+          {/* 文本输入区域 - 始终保持合理的最小高度 */}
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -124,58 +127,62 @@ export function ModernChatInput({
               className={cn(
                 "w-full resize-none border-0 bg-transparent outline-none",
                 "text-sm leading-relaxed placeholder-muted-foreground/60",
-                "py-2 px-0 min-h-[40px] max-h-[200px] overflow-y-auto",
-                "scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+                "py-2 px-3 min-h-[36px] max-h-[120px] overflow-y-auto rounded-lg",
+                "scrollbar-thin scrollbar-thumb-border/30 scrollbar-track-transparent",
+                "transition-colors duration-200",
+                isFocused && "bg-muted/20"
               )}
-              
             />
-            
-            {/* 字符计数 */}
-            {(isFocused || isNearLimit) && (
-              <div className={cn(
-                "absolute bottom-1 right-2 text-xs transition-all duration-200",
-                isNearLimit ? "text-orange-500" : "text-muted-foreground/50",
-                charCount > maxLength && "text-red-500"
-              )}>
-                {charCount}/{maxLength}
-              </div>
-            )}
           </div>
 
-          {/* 右侧发送按钮 */}
-          <div className="flex items-center gap-1 pb-2">
-            {/* 语音按钮 */}
+          {/* 右侧操作按钮组 */}
+          <div className="flex items-center gap-1">
+            {/* 表情和语音按钮 */}
             {!value.trim() && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "w-8 h-8 p-0 rounded-full transition-all duration-200",
-                  "hover:bg-primary/10 hover:text-primary hover:scale-110",
-                  "active:scale-95"
-                )}
-                disabled={disabled}
-              >
-                <Mic className="w-4 h-4" />
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-8 h-8 p-0 rounded-lg transition-all duration-200",
+                    "hover:bg-primary/10 hover:text-primary hover:scale-105",
+                    "active:scale-95"
+                  )}
+                  disabled={disabled}
+                >
+                  <Smile className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-8 h-8 p-0 rounded-lg transition-all duration-200",
+                    "hover:bg-primary/10 hover:text-primary hover:scale-105",
+                    "active:scale-95"
+                  )}
+                  disabled={disabled}
+                >
+                  <Mic className="w-4 h-4" />
+                </Button>
+              </>
             )}
 
-            {/* 发送按钮 */}
+            {/* 发送按钮 - 更精致的设计 */}
             <Button
               onClick={onSend}
               disabled={!canSend}
               size="sm"
               className={cn(
-                "w-8 h-8 p-0 rounded-full transition-all duration-300 relative overflow-hidden",
+                "w-8 h-8 p-0 rounded-lg transition-all duration-300 relative overflow-hidden",
                 canSend
-                  ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl hover:scale-110 active:scale-95"
-                  : "bg-muted text-muted-foreground cursor-not-allowed",
+                  ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+                  : "bg-muted/50 text-muted-foreground cursor-not-allowed",
                 "group"
               )}
             >
               {/* 发送按钮背景动画 */}
               {canSend && (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-full transform scale-0 group-hover:scale-100 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary rounded-lg transform scale-0 group-hover:scale-100 transition-transform duration-200" />
               )}
               
               {/* 图标 */}
@@ -190,37 +197,35 @@ export function ModernChatInput({
                 )}
               </div>
 
-              {/* 发送成功的波纹效果 */}
+              {/* 发送成功的脉冲效果 */}
               {canSend && (
-                <div className="absolute inset-0 rounded-full bg-primary/20 scale-0 group-active:scale-150 opacity-0 group-active:opacity-100 transition-all duration-200" />
+                <div className="absolute inset-0 rounded-lg bg-primary/30 scale-0 group-active:scale-150 opacity-0 group-active:opacity-100 transition-all duration-150" />
               )}
             </Button>
           </div>
         </div>
-
-        {/* 底部提示 */}
-        {isFocused && (
-          <div className="px-4 pb-3 flex items-center justify-between text-xs text-muted-foreground/60">
-            <div className="flex items-center gap-2">
-              <Zap className="w-3 h-3" />
-              <span>Enter 发送，Shift + Enter 换行</span>
-            </div>
-            {canSend && (
-              <div className="flex items-center gap-1 text-primary/60">
-                <Sparkles className="w-3 h-3" />
-                <span>准备发送</span>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* 输入状态指示器 */}
+      {/* 思考状态覆盖 - 更优雅的设计 */}
       {disabled && (
-        <div className="absolute inset-0 bg-background/50 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Square className="w-4 h-4" />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
+          <div className="flex items-center gap-3 text-muted-foreground bg-background/80 px-4 py-2 rounded-lg shadow-sm">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            </div>
             <span className="text-sm">AI正在思考中...</span>
+          </div>
+        </div>
+      )}
+
+      {/* 底部状态指示器 */}
+      {canSend && isFocused && (
+        <div className="mt-2 flex items-center justify-end">
+          <div className="flex items-center gap-2 text-xs text-primary/60 bg-primary/5 px-2 py-1 rounded-md">
+            <Sparkles className="w-3 h-3" />
+            <span>准备发送</span>
           </div>
         </div>
       )}

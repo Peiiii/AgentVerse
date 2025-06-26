@@ -123,7 +123,10 @@ export function AgentDetailPage() {
   return (
     <div className="h-full w-full flex overflow-hidden">
       {/* 左侧设置区 */}
-      <div className="w-96 flex-shrink-0 border-r bg-background/50 backdrop-blur-xl flex flex-col">
+      <div className={cn(
+        "flex-shrink-0 border-r bg-background/30 backdrop-blur-xl flex flex-col transition-all duration-300",
+        sidebarTab === "ai-create" ? "w-[45%]" : "w-96"
+      )}>
         {/* 头部 */}
         <div className="p-6 border-b bg-background/80 backdrop-blur-xl">
           <div className="flex items-center gap-4 mb-6">
@@ -207,7 +210,7 @@ export function AgentDetailPage() {
       </div>
 
       {/* 右侧聊天区 */}
-      <div className="flex-1 min-w-0 flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="flex-1 min-w-0 flex flex-col bg-gradient-to-br from-blue-50/20 via-background to-purple-50/10">
         {/* 聊天头部 */}
         <div className="p-6 border-b bg-background/80 backdrop-blur-xl">
           <div className="flex items-center gap-4">
@@ -267,10 +270,10 @@ export function AgentDetailPage() {
                   )}
                   <div
                     className={cn(
-                      "max-w-[70%] rounded-2xl p-4 shadow-sm backdrop-blur-sm",
+                      "max-w-[70%] rounded-2xl p-4 shadow-sm backdrop-blur-sm border",
                       message.isUser
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-background/80 border border-border/50"
+                        ? "bg-primary text-primary-foreground border-primary/20"
+                        : "bg-background/90 border-border/30 hover:bg-background/95 transition-colors"
                     )}
                   >
                     <div className="text-sm leading-relaxed whitespace-pre-line">
@@ -303,7 +306,7 @@ export function AgentDetailPage() {
                     {agent.name?.[0] || "?"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="bg-background/80 border border-border/50 rounded-2xl p-4 backdrop-blur-sm">
+                <div className="bg-background/90 border border-border/30 rounded-2xl p-4 backdrop-blur-sm">
                   <div className="flex items-center gap-3">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>

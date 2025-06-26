@@ -143,23 +143,22 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
   };
 
   return (
-    <div className={cn("h-full flex flex-col bg-gradient-to-br from-background to-muted/20", className)}>
-      {/* 头部 */}
-      <div className="p-4 border-b bg-background/80 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
-            <Wand2 className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h3 className="font-semibold">AI智能体创建助手</h3>
-            <p className="text-xs text-muted-foreground">通过对话创建你的专属智能体</p>
-          </div>
-        </div>
-      </div>
-
+    <div className={cn("h-full flex flex-col bg-gradient-to-br from-blue-50/30 via-background to-green-50/20", className)}>
       {/* 聊天区域 */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-6">
         <div className="space-y-6 max-w-2xl mx-auto">
+          {/* 可滚动的头部欢迎信息 */}
+          <div className="text-center py-8">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center">
+              <Wand2 className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+              AI智能体创建助手
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              通过对话创建你的专属智能体
+            </p>
+          </div>
           {messages.map((message) => (
             <div key={message.id} className="space-y-4">
               {/* 消息气泡 */}
@@ -175,12 +174,12 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
                   </Avatar>
                 )}
                 
-                <div className={cn(
-                  "max-w-[80%] rounded-2xl p-4 shadow-sm",
-                  message.isUser
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-background border border-border/50"
-                )}>
+                                 <div className={cn(
+                   "max-w-[80%] rounded-2xl p-4 shadow-sm border backdrop-blur-sm",
+                   message.isUser
+                     ? "bg-primary text-primary-foreground border-primary/20"
+                     : "bg-background/90 border-border/30 hover:bg-background/95 transition-colors"
+                 )}>
                   <div className="text-sm leading-relaxed whitespace-pre-line">
                     {message.content}
                   </div>
@@ -274,7 +273,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
                   <Bot className="w-4 h-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="bg-background border border-border/50 rounded-2xl p-4">
+                             <div className="bg-background/90 border border-border/30 rounded-2xl p-4 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
@@ -290,15 +289,16 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
       </ScrollArea>
 
       {/* 输入区域 */}
-      <div className="p-4 border-t bg-background/80 backdrop-blur-xl">
-        <ModernChatInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={handleSendMessage}
-          disabled={isThinking}
-          placeholder="描述你想要的智能体..."
-          className="max-w-2xl mx-auto"
-        />
+      <div className="p-6 border-t bg-background/90 backdrop-blur-xl">
+        <div className="max-w-2xl mx-auto">
+          <ModernChatInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={handleSendMessage}
+            disabled={isThinking}
+            placeholder="描述你想要的智能体..."
+          />
+        </div>
       </div>
     </div>
   );
