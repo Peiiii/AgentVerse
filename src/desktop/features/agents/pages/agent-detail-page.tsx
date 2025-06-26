@@ -124,11 +124,11 @@ export function AgentDetailPage() {
     <div className="h-full w-full flex overflow-hidden">
       {/* 左侧设置区 */}
       <div className={cn(
-        "flex-shrink-0 border-r bg-background/30 backdrop-blur-xl flex flex-col transition-all duration-300",
+        "flex-shrink-0 border-r bg-background flex flex-col transition-all duration-300",
         sidebarTab === "ai-create" ? "w-[45%]" : "w-96"
       )}>
         {/* 头部 */}
-        <div className="p-6 border-b bg-background/80 backdrop-blur-xl">
+        <div className="p-6 border-b bg-muted/30">
           <div className="flex items-center gap-4 mb-6">
             <Button 
               variant="ghost" 
@@ -210,9 +210,9 @@ export function AgentDetailPage() {
       </div>
 
       {/* 右侧聊天区 */}
-      <div className="flex-1 min-w-0 flex flex-col bg-gradient-to-br from-blue-50/20 via-background to-purple-50/10">
+      <div className="flex-1 min-w-0 flex flex-col bg-muted/20">
         {/* 聊天头部 */}
-        <div className="p-6 border-b bg-background/80 backdrop-blur-xl">
+        <div className="p-6 border-b bg-background/95">
           <div className="flex items-center gap-4">
             <div className="relative">
               <Avatar className="w-10 h-10 ring-2 ring-primary/20 shadow-lg">
@@ -270,10 +270,10 @@ export function AgentDetailPage() {
                   )}
                   <div
                     className={cn(
-                      "max-w-[70%] rounded-2xl p-4 shadow-sm backdrop-blur-sm border",
+                      "max-w-[70%] rounded-2xl p-4 shadow-sm border",
                       message.isUser
                         ? "bg-primary text-primary-foreground border-primary/20"
-                        : "bg-background/90 border-border/30 hover:bg-background/95 transition-colors"
+                        : "bg-background border-border/50 hover:bg-muted/30 transition-colors"
                     )}
                   >
                     <div className="text-sm leading-relaxed whitespace-pre-line">
@@ -306,7 +306,7 @@ export function AgentDetailPage() {
                     {agent.name?.[0] || "?"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="bg-background/90 border border-border/30 rounded-2xl p-4 backdrop-blur-sm">
+                <div className="bg-background border border-border/50 rounded-2xl p-4">
                   <div className="flex items-center gap-3">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
@@ -322,7 +322,7 @@ export function AgentDetailPage() {
         </ScrollArea>
 
         {/* 输入区 */}
-        <div className="p-6 border-t bg-background/80 backdrop-blur-xl">
+        <div className="p-6 border-t bg-background/95">
           <div className="max-w-4xl mx-auto">
             <ModernChatInput
               value={inputMessage}

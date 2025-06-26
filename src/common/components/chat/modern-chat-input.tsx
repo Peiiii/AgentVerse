@@ -5,7 +5,6 @@ import {
   Mic, 
   Smile, 
   ArrowUp,
-  Sparkles,
   Plus
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -76,24 +75,19 @@ export function ModernChatInput({
         )}
       </div>
 
-      {/* 主输入区域 - 固定布局，不会因为focus改变高度 */}
+      {/* 主输入区域 - 简洁现代设计 */}
       <div className={cn(
-        "relative bg-background/90 backdrop-blur-sm border rounded-xl transition-all duration-200 ease-out",
-        "shadow-sm hover:shadow-md",
+        "relative bg-background border rounded-lg transition-all duration-200 ease-out",
+        "shadow-sm",
         isFocused 
-          ? "border-primary/40 shadow-primary/5" 
-          : "border-border/40 hover:border-border/60",
+          ? "border-primary/50 ring-1 ring-primary/20" 
+          : "border-border hover:border-border/80",
         disabled && "opacity-50 cursor-not-allowed"
       )}>
-        {/* 装饰性渐变边框 */}
-        <div className={cn(
-          "absolute inset-0 rounded-xl opacity-0 transition-opacity duration-200",
-          "bg-gradient-to-r from-primary/10 via-transparent to-primary/10",
-          isFocused && "opacity-100"
-        )} />
 
-        {/* 输入容器 - Discord/微信风格的紧凑布局 */}
-        <div className="relative flex items-end gap-3 p-3">
+
+        {/* 输入容器 - 简洁布局 */}
+        <div className="relative flex items-end gap-2 p-3">
           {/* 左侧工具按钮组 */}
           <div className="flex items-center">
             <Button
@@ -126,11 +120,9 @@ export function ModernChatInput({
               disabled={disabled}
               className={cn(
                 "w-full resize-none border-0 bg-transparent outline-none",
-                "text-sm leading-relaxed placeholder-muted-foreground/60",
-                "py-2 px-3 min-h-[36px] max-h-[120px] overflow-y-auto rounded-lg",
-                "scrollbar-thin scrollbar-thumb-border/30 scrollbar-track-transparent",
-                "transition-colors duration-200",
-                isFocused && "bg-muted/20"
+                "text-sm leading-relaxed placeholder-muted-foreground/70",
+                "py-2 px-2 min-h-[36px] max-h-[120px] overflow-y-auto",
+                "scrollbar-thin scrollbar-thumb-border/30 scrollbar-track-transparent"
               )}
             />
           </div>
@@ -206,10 +198,10 @@ export function ModernChatInput({
         </div>
       </div>
 
-      {/* 思考状态覆盖 - 更优雅的设计 */}
+      {/* 思考状态覆盖 */}
       {disabled && (
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
-          <div className="flex items-center gap-3 text-muted-foreground bg-background/80 px-4 py-2 rounded-lg shadow-sm">
+        <div className="absolute inset-0 bg-background/80 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-3 text-muted-foreground bg-background px-4 py-2 rounded-lg shadow-sm border">
             <div className="flex space-x-1">
               <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
               <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
@@ -220,15 +212,7 @@ export function ModernChatInput({
         </div>
       )}
 
-      {/* 底部状态指示器 */}
-      {canSend && isFocused && (
-        <div className="mt-2 flex items-center justify-end">
-          <div className="flex items-center gap-2 text-xs text-primary/60 bg-primary/5 px-2 py-1 rounded-md">
-            <Sparkles className="w-3 h-3" />
-            <span>准备发送</span>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 } 

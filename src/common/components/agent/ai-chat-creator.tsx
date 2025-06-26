@@ -143,7 +143,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
   };
 
   return (
-    <div className={cn("h-full flex flex-col bg-gradient-to-br from-blue-50/30 via-background to-green-50/20", className)}>
+    <div className={cn("h-full flex flex-col bg-muted/30", className)}>
       {/* 聊天区域 */}
       <ScrollArea className="flex-1 p-6">
         <div className="space-y-6 max-w-2xl mx-auto">
@@ -175,10 +175,10 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
                 )}
                 
                                  <div className={cn(
-                   "max-w-[80%] rounded-2xl p-4 shadow-sm border backdrop-blur-sm",
+                   "max-w-[80%] rounded-2xl p-4 shadow-sm border",
                    message.isUser
                      ? "bg-primary text-primary-foreground border-primary/20"
-                     : "bg-background/90 border-border/30 hover:bg-background/95 transition-colors"
+                     : "bg-background border-border/50 hover:bg-muted/30 transition-colors"
                  )}>
                   <div className="text-sm leading-relaxed whitespace-pre-line">
                     {message.content}
@@ -273,7 +273,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
                   <Bot className="w-4 h-4" />
                 </AvatarFallback>
               </Avatar>
-                             <div className="bg-background/90 border border-border/30 rounded-2xl p-4 backdrop-blur-sm">
+                             <div className="bg-background border border-border/50 rounded-2xl p-4">
                 <div className="flex items-center gap-2">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
@@ -289,7 +289,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
       </ScrollArea>
 
       {/* 输入区域 */}
-      <div className="p-6 border-t bg-background/90 backdrop-blur-xl">
+      <div className="p-6 border-t bg-background/95">
         <div className="max-w-2xl mx-auto">
           <ModernChatInput
             value={inputValue}
