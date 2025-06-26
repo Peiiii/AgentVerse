@@ -143,16 +143,33 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
   };
 
   return (
-    <div className={cn("h-full flex flex-col bg-muted/30", className)}>
+    <div className={cn("h-full flex flex-col", className)}>
       {/* 聊天区域 */}
       <ScrollArea className="flex-1 p-6">
         <div className="space-y-6 max-w-2xl mx-auto">
           {/* 可滚动的头部欢迎信息 */}
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center">
-              <Wand2 className="w-8 h-8 text-primary" />
+            <div className="relative w-30 h-30 mx-auto mb-6">
+              {/* 魔法圆阵效果 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 rounded-full animate-spin opacity-25" style={{ animationDuration: "10s" }}></div>
+              <div className="absolute inset-2 border-2 border-dashed border-purple-300/50 rounded-full animate-spin" style={{ animationDuration: "8s", animationDirection: "reverse" }}></div>
+              <div className="absolute inset-1 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 rounded-full animate-ping opacity-15" style={{ animationDuration: "4s" }}></div>
+              
+              {/* 中心魔法棒容器 */}
+              <div className="absolute inset-4 bg-gradient-to-br from-violet-600 via-purple-600 via-fuchsia-600 to-pink-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-white/40">
+                <div className="w-12 h-12 bg-white/35 backdrop-blur-sm rounded-full flex items-center justify-center animate-pulse">
+                  <Wand2 className="w-6 h-6 text-white drop-shadow-lg" style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.8))" }} />
+                </div>
+              </div>
+              
+              {/* 魔法符文和星星装饰 */}
+              <div className="absolute -top-2 left-1 w-5 h-5 bg-gradient-to-br from-yellow-300 to-amber-400 animate-bounce shadow-lg" style={{ animationDelay: "0s", clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)" }}></div>
+              <div className="absolute -bottom-2 right-1 w-4 h-4 bg-gradient-to-br from-pink-300 to-rose-400 animate-bounce shadow-lg" style={{ animationDelay: "0.6s", clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)" }}></div>
+              <div className="absolute top-2 -right-3 w-3 h-3 bg-gradient-to-br from-emerald-300 to-teal-400 animate-bounce shadow-lg" style={{ animationDelay: "1.2s", clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)" }}></div>
+              <div className="absolute bottom-6 -left-3 w-2 h-2 bg-gradient-to-br from-indigo-300 to-purple-400 rounded-full animate-bounce shadow-lg" style={{ animationDelay: "1.8s" }}></div>
+              <div className="absolute top-6 left-0 w-1.5 h-1.5 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full animate-bounce shadow-lg" style={{ animationDelay: "2.4s" }}></div>
             </div>
-            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
               AI智能体创建助手
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -167,35 +184,27 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
                 message.isUser ? "justify-end" : "justify-start"
               )}>
                 {!message.isUser && (
-                  <Avatar className="w-8 h-8 border-2 border-primary/20">
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs">
+                  <Avatar className="w-8 h-8 border-2 border-gradient-to-r from-emerald-400 to-blue-400">
+                    <AvatarFallback className="bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 text-white text-xs">
                       <Bot className="w-4 h-4" />
                     </AvatarFallback>
                   </Avatar>
                 )}
                 
-                                 <div className={cn(
-                   "max-w-[80%] rounded-2xl p-4 shadow-sm border",
-                   message.isUser
-                     ? "bg-primary text-primary-foreground border-primary/20"
-                     : "bg-background border-border/50 hover:bg-muted/30 transition-colors"
-                 )}>
+                <div className={cn(
+                  "max-w-[80%] rounded-2xl p-4 shadow-sm border",
+                  message.isUser
+                    ? "bg-orange-500 dark:bg-orange-600 text-white border-orange-500/20"
+                    : "bg-card border-border hover:bg-muted/30 transition-colors"
+                )}>
                   <div className="text-sm leading-relaxed whitespace-pre-line">
                     {message.content}
-                  </div>
-                  
-                  {/* 时间戳 */}
-                  <div className={cn(
-                    "text-xs mt-2 opacity-60",
-                    message.isUser ? "text-primary-foreground/60" : "text-muted-foreground"
-                  )}>
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
 
                 {message.isUser && (
-                  <Avatar className="w-8 h-8 border-2 border-muted">
-                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                  <Avatar className="w-8 h-8 border-2 border-gradient-to-r from-orange-400 to-pink-400">
+                    <AvatarFallback className="bg-gradient-to-br from-orange-500 via-pink-500 to-red-500 text-white text-xs">
                       <User className="w-4 h-4" />
                     </AvatarFallback>
                   </Avatar>
@@ -206,8 +215,8 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
               {message.agentPreview && (
                 <div className="ml-11 p-4 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl">
                   <div className="flex items-start gap-3">
-                    <Avatar className="w-12 h-12 border-2 border-primary/30">
-                      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40">
+                    <Avatar className="w-12 h-12 border-2 border-gradient-to-r from-violet-400 to-fuchsia-400">
+                      <AvatarFallback className="bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 text-white font-bold">
                         {message.agentPreview.name?.[0] || "A"}
                       </AvatarFallback>
                     </Avatar>
@@ -268,12 +277,12 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
           {/* 思考状态 */}
           {isThinking && (
             <div className="flex gap-3 justify-start">
-              <Avatar className="w-8 h-8 border-2 border-primary/20">
-                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs">
+              <Avatar className="w-8 h-8 border-2 border-gradient-to-r from-emerald-400 to-blue-400">
+                <AvatarFallback className="bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 text-white text-xs">
                   <Bot className="w-4 h-4" />
                 </AvatarFallback>
               </Avatar>
-                             <div className="bg-background border border-border/50 rounded-2xl p-4">
+              <div className="bg-card border border-border rounded-2xl p-4">
                 <div className="flex items-center gap-2">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
@@ -289,7 +298,7 @@ export function AiChatCreator({ onAgentCreate, className }: AiChatCreatorProps) 
       </ScrollArea>
 
       {/* 输入区域 */}
-      <div className="p-6 border-t bg-background/95">
+      <div className="p-6 border-t">
         <div className="max-w-2xl mx-auto">
           <ModernChatInput
             value={inputValue}

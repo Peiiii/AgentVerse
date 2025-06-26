@@ -4,7 +4,7 @@ import { ModernChatInput } from "@/common/components/chat/modern-chat-input";
 import { Button } from "@/common/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
 import { useAgents } from "@/core/hooks/useAgents";
-import { ArrowLeft, Bot, MessageSquare, Settings, Sparkles, Wand2 } from "lucide-react";
+import { ArrowLeft, Bot, MessageSquare, Settings, Sparkles, Wand2, Edit3, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Agent } from "@/common/types/agent";
@@ -94,25 +94,25 @@ export function AgentDetailPage() {
       case "moderator":
         return {
           icon: Bot,
-          color: "text-purple-500",
-          bgColor: "bg-purple-500/10",
-          borderColor: "border-purple-500/20",
+          color: "text-amber-600 dark:text-amber-400",
+          bgColor: "bg-amber-50 dark:bg-amber-950/50",
+          borderColor: "border-amber-200 dark:border-amber-800",
           label: "主持人"
         };
       case "participant":
         return {
           icon: MessageSquare,
-          color: "text-green-500",
-          bgColor: "bg-green-500/10",
-          borderColor: "border-green-500/20",
+          color: "text-emerald-600 dark:text-emerald-400",
+          bgColor: "bg-emerald-50 dark:bg-emerald-950/50",
+          borderColor: "border-emerald-200 dark:border-emerald-800",
           label: "参与者"
         };
       default:
         return {
           icon: Sparkles,
-          color: "text-blue-500",
-          bgColor: "bg-blue-500/10",
-          borderColor: "border-blue-500/20",
+          color: "text-blue-600 dark:text-blue-400",
+          bgColor: "bg-blue-50 dark:bg-blue-950/50",
+          borderColor: "border-blue-200 dark:border-blue-800",
           label: "智能体"
         };
     }
@@ -122,19 +122,16 @@ export function AgentDetailPage() {
 
   return (
     <div className="h-full w-full flex overflow-hidden">
-      {/* 左侧设置区 */}
-      <div className={cn(
-        "flex-shrink-0 border-r bg-background flex flex-col transition-all duration-300",
-        sidebarTab === "ai-create" ? "w-[45%]" : "w-96"
-      )}>
-        {/* 头部 */}
-        <div className="p-6 border-b bg-muted/30">
+      {/* 左侧设置区 - 统一使用50%宽度 */}
+      <div className="w-1/2 border-r flex flex-col">
+        {/* 左侧头部 - 配置导向 */}
+        <div className="p-6 border-b">
           <div className="flex items-center gap-4 mb-6">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/agents")}
-              className="flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+              className="flex-shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
@@ -147,14 +144,14 @@ export function AgentDetailPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div className={cn(
-                  "absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-lg",
-                  roleConfig.bgColor, roleConfig.borderColor, "border-2"
+                  "absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-lg border-2 border-background",
+                  roleConfig.bgColor
                 )}>
                   <roleConfig.icon className={cn("w-2.5 h-2.5", roleConfig.color)} />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold truncate bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+                <h1 className="text-xl font-bold truncate">
                   {agent.name}
                 </h1>
                 <Badge
@@ -162,10 +159,12 @@ export function AgentDetailPage() {
                   className={cn(
                     "text-xs px-2 py-1 mt-1",
                     roleConfig.borderColor,
-                    roleConfig.bgColor
+                    roleConfig.bgColor,
+                    roleConfig.color
                   )}
                 >
-                  {roleConfig.label}
+                  <Edit3 className="w-3 h-3 mr-1" />
+                  配置中心
                 </Badge>
               </div>
             </div>
@@ -185,17 +184,29 @@ export function AgentDetailPage() {
           </Tabs>
         </div>
 
-        {/* 内容区 */}
-        <div className="flex-1 overflow-hidden">
+        {/* 内容区 - 简洁的背景 */}
+        <div className="flex-1 overflow-hidden bg-muted/20">
           <Tabs value={sidebarTab} className="h-full">
             <TabsContent value="configure" className="h-full m-0">
               <ScrollArea className="h-full">
-                                 <div className="p-4">
-                   <AgentEmbeddedForm
-                     onSubmit={handleAgentUpdate}
-                     initialData={agent}
-                   />
-                 </div>
+                <div className="p-6">
+                  {/* 添加一个温暖的卡片容器 */}
+                  <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Settings className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">智能体配置</h3>
+                        <p className="text-sm text-muted-foreground">详细设置智能体的各项属性和行为特征</p>
+                      </div>
+                    </div>
+                    <AgentEmbeddedForm
+                      onSubmit={handleAgentUpdate}
+                      initialData={agent}
+                    />
+                  </div>
+                </div>
               </ScrollArea>
             </TabsContent>
             
@@ -209,10 +220,10 @@ export function AgentDetailPage() {
         </div>
       </div>
 
-      {/* 右侧聊天区 */}
-      <div className="flex-1 min-w-0 flex flex-col bg-muted/20">
-        {/* 聊天头部 */}
-        <div className="p-6 border-b bg-background/95">
+      {/* 右侧聊天区 - 使用50%宽度 */}
+      <div className="w-1/2 min-w-0 flex flex-col">
+        {/* 右侧头部 - 聊天导向 */}
+        <div className="p-6 border-b">
           <div className="flex items-center gap-4">
             <div className="relative">
               <Avatar className="w-10 h-10 ring-2 ring-primary/20 shadow-lg">
@@ -222,29 +233,50 @@ export function AgentDetailPage() {
                 </AvatarFallback>
               </Avatar>
               {/* 在线状态指示器 */}
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full animate-pulse shadow-sm"></div>
             </div>
             <div className="flex-1">
-              <h2 className="font-bold text-lg bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+              <h2 className="font-bold text-lg">
                 与 {agent.name} 对话
               </h2>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                测试智能体的对话能力和性格特征
+                <Zap className="w-4 h-4 text-green-500" />
+                实时体验智能体能力
               </p>
             </div>
           </div>
         </div>
 
         {/* 聊天消息区 */}
-        <ScrollArea className="flex-1 p-6">
+        <ScrollArea className="flex-1 p-6 bg-muted/20">
           <div className="space-y-6 max-w-4xl mx-auto">
             {chatMessages.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center">
-                  <MessageSquare className="w-12 h-12 text-primary" />
+                <div className="relative w-36 h-36 mx-auto mb-8">
+                  {/* 聊天气泡背景效果 */}
+                  <div className="absolute top-0 left-4 w-16 h-12 bg-gradient-to-br from-emerald-300 to-teal-400 rounded-2xl rounded-bl-sm opacity-60 animate-pulse" style={{ animationDelay: "0s", animationDuration: "2s" }}></div>
+                  <div className="absolute top-6 right-2 w-12 h-10 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-2xl rounded-br-sm opacity-50 animate-pulse" style={{ animationDelay: "0.7s", animationDuration: "2.5s" }}></div>
+                  <div className="absolute bottom-4 left-0 w-14 h-11 bg-gradient-to-br from-pink-300 to-rose-400 rounded-2xl rounded-bl-sm opacity-40 animate-pulse" style={{ animationDelay: "1.4s", animationDuration: "2.2s" }}></div>
+                  
+                  {/* 中心对话头像 */}
+                  <div className="absolute inset-6 bg-gradient-to-br from-emerald-500 via-teal-500 via-blue-500 to-indigo-500 rounded-3xl flex items-center justify-center shadow-2xl border-4 border-white/30">
+                    <div className="w-16 h-16 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                      <MessageSquare className="w-8 h-8 text-white drop-shadow-lg animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  {/* 对话泡泡装饰 */}
+                  <div className="absolute -top-3 right-8 w-8 h-6 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full animate-bounce shadow-lg" style={{ animationDelay: "0s" }}>
+                    <div className="absolute bottom-0 right-1 w-2 h-2 bg-gradient-to-br from-yellow-400 to-amber-500 rotate-45 transform origin-top-left"></div>
+                  </div>
+                  <div className="absolute bottom-0 right-4 w-6 h-5 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full animate-bounce shadow-lg" style={{ animationDelay: "0.8s" }}>
+                    <div className="absolute bottom-0 left-1 w-1.5 h-1.5 bg-gradient-to-br from-cyan-400 to-blue-500 rotate-45 transform origin-top-right"></div>
+                  </div>
+                  <div className="absolute top-8 -left-2 w-5 h-4 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full animate-bounce shadow-lg" style={{ animationDelay: "1.6s" }}>
+                    <div className="absolute bottom-0 right-0.5 w-1 h-1 bg-gradient-to-br from-purple-400 to-pink-500 rotate-45 transform origin-top-left"></div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+                <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 bg-clip-text text-transparent">
                   开始与智能体对话
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
@@ -261,9 +293,9 @@ export function AgentDetailPage() {
                   )}
                 >
                   {!message.isUser && (
-                    <Avatar className="w-10 h-10 ring-2 ring-primary/20 shadow-lg">
+                    <Avatar className="w-10 h-10 ring-2 ring-gradient-to-r from-purple-400 to-pink-400 shadow-lg">
                       <AvatarImage src={agent.avatar} alt={agent.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40">
+                      <AvatarFallback className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white font-bold">
                         {agent.name?.[0] || "?"}
                       </AvatarFallback>
                     </Avatar>
@@ -272,23 +304,17 @@ export function AgentDetailPage() {
                     className={cn(
                       "max-w-[70%] rounded-2xl p-4 shadow-sm border",
                       message.isUser
-                        ? "bg-primary text-primary-foreground border-primary/20"
-                        : "bg-background border-border/50 hover:bg-muted/30 transition-colors"
+                        ? "bg-blue-500 dark:bg-blue-600 text-white border-blue-500/20"
+                        : "bg-card border-border hover:bg-muted/30 transition-colors"
                     )}
                   >
                     <div className="text-sm leading-relaxed whitespace-pre-line">
                       {message.content}
                     </div>
-                    <div className={cn(
-                      "text-xs mt-2 opacity-60",
-                      message.isUser ? "text-primary-foreground/60" : "text-muted-foreground"
-                    )}>
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
                   </div>
                   {message.isUser && (
-                    <Avatar className="w-10 h-10 ring-2 ring-muted shadow-lg">
-                      <AvatarFallback className="bg-gradient-to-br from-muted to-muted/80">
+                    <Avatar className="w-10 h-10 shadow-lg">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 text-white font-bold border-2 border-blue-300/50">
                         你
                       </AvatarFallback>
                     </Avatar>
@@ -300,13 +326,13 @@ export function AgentDetailPage() {
             {/* 思考中指示器 */}
             {isThinking && (
               <div className="flex gap-4 justify-start">
-                <Avatar className="w-10 h-10 ring-2 ring-primary/20 shadow-lg">
+                <Avatar className="w-10 h-10 ring-2 ring-gradient-to-r from-purple-400 to-pink-400 shadow-lg">
                   <AvatarImage src={agent.avatar} alt={agent.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40">
+                  <AvatarFallback className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white font-bold">
                     {agent.name?.[0] || "?"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="bg-background border border-border/50 rounded-2xl p-4">
+                <div className="bg-card border border-border rounded-2xl p-4">
                   <div className="flex items-center gap-3">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
@@ -322,7 +348,7 @@ export function AgentDetailPage() {
         </ScrollArea>
 
         {/* 输入区 */}
-        <div className="p-6 border-t bg-background/95">
+        <div className="p-6 border-t">
           <div className="max-w-4xl mx-auto">
             <ModernChatInput
               value={inputMessage}
