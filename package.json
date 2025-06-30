@@ -17,7 +17,10 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@agent-labs/agent-chat": "^1.5.0",
+    "@ag-ui/client": "^0.0.30",
+    "@ag-ui/core": "^0.0.30",
+    "@ag-ui/encoder": "^0.0.30",
+    "@agent-labs/agent-chat": "^1.5.3",
     "@cardos/extension": "0.2.0-beta.3",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-avatar": "^1.1.2",
@@ -37,6 +40,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@theguild/remark-mermaid": "^0.3.0",
     "@types/react-router-dom": "^5.3.3",
+    "@types/uuid": "^10.0.0",
     "ahooks": "^3.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -47,7 +51,7 @@
     "lucide-react": "^0.468.0",
     "mermaid": "^11.6.0",
     "nanoid": "^5.0.9",
-    "openai": "^4.80.1",
+    "openai": "^4.82.0",
     "pinyin-match": "^1.2.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -65,6 +69,7 @@
     "rxjs": "^7.8.1",
     "tailwind-merge": "^2.5.5",
     "unified": "^11.0.5",
+    "uuid": "^11.1.0",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

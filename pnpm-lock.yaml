@@ -8,9 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@ag-ui/client':
+        specifier: ^0.0.30
+        version: 0.0.30
+      '@ag-ui/core':
+        specifier: ^0.0.30
+        version: 0.0.30
+      '@ag-ui/encoder':
+        specifier: ^0.0.30
+        version: 0.0.30
       '@agent-labs/agent-chat':
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)
+        specifier: ^1.5.3
+        version: 1.5.3(@ag-ui/client@0.0.30)(@ag-ui/core@0.0.30)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)
       '@cardos/extension':
         specifier: 0.2.0-beta.3
         version: 0.2.0-beta.3(rxjs@7.8.1)
@@ -68,6 +77,9 @@ importers:
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
+      '@types/uuid':
+        specifier: ^10.0.0
+        version: 10.0.0
       ahooks:
         specifier: ^3.8.4
         version: 3.8.4(react@19.1.0)
@@ -99,7 +111,7 @@ importers:
         specifier: ^5.0.9
         version: 5.0.9
       openai:
-        specifier: ^4.80.1
+        specifier: ^4.82.0
         version: 4.82.0(ws@8.18.0)(zod@3.25.67)
       pinyin-match:
         specifier: ^1.2.6
@@ -152,6 +164,9 @@ importers:
       unified:
         specifier: ^11.0.5
         version: 11.0.5
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
       zustand:
         specifier: ^5.0.5
         version: 5.0.5(@types/react@18.3.18)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
@@ -294,21 +309,23 @@ packages:
   '@adobe/css-tools@4.4.1':
     resolution: {integrity: sha512-12WGKBQzjUAI4ayyF4IAtfw2QR/IDoqk6jTddXDhtYTJF9ASmoE1zst7cVtP0aL/F1jUJL5r+JxKXKEgHNbEUQ==}
 
-  '@ag-ui/client@0.0.28':
-    resolution: {integrity: sha512-B09Yp2Czol9Y8AoiiMW/SF2PCAdUMePzW6JtGIqmb7Q05QHi+GXPKIXKpoOasQvFgMqwJDW0g6RGozUlD45dxA==}
+  '@ag-ui/client@0.0.30':
+    resolution: {integrity: sha512-bWdd4DgniHa8mWBaVMVYvwKLAbwi+SBUCUGqnEH8z2lkHgjY5xZVekNq5g3x3i4OSJ6RVr4XDE+DAORgOh09qA==}
 
-  '@ag-ui/core@0.0.28':
-    resolution: {integrity: sha512-2Vjuxl0gE8E2RFjFccGZNczDw3Xqxve/EfoYRVAFNX3+rY7z64Mj0OWDw5p9L+X8UG0/+t0xYIquQpw7B4NdHA==}
+  '@ag-ui/core@0.0.30':
+    resolution: {integrity: sha512-cBukbc2O0qMKi/BKix6Exld5zSqGKR72376KA6NZNQz/xYAiPNhmK40VX77d/hyblhtXT3BlBGrYmda9V4ETlw==}
 
-  '@ag-ui/encoder@0.0.28':
-    resolution: {integrity: sha512-A7N7QE6P70rBQ9k5kcm1xQUAq4K6Dhg7y/hapkL6oJG/zQabRKS5wSePO34wfLtg4KKIPIqiUGqVdy8qk2a3Ng==}
+  '@ag-ui/encoder@0.0.30':
+    resolution: {integrity: sha512-xk43F5WaEpaRg5vY0y6U/ZMAzScieSA1L0TAtVGysh91M9JS9hxuxTK2jyxh/sC3AySIjbZUQ9m69fECKloT0g==}
 
-  '@ag-ui/proto@0.0.28':
-    resolution: {integrity: sha512-jgvUT81n4K5TldkrpVxM5eLRNOq5tV5BKNi079NGCDnK1mc2ElORsHcCd6fjAOpUPpfirS8RuQr9MvoMXE42aQ==}
+  '@ag-ui/proto@0.0.30':
+    resolution: {integrity: sha512-5yObohnpAhuzkIrcbgBuT7xrXLThuhsBl+vh85uNeUlb6CNJ7W2rdwApJGTj/3HbitK4iLq2BiY3U18Bno+qqg==}
 
-  '@agent-labs/agent-chat@1.5.0':
-    resolution: {integrity: sha512-tJcI4u5WaRm2Tfnprph2jrnKqlehgPs2LQtlJ1Wvcg5qgiz6sl2rs5yaSdRHWeb3g6qGaGPsCJpZWSFUVFTooQ==}
+  '@agent-labs/agent-chat@1.5.3':
+    resolution: {integrity: sha512-mQabUZzN8zCH8C48H2MAtRVfDwy/ckX2ShCJnwYOlsaJy/GqGIoY5NytOA6KEdASDWMy9/2+w0KWn4V+4K253g==}
     peerDependencies:
+      '@ag-ui/client': ^0.0.30
+      '@ag-ui/core': ^0.0.30
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
@@ -5927,11 +5944,11 @@ snapshots:
 
   '@adobe/css-tools@4.4.1': {}
 
-  '@ag-ui/client@0.0.28':
+  '@ag-ui/client@0.0.30':
     dependencies:
-      '@ag-ui/core': 0.0.28
-      '@ag-ui/encoder': 0.0.28
-      '@ag-ui/proto': 0.0.28
+      '@ag-ui/core': 0.0.30
+      '@ag-ui/encoder': 0.0.30
+      '@ag-ui/proto': 0.0.30
       '@types/uuid': 10.0.0
       fast-json-patch: 3.1.1
       rxjs: 7.8.1
@@ -5939,24 +5956,25 @@ snapshots:
       uuid: 11.1.0
       zod: 3.25.67
 
-  '@ag-ui/core@0.0.28':
+  '@ag-ui/core@0.0.30':
     dependencies:
       rxjs: 7.8.1
       zod: 3.25.67
 
-  '@ag-ui/encoder@0.0.28':
+  '@ag-ui/encoder@0.0.30':
     dependencies:
-      '@ag-ui/core': 0.0.28
-      '@ag-ui/proto': 0.0.28
+      '@ag-ui/core': 0.0.30
+      '@ag-ui/proto': 0.0.30
 
-  '@ag-ui/proto@0.0.28':
+  '@ag-ui/proto@0.0.30':
     dependencies:
-      '@ag-ui/core': 0.0.28
+      '@ag-ui/core': 0.0.30
       '@bufbuild/protobuf': 2.5.2
 
-  '@agent-labs/agent-chat@1.5.0(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)':
+  '@agent-labs/agent-chat@1.5.3(@ag-ui/client@0.0.30)(@ag-ui/core@0.0.30)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)':
     dependencies:
-      '@ag-ui/client': 0.0.28
+      '@ag-ui/client': 0.0.30
+      '@ag-ui/core': 0.0.30
       '@ai-sdk/react': 1.2.12(react@19.1.0)(zod@3.25.67)
       '@ai-sdk/ui-utils': 1.2.11(zod@3.25.67)
       '@radix-ui/react-avatar': 1.1.10(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
