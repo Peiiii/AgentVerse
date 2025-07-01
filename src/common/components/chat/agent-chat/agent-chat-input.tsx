@@ -6,7 +6,9 @@ interface AgentChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
+  onAbort?: () => void;
   disabled?: boolean;
+  sendDisabled?: boolean;
 }
 
 export function AgentChatInput({ 
@@ -14,7 +16,9 @@ export function AgentChatInput({
   value, 
   onChange, 
   onSend, 
-  disabled = false 
+  onAbort,
+  disabled = false,
+  sendDisabled
 }: AgentChatInputProps) {
   return (
     <div className="p-6 border-t">
@@ -23,7 +27,9 @@ export function AgentChatInput({
           value={value}
           onChange={onChange}
           onSend={onSend}
+          onAbort={onAbort}
           disabled={disabled}
+          sendDisabled={sendDisabled}
           placeholder={`与 ${agent.name} 对话...`}
         />
       </div>

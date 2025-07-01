@@ -5,7 +5,8 @@ import {
   Mic, 
   Smile, 
   ArrowUp,
-  Plus
+  Plus,
+  Square
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -13,7 +14,10 @@ interface ModernChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
+  onAbort?: () => void;
   disabled?: boolean;
+  inputDisabled?: boolean;
+  sendDisabled?: boolean;
   placeholder?: string;
   maxLength?: number;
   className?: string;
@@ -23,7 +27,10 @@ export function ModernChatInput({
   value,
   onChange,
   onSend,
+  onAbort,
   disabled = false,
+  inputDisabled = false,
+  sendDisabled = false,
   placeholder = "输入消息...",
   maxLength = 2000,
   className,
@@ -31,6 +38,10 @@ export function ModernChatInput({
   const [isFocused, setIsFocused] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 计算实际的禁用状态
+  const isInputDisabled = disabled || inputDisabled;
+  const isSendDisabled = disabled || sendDisabled;
 
   // 自动调整高度
   useEffect(() => {
@@ -46,13 +57,13 @@ export function ModernChatInput({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
       e.preventDefault();
-      if (value.trim() && !disabled) {
+      if (value.trim() && !isSendDisabled) {
         onSend();
       }
     }
   };
 
-  const canSend = value.trim().length > 0 && !disabled;
+  const canSend = value.trim().length > 0 && !isSendDisabled;
   const charCount = value.length;
   const isNearLimit = charCount > maxLength * 0.8;
 
@@ -82,7 +93,7 @@ export function ModernChatInput({
         isFocused 
           ? "border-primary/50 ring-1 ring-primary/20" 
           : "border-border hover:border-border/80",
-        disabled && "opacity-50 cursor-not-allowed"
+        isInputDisabled && "opacity-50 cursor-not-allowed"
       )}>
 
 
@@ -98,7 +109,7 @@ export function ModernChatInput({
                 "hover:bg-primary/10 hover:text-primary hover:scale-105",
                 "active:scale-95"
               )}
-              disabled={disabled}
+              disabled={isInputDisabled}
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -117,7 +128,7 @@ export function ModernChatInput({
               onCompositionEnd={() => setIsComposing(false)}
               placeholder={placeholder}
               maxLength={maxLength}
-              disabled={disabled}
+              disabled={isInputDisabled}
               className={cn(
                 "w-full resize-none border-0 bg-transparent outline-none",
                 "text-sm leading-relaxed placeholder-muted-foreground/70",
@@ -129,6 +140,22 @@ export function ModernChatInput({
 
           {/* 右侧操作按钮组 */}
           <div className="flex items-center gap-1">
+            {/* 暂停按钮 - 仅在 AI 回复时显示 */}
+            {onAbort && isSendDisabled && !isInputDisabled && (
+              <Button
+                onClick={onAbort}
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "w-8 h-8 p-0 rounded-lg transition-all duration-200",
+                  "hover:bg-orange-500/10 hover:text-orange-500 hover:scale-105",
+                  "active:scale-95"
+                )}
+              >
+                <Square className="w-4 h-4" />
+              </Button>
+            )}
+
             {/* 表情和语音按钮 */}
             {!value.trim() && (
               <>
@@ -140,7 +167,7 @@ export function ModernChatInput({
                     "hover:bg-primary/10 hover:text-primary hover:scale-105",
                     "active:scale-95"
                   )}
-                  disabled={disabled}
+                  disabled={isInputDisabled}
                 >
                   <Smile className="w-4 h-4" />
                 </Button>
@@ -152,7 +179,7 @@ export function ModernChatInput({
                     "hover:bg-primary/10 hover:text-primary hover:scale-105",
                     "active:scale-95"
                   )}
-                  disabled={disabled}
+                  disabled={isInputDisabled}
                 >
                   <Mic className="w-4 h-4" />
                 </Button>
