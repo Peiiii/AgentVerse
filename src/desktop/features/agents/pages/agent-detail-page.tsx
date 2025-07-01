@@ -21,9 +21,8 @@ export function AgentDetailPage() {
   
   const [agent, setAgent] = useState<AgentDef | null>(null);
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("configure");
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
-  const [isThinking, setIsThinking] = useState(false);
 
   // 查找当前agent
   useEffect(() => {
@@ -49,33 +48,6 @@ export function AgentDetailPage() {
       </div>
     );
   }
-
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
-
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      isUser: true,
-      timestamp: new Date(),
-    };
-
-    setChatMessages(prev => [...prev, userMessage]);
-    setInputMessage("");
-    setIsThinking(true);
-
-    // 模拟AI响应
-    setTimeout(() => {
-      const agentMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: `你好！我是${agent.name}。${agent.personality || "我很高兴与你交流。"}`,
-        isUser: false,
-        timestamp: new Date(),
-      };
-      setChatMessages(prev => [...prev, agentMessage]);
-      setIsThinking(false);
-    }, 1500);
-  };
 
   const handleAgentUpdate = (updatedAgentData: Omit<AgentDef, "id">) => {
     const updatedAgent = { ...updatedAgentData, id: agent.id };
@@ -219,9 +191,7 @@ export function AgentDetailPage() {
         agent={agent}
         messages={chatMessages}
         inputMessage={inputMessage}
-        isThinking={isThinking}
         onInputChange={setInputMessage}
-        onSendMessage={handleSendMessage}
       />
     </div>
   );

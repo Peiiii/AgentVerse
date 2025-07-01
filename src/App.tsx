@@ -4,6 +4,6 @@ import { useBreakpointContext } from "@/common/components/common/breakpoint-prov
 
 
 export const App = () => {
-  const { isDesktop } = useBreakpointContext();
-  return isDesktop ? <DesktopApp /> : <MobileApp />;
+  const { isMobile } = useBreakpointContext();
+  return !isMobile ? <DesktopApp /> : <MobileApp />;
 };

@@ -3,19 +3,19 @@ import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { ChatMessage } from "@/common/types/chat";
+import type { UIMessage } from "@ai-sdk/ui-utils";
 
 interface AgentChatMessagesProps {
   agent: AgentDef;
-  messages: ChatMessage[];
+  uiMessages: UIMessage[];
   isThinking: boolean;
 }
 
-export function AgentChatMessages({ agent, messages, isThinking }: AgentChatMessagesProps) {
+export function AgentChatMessages({ agent, uiMessages, isThinking }: AgentChatMessagesProps) {
   return (
     <ScrollArea className="flex-1 p-6 bg-muted/20">
       <div className="space-y-6 max-w-4xl mx-auto">
-        {messages.length === 0 ? (
+        {uiMessages.length === 0 ? (
           <div className="text-center py-16">
             <div className="relative w-36 h-36 mx-auto mb-8">
               {/* 聊天气泡背景效果 */}
@@ -49,15 +49,15 @@ export function AgentChatMessages({ agent, messages, isThinking }: AgentChatMess
             </p>
           </div>
         ) : (
-          messages.map((message) => (
+          uiMessages.map((message) => (
             <div
               key={message.id}
               className={cn(
                 "flex gap-4",
-                message.isUser ? "justify-end" : "justify-start"
+                message.role === "user" ? "justify-end" : "justify-start"
               )}
             >
-              {!message.isUser && (
+              {message.role !== "user" && (
                 <Avatar className="w-10 h-10 ring-2 ring-gradient-to-r from-purple-400 to-pink-400 shadow-lg">
                   <AvatarImage src={agent.avatar} alt={agent.name} />
                   <AvatarFallback className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white font-bold">
@@ -68,7 +68,7 @@ export function AgentChatMessages({ agent, messages, isThinking }: AgentChatMess
               <div
                 className={cn(
                   "max-w-[70%] rounded-2xl p-4 shadow-sm border",
-                  message.isUser
+                  message.role === "user"
                     ? "bg-blue-500 dark:bg-blue-600 text-white border-blue-500/20"
                     : "bg-card border-border hover:bg-muted/30 transition-colors"
                 )}
@@ -77,7 +77,7 @@ export function AgentChatMessages({ agent, messages, isThinking }: AgentChatMess
                   {message.content}
                 </div>
               </div>
-              {message.isUser && (
+              {message.role === "user" && (
                 <Avatar className="w-10 h-10 shadow-lg">
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 text-white font-bold border-2 border-blue-300/50">
                     你

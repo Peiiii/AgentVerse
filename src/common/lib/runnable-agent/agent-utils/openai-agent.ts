@@ -14,7 +14,7 @@ import { StreamProcessor } from "./stream-processor";
 import { EventData } from "./types";
 
 export interface AgentConfig {
-  openaiApiKey: string;
+  apiKey: string;
   model: string;
   temperature?: number;
   maxTokens?: number;
@@ -32,8 +32,9 @@ export class OpenAIAgent {
 
   constructor(private config: AgentConfig) {
     this.client = new OpenAI({
-      apiKey: config.openaiApiKey,
+      apiKey: config.apiKey,
       baseURL: config.baseURL,
+      dangerouslyAllowBrowser: true,
     });
   }
 
