@@ -180,6 +180,7 @@ export function AgentDetailPage() {
               <AiChatCreator 
                 onAgentCreate={handleAgentUpdate}
                 className="h-full"
+                editingAgent={agent}
               />
             </TabsContent>
           </Tabs>

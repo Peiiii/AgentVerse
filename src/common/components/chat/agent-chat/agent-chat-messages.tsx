@@ -6,6 +6,7 @@ import { AgentDef } from "@/common/types/agent";
 import type { UIMessage } from "@ai-sdk/ui-utils";
 import { ChevronDown, MessageSquare, Bot, User } from "lucide-react";
 import { forwardRef, useImperativeHandle, ReactNode } from "react";
+import { ToolCallRenderer } from "./tool-call-renderer";
 
 // 消息样式主题配置
 export interface MessageStyleConfig {
@@ -121,6 +122,8 @@ interface AgentChatMessagesProps {
   emptyState?: EmptyStateConfig;
   // 新增：自定义样式类名
   className?: string;
+  // 新增：可插拔工具渲染器
+  toolRenderers?: Record<string, import("@agent-labs/agent-chat").ToolRenderer>;
 }
 
 export interface AgentChatMessagesRef {
@@ -254,7 +257,23 @@ export const AgentChatMessages = forwardRef<AgentChatMessagesRef, AgentChatMessa
                       )}
                     >
                       <div className="text-sm leading-relaxed whitespace-pre-line">
-                        {message.content}
+                        {/* 新增：支持tool-invocation渲染 */}
+                        {Array.isArray(message.parts)
+                          ? message.parts.map((part, idx) => {
+                              if (part.type === "tool-invocation") {
+                                return (
+                                  <ToolCallRenderer
+                                    key={idx}
+                                    toolInvocation={part.toolInvocation}
+                                  />
+                                );
+                              }
+                              if (part.type === "text") {
+                                return <span key={idx}>{part.text}</span>;
+                              }
+                              return null;
+                            })
+                          : message.content}
                       </div>
                     </div>
                     {message.role === "user" && renderAvatar("user")}
