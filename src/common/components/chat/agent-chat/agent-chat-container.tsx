@@ -94,6 +94,8 @@ export function AgentChatContainer({
         agent={agentDef}
         uiMessages={uiMessages}
         isResponding={isAgentResponding}
+        messageTheme="default"
+        avatarTheme="default"
       />
       <AgentChatInput
         agent={agentDef}

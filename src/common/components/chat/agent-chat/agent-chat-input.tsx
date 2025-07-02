@@ -1,5 +1,6 @@
 import { ModernChatInput } from "@/common/components/chat/modern-chat-input";
 import { AgentDef } from "@/common/types/agent";
+import { cn } from "@/common/lib/utils";
 
 interface AgentChatInputProps {
   agent: AgentDef;
@@ -9,6 +10,9 @@ interface AgentChatInputProps {
   onAbort?: () => void;
   disabled?: boolean;
   sendDisabled?: boolean;
+  customPlaceholder?: string;
+  containerWidth?: "narrow" | "wide" | "auto";
+  className?: string;
 }
 
 export function AgentChatInput({ 
@@ -18,11 +22,22 @@ export function AgentChatInput({
   onSend, 
   onAbort,
   disabled = false,
-  sendDisabled
+  sendDisabled,
+  customPlaceholder,
+  containerWidth = "wide",
+  className,
 }: AgentChatInputProps) {
+  const containerWidthClasses = {
+    narrow: "max-w-2xl",
+    wide: "max-w-4xl", 
+    auto: "max-w-none",
+  };
+
+  const placeholder = customPlaceholder || `与 ${agent.name} 对话...`;
+
   return (
-    <div className="p-6 border-t">
-      <div className="max-w-4xl mx-auto">
+    <div className={cn("p-6 border-t", className)}>
+      <div className={cn("mx-auto", containerWidthClasses[containerWidth])}>
         <ModernChatInput
           value={value}
           onChange={onChange}
@@ -30,7 +45,7 @@ export function AgentChatInput({
           onAbort={onAbort}
           disabled={disabled}
           sendDisabled={sendDisabled}
-          placeholder={`与 ${agent.name} 对话...`}
+          placeholder={placeholder}
         />
       </div>
     </div>
