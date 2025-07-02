@@ -117,6 +117,80 @@ function WindowExample() {
 
 所有 hooks 默认使用全局实例，无需配置 Provider，只有多实例隔离时才需要。
 
+你可以通过 AgentContextManagerContext、AgentToolDefManagerContext、AgentToolExecutorManagerContext、AgentToolRendererManagerContext 这些 Provider 进行自定义隔离，绝大多数场景下无需配置，默认全局实例即可。
+
+**推荐写法：**
+
+```tsx
+import { AgentToolDefManagerContext, AgentToolDefManager, AgentChatWindow } from '@agent-labs/agent-chat'
+import { agent } from './agent'
+import { useMemo } from 'react'
+
+function IsolatedChat() {
+  // 保证 manager 实例稳定
+  const customToolDefManager = useMemo(() => new AgentToolDefManager(), [])
+
+  return (
+    <AgentToolDefManagerContext.Provider value={customToolDefManager}>
+      <AgentChatWindow agent={agent} />
+    </AgentToolDefManagerContext.Provider>
+  )
+}
+```
+
+**多实例隔离：**
+
+```tsx
+function MultiChat() {
+  const managerA = useMemo(() => new AgentToolDefManager(), [])
+  const managerB = useMemo(() => new AgentToolDefManager(), [])
+
+  return (
+    <>
+      <AgentToolDefManagerContext.Provider value={managerA}>
+        <ChatA />
+      </AgentToolDefManagerContext.Provider>
+      <AgentToolDefManagerContext.Provider value={managerB}>
+        <ChatB />
+      </AgentToolDefManagerContext.Provider>
+    </>
+  )
+}
+```
+
+**所有 Provider 分别自定义的例子：**
+
+```tsx
+import {
+  AgentContextManagerContext, AgentContextManager,
+  AgentToolDefManagerContext, AgentToolDefManager,
+  AgentToolExecutorManagerContext, AgentToolExecutorManager,
+  AgentToolRendererManagerContext, AgentToolRendererManager,
+  AgentChatWindow
+} from '@agent-labs/agent-chat'
+import { agent } from './agent'
+import { useMemo } from 'react'
+
+function FullyIsolatedChat() {
+  const contextManager = useMemo(() => new AgentContextManager(), [])
+  const toolDefManager = useMemo(() => new AgentToolDefManager(), [])
+  const toolExecutorManager = useMemo(() => new AgentToolExecutorManager(), [])
+  const toolRendererManager = useMemo(() => new AgentToolRendererManager(), [])
+
+  return (
+    <AgentContextManagerContext.Provider value={contextManager}>
+      <AgentToolDefManagerContext.Provider value={toolDefManager}>
+        <AgentToolExecutorManagerContext.Provider value={toolExecutorManager}>
+          <AgentToolRendererManagerContext.Provider value={toolRendererManager}>
+            <AgentChatWindow agent={agent} />
+          </AgentToolRendererManagerContext.Provider>
+        </AgentToolExecutorManagerContext.Provider>
+      </AgentToolDefManagerContext.Provider>
+    </AgentContextManagerContext.Provider>
+  )
+}
+```
+
 ## 典型场景
 
 ### 基础聊天界面

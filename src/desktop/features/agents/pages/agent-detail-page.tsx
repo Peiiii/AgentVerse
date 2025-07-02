@@ -1,24 +1,24 @@
 import { AgentEmbeddedForm } from "@/common/components/agent/agent-embedded-form";
 import { AiChatCreator } from "@/common/components/agent/ai-chat-creator";
 import { AgentChatContainer } from "@/common/components/chat/agent-chat";
-import { Button } from "@/common/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
-import { useAgents } from "@/core/hooks/useAgents";
-import { ArrowLeft, Bot, Settings, Sparkles, Wand2, Edit3 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AgentDef } from "@/common/types/agent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
-import { cn } from "@/common/lib/utils";
+import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
+import { cn } from "@/common/lib/utils";
+import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
+import { useAgents } from "@/core/hooks/useAgents";
+import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
   const { agents, updateAgent } = useAgents();
-  
+
   const [agent, setAgent] = useState<AgentDef | null>(null);
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("configure");
   const [chatMessages] = useState<ChatMessage[]>([]);
@@ -93,9 +93,9 @@ export function AgentDetailPage() {
         {/* 左侧头部 - 配置导向 */}
         <div className="p-6 border-b">
           <div className="flex items-center gap-4 mb-6">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate("/agents")}
               className="flex-shrink-0"
             >
@@ -175,9 +175,9 @@ export function AgentDetailPage() {
                 </div>
               </ScrollArea>
             </TabsContent>
-            
+
             <TabsContent value="ai-create" className="h-full m-0">
-              <AiChatCreator 
+              <AiChatCreator
                 onAgentCreate={handleAgentUpdate}
                 className="h-full"
                 editingAgent={agent}
