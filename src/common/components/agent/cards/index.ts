@@ -4,6 +4,7 @@ export { AgentSelectCard } from './agent-select-card';
 export { AgentChatCard } from './agent-chat-card';
 export { AgentGroupCard } from './agent-group-card';
 export { ModernAgentCard } from './modern-agent-card';
+export { AgentInfoCard } from "./agent-info-card";
 
 export type { AgentCardProps, AgentCardMode } from './agent-card';
 export type { AgentSelectCardProps } from './agent-select-card';

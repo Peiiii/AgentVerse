@@ -1,6 +1,6 @@
 import { AgentEmbeddedForm } from "@/common/components/agent/agent-embedded-form";
 import { AiChatCreator } from "@/common/components/agent/ai-chat-creator";
-import { AgentChatContainer } from "@/common/components/chat/agent-chat";
+import { AgentChatContainer, type AgentChatContainerRef } from "@/common/components/chat/agent-chat";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
@@ -11,7 +11,7 @@ import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { useAgents } from "@/core/hooks/useAgents";
 import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export function AgentDetailPage() {
@@ -20,15 +20,48 @@ export function AgentDetailPage() {
   const { agents, updateAgent } = useAgents();
 
   const [agent, setAgent] = useState<AgentDef | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("configure");
+  const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("ai-create");
   const [chatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
+  
+  // 聊天容器ref
+  const chatContainerRef = useRef<AgentChatContainerRef>(null);
+
+  // 所有回调函数必须在条件返回之前定义
+  const handleAgentUpdate = useCallback((updatedAgentData: Omit<AgentDef, "id">) => {
+    if (!agent) return;
+    
+    const updatedAgent = { ...updatedAgentData, id: agent.id };
+    setAgent(updatedAgent);
+    updateAgent(agent.id, updatedAgentData);
+    
+    // 自动显示悬浮层（agent更新后）
+    if (chatContainerRef.current) {
+      chatContainerRef.current.showFloatingInfo();
+    }
+  }, [agent, updateAgent]);
+
+  // 处理输入变化
+  const handleInputChange = useCallback((value: string) => {
+    setInputMessage(value);
+  }, []);
 
   // 查找当前agent
   useEffect(() => {
     if (agentId) {
       const foundAgent = agents.find(a => a.id === agentId);
       setAgent(foundAgent || null);
+      
+      // 页面首次加载时，短暂显示悬浮层作为提示
+      if (foundAgent && chatContainerRef.current) {
+        setTimeout(() => {
+          chatContainerRef.current?.showFloatingInfo();
+          // 3秒后自动隐藏
+          setTimeout(() => {
+            chatContainerRef.current?.hideFloatingInfo();
+          }, 3000);
+        }, 1000);
+      }
     }
   }, [agentId, agents]);
 
@@ -48,12 +81,6 @@ export function AgentDetailPage() {
       </div>
     );
   }
-
-  const handleAgentUpdate = (updatedAgentData: Omit<AgentDef, "id">) => {
-    const updatedAgent = { ...updatedAgentData, id: agent.id };
-    setAgent(updatedAgent);
-    updateAgent(agent.id, updatedAgentData);
-  };
 
   const getRoleConfig = (role?: string) => {
     switch (role) {
@@ -187,12 +214,17 @@ export function AgentDetailPage() {
         </div>
       </div>
 
-      {/* 右侧聊天区 - 使用新的组件 */}
+            {/* 右侧聊天区 - 使用新的组件 */}
       <AgentChatContainer
+        ref={chatContainerRef}
         agent={agent}
         messages={chatMessages}
         inputMessage={inputMessage}
-        onInputChange={setInputMessage}
+        onInputChange={handleInputChange}
+        showInfoPanel={false}
+        defaultInfoExpanded={false}
+        compactInfo={true}
+        enableFloatingInfo={true}
       />
     </div>
   );

@@ -7,9 +7,11 @@ import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { tools, useAgentChat } from "@agent-labs/agent-chat";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { map } from "rxjs";
+import { FloatingAgentInfo } from "../../agent/floating-agent-info";
 import { AgentChatHeader } from "./agent-chat-header";
+import { AgentChatHeaderWithInfo } from "./agent-chat-header-with-info";
 import { AgentChatInput } from "./agent-chat-input";
 import { AgentChatMessages, AgentChatMessagesRef } from "./agent-chat-messages";
 
@@ -18,14 +20,29 @@ interface AgentChatContainerProps {
   messages: ChatMessage[];
   inputMessage: string;
   onInputChange: (value: string) => void;
+  showInfoPanel?: boolean;
+  defaultInfoExpanded?: boolean;
+  compactInfo?: boolean;
+  enableFloatingInfo?: boolean;
 }
 
-export function AgentChatContainer({
+export interface AgentChatContainerRef {
+  showFloatingInfo: () => void;
+  hideFloatingInfo: () => void;
+  toggleFloatingInfo: () => void;
+  isFloatingInfoVisible: () => boolean;
+}
+
+export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatContainerProps>(({
   agent: agentDef,
   messages,
   inputMessage,
   onInputChange,
-}: AgentChatContainerProps) {
+  showInfoPanel = false,
+  defaultInfoExpanded = false,
+  compactInfo = false,
+  enableFloatingInfo = false,
+}, ref) => {
   const agentDef$ = useObservableFromState(agentDef);
   const [initialAgent] = useState(() => {
     const { providerConfig } = getLLMProviderConfig();
@@ -68,12 +85,40 @@ export function AgentChatContainer({
 
   const messagesRef = useRef<AgentChatMessagesRef>(null);
 
+  // 悬浮层状态管理
+  const [isFloatingInfoVisible, setIsFloatingInfoVisible] = useState(false);
+  const isUserInteracting = useRef<boolean>(false);
+
+  // 暴露给外部的控制接口
+  useImperativeHandle(ref, () => ({
+    showFloatingInfo: () => setIsFloatingInfoVisible(true),
+    hideFloatingInfo: () => setIsFloatingInfoVisible(false),
+    toggleFloatingInfo: () => setIsFloatingInfoVisible(prev => !prev),
+    isFloatingInfoVisible: () => isFloatingInfoVisible,
+  }), [isFloatingInfoVisible]);
+
   // 简单的自动滚动：当消息数量变化时滚动到底部
   useEffect(() => {
     if (messagesRef.current) {
       messagesRef.current.scrollToBottom();
     }
   }, [uiMessages.length]);
+
+  // 处理输入变化 - 开始输入时自动隐藏悬浮层
+  const handleInputChange = useCallback((value: string) => {
+    onInputChange(value);
+    
+    // 当用户开始输入时，标记为交互状态并隐藏悬浮层
+    if (enableFloatingInfo && value.trim().length > 0 && !isUserInteracting.current) {
+      isUserInteracting.current = true;
+      setIsFloatingInfoVisible(false);
+      
+      // 重置交互状态（延迟一段时间后）
+      setTimeout(() => {
+        isUserInteracting.current = false;
+      }, 5000);
+    }
+  }, [onInputChange, enableFloatingInfo]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -88,7 +133,16 @@ export function AgentChatContainer({
 
   return (
     <div className="w-1/2 min-w-0 flex flex-col">
-      <AgentChatHeader agent={agentDef} />
+      {showInfoPanel ? (
+        <AgentChatHeaderWithInfo 
+          agent={agentDef} 
+          showInfoPanel={showInfoPanel}
+          defaultExpanded={defaultInfoExpanded}
+          compact={compactInfo}
+        />
+      ) : (
+        <AgentChatHeader agent={agentDef} />
+      )}
       <AgentChatMessages
         ref={messagesRef}
         agent={agentDef}
@@ -100,11 +154,21 @@ export function AgentChatContainer({
       <AgentChatInput
         agent={agentDef}
         value={inputMessage}
-        onChange={onInputChange}
+        onChange={handleInputChange}
         onSend={handleSendMessage}
         onAbort={abortAgentRun}
         sendDisabled={isAgentResponding}
       />
+      
+      {/* 悬浮层信息卡片 */}
+      {enableFloatingInfo && (
+        <FloatingAgentInfo
+          agent={agentDef}
+          isVisible={isFloatingInfoVisible}
+          onVisibilityChange={setIsFloatingInfoVisible}
+          autoHide={true}
+        />
+      )}
     </div>
   );
-}
+});
