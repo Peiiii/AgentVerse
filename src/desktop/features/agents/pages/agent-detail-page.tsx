@@ -65,11 +65,8 @@ export function AgentDetailPage() {
   ), () => {
     setTimeout(() => {
       chatContainerRef.current?.showFloatingInfo();
-      // 3秒后自动隐藏
-      setTimeout(() => {
-        chatContainerRef.current?.hideFloatingInfo();
-      }, 3000);
-    }, 1000);
+    })
+
   })
 
   // 如果agent未找到，显示错误页面
