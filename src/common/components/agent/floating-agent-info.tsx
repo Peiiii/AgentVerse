@@ -1,9 +1,8 @@
+import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { Info, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { AgentInfoCard } from "./cards/agent-info-card";
+import { Bot, Brain, Edit3, Info, Sparkles, Target, User, X } from "lucide-react";
 
 interface FloatingAgentInfoProps {
   agent: AgentDef;
@@ -20,17 +19,7 @@ export function FloatingAgentInfo({
   autoHide = true,
   className
 }: FloatingAgentInfoProps) {
-  const [isAnimating, setIsAnimating] = useState(false);
 
-  // 处理显示/隐藏动画
-  useEffect(() => {
-    if (isVisible) {
-      setIsAnimating(true);
-    } else {
-      const timer = setTimeout(() => setIsAnimating(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible]);
 
   const handleToggle = () => {
     onVisibilityChange(!isVisible);
@@ -40,81 +29,176 @@ export function FloatingAgentInfo({
     onVisibilityChange(false);
   };
 
-  if (!isAnimating && !isVisible) {
-    return null;
-  }
+  const getRoleConfig = (role?: string) => {
+    switch (role) {
+      case "moderator":
+        return {
+          icon: Bot,
+          color: "text-amber-600 dark:text-amber-400",
+          bgColor: "bg-amber-50 dark:bg-amber-950/50",
+          borderColor: "border-amber-200 dark:border-amber-800",
+          label: "主持人"
+        };
+      case "participant":
+        return {
+          icon: Bot,
+          color: "text-emerald-600 dark:text-emerald-400",
+          bgColor: "bg-emerald-50 dark:bg-emerald-950/50",
+          borderColor: "border-emerald-200 dark:border-emerald-800",
+          label: "参与者"
+        };
+      default:
+        return {
+          icon: Sparkles,
+          color: "text-blue-600 dark:text-blue-400",
+          bgColor: "bg-blue-50 dark:bg-blue-950/50",
+          borderColor: "border-blue-200 dark:border-blue-800",
+          label: "智能体"
+        };
+    }
+  };
+
+  const roleConfig = getRoleConfig(agent.role);
 
   return (
     <>
       {/* 悬浮按钮 - 始终显示 */}
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={handleToggle}
         className={cn(
-          "fixed top-4 right-4 z-50 shadow-lg border-2 transition-all duration-200",
-          "bg-background/80 backdrop-blur-sm hover:bg-background",
-          isVisible 
-            ? "border-primary text-primary hover:border-primary/80" 
-            : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary",
+          "absolute top-4 right-4 z-10 transition-all duration-200",
+          "text-muted-foreground hover:text-foreground",
+          isVisible && "text-primary",
           className
         )}
       >
         <Info className="w-4 h-4" />
-        <span className="hidden sm:inline ml-2">
+        <span className="hidden sm:inline ml-2 text-xs">
           {isVisible ? "隐藏信息" : "查看信息"}
         </span>
       </Button>
 
-      {/* 悬浮信息卡片 */}
+      {/* 信息面板 - 在header下方展开 */}
       <div
         className={cn(
-          "fixed top-16 right-4 z-40 w-80 max-w-[calc(100vw-2rem)]",
-          "transition-all duration-300 ease-in-out",
-          isVisible 
-            ? "opacity-100 translate-y-0 scale-100" 
-            : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+          "overflow-hidden transition-all duration-300 ease-in-out",
+          isVisible ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="relative bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-2xl">
-          {/* 关闭按钮 */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="absolute top-2 right-2 z-10 w-8 h-8 p-0 text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-
-          {/* Agent信息卡片 */}
-          <div className="p-4 pr-12">
-            <AgentInfoCard 
-              agent={agent} 
-              variant="compact"
-              showPrompt={false}
-              className="border-0 shadow-none bg-transparent"
-            />
-          </div>
-
-          {/* 自动隐藏提示 */}
-          {autoHide && (
-            <div className="px-4 pb-3">
-              <div className="text-xs text-muted-foreground text-center bg-muted/50 rounded-md px-2 py-1">
-                💡 开始对话时会自动隐藏
+        <div className="border-b bg-muted/30">
+          <div className="p-6">
+            {/* 头部信息 */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-semibold text-foreground">{agent.name}</h3>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs px-2 py-1",
+                    roleConfig.borderColor,
+                    roleConfig.bgColor,
+                    roleConfig.color
+                  )}
+                >
+                  {roleConfig.label}
+                </Badge>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClose}
+                className="w-8 h-8 p-0 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* 描述信息 */}
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+              {agent.personality || "一个智能助手，随时为您提供帮助"}
+            </p>
+            
+            {/* 详细信息网格 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* 左侧信息 */}
+              <div className="space-y-3">
+                {/* 性格特征 */}
+                <div className="flex items-start gap-3">
+                  <User className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-foreground mb-1">性格特征</div>
+                    <div className="text-xs text-muted-foreground leading-relaxed">
+                      {agent.personality || "友善、专业、乐于助人"}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 回应风格 */}
+                <div className="flex items-start gap-3">
+                  <Target className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-foreground mb-1">回应风格</div>
+                    <div className="text-xs text-muted-foreground leading-relaxed">
+                      {agent.responseStyle || "友好专业"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* 右侧信息 */}
+              <div className="space-y-3">
+                {/* 专业技能 */}
+                <div className="flex items-start gap-3">
+                  <Brain className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-foreground mb-1">专业技能</div>
+                    {agent.expertise && agent.expertise.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {agent.expertise.map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs px-1.5 py-0">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground">通用智能助手</div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* 系统提示词预览 */}
+                {agent.prompt && (
+                  <div className="flex items-start gap-3">
+                    <Edit3 className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-foreground mb-1">系统提示</div>
+                      <div className="max-h-20 overflow-y-auto">
+                        <div className="text-xs text-muted-foreground leading-relaxed">
+                          {agent.prompt}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+            
+            {/* 底部提示 */}
+            {autoHide && (
+              <div className="mt-4 pt-3 border-t border-border/50">
+                <div className="text-center">
+                  <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 inline-block">
+                    💡 发送消息时会自动隐藏
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* 背景遮罩 - 点击关闭 */}
-      {isVisible && (
-        <div
-          className="fixed inset-0 z-30 bg-black/10 backdrop-blur-[1px]"
-          onClick={handleClose}
-        />
-      )}
     </>
   );
 } 

@@ -6,13 +6,16 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
+import { useEffectFromObservable, useObservableFromState } from "@/common/lib/rx-state";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { useAgents } from "@/core/hooks/useAgents";
+import { isEqual } from "lodash-es";
 import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { combineLatest, distinctUntilChanged, filter, map, take, tap } from "rxjs";
 
 export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>();
@@ -23,18 +26,18 @@ export function AgentDetailPage() {
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("ai-create");
   const [chatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
-  
+
   // 聊天容器ref
   const chatContainerRef = useRef<AgentChatContainerRef>(null);
 
   // 所有回调函数必须在条件返回之前定义
   const handleAgentUpdate = useCallback((updatedAgentData: Omit<AgentDef, "id">) => {
     if (!agent) return;
-    
+
     const updatedAgent = { ...updatedAgentData, id: agent.id };
     setAgent(updatedAgent);
     updateAgent(agent.id, updatedAgentData);
-    
+
     // 自动显示悬浮层（agent更新后）
     if (chatContainerRef.current) {
       chatContainerRef.current.showFloatingInfo();
@@ -47,23 +50,27 @@ export function AgentDetailPage() {
   }, []);
 
   // 查找当前agent
-  useEffect(() => {
-    if (agentId) {
-      const foundAgent = agents.find(a => a.id === agentId);
-      setAgent(foundAgent || null);
-      
-      // 页面首次加载时，短暂显示悬浮层作为提示
-      if (foundAgent && chatContainerRef.current) {
-        setTimeout(() => {
-          chatContainerRef.current?.showFloatingInfo();
-          // 3秒后自动隐藏
-          setTimeout(() => {
-            chatContainerRef.current?.hideFloatingInfo();
-          }, 3000);
-        }, 1000);
-      }
-    }
-  }, [agentId, agents]);
+  const agentId$ = useObservableFromState(agentId);
+  const agents$ = useObservableFromState(agents);
+  useEffectFromObservable(() => combineLatest([agentId$, agents$]).pipe(
+    map(([aId, aList]) => {
+      return aList.find(a => a.id === aId);
+    }),
+    filter(Boolean),
+    distinctUntilChanged((pre, cur) => isEqual(pre, cur)),
+    tap((agent) => {
+      setAgent(agent);
+    }),
+    take(1)
+  ), () => {
+    setTimeout(() => {
+      chatContainerRef.current?.showFloatingInfo();
+      // 3秒后自动隐藏
+      setTimeout(() => {
+        chatContainerRef.current?.hideFloatingInfo();
+      }, 3000);
+    }, 1000);
+  })
 
   // 如果agent未找到，显示错误页面
   if (!agentId || !agent) {
@@ -214,7 +221,7 @@ export function AgentDetailPage() {
         </div>
       </div>
 
-            {/* 右侧聊天区 - 使用新的组件 */}
+      {/* 右侧聊天区 - 使用新的组件 */}
       <AgentChatContainer
         ref={chatContainerRef}
         agent={agent}

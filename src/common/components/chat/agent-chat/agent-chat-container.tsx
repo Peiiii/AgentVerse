@@ -9,7 +9,7 @@ import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { tools, useAgentChat } from "@agent-labs/agent-chat";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { map } from "rxjs";
-import { FloatingAgentInfo } from "../../agent/floating-agent-info";
+
 import { AgentChatHeader } from "./agent-chat-header";
 import { AgentChatHeaderWithInfo } from "./agent-chat-header-with-info";
 import { AgentChatInput } from "./agent-chat-input";
@@ -87,7 +87,6 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
 
   // 悬浮层状态管理
   const [isFloatingInfoVisible, setIsFloatingInfoVisible] = useState(false);
-  const isUserInteracting = useRef<boolean>(false);
 
   // 暴露给外部的控制接口
   useImperativeHandle(ref, () => ({
@@ -104,26 +103,20 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
     }
   }, [uiMessages.length]);
 
-  // 处理输入变化 - 开始输入时自动隐藏悬浮层
+  // 处理输入变化 - 不再自动隐藏悬浮层
   const handleInputChange = useCallback((value: string) => {
     onInputChange(value);
-    
-    // 当用户开始输入时，标记为交互状态并隐藏悬浮层
-    if (enableFloatingInfo && value.trim().length > 0 && !isUserInteracting.current) {
-      isUserInteracting.current = true;
-      setIsFloatingInfoVisible(false);
-      
-      // 重置交互状态（延迟一段时间后）
-      setTimeout(() => {
-        isUserInteracting.current = false;
-      }, 5000);
-    }
-  }, [onInputChange, enableFloatingInfo]);
+  }, [onInputChange]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
     try {
+      // 发送消息时自动隐藏悬浮层
+      if (enableFloatingInfo) {
+        setIsFloatingInfoVisible(false);
+      }
+      
       await sendMessage(inputMessage);
       onInputChange(""); // 清空输入
     } catch (error) {
@@ -141,7 +134,12 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
           compact={compactInfo}
         />
       ) : (
-        <AgentChatHeader agent={agentDef} />
+        <AgentChatHeader 
+          agent={agentDef}
+          showFloatingInfo={enableFloatingInfo}
+          isFloatingInfoVisible={isFloatingInfoVisible}
+          onFloatingInfoVisibilityChange={setIsFloatingInfoVisible}
+        />
       )}
       <AgentChatMessages
         ref={messagesRef}
@@ -159,16 +157,6 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
         onAbort={abortAgentRun}
         sendDisabled={isAgentResponding}
       />
-      
-      {/* 悬浮层信息卡片 */}
-      {enableFloatingInfo && (
-        <FloatingAgentInfo
-          agent={agentDef}
-          isVisible={isFloatingInfoVisible}
-          onVisibilityChange={setIsFloatingInfoVisible}
-          autoHide={true}
-        />
-      )}
     </div>
   );
 });
