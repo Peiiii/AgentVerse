@@ -11,7 +11,7 @@ import {
 import { useMemo, useState } from "react";
 import { AgentChatInput, AgentChatMessages } from "../chat/agent-chat";
 import { ChatWelcomeHeader } from "../chat/chat-welcome-header";
-import { AgentChatProviderWrapper } from "./agent-chat-provider-wrapper";
+import { AgentChatProviderWrapper } from "../chat/agent-chat/agent-chat-provider-wrapper";
 
 
 interface AiChatCreatorProps {
@@ -130,11 +130,11 @@ function useAgentCreatorConfigHook(onAgentCreate: (agent: Omit<AgentDef, "id">) 
             });
           }, 300);
           return (
-            <div className="p-4 border rounded-lg bg-gradient-to-br from-violet-50 to-blue-50 shadow">
-              <h3 className="font-bold mb-2 text-violet-700 flex items-center gap-2">
+            <div className="p-4 border rounded-lg bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-900/60 dark:to-blue-900/60 shadow dark:border-gray-700">
+              <h3 className="font-bold mb-2 text-violet-700 dark:text-violet-200 flex items-center gap-2">
                 🪄 智能体配置预览
               </h3>
-              <div className="mb-2 text-sm text-gray-700">
+              <div className="mb-2 text-sm text-gray-700 dark:text-gray-200">
                 <strong>名称：</strong>{args.name}<br />
                 <strong>角色：</strong>{args.role}<br />
                 <strong>性格：</strong>{args.personality}<br />
@@ -142,7 +142,7 @@ function useAgentCreatorConfigHook(onAgentCreate: (agent: Omit<AgentDef, "id">) 
                 <strong>系统提示：</strong><span className="break-all">{args.prompt}</span><br />
                 <strong>回应风格：</strong>{args.responseStyle || "-"}<br />
               </div>
-              <div className="text-center text-xs text-gray-400 mt-2">AI已自动确认创建，无需手动操作</div>
+              <div className="text-center text-xs text-gray-400 dark:text-gray-500 mt-2">AI已自动确认创建，无需手动操作</div>
             </div>
           );
         },
@@ -166,13 +166,16 @@ function AiChatCreatorInner({ onAgentCreate, className, editingAgent }: AiChatCr
     prompt: `你是一个智能体定制助手，帮助用户通过对话创建专属AI智能体。
 
 【你的目标】
-- 用户只需一句话描述，AI应自动理解、自动补全、自动创建，无需用户多余操作。
-- 如果信息充足，直接调用 updateAgent 工具并自动确认创建，无需用户点击确认。
-- 如需补充信息，一次性列出所有缺失项，尽量推断默认值，减少追问。
+- 用户只需一句话描述，AI应主动推断、自动补全、自动创建，无需用户多余操作。
+- 如信息充足，直接调用 updateAgent 工具并自动确认创建，无需用户点击确认。
+- 如需补充信息，一次性合并所有缺失项，给出建议值，尽量推断默认值，减少追问。
+- 每次回复都要尽量输出完整的智能体配置预览，主动告知进度和补全内容。
+- 避免重复、无效提问，始终推进创建流程。
+- 支持用户一句话创建、极简交互。
 
 【对话流程】
 1. 用户一句话描述需求时，优先尝试直接创建并自动确认。
-2. 信息不全时，合并追问所有缺失项。
+2. 信息不全时，合并追问所有缺失项，并给出建议。
 3. 创建后，简洁确认并展示结果。
 
 请用极简、主动的方式帮助用户"零操作"完成智能体创建。`,
