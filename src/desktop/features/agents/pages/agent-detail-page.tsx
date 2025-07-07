@@ -16,11 +16,14 @@ import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { combineLatest, distinctUntilChanged, filter, map, take, tap } from "rxjs";
+import { useAgentChatPageHelper } from "@/core/hooks/use-agent-chat-page-helper";
 
 export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
   const { agents, updateAgent } = useAgents();
+
+  const { enterAgentChat } = useAgentChatPageHelper();
 
   const [agent, setAgent] = useState<AgentDef | null>(null);
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("ai-create");
@@ -68,6 +71,12 @@ export function AgentDetailPage() {
     })
 
   })
+
+  // 一键和TA对话逻辑
+  const handleChatWithAgent = useCallback(async () => {
+    if (!agent) return;
+    await enterAgentChat(agent);
+  }, [agent, enterAgentChat]);
 
   // 如果agent未找到，显示错误页面
   if (!agentId || !agent) {
@@ -164,6 +173,15 @@ export function AgentDetailPage() {
                   配置中心
                 </Badge>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onClick={handleChatWithAgent}
+              >
+                <Bot className="w-4 h-4 mr-1" />
+                和TA对话
+              </Button>
             </div>
           </div>
 

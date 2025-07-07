@@ -1,0 +1,105 @@
+# 命名规范
+
+## 文件与文件夹命名
+
+### 1. 文件命名规范
+- 所有文件和文件夹必须使用 **kebab-case** 命名
+- 示例：
+  - ✅ `user-profile.tsx`
+  - ✅ `agent-detail-page.tsx`
+  - ✅ `discussion-member.service.ts`
+  - ❌ `userProfile.tsx`
+  - ❌ `agentDetailPage.tsx`
+  - ❌ `discussionMemberService.ts`
+
+### 2. Service文件特殊规范
+- Service文件必须以 `.service.ts` 结尾
+- 示例：
+  - ✅ `discussion-member.service.ts`
+  - ✅ `agent.service.ts`
+  - ✅ `message.service.ts`
+  - ❌ `discussion-member.ts`
+  - ❌ `agentService.ts`
+
+### 3. 文件夹命名规范
+- 文件夹也必须使用 kebab-case
+- 示例：
+  - ✅ `agent-detail/`
+  - ✅ `discussion-control/`
+  - ✅ `member-management/`
+  - ❌ `agentDetail/`
+  - ❌ `discussionControl/`
+
+## Hook命名规范
+
+### 1. 语义化命名原则
+- Hook名称应当语义化，清晰表达功能用途
+- 避免可能与其他功能混淆的命名
+- 确保命名具有清晰的识别性
+
+### 2. 命名模式
+- 使用 `use` 前缀 + 功能描述
+- 功能描述应当具体且唯一
+- 示例：
+  - ✅ `useAgentChat` - 进入AI对话空间
+  - ✅ `useDiscussionMembers` - 讨论成员管理
+  - ✅ `useAgentDetail` - 智能体详情
+  - ✅ `useMessageHistory` - 消息历史
+  - ❌ `useData` - 过于通用
+  - ❌ `useManager` - 不够具体
+  - ❌ `useHandler` - 功能不明确
+
+### 3. 避免的命名模式
+- 避免过于通用的词汇：`useData`, `useManager`, `useHandler`
+- 避免可能冲突的命名：`useAgent` (可能与其他agent相关hook混淆)
+- 避免缩写：`useMsg` (应使用 `useMessage`)
+- 避免数字后缀：`useAgent2`, `useChatV2`
+
+### 4. 推荐命名模式
+- 功能 + 对象：`useAgentChat`, `useMessageHistory`
+- 动作 + 对象：`useCreateDiscussion`, `useUpdateAgent`
+- 状态 + 对象：`useAgentState`, `useDiscussionStatus`
+
+## 当前项目需要修复的命名
+
+### Hook文件命名不一致问题
+以下文件需要重命名为kebab-case：
+
+**需要修复的文件：**
+- `useAgentChat.ts` → `use-agent-chat.ts`
+- `useAgentForm.ts` → `use-agent-form.ts`
+- `useAgents.ts` → `use-agents.ts`
+- `useMemberSelection.ts` → `use-member-selection.ts`
+- `useMessageList.ts` → `use-message-list.ts`
+- `useDiscussionMembers.ts` → `use-discussion-members.ts`
+- `useDiscussions.ts` → `use-discussions.ts`
+- `useMessages.ts` → `use-messages.ts`
+- `useSettings.ts` → `use-settings.ts`
+- `useSettingCategories.ts` → `use-setting-categories.ts`
+- `useDiscussion.ts` → `use-discussion.ts`
+- `useOptimisticUpdate.ts` → `use-optimistic-update.ts`
+- `useKeyboardExpandableList.ts` → `use-keyboard-expandable-list.ts`
+- `useMediaQuery.ts` → `use-media-query.ts`
+- `useMessageInput.ts` → `use-message-input.ts`
+- `useObservableState.ts` → `use-observable-state.ts`
+- `usePersistedState.ts` → `use-persisted-state.ts`
+- `useViewportHeight.ts` → `use-viewport-height.ts`
+- `useWindowSize.ts` → `use-window-size.ts`
+- `useAutoScroll.ts` → `use-auto-scroll.ts`
+- `useBreakpoint.ts` → `use-breakpoint.ts`
+
+**已符合规范的文件：**
+- `use-connect-navigation-store.ts` ✅
+- `use-extensions.ts` ✅
+- `use-setup-app.ts` ✅
+- `use-toast.ts` ✅
+- `use-copy.ts` ✅
+
+### 修复步骤
+1. 重命名文件为kebab-case
+2. 更新所有import语句
+3. 确保功能不受影响
+---
+alwaysApply: true
+description: 文件命名和Hook命名规范，确保代码风格一致性
+---
