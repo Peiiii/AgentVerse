@@ -10,6 +10,7 @@ import { tools, useAgentChat } from "@agent-labs/agent-chat";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { map } from "rxjs";
 
+import { cn } from "@/common/lib/utils";
 import { AgentChatHeader } from "./agent-chat-header";
 import { AgentChatHeaderWithInfo } from "./agent-chat-header-with-info";
 import { AgentChatInput } from "./agent-chat-input";
@@ -24,6 +25,7 @@ interface AgentChatContainerProps {
   defaultInfoExpanded?: boolean;
   compactInfo?: boolean;
   enableFloatingInfo?: boolean;
+  className?: string;
 }
 
 export interface AgentChatContainerRef {
@@ -42,6 +44,7 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
   defaultInfoExpanded = false,
   compactInfo = false,
   enableFloatingInfo = false,
+  className,
 }, ref) => {
   const agentDef$ = useObservableFromState(agentDef);
   const [initialAgent] = useState(() => {
@@ -125,7 +128,7 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
   };
 
   return (
-    <div className="w-1/2 min-w-0 flex flex-col">
+    <div className={cn("min-w-0 flex flex-col", className)}>
       {showInfoPanel ? (
         <AgentChatHeaderWithInfo 
           agent={agentDef} 

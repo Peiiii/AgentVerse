@@ -228,7 +228,7 @@ export function AgentDetailPage() {
             <TabsContent value="ai-create" className="h-full m-0">
               <AiChatCreator
                 onAgentCreate={handleAgentUpdate}
-                className="h-full"
+                className="h-full" 
                 editingAgent={agent}
               />
             </TabsContent>
@@ -238,6 +238,7 @@ export function AgentDetailPage() {
 
       {/* 右侧聊天区 - 使用新的组件 */}
       <AgentChatContainer
+        className="w-1/2"
         ref={chatContainerRef}
         agent={agent}
         messages={chatMessages}

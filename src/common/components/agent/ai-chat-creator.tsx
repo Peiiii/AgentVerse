@@ -275,7 +275,7 @@ function AiChatCreatorInner({ onAgentCreate, className, editingAgent }: AiChatCr
 export function AiChatCreator(props: AiChatCreatorProps) {
   return (
     <AgentChatProviderWrapper>
-      <AiChatCreatorInner {...props} />
+      <AiChatCreatorInner {...props}/>
     </AgentChatProviderWrapper>
   );
 } 
