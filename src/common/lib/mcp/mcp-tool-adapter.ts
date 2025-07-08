@@ -1,5 +1,6 @@
 import type { ToolDefinition } from "@agent-labs/agent-chat";
-import type { MCPTool, MCPConnection } from "./mcp-connection-manager";
+import type { MCPConnection } from "./mcp-connection-manager";
+import type { MCPTool } from "@/common/hooks/use-mcp-client";
 
 /**
  * 将MCP工具转换为@agent-labs/agent-chat的ToolDefinition格式
@@ -10,11 +11,11 @@ export function adaptMCPToolToToolDefinition(
 ): ToolDefinition {
   return {
     name: `mcp_${connectionId}_${mcpTool.name}`,
-    description: mcpTool.description,
+    description: mcpTool.description || "",
     parameters: {
-      type: mcpTool.inputSchema.type as any,
-      properties: mcpTool.inputSchema.properties,
-      required: mcpTool.inputSchema.required || [],
+      type: mcpTool.inputSchema?.type as any || "object",
+      properties: mcpTool.inputSchema?.properties || {},
+      required: mcpTool.inputSchema?.required || [],
     },
   };
 }
@@ -123,12 +124,12 @@ export function formatMCPToolDescription(
   tool: MCPTool,
   connectionName: string
 ): string {
-  const requiredParams = tool.inputSchema.required || [];
-  const optionalParams = Object.keys(tool.inputSchema.properties).filter(
+  const requiredParams = tool.inputSchema?.required || [];
+  const optionalParams = Object.keys(tool.inputSchema?.properties || {}).filter(
     (key) => !requiredParams.includes(key)
   );
 
-  let description = `${tool.description}\n\n`;
+  let description = `${tool.description || "MCP工具"}\n\n`;
   description += `**来源**: ${connectionName}\n\n`;
 
   if (requiredParams.length > 0) {

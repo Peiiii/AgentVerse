@@ -1,37 +1,50 @@
-import { useMCPTools } from "@/common/hooks/use-mcp-tools";
+import { useMCPClient } from "@/common/hooks/use-mcp-client";
+import { useMCPConnectionManager } from "@/common/hooks/use-mcp-connection-manager";
+import type { MCPConnection, MCPServerConfig } from "@/common/lib/mcp/mcp-connection-manager";
 import { createContext, ReactNode, useContext } from "react";
 
-interface MCPContextValue {
-    connections: any[];
+export interface MCPConnectionManagerContextValue {
+    connections: MCPConnection[];
     isLoading: boolean;
     error: string | null;
-    connectToServer: (config: any) => Promise<string>;
+    connectToServer: (config: MCPServerConfig) => Promise<string>;
+    connectWithClient: (connectionId: string, client: ReturnType<typeof useMCPClient>) => Promise<void>;
     disconnectFromServer: (connectionId: string) => Promise<void>;
-    mcpToolDefinitions: any[];
-    getConnection: (connectionId: string) => any;
+    removeConnection: (connectionId: string) => Promise<void>;
+    importServers: (configList: MCPServerConfig[]) => Promise<string[]>;
+    importAndConnectServers: (configList: MCPServerConfig[]) => Promise<{
+        total: number;
+        successful: number;
+        failed: number;
+        connectionIds: string[];
+    }>;
+    getAllTools: any[];
+    getConnection: (connectionId: string) => MCPConnection | undefined;
     getTools: (connectionId: string) => any[];
+    getClient: (connectionId: string) => ReturnType<typeof useMCPClient> | undefined;
+    activeClients: Map<string, ReturnType<typeof useMCPClient>>;
 }
 
-const MCPContext = createContext<MCPContextValue | null>(null);
+const MCPConnectionManagerContext = createContext<MCPConnectionManagerContextValue | null>(null);
 
 interface MCPProviderProps {
     children: ReactNode;
 }
 
 export function MCPProvider({ children }: MCPProviderProps) {
-    const mcpTools = useMCPTools();
+    const mcpConnectionManager = useMCPConnectionManager();
 
     return (
-        <MCPContext.Provider value={mcpTools}>
+        <MCPConnectionManagerContext.Provider value={mcpConnectionManager}>
             {children}
-        </MCPContext.Provider>
+        </MCPConnectionManagerContext.Provider>
     );
 }
 
-export function useMCPContext() {
-    const context = useContext(MCPContext);
+export function useMCPConnectionManagerContext() {
+    const context = useContext(MCPConnectionManagerContext);
     if (!context) {
-        throw new Error("useMCPContext must be used within MCPProvider");
+        throw new Error("useMCPConnectionManagerContext must be used within MCPProvider");
     }
     return context;
 } 

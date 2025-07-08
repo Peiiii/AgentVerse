@@ -1,70 +1,19 @@
-import { MCPConnectionManager, type MCPConnection, type MCPServerConfig } from "@/common/lib/mcp/mcp-connection-manager";
-import {
-    adaptMCPToolsToToolDefinitions,
-    extractMCPToolInfo,
-    formatMCPToolDescription
-} from "@/common/lib/mcp/mcp-tool-adapter";
+import { adaptMCPToolsToToolDefinitions, extractMCPToolInfo, formatMCPToolDescription } from "@/common/lib/mcp/mcp-tool-adapter";
 import type { ToolExecutor, ToolRenderer } from "@agent-labs/agent-chat";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useProvideAgentConfig } from "./use-provide-agent-config";
+import { useMCPConnectionManager } from "./use-mcp-connection-manager";
 
 /**
- * MCP工具管理Hook
- * 提供MCP服务器连接管理和工具集成功能
+ * MCP AI工具集成Hook
+ * 
+ * 设计原则：
+ * - 专注于MCP工具与AI聊天的集成
+ * - 将MCP工具转换为AI可用的格式
+ * - 处理工具执行和渲染逻辑
  */
-export function useMCPTools() {
-    const [connectionManager] = useState(() => new MCPConnectionManager());
-    const [connections, setConnections] = useState<MCPConnection[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    // 监听连接状态变化
-    useEffect(() => {
-        const updateConnections = () => {
-            setConnections(connectionManager.getConnections());
-        };
-
-        connectionManager.on("connectionCreated", updateConnections);
-        connectionManager.on("connectionEstablished", updateConnections);
-        connectionManager.on("connectionDisconnected", updateConnections);
-        connectionManager.on("connectionFailed", updateConnections);
-        connectionManager.on("toolsUpdated", updateConnections);
-
-        // 初始化连接列表
-        updateConnections();
-
-        return () => {
-            connectionManager.removeAllListeners();
-        };
-    }, [connectionManager]);
-
-    // 连接到MCP服务器
-    const connectToServer = useCallback(async (config: MCPServerConfig) => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const connectionId = await connectionManager.connect(config);
-            return connectionId;
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "连接失败";
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
-    }, [connectionManager]);
-
-    // 断开MCP服务器连接
-    const disconnectFromServer = useCallback(async (connectionId: string) => {
-        try {
-            await connectionManager.disconnect(connectionId);
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "断开连接失败";
-            setError(errorMessage);
-            throw err;
-        }
-    }, [connectionManager]);
+export function useMCPAIIntegration() {
+    const { connections, activeClients } = useMCPConnectionManager();
 
     // 获取所有MCP工具定义
     const mcpToolDefinitions = useMemo(() => {
@@ -83,18 +32,24 @@ export function useMCPTools() {
 
             executors[toolDef.name] = async (toolCall) => {
                 try {
-                    const result = await connectionManager.executeTool(
-                        toolInfo.connectionId,
-                        {
-                            toolName: toolInfo.toolName,
-                            arguments: JSON.parse(toolCall.function.arguments),
-                        }
-                    );
+                    const client = activeClients.get(toolInfo.connectionId);
+                    if (!client) {
+                        throw new Error(`Client not found for connection ${toolInfo.connectionId}`);
+                    }
+
+                    if (!client.client) {
+                        throw new Error("MCP client not connected");
+                    }
+
+                    const result = await client.client.callTool({
+                        name: toolInfo.toolName,
+                        arguments: JSON.parse(toolCall.function.arguments)
+                    });
 
                     return {
                         toolCallId: toolCall.id,
-                        result: result.success ? result.result : { error: result.error },
-                        status: result.success ? "success" as const : "error" as const,
+                        result: result,
+                        status: "success" as const,
                     };
                 } catch (err) {
                     return {
@@ -107,13 +62,15 @@ export function useMCPTools() {
         }
 
         return executors;
-    }, [mcpToolDefinitions, connectionManager]);
+    }, [mcpToolDefinitions, activeClients]);
 
     // 创建MCP工具渲染器
     const mcpToolRenderers = useMemo(() => {
         const renderers: ToolRenderer[] = [];
 
         for (const connection of connections) {
+            if (connection.status !== "connected") continue;
+
             for (const tool of connection.tools) {
                 const toolDefName = `mcp_${connection.id}_${tool.name}`;
 
@@ -122,12 +79,12 @@ export function useMCPTools() {
                         name: toolDefName,
                         description: formatMCPToolDescription(tool, connection.config.name),
                         parameters: {
-                            type: tool.inputSchema.type as any,
-                            properties: tool.inputSchema.properties,
-                            required: tool.inputSchema.required || [],
+                            type: tool.inputSchema?.type as any || "object",
+                            properties: tool.inputSchema?.properties || {},
+                            required: tool.inputSchema?.required || [],
                         },
                     },
-                    render: (toolInvocation, _onResult) => {
+                    render: (toolInvocation) => {
                         const args = JSON.parse(toolInvocation.function.arguments);
 
                         return React.createElement("div", {
@@ -142,7 +99,9 @@ export function useMCPTools() {
                                 className: "mb-2 text-sm text-gray-700 dark:text-gray-200"
                             }, [
                                 `服务器：${connection.config.name}`,
+                                React.createElement("br", { key: "br1" }),
                                 `工具：${tool.name}`,
+                                React.createElement("br", { key: "br2" }),
                                 "参数：",
                                 React.createElement("pre", {
                                     key: "args",
@@ -162,7 +121,7 @@ export function useMCPTools() {
         return renderers;
     }, [connections]);
 
-    // 提供MCP工具给@agent-labs/agent-chat
+    // 自动提供MCP工具给@agent-labs/agent-chat
     useProvideAgentConfig({
         tools: mcpToolDefinitions,
         executors: mcpToolExecutors,
@@ -170,20 +129,10 @@ export function useMCPTools() {
     });
 
     return {
-        // 连接管理
-        connections,
-        isLoading,
-        error,
-        connectToServer,
-        disconnectFromServer,
-
-        // 工具信息
         mcpToolDefinitions,
         mcpToolExecutors,
         mcpToolRenderers,
-
-        // 工具管理
-        getConnection: connectionManager.getConnection.bind(connectionManager),
-        getTools: connectionManager.getTools.bind(connectionManager),
+        connectedToolsCount: mcpToolDefinitions.length,
+        connectedServersCount: connections.filter(c => c.status === "connected").length,
     };
 } 

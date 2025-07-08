@@ -3,7 +3,6 @@ import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
 import { MCPProvider } from "@/common/components/mcp/mcp-provider";
 import { githubExtension } from "@/common/features/github/extensions";
-import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useMessages } from "@/core/hooks/useMessages";
@@ -17,7 +16,7 @@ import { HashRouter } from "react-router-dom";
 
 export function DesktopAppInner() {
   const { initialized } = useSetupApp({
-    extensions: [desktopChatExtension, desktopAgentsExtension, desktopMCPExtension, settingsExtension, githubExtension],
+    extensions: [desktopChatExtension, desktopAgentsExtension, desktopMCPExtension, githubExtension],
   });
   const { rootClassName } = useTheme();
   const { messages } = useMessages();

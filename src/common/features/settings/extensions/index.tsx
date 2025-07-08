@@ -3,12 +3,11 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Settings } from "lucide-react";
 
-
 export const settingsExtension = defineExtension({
     manifest: {
         id: "settings",
         name: "Settings",
-        description: "Settings",
+        description: "Settings and MCP Connection Management",
         version: "1.0.0",
         author: "AgentVerse",
         icon: "settings",
@@ -19,8 +18,8 @@ export const settingsExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
             id: "settings",
-            label: "Settings",
-            title: "Settings",
+            label: "设置",
+            title: "设置",
             group: "footer",
             icon: "settings",
             order: 30,
