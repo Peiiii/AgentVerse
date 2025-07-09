@@ -1,7 +1,6 @@
 import { PluginRouter } from "@/common/components/common/plugin-router";
 import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
-import { MCPProvider } from "@/common/components/mcp/mcp-provider";
 import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
@@ -37,16 +36,14 @@ export function DesktopAppInner() {
   return !initialized ? (
     <div>Loading...</div>
   ) : (
-    <MCPProvider>
-      <div className="fixed inset-0 flex flex-col" style={{ height }}>
-        <div className={cn(rootClassName, "flex flex-col h-full")}>
-          <div className="flex-1 min-h-0 flex">
-            <ActivityBarComponent className="flex" />
-            <PluginRouter />
-          </div>
+    <div className="fixed inset-0 flex flex-col" style={{ height }}>
+      <div className={cn(rootClassName, "flex flex-col h-full")}>
+        <div className="flex-1 min-h-0 flex">
+          <ActivityBarComponent className="flex" />
+          <PluginRouter />
         </div>
       </div>
-    </MCPProvider>
+    </div>
   );
 }
 
