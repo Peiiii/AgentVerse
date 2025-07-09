@@ -41,9 +41,9 @@ import {
   Users,
   X,
   XCircle,
-  type LucideIcon
-} from 'lucide-react';
-import { create } from 'zustand';
+  type LucideIcon,
+} from "lucide-react";
+import { create } from "zustand";
 
 export interface IconState {
   // 图标映射
@@ -62,114 +62,114 @@ export interface IconState {
 // 默认图标映射
 const defaultIcons: Record<string, LucideIcon> = {
   // 基础图标
-  'message': MessageSquare,
-  'users': Users,
-  'settings': Settings,
-  'github': Github,
-  'home': Home,
-  'search': Search,
-  'file': FileText,
-  'folder': Folder,
-  'calendar': Calendar,
-  'star': Star,
-  'heart': Heart,
-  'bookmark': Bookmark,
-  'bot': Bot,
+  message: MessageSquare,
+  users: Users,
+  settings: Settings,
+  github: Github,
+  home: Home,
+  search: Search,
+  file: FileText,
+  folder: Folder,
+  calendar: Calendar,
+  star: Star,
+  heart: Heart,
+  bookmark: Bookmark,
+  bot: Bot,
 
   // 操作图标
-  'download': Download,
-  'upload': Upload,
-  'share': Share,
-  'edit': Edit,
-  'trash': Trash,
-  'plus': Plus,
-  'minus': Minus,
-  'check': Check,
-  'x': X,
+  download: Download,
+  upload: Upload,
+  share: Share,
+  edit: Edit,
+  trash: Trash,
+  plus: Plus,
+  minus: Minus,
+  check: Check,
+  x: X,
 
   // 导航图标
-  'chevron-left': ChevronLeft,
-  'chevron-right': ChevronRight,
-  'chevron-up': ChevronUp,
-  'chevron-down': ChevronDown,
-  'menu': Menu,
-  'more-horizontal': MoreHorizontal,
-  'more-vertical': MoreVertical,
+  "chevron-left": ChevronLeft,
+  "chevron-right": ChevronRight,
+  "chevron-up": ChevronUp,
+  "chevron-down": ChevronDown,
+  menu: Menu,
+  "more-horizontal": MoreHorizontal,
+  "more-vertical": MoreVertical,
 
   // 主题图标
-  'sun': Sun,
-  'moon': Moon,
-  'monitor': Monitor,
+  sun: Sun,
+  moon: Moon,
+  monitor: Monitor,
 
   // 用户相关图标
-  'bell': Bell,
-  'user': User,
-  'log-out': LogOut,
-  'cog': Cog,
+  bell: Bell,
+  user: User,
+  "log-out": LogOut,
+  cog: Cog,
 
   // 状态图标
-  'help-circle': HelpCircle,
-  'info': Info,
-  'alert-circle': AlertCircle,
-  'alert-triangle': AlertTriangle,
-  'check-circle': CheckCircle,
-  'x-circle': XCircle,
+  "help-circle": HelpCircle,
+  info: Info,
+  "alert-circle": AlertCircle,
+  "alert-triangle": AlertTriangle,
+  "check-circle": CheckCircle,
+  "x-circle": XCircle,
 };
 
+export const useIconStore = create<IconState>()((set, get) => ({
+  icons: defaultIcons,
 
-export const useIconStore = create<IconState>()(
-  (set, get) => ({
-    icons: defaultIcons,
+  addIcon: (id: string, icon: LucideIcon) => {
+    set((state) => ({
+      icons: {
+        ...state.icons,
+        [id]: icon,
+      },
+    }));
+    return () => {
+      get().removeIcon(id);
+    };
+  },
 
-    addIcon: (id: string, icon: LucideIcon) => {
-      set((state) => ({
-        icons: {
-          ...state.icons,
-          [id]: icon,
-        },
-      }));
-      return () => {
-        get().removeIcon(id);
-      }
-    },
-
-    addIcons: (icons: Record<string, LucideIcon>) => () => {
-      set((state) => ({
+  addIcons: (icons: Record<string, LucideIcon>) => {
+    set((state) => {
+      return {
         icons: {
           ...state.icons,
           ...icons,
         },
-      }));
-      return () => {
-        Object.keys(icons).forEach((key) => {
-          get().removeIcon(key);
-        });
-      }
-    },
-
-    removeIcon: (id: string) => {
-      set((state) => {
-        const newIcons = { ...state.icons };
-        delete newIcons[id];
-        return {
-          icons: newIcons,
-        };
+      };
+    });
+    return () => {
+      Object.keys(icons).forEach((key) => {
+        get().removeIcon(key);
       });
-    },
+    };
+  },
 
-    getIcon: (id: string) => {
-      return get().icons[id];
-    },
+  removeIcon: (id: string) => {
+    set((state) => {
+      const newIcons = { ...state.icons };
+      delete newIcons[id];
+      return {
+        icons: newIcons,
+      };
+    });
+  },
 
-    reset: () => {
-      set({
-        icons: defaultIcons,
-      });
-    },
-  }),
-);
+  getIcon: (id: string) => {
+    return get().icons[id];
+  },
+
+  reset: () => {
+    set({
+      icons: defaultIcons,
+    });
+  },
+}));
 
 // 选择器hooks
 export const useIcons = () => useIconStore((state) => state.icons);
 export const useIcon = (id: string) => useIconStore((state) => state.icons[id]);
-export const useIconIds = () => useIconStore((state) => Object.keys(state.icons)); 
+export const useIconIds = () =>
+  useIconStore((state) => Object.keys(state.icons));
