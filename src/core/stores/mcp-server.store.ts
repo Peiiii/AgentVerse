@@ -24,10 +24,11 @@ export interface MCPServerConnection {
 }
 
 export interface MCPServerState {
-  // 服务器列表
+  // 服务器列表 - 只持久化这个
   servers: MCPServerConfig[];
-  // 连接状态 - 使用数组而不是Map以便序列化
-  connections: Array<[string, MCPServerConnection]>;
+  
+  // 运行时状态 - 不持久化
+  connections: Map<string, MCPServerConnection>;
   
   // 服务器管理
   addServer: (config: Omit<MCPServerConfig, 'id'>) => string;
@@ -44,6 +45,8 @@ export interface MCPServerState {
   getConnection: (serverId: string) => MCPServerConnection | undefined;
   getAllTools: () => Array<{ serverId: string; serverName: string; tool: any }>;
   getConnectedServers: () => MCPServerConfig[];
+  isConnected: (serverId: string) => boolean;
+  getServerStatus: (serverId: string) => 'disconnected' | 'connecting' | 'connected' | 'error';
   
   // 内部方法
   getConnectionsMap: () => Map<string, MCPServerConnection>;
@@ -53,22 +56,27 @@ export const useMCPServerStore = create<MCPServerState>()(
   persist(
     (set, get) => ({
       servers: [],
-      connections: [],
+      connections: new Map(),
 
       addServer: (config) => {
         const id = `mcp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const serverConfig: MCPServerConfig = { ...config, id };
         
-        set((state) => ({
-          servers: [...state.servers, serverConfig],
-          connections: [...state.connections, [id, {
+        set((state) => {
+          const newConnections = new Map(state.connections);
+          newConnections.set(id, {
             config: serverConfig,
             status: 'disconnected',
             tools: [],
             resources: [],
             prompts: [],
-          }]],
-        }));
+          });
+          
+          return {
+            servers: [...state.servers, serverConfig],
+            connections: newConnections,
+          };
+        });
         
         return id;
       },
@@ -79,26 +87,35 @@ export const useMCPServerStore = create<MCPServerState>()(
             server.id === id ? { ...server, ...updates } : server
           );
           
-          const updatedConnections = state.connections.map(([connId, connection]) =>
-            connId === id 
-              ? [connId, { ...connection, config: { ...connection.config, ...updates } }] as [string, MCPServerConnection]
-              : [connId, connection] as [string, MCPServerConnection]
-          );
+          const newConnections = new Map(state.connections);
+          const existingConnection = newConnections.get(id);
+          if (existingConnection) {
+            newConnections.set(id, {
+              ...existingConnection,
+              config: { ...existingConnection.config, ...updates }
+            });
+          }
           
-          return { servers: updatedServers, connections: updatedConnections };
+          return { 
+            servers: updatedServers, 
+            connections: newConnections 
+          };
         });
       },
 
       removeServer: (id) => {
         set((state) => {
-          const connection = state.connections.find(([connId]) => connId === id)?.[1];
+          const connection = state.connections.get(id);
           if (connection?.client) {
             connection.client.close().catch(console.error);
           }
           
+          const newConnections = new Map(state.connections);
+          newConnections.delete(id);
+          
           return {
             servers: state.servers.filter(server => server.id !== id),
-            connections: state.connections.filter(([connId]) => connId !== id),
+            connections: newConnections,
           };
         });
       },
@@ -107,7 +124,7 @@ export const useMCPServerStore = create<MCPServerState>()(
         const ids: string[] = [];
         set((state) => {
           const newServers = [...state.servers];
-          const newConnections = [...state.connections];
+          const newConnections = new Map(state.connections);
           
           configs.forEach(config => {
             const id = `mcp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -115,13 +132,13 @@ export const useMCPServerStore = create<MCPServerState>()(
             ids.push(id);
             
             newServers.push(serverConfig);
-            newConnections.push([id, {
+            newConnections.set(id, {
               config: serverConfig,
               status: 'disconnected',
               tools: [],
               resources: [],
               prompts: [],
-            }]);
+            });
           });
           
           return { servers: newServers, connections: newConnections };
@@ -132,19 +149,22 @@ export const useMCPServerStore = create<MCPServerState>()(
 
       connect: async (serverId) => {
         const state = get();
-        const connectionEntry = state.connections.find(([id]) => id === serverId);
-        if (!connectionEntry) throw new Error(`Server ${serverId} not found`);
-        
-        const [, connection] = connectionEntry;
+        const connection = state.connections.get(serverId);
+        if (!connection) throw new Error(`Server ${serverId} not found`);
 
         // 更新状态为连接中
-        set((state) => ({
-          connections: state.connections.map(([id, conn]) =>
-            id === serverId 
-              ? [id, { ...conn, status: 'connecting', error: undefined }]
-              : [id, conn]
-          ),
-        }));
+        set((state) => {
+          const newConnections = new Map(state.connections);
+          const existingConnection = newConnections.get(serverId);
+          if (existingConnection) {
+            newConnections.set(serverId, {
+              ...existingConnection,
+              status: 'connecting',
+              error: undefined
+            });
+          }
+          return { connections: newConnections };
+        });
 
         try {
           // 创建客户端
@@ -172,33 +192,39 @@ export const useMCPServerStore = create<MCPServerState>()(
           ]);
 
           // 更新连接状态
-          set((state) => ({
-            connections: state.connections.map(([id, conn]) =>
-              id === serverId 
-                ? [id, {
-                    ...conn,
-                    status: 'connected',
-                    client,
-                    tools: toolsResult.tools || [],
-                    resources: resourcesResult.resources || [],
-                    prompts: promptsResult.prompts || [],
-                    lastConnected: new Date(),
-                    error: undefined,
-                  }]
-                : [id, conn]
-            ),
-          }));
+          set((state) => {
+            const newConnections = new Map(state.connections);
+            const existingConnection = newConnections.get(serverId);
+            if (existingConnection) {
+              newConnections.set(serverId, {
+                ...existingConnection,
+                status: 'connected',
+                client,
+                tools: toolsResult.tools || [],
+                resources: resourcesResult.resources || [],
+                prompts: promptsResult.prompts || [],
+                lastConnected: new Date(),
+                error: undefined,
+              });
+            }
+            return { connections: newConnections };
+          });
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : '连接失败';
           
-          set((state) => ({
-            connections: state.connections.map(([id, conn]) =>
-              id === serverId 
-                ? [id, { ...conn, status: 'error', error: errorMessage }]
-                : [id, conn]
-            ),
-          }));
+          set((state) => {
+            const newConnections = new Map(state.connections);
+            const existingConnection = newConnections.get(serverId);
+            if (existingConnection) {
+              newConnections.set(serverId, {
+                ...existingConnection,
+                status: 'error',
+                error: errorMessage
+              });
+            }
+            return { connections: newConnections };
+          });
           
           throw error;
         }
@@ -206,10 +232,8 @@ export const useMCPServerStore = create<MCPServerState>()(
 
       disconnect: async (serverId) => {
         const state = get();
-        const connectionEntry = state.connections.find(([id]) => id === serverId);
-        if (!connectionEntry) return;
-        
-        const [, connection] = connectionEntry;
+        const connection = state.connections.get(serverId);
+        if (!connection) return;
 
         try {
           if (connection.client) {
@@ -219,29 +243,29 @@ export const useMCPServerStore = create<MCPServerState>()(
           console.warn('Error closing client:', error);
         }
 
-        set((state) => ({
-          connections: state.connections.map(([id, conn]) =>
-            id === serverId 
-              ? [id, {
-                  ...conn,
-                  status: 'disconnected',
-                  client: undefined,
-                  tools: [],
-                  resources: [],
-                  prompts: [],
-                  error: undefined,
-                }]
-              : [id, conn]
-          ),
-        }));
+        set((state) => {
+          const newConnections = new Map(state.connections);
+          const existingConnection = newConnections.get(serverId);
+          if (existingConnection) {
+            newConnections.set(serverId, {
+              ...existingConnection,
+              status: 'disconnected',
+              client: undefined,
+              tools: [],
+              resources: [],
+              prompts: [],
+              error: undefined,
+            });
+          }
+          return { connections: newConnections };
+        });
       },
 
       refreshTools: async (serverId) => {
         const state = get();
-        const connectionEntry = state.connections.find(([id]) => id === serverId);
-        if (!connectionEntry) throw new Error(`Server ${serverId} not found`);
+        const connection = state.connections.get(serverId);
+        if (!connection) throw new Error(`Server ${serverId} not found`);
         
-        const [, connection] = connectionEntry;
         if (!connection.client || connection.status !== 'connected') {
           throw new Error('Server not connected');
         }
@@ -253,18 +277,19 @@ export const useMCPServerStore = create<MCPServerState>()(
             connection.client.listPrompts().catch(() => ({ prompts: [] })),
           ]);
 
-          set((state) => ({
-            connections: state.connections.map(([id, conn]) =>
-              id === serverId 
-                ? [id, {
-                    ...conn,
-                    tools: toolsResult.tools || [],
-                    resources: resourcesResult.resources || [],
-                    prompts: promptsResult.prompts || [],
-                  }]
-                : [id, conn]
-            ),
-          }));
+          set((state) => {
+            const newConnections = new Map(state.connections);
+            const existingConnection = newConnections.get(serverId);
+            if (existingConnection) {
+              newConnections.set(serverId, {
+                ...existingConnection,
+                tools: toolsResult.tools || [],
+                resources: resourcesResult.resources || [],
+                prompts: promptsResult.prompts || [],
+              });
+            }
+            return { connections: newConnections };
+          });
         } catch (error) {
           console.error('Failed to refresh tools:', error);
           throw error;
@@ -273,14 +298,14 @@ export const useMCPServerStore = create<MCPServerState>()(
 
       getConnection: (serverId) => {
         const state = get();
-        return state.connections.find(([id]) => id === serverId)?.[1];
+        return state.connections.get(serverId);
       },
 
       getAllTools: () => {
         const state = get();
         const allTools: Array<{ serverId: string; serverName: string; tool: any }> = [];
         
-        state.connections.forEach(([serverId, connection]) => {
+        state.connections.forEach((connection, serverId) => {
           if (connection.status === 'connected') {
             connection.tools.forEach(tool => {
               allTools.push({
@@ -298,18 +323,49 @@ export const useMCPServerStore = create<MCPServerState>()(
       getConnectedServers: () => {
         const state = get();
         return state.servers.filter(server => {
-          const connection = state.connections.find(([id]) => id === server.id)?.[1];
+          const connection = state.connections.get(server.id);
           return connection?.status === 'connected';
         });
       },
 
+      isConnected: (serverId) => {
+        const state = get();
+        const connection = state.connections.get(serverId);
+        return connection?.status === 'connected';
+      },
+
+      getServerStatus: (serverId) => {
+        const state = get();
+        const connection = state.connections.get(serverId);
+        return connection?.status || 'disconnected';
+      },
+
       getConnectionsMap: () => {
         const state = get();
-        return new Map(state.connections);
+        return state.connections;
       },
     }),
     {
       name: 'mcp-server-store',
+      // 只持久化servers数组，不持久化connections
+      partialize: (state) => ({ servers: state.servers }),
+      // 页面加载时，为每个服务器初始化连接状态
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // 为每个服务器创建初始连接状态
+          const newConnections = new Map();
+          state.servers.forEach(server => {
+            newConnections.set(server.id, {
+              config: server,
+              status: 'disconnected',
+              tools: [],
+              resources: [],
+              prompts: [],
+            });
+          });
+          state.connections = newConnections;
+        }
+      },
     }
   )
 ); 

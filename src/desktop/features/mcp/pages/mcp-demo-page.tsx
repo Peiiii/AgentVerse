@@ -7,19 +7,18 @@ import { Label } from "@/common/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/common/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
 import { Textarea } from "@/common/components/ui/textarea";
-import { useMCPServers } from "@/common/hooks/use-mcp-servers";
 import { useAllTools } from "@/common/hooks/use-all-tools";
-import { useProvideAgentToolDefs, useProvideAgentToolExecutors } from "@agent-labs/agent-chat";
-import { type MCPServerConfig } from "@/core/stores/mcp-server.store";
+import { useMCPServers } from "@/common/hooks/use-mcp-servers";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
-import { AlertCircle, Database, Lightbulb, MessageSquare, Plus, RefreshCw, Server, Trash2, Wrench } from "lucide-react";
+import { type MCPServerConfig } from "@/core/stores/mcp-server.store";
+import { useProvideAgentToolDefs, useProvideAgentToolExecutors } from "@agent-labs/agent-chat";
+import { AlertCircle, MessageSquare, Plus, RefreshCw, Server, Trash2, Wrench } from "lucide-react";
 import React, { useState } from "react";
 
 function MCPDemoContent() {
   const {
     servers,
-    connections,
     stats,
     addServer,
     removeServer,
@@ -58,13 +57,13 @@ function MCPDemoContent() {
     prompt: `你是一个支持MCP（Model Context Protocol）工具的AI智能助手。你可以通过连接到系统的MCP服务器来使用各种强大的工具完成复杂任务。
 
 ## 当前可用的MCP工具：
-${toolsStats.totalTools > 0 
-  ? toolsStats.servers.map(serverName => {
-      const serverTools = toolsStats.toolsByServer[serverName] || [];
-      return `**${serverName}**:\n${serverTools.map(toolName => `- ${toolName}`).join('\n')}`;
-    }).join('\n\n')
-  : '暂无可用的MCP工具，请先连接服务器'
-}
+${toolsStats.totalTools > 0
+        ? toolsStats.servers.map(serverName => {
+          const serverTools = toolsStats.toolsByServer[serverName] || [];
+          return `**${serverName}**:\n${serverTools.map(toolName => `- ${toolName}`).join('\n')}`;
+        }).join('\n\n')
+        : '暂无可用的MCP工具，请先连接服务器'
+      }
 
 ## 你的能力包括：
 1. **文件系统操作** - 读取、写入、搜索文件
@@ -130,7 +129,7 @@ ${toolsStats.totalTools > 0
         // 处理嵌套对象格式
         const extractServers = (obj: any, prefix = ''): Array<Omit<MCPServerConfig, 'id'>> => {
           const servers: Array<Omit<MCPServerConfig, 'id'>> = [];
-          
+
           for (const [key, value] of Object.entries(obj)) {
             if (typeof value === 'object' && value !== null && 'url' in value) {
               // 这是一个服务器配置
@@ -147,10 +146,10 @@ ${toolsStats.totalTools > 0
               servers.push(...nestedServers);
             }
           }
-          
+
           return servers;
         };
-        
+
         configs = extractServers(parsed);
       } else {
         throw new Error("JSON格式不支持");
@@ -212,7 +211,7 @@ ${toolsStats.totalTools > 0
           <p className="text-sm text-muted-foreground mt-1">
             体验基于MCP官方SDK的AI工具调用和服务集成
           </p>
-          
+
           {/* 统计信息 */}
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -362,11 +361,10 @@ ${toolsStats.totalTools > 0
                             <CardHeader className="pb-2">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className={`w-2 h-2 rounded-full ${
-                                    status === "connected" ? "bg-green-500" :
-                                    status === "connecting" ? "bg-yellow-500" :
-                                    status === "error" ? "bg-red-500" : "bg-gray-400"
-                                  }`} />
+                                  <div className={`w-2 h-2 rounded-full ${status === "connected" ? "bg-green-500" :
+                                      status === "connecting" ? "bg-yellow-500" :
+                                        status === "error" ? "bg-red-500" : "bg-gray-400"
+                                    }`} />
                                   <span className="font-medium text-sm">{server.name}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
@@ -503,7 +501,7 @@ ${toolsStats.totalTools > 0
           <p className="text-sm text-muted-foreground mt-1">
             体验AI如何使用MCP工具来完成复杂任务 · 支持{toolsStats.totalTools}个工具调用
           </p>
-          
+
           {/* 快速提示 */}
           {toolsStats.totalTools > 0 && (
             <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">

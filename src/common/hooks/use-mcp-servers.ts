@@ -15,11 +15,11 @@ export function useMCPServers() {
 
   // 连接状态统计
   const stats = useMemo(() => {
-    const connected = connections.filter(([, conn]) => conn.status === 'connected').length;
-    const total = connections.length;
-    const totalTools = connections.reduce((sum, [, conn]) => sum + conn.tools.length, 0);
-    const totalResources = connections.reduce((sum, [, conn]) => sum + conn.resources.length, 0);
-    const totalPrompts = connections.reduce((sum, [, conn]) => sum + conn.prompts.length, 0);
+    const connected = Array.from(connections.values()).filter(conn => conn.status === 'connected').length;
+    const total = connections.size;
+    const totalTools = Array.from(connections.values()).reduce((sum, conn) => sum + conn.tools.length, 0);
+    const totalResources = Array.from(connections.values()).reduce((sum, conn) => sum + conn.resources.length, 0);
+    const totalPrompts = Array.from(connections.values()).reduce((sum, conn) => sum + conn.prompts.length, 0);
 
     return {
       connected,
@@ -82,14 +82,12 @@ export function useMCPServers() {
 
   // 检查服务器是否已连接
   const isConnected = useCallback((serverId: string) => {
-    const connection = store.getConnection(serverId);
-    return connection?.status === 'connected';
+    return store.isConnected(serverId);
   }, [store]);
 
   // 获取服务器状态
   const getServerStatus = useCallback((serverId: string) => {
-    const connection = store.getConnection(serverId);
-    return connection?.status || 'disconnected';
+    return store.getServerStatus(serverId);
   }, [store]);
 
   return {
