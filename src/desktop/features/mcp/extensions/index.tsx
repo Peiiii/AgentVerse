@@ -3,7 +3,7 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { Server } from "lucide-react";
+import { Cpu } from "lucide-react";
 import { MCPDemoPage } from "../pages/mcp-demo-page";
 
 export const desktopMCPExtension = defineExtension({
@@ -17,14 +17,14 @@ export const desktopMCPExtension = defineExtension({
     },
     activate: ({ subscriptions }) => {
         subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
-            "server": Server,
+            "cpu": Cpu,
         })))
         subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
             id: "mcp",
             label: "MCP Tools",
             title: "Model Context Protocol tools",
             group: "main",
-            icon: "server",
+            icon: "cpu",
             order: 30,
         })))
         subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([

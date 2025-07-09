@@ -3,6 +3,7 @@ import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
 import { MCPProvider } from "@/common/components/mcp/mcp-provider";
 import { githubExtension } from "@/common/features/github/extensions";
+import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useMessages } from "@/core/hooks/useMessages";
@@ -16,21 +17,26 @@ import { HashRouter } from "react-router-dom";
 
 export function DesktopAppInner() {
   const { initialized } = useSetupApp({
-    extensions: [desktopChatExtension, desktopAgentsExtension, desktopMCPExtension, githubExtension],
+    extensions: [
+      desktopChatExtension,
+      desktopAgentsExtension,
+      settingsExtension,
+      desktopMCPExtension,
+      githubExtension,
+    ],
   });
   const { rootClassName } = useTheme();
   const { messages } = useMessages();
 
   const { height } = useViewportHeight();
 
-
   useEffect(() => {
     discussionControlService.setMessages(messages);
   }, [messages]);
 
-
-  return (
-    !initialized ? <div>Loading...</div> :
+  return !initialized ? (
+    <div>Loading...</div>
+  ) : (
     <MCPProvider>
       <div className="fixed inset-0 flex flex-col" style={{ height }}>
         <div className={cn(rootClassName, "flex flex-col h-full")}>
@@ -43,7 +49,6 @@ export function DesktopAppInner() {
     </MCPProvider>
   );
 }
-
 
 export function DesktopApp() {
   // 桌面端路由, 和mobile端不共享路由实例
