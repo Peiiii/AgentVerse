@@ -14,7 +14,9 @@ import { ChatMessage } from "@/common/types/chat";
 import { type MCPServerConfig } from "@/core/stores/mcp-server.store";
 import { useProvideAgentToolDefs, useProvideAgentToolExecutors } from "@agent-labs/agent-chat";
 import { AlertCircle, MessageSquare, Plus, RefreshCw, Server, Trash2, Wrench } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { MCPClient, MCPTransportFactory } from "@/common/lib/mcp";
+import { MockMCPServer } from "@/common/lib/mcp/examples/mock-server";
 
 function MCPDemoContent() {
   const {
@@ -199,6 +201,84 @@ ${toolsStats.totalTools > 0
     removeServer(serverId);
   };
 
+  // 通用MCP传输层演示
+  const [universalMCPStatus, setUniversalMCPStatus] = useState<string>("未连接");
+  const [universalMCPTools, setUniversalMCPTools] = useState<any[]>([]);
+  const [universalMCPResult, setUniversalMCPResult] = useState<string>("");
+  const universalMCPRef = useRef<MCPClient | null>(null);
+  const mockServerRef = useRef<MockMCPServer | null>(null);
+
+  // 初始化通用MCP演示
+  useEffect(() => {
+    // 创建事件总线用于演示
+    const eventBus = new EventTarget();
+    
+    // 创建Event传输层
+    const eventTransport = MCPTransportFactory.create({
+      type: 'event',
+      eventBus,
+      channel: 'demo'
+    });
+
+    // 创建MCP客户端
+    universalMCPRef.current = new MCPClient(eventTransport);
+
+    // 创建模拟服务器
+    mockServerRef.current = new MockMCPServer(eventTransport);
+
+    return () => {
+      // 清理
+      if (universalMCPRef.current) {
+        // 断开连接
+      }
+    };
+  }, []);
+
+  // 连接通用MCP
+  const handleConnectUniversalMCP = async () => {
+    try {
+      setUniversalMCPStatus("连接中...");
+      
+      if (universalMCPRef.current) {
+        // 获取工具列表
+        const tools = await universalMCPRef.current.listTools();
+        setUniversalMCPTools(tools);
+        setUniversalMCPStatus("已连接");
+        setUniversalMCPResult(`成功获取到 ${tools.length} 个工具`);
+      }
+    } catch (error) {
+      setUniversalMCPStatus("连接失败");
+      setUniversalMCPResult(`错误: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
+  };
+
+  // 调用通用MCP工具
+  const handleCallUniversalTool = async (toolName: string) => {
+    try {
+      if (!universalMCPRef.current) return;
+
+      let args: any;
+      switch (toolName) {
+        case "file_read":
+          args = { path: "/demo/test.txt" };
+          break;
+        case "file_write":
+          args = { path: "/demo/output.txt", content: "Hello from Universal MCP!" };
+          break;
+        case "search_web":
+          args = { query: "通用MCP传输层" };
+          break;
+        default:
+          args = {};
+      }
+
+      const result = await universalMCPRef.current.callTool(toolName, args);
+      setUniversalMCPResult(`工具调用成功: ${JSON.stringify(result, null, 2)}`);
+    } catch (error) {
+      setUniversalMCPResult(`工具调用失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
+  };
+
   return (
     <div className="h-full w-full flex overflow-hidden">
       {/* 左侧MCP管理区 */}
@@ -233,9 +313,10 @@ ${toolsStats.totalTools > 0
 
         <div className="flex-1 overflow-hidden min-h-0">
           <Tabs defaultValue="servers" className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
               <TabsTrigger value="servers" className="text-xs">服务器管理</TabsTrigger>
               <TabsTrigger value="tools" className="text-xs">工具列表</TabsTrigger>
+              <TabsTrigger value="universal" className="text-xs">通用传输层</TabsTrigger>
             </TabsList>
 
             <TabsContent value="servers" className="flex-1 overflow-hidden m-0">
@@ -482,6 +563,97 @@ ${toolsStats.totalTools > 0
                           );
                         })}
                       </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="universal" className="flex-1 overflow-hidden m-0">
+              <div className="p-6 overflow-y-auto h-full pb-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold mb-2">通用MCP传输层演示</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      演示基于抽象传输层的通用MCP客户端，支持PostMessage、Event等多种通信方式
+                    </p>
+                    
+                    {/* 连接状态 */}
+                    <Card className="mb-4">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${
+                            universalMCPStatus === "已连接" ? "bg-green-500" :
+                            universalMCPStatus === "连接中..." ? "bg-yellow-500" :
+                            universalMCPStatus === "连接失败" ? "bg-red-500" : "bg-gray-400"
+                          }`} />
+                          通用MCP客户端
+                          <Badge variant="outline" className="text-xs">
+                            {universalMCPStatus}
+                          </Badge>
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          基于Event传输层的模拟MCP服务器
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <Button 
+                          onClick={handleConnectUniversalMCP}
+                          disabled={universalMCPStatus === "连接中..."}
+                          className="w-full"
+                        >
+                          {universalMCPStatus === "已连接" ? "重新连接" : "连接服务器"}
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* 工具列表 */}
+                    {universalMCPTools.length > 0 && (
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">可用工具</CardTitle>
+                          <CardDescription className="text-xs">
+                            {universalMCPTools.length} 个工具
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="space-y-2">
+                            {universalMCPTools.map((tool: any) => (
+                              <div key={tool.name} className="space-y-2">
+                                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm">
+                                  <Wrench className="w-3 h-3 text-muted-foreground" />
+                                  <div className="flex-1">
+                                    <span className="font-medium">{tool.name}</span>
+                                    {tool.description && (
+                                      <p className="text-xs text-muted-foreground">{tool.description}</p>
+                                    )}
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleCallUniversalTool(tool.name)}
+                                  >
+                                    调用
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* 调用结果 */}
+                    {universalMCPResult && (
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">调用结果</CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="p-3 bg-muted/30 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-auto">
+                            {universalMCPResult}
+                          </div>
+                        </CardContent>
+                      </Card>
                     )}
                   </div>
                 </div>
