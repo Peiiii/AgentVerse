@@ -42,7 +42,7 @@ function MCPDemoContent() {
   // 表单状态
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
-  const [serverType, setServerType] = useState<"sse" | "http">("http");
+  const [serverType, setServerType] = useState<"sse" | "streamable-http">("streamable-http");
   const [serverDescription, setServerDescription] = useState("");
 
   // JSON导入状态
@@ -105,7 +105,7 @@ ${toolsStats.totalTools > 0
       // 清空表单
       setServerName("");
       setServerUrl("");
-      setServerType("http");
+      setServerType("streamable-http");
       setServerDescription("");
     } catch (error) {
       console.error("添加服务器失败:", error);
@@ -137,7 +137,7 @@ ${toolsStats.totalTools > 0
               servers.push({
                 name: prefix ? `${prefix}-${key}` : key,
                 url: String(serverConfig.url),
-                type: (serverConfig.type as 'sse' | 'http') || 'http',
+                type: (serverConfig.type as 'sse' | 'streamable-http') || 'streamable-http',
                 description: serverConfig.description || `${key} MCP服务器`,
               });
             } else if (typeof value === 'object' && value !== null) {
@@ -269,12 +269,12 @@ ${toolsStats.totalTools > 0
                     </div>
                     <div>
                       <Label htmlFor="server-type">传输协议</Label>
-                      <Select value={serverType} onValueChange={(value: "sse" | "http") => setServerType(value)}>
+                      <Select value={serverType} onValueChange={(value: "sse" | "streamable-http") => setServerType(value)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="http">HTTP</SelectItem>
+                          <SelectItem value="streamable-http">Streamable HTTP</SelectItem>
                           <SelectItem value="sse">SSE</SelectItem>
                         </SelectContent>
                       </Select>
@@ -313,7 +313,7 @@ ${toolsStats.totalTools > 0
   {
     "name": "文件系统服务器",
     "url": "http://localhost:3000",
-    "type": "http",
+    "type": "streamable-http",
     "description": "文件系统操作"
   }
 ]

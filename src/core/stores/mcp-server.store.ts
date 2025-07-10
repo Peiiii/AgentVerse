@@ -8,7 +8,7 @@ export interface MCPServerConfig {
   id: string;
   name: string;
   url: string;
-  type: 'sse' | 'http';
+  type: 'sse' | 'streamable-http';
   description?: string;
 }
 
