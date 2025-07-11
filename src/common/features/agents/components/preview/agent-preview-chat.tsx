@@ -5,20 +5,22 @@ import { ChatMessage } from "@/common/types/chat";
 import { useCallback, useRef, useState } from "react";
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { getDefaultPreviewTools } from "./agent-preview-tools";
+import { getEnhancedPreviewTools } from "./agent-preview-enhanced-tools";
 
 interface AgentPreviewChatProps {
   agentDef: AgentDef;
   className?: string;
   tools?: ReturnType<typeof getDefaultPreviewTools>;
+  useEnhancedTools?: boolean;
 }
 
-function AgentPreviewChatInner({ agentDef, className, tools }: AgentPreviewChatProps) {
+function AgentPreviewChatInner({ agentDef, className, tools, useEnhancedTools = false }: AgentPreviewChatProps) {
   const [chatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const chatContainerRef = useRef<AgentChatContainerRef>(null);
 
   // 使用可插拔的工具配置
-  const previewTools = tools || getDefaultPreviewTools(agentDef);
+  const previewTools = tools || (useEnhancedTools ? getEnhancedPreviewTools(agentDef) : getDefaultPreviewTools(agentDef));
   useProvideAgentTools(previewTools);
 
   // 处理输入变化

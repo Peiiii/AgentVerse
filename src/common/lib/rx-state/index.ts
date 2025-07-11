@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { BehaviorSubject, distinctUntilChanged, Observable } from "rxjs";
 
 export const useObservableFromState = <T>(value: T) => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   const subject = useMemo(() => {
     return new BehaviorSubject(value);
   }, [value]);

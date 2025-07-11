@@ -34,7 +34,6 @@ export const createAgentAnalysisTool = (agentDef: AgentDef): AgentTool => ({
     required: [],
   },
   execute: async (toolCall) => {
-    // 基于真实的 agent 数据进行分析
     const capabilities = [];
     
     if (agentDef.prompt) {
@@ -66,17 +65,17 @@ export const createAgentAnalysisTool = (agentDef: AgentDef): AgentTool => ({
   },
 });
 
-// 文件系统工具：基于 LightningFS 的完整文件操作
-export const fileSystemTool: AgentTool = {
+// 增强的文件系统工具：基于 LightningFS 的完整文件操作
+export const enhancedFileSystemTool: AgentTool = {
   name: "fileSystem",
-  description: "文件系统操作（基于 LightningFS）",
+  description: "增强的文件系统操作（基于 LightningFS）",
   parameters: {
     type: "object",
     properties: {
       operation: {
         type: "string",
-        enum: ["list", "read", "write", "create", "delete", "rename", "search", "info", "upload", "download"],
-        description: "操作类型：list（列出）、read（读取）、write（写入）、create（创建）、delete（删除）、rename（重命名）、search（搜索）、info（信息）、upload（上传）、download（下载）"
+        enum: ["list", "read", "write", "create", "delete", "rename", "search", "info", "upload", "download", "navigate", "back"],
+        description: "操作类型：list（列出）、read（读取）、write（写入）、create（创建）、delete（删除）、rename（重命名）、search（搜索）、info（信息）、upload（上传）、download（下载）、navigate（导航）、back（返回上级）"
       },
       path: {
         type: "string",
@@ -299,8 +298,52 @@ export const fileSystemTool: AgentTool = {
           };
         }
           
+        case "navigate": {
+          if (!args.path) {
+            return {
+              toolCallId: toolCall.id,
+              result: {
+                operation: "navigate",
+                error: "缺少路径参数",
+              },
+              status: "error" as const,
+            };
+          }
+          defaultFileManager.setCurrentPath(args.path);
+          const navigateResult = await defaultFileManager.listDirectory(args.path);
+          return {
+            toolCallId: toolCall.id,
+            result: {
+              operation: "navigate",
+              success: navigateResult.success,
+              data: navigateResult.data,
+              message: `成功导航到 ${args.path}`,
+              error: navigateResult.error,
+            },
+            status: navigateResult.success ? "success" as const : "error" as const,
+          };
+        }
+          
+        case "back": {
+          const currentPath = defaultFileManager.getCurrentPath();
+          const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+          const targetPath = parentPath || '/';
+          defaultFileManager.setCurrentPath(targetPath);
+          const backResult = await defaultFileManager.listDirectory(targetPath);
+          return {
+            toolCallId: toolCall.id,
+            result: {
+              operation: "back",
+              success: backResult.success,
+              data: backResult.data,
+              message: `成功返回上级目录 ${targetPath}`,
+              error: backResult.error,
+            },
+            status: backResult.success ? "success" as const : "error" as const,
+          };
+        }
+          
         case "upload": {
-          // 上传文件需要用户交互，返回提示信息
           return {
             toolCallId: toolCall.id,
             result: {
@@ -335,7 +378,7 @@ export const fileSystemTool: AgentTool = {
           };
         }
           
-        default:
+        default: {
           return {
             toolCallId: toolCall.id,
             result: {
@@ -344,6 +387,7 @@ export const fileSystemTool: AgentTool = {
             },
             status: "error" as const,
           };
+        }
       }
     } catch (error) {
       return {
@@ -351,6 +395,130 @@ export const fileSystemTool: AgentTool = {
         result: {
           operation: args.operation,
           error: error instanceof Error ? error.message : "未知错误",
+        },
+        status: "error" as const,
+      };
+    }
+  },
+};
+
+// 代码分析工具
+export const codeAnalysisTool: AgentTool = {
+  name: "analyzeCode",
+  description: "分析代码文件的结构和内容",
+  parameters: {
+    type: "object",
+    properties: {
+      path: {
+        type: "string",
+        description: "代码文件路径"
+      },
+      analysisType: {
+        type: "string",
+        enum: ["structure", "complexity", "quality", "summary"],
+        description: "分析类型：structure（结构）、complexity（复杂度）、quality（质量）、summary（摘要）"
+      }
+    },
+    required: ["path", "analysisType"],
+  },
+  execute: async (toolCall) => {
+    const args = JSON.parse(toolCall.function.arguments);
+    
+    try {
+      const readResult = await defaultFileManager.readFile(args.path);
+      if (!readResult.success || !readResult.data) {
+        return {
+          toolCallId: toolCall.id,
+          result: {
+            error: "无法读取文件",
+          },
+          status: "error" as const,
+        };
+      }
+
+      const content = readResult.data.content;
+      const lines = content.split('\n');
+      const words = content.split(/\s+/);
+      
+      let analysis: Record<string, unknown> = {
+        fileName: args.path.split('/').pop(),
+        fileSize: readResult.data.size,
+        lineCount: lines.length,
+        wordCount: words.length,
+        characterCount: content.length,
+      };
+
+      switch (args.analysisType) {
+        case "structure": {
+          const functions = content.match(/function\s+\w+\s*\(/g) || [];
+          const classes = content.match(/class\s+\w+/g) || [];
+          const imports = content.match(/import\s+.*from/g) || [];
+          analysis = {
+            ...analysis,
+            functions: functions.length,
+            classes: classes.length,
+            imports: imports.length,
+            structure: {
+              functions: functions.map(f => f.replace(/function\s+(\w+)\s*\(/, '$1')),
+              classes: classes.map(c => c.replace(/class\s+(\w+)/, '$1')),
+              imports: imports.slice(0, 5), // 只显示前5个
+            }
+          };
+          break;
+        }
+          
+        case "complexity": {
+          const complexity = {
+            ...analysis,
+            averageLineLength: Math.round(content.length / lines.length),
+            emptyLines: lines.filter(line => line.trim() === '').length,
+            commentLines: lines.filter(line => line.trim().startsWith('//') || line.trim().startsWith('/*')).length,
+          };
+          analysis = complexity;
+          break;
+        }
+          
+        case "quality": {
+          const quality = {
+            ...analysis,
+            hasComments: content.includes('//') || content.includes('/*'),
+            hasErrorHandling: content.includes('try') || content.includes('catch'),
+            hasLogging: content.includes('console.log') || content.includes('console.error'),
+            hasTests: content.includes('test') || content.includes('spec'),
+          };
+          analysis = quality;
+          break;
+        }
+          
+        case "summary": {
+          analysis = {
+            ...analysis,
+            summary: `文件 ${analysis.fileName} 包含 ${analysis.lineCount} 行代码，${analysis.wordCount} 个单词，文件大小 ${analysis.fileSize} 字节。`,
+            language: args.path.endsWith('.ts') ? 'TypeScript' : 
+                     args.path.endsWith('.js') ? 'JavaScript' :
+                     args.path.endsWith('.tsx') ? 'TypeScript React' :
+                     args.path.endsWith('.jsx') ? 'JavaScript React' :
+                     args.path.endsWith('.json') ? 'JSON' :
+                     args.path.endsWith('.md') ? 'Markdown' : 'Unknown'
+          };
+          break;
+        }
+      }
+
+      return {
+        toolCallId: toolCall.id,
+        result: {
+          analysisType: args.analysisType,
+          data: analysis,
+          message: `成功分析文件 ${args.path}`,
+        },
+        status: "success" as const,
+      };
+    } catch (error) {
+      return {
+        toolCallId: toolCall.id,
+        result: {
+          error: error instanceof Error ? error.message : "分析失败",
         },
         status: "error" as const,
       };
@@ -431,10 +599,11 @@ export const networkTool: AgentTool = {
   },
 };
 
-// 默认工具集合
-export const getDefaultPreviewTools = (agentDef: AgentDef): AgentTool[] => [
+// 增强的默认工具集合
+export const getEnhancedPreviewTools = (agentDef: AgentDef): AgentTool[] => [
   getCurrentTimeTool,
   createAgentAnalysisTool(agentDef),
-  fileSystemTool,
+  enhancedFileSystemTool,
+  codeAnalysisTool,
   networkTool,
 ]; 

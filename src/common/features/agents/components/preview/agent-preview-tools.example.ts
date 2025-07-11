@@ -38,7 +38,7 @@ export const createCustomPreviewTools = (agentDef: AgentDef): AgentTool[] => {
           },
           status: "success" as const,
         };
-      } catch (error) {
+      } catch {
         return {
           toolCallId: toolCall.id,
           result: {

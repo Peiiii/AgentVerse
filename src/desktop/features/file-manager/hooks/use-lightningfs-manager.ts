@@ -1,14 +1,7 @@
-import LightningFS from '@isomorphic-git/lightning-fs';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-export interface FsEntry {
-  name: string;
-  path: string;
-  type: 'file' | 'dir';
-}
+import { useCallback, useEffect, useState } from 'react';
+import { defaultFileManager, type FsEntry } from '@/common/lib/file-manager.service';
 
 export function useLightningFSManager() {
-  const fsRef = useRef<any>(null);
   const [cwd, setCwd] = useState<string>("/");
   const [entries, setEntries] = useState<FsEntry[]>([]);
   const [fileContent, setFileContent] = useState<string>("");
@@ -16,13 +9,10 @@ export function useLightningFSManager() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // 初始化 LightningFS
+  // 初始化文件管理器
   useEffect(() => {
-    if (!fsRef.current) {
-      fsRef.current = new LightningFS('file-manager', { wipe: false });
-    }
+    defaultFileManager.setCurrentPath(cwd);
     refreshEntries(cwd);
-    // eslint-disable-next-line
   }, []);
 
   // 读取目录内容
@@ -30,20 +20,13 @@ export function useLightningFSManager() {
     setLoading(true);
     setError("");
     try {
-      const fs = fsRef.current;
-      const names: string[] = await fs.promises.readdir(dir);
-      const stats = await Promise.all(
-        names.map(async (name) => {
-          const path = dir.endsWith('/') ? dir + name : dir + '/' + name;
-          const stat = await fs.promises.stat(path);
-          return {
-            name,
-            path,
-            type: stat.isDirectory() ? 'dir' : 'file',
-          } as FsEntry;
-        })
-      );
-      setEntries(stats);
+      const result = await defaultFileManager.listDirectory(dir);
+      if (result.success && result.data) {
+        setEntries(result.data.entries);
+      } else {
+        setEntries([]);
+        setError(result.error || '读取目录失败');
+      }
     } catch (e: any) {
       setEntries([]);
       setError(e.message || '读取目录失败');
@@ -55,6 +38,7 @@ export function useLightningFSManager() {
   // 进入目录
   const enterDir = useCallback((dir: string) => {
     setCwd(dir);
+    defaultFileManager.setCurrentPath(dir);
     refreshEntries(dir);
     setSelectedFile("");
     setFileContent("");
@@ -66,9 +50,13 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
-      const buf = await fs.promises.readFile(filePath, { encoding: 'utf8' });
-      setFileContent(buf);
+      const result = await defaultFileManager.readFile(filePath);
+      if (result.success && result.data) {
+        setFileContent(result.data.content);
+      } else {
+        setFileContent("");
+        setError(result.error || '读取文件失败');
+      }
     } catch (e: any) {
       setFileContent("");
       setError(e.message || '读取文件失败');
@@ -82,10 +70,13 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
       const newPath = cwd.endsWith('/') ? cwd + dirName : cwd + '/' + dirName;
-      await fs.promises.mkdir(newPath);
-      await refreshEntries(cwd);
+      const result = await defaultFileManager.createDirectory(newPath);
+      if (result.success) {
+        await refreshEntries(cwd);
+      } else {
+        setError(result.error || '创建目录失败');
+      }
     } catch (e: any) {
       setError(e.message || '创建目录失败');
     } finally {
@@ -98,10 +89,13 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
       const newPath = cwd.endsWith('/') ? cwd + fileName : cwd + '/' + fileName;
-      await fs.promises.writeFile(newPath, content, { encoding: 'utf8' });
-      await refreshEntries(cwd);
+      const result = await defaultFileManager.writeFile(newPath, content);
+      if (result.success) {
+        await refreshEntries(cwd);
+      } else {
+        setError(result.error || '创建文件失败');
+      }
     } catch (e: any) {
       setError(e.message || '创建文件失败');
     } finally {
@@ -114,14 +108,12 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
-      const stat = await fs.promises.stat(path);
-      if (stat.isDirectory()) {
-        await fs.promises.rmdir(path);
+      const result = await defaultFileManager.deleteEntry(path);
+      if (result.success) {
+        await refreshEntries(cwd);
       } else {
-        await fs.promises.unlink(path);
+        setError(result.error || '删除失败');
       }
-      await refreshEntries(cwd);
     } catch (e: any) {
       setError(e.message || '删除失败');
     } finally {
@@ -134,11 +126,14 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
       const dir = oldPath.substring(0, oldPath.lastIndexOf("/"));
       const newPath = dir + '/' + newName;
-      await fs.promises.rename(oldPath, newPath);
-      await refreshEntries(cwd);
+      const result = await defaultFileManager.renameEntry(oldPath, newPath);
+      if (result.success) {
+        await refreshEntries(cwd);
+      } else {
+        setError(result.error || '重命名失败');
+      }
     } catch (e: any) {
       setError(e.message || '重命名失败');
     } finally {
@@ -151,10 +146,13 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
-      await fs.promises.writeFile(filePath, content, { encoding: 'utf8' });
-      await refreshEntries(cwd);
-      setFileContent(content);
+      const result = await defaultFileManager.writeFile(filePath, content);
+      if (result.success) {
+        await refreshEntries(cwd);
+        setFileContent(content);
+      } else {
+        setError(result.error || '写入失败');
+      }
     } catch (e: any) {
       setError(e.message || '写入失败');
     } finally {
@@ -167,11 +165,12 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
-      const newPath = cwd.endsWith('/') ? cwd + file.name : cwd + '/' + file.name;
-      const text = await file.text();
-      await fs.promises.writeFile(newPath, text, { encoding: 'utf8' });
-      await refreshEntries(cwd);
+      const result = await defaultFileManager.uploadFile(file, cwd);
+      if (result.success) {
+        await refreshEntries(cwd);
+      } else {
+        setError(result.error || '上传失败');
+      }
     } catch (e: any) {
       setError(e.message || '上传失败');
     } finally {
@@ -184,15 +183,10 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
-      const fs = fsRef.current;
-      const content = await fs.promises.readFile(filePath, { encoding: 'utf8' });
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filePath.split('/').pop() || 'download.txt';
-      a.click();
-      URL.revokeObjectURL(url);
+      const result = await defaultFileManager.downloadFile(filePath);
+      if (!result.success) {
+        setError(result.error || '下载失败');
+      }
     } catch (e: any) {
       setError(e.message || '下载失败');
     } finally {
