@@ -1,3 +1,6 @@
+---
+alwaysApply: true
+---
 # 文件组织规则
 
 ## 核心目录结构（示意）
@@ -76,7 +79,3 @@ src/
 - 文件：kebab-case
 - 服务文件：以 `.service.ts` 结尾
 - Hook 文件：以 `use-` 开头
-description:
-globs:
-alwaysApply: false
----
