@@ -10,7 +10,9 @@ import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { desktopAgentsExtension } from "@/desktop/features/agents/extensions";
 import { desktopChatExtension } from "@/desktop/features/chat/extensions";
+import { desktopIndexedDBExtension } from "@/desktop/features/indexeddb/extensions";
 import { desktopMCPExtension } from "@/desktop/features/mcp/extensions";
+import { desktopFileManagerExtension } from "@/desktop/features/file-manager/extensions";
 import { useEffect } from "react";
 import { HashRouter } from "react-router-dom";
 
@@ -21,6 +23,8 @@ export function DesktopAppInner() {
       desktopAgentsExtension,
       settingsExtension,
       desktopMCPExtension,
+      desktopIndexedDBExtension,
+      desktopFileManagerExtension,
       githubExtension,
     ],
   });

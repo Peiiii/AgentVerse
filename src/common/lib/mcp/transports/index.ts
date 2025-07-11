@@ -1,4 +1,4 @@
-import { MCPTransport } from '../transport';
+import type { MCPTransport } from './transport';
 import { PostMessageTransport } from './postmessage';
 import { EventTransport } from './event';
 

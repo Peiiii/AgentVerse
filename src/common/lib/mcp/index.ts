@@ -1,5 +1,5 @@
 // 核心传输层抽象
-export { MCPTransport, MCPClient, MCPMessage } from './transport';
+export { type MCPTransport, MCPClient, type MCPMessage } from './transports/transport';
 
 // 传输层实现
 export { 

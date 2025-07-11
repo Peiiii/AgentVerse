@@ -1,4 +1,4 @@
-import { MCPTransport, MCPMessage } from '../transport';
+import { MCPTransport, MCPMessage } from './transport';
 
 /**
  * Event传输层

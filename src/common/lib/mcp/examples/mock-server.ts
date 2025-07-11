@@ -1,4 +1,4 @@
-import { MCPTransport, MCPMessage } from '../transport';
+import { MCPTransport, MCPMessage } from '../transports/transport';
 
 /**
  * 模拟MCP服务器
