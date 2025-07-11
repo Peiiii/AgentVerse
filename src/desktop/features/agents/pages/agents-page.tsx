@@ -1,4 +1,4 @@
-import { AgentForm } from "@/common/components/agent/agent-form";
+import { AgentForm } from "@/common/features/agents/components/forms";
 import { ModernAgentCard } from "@/common/components/agent/cards/modern-agent-card";
 import { PageContainer } from "@/common/components/layout/page-container";
 import { Badge } from "@/common/components/ui/badge";

@@ -9,9 +9,9 @@ import {
   Wand2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { AgentChatInput, AgentChatMessages } from "../chat/agent-chat";
-import { ChatWelcomeHeader } from "../chat/chat-welcome-header";
-import { AgentChatProviderWrapper } from "../chat/agent-chat/agent-chat-provider-wrapper";
+import { AgentChatInput, AgentChatMessages } from "@/common/components/chat/agent-chat";
+import { ChatWelcomeHeader } from "@/common/components/chat/chat-welcome-header";
+import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 
 
 interface AiChatCreatorProps {

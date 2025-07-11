@@ -1,4 +1,4 @@
-import { AgentForm } from "@/common/components/agent/agent-form";
+import { AgentForm } from "@/common/features/agents/components/forms";
 import { AgentList } from "@/common/components/agent/lists/agent-list";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";

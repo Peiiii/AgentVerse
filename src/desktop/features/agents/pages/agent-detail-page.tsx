@@ -1,6 +1,6 @@
-import { AgentEmbeddedForm } from "@/common/components/agent/agent-embedded-form";
-import { AiChatCreator } from "@/common/components/agent/ai-chat-creator";
-import { AgentPreviewChat } from "@/common/components/agent/agent-preview-chat";
+import { AgentEmbeddedForm } from "@/common/features/agents/components/forms";
+import { AiChatCreator } from "@/common/features/agents/components/creation";
+import { AgentPreviewChat } from "@/common/features/agents/components/preview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Zap } from "lucide-react";
 import { AgentDef } from "@/common/types/agent";
-import { FloatingAgentInfo } from "../../agent/floating-agent-info";
+import { FloatingAgentInfo } from "@/common/features/agents/components";
 
 interface AgentChatHeaderProps {
   agent: AgentDef;

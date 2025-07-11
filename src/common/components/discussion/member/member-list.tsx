@@ -11,7 +11,7 @@ import { MemberItem } from "./member-item";
 import { MemberSkeleton } from "./member-skeleton";
 import { QuickMemberSelector } from "./quick-member-selector";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
-import { AgentForm } from "@/common/components/agent/agent-form";
+import { AgentForm } from "@/common/features/agents/components/forms";
 
 interface MemberListProps {
   className?: string;

@@ -9,8 +9,8 @@ export * from './lists/index.ts';
 // 对话框组件
 export * from './dialogs/index.ts';
 
-// 表单组件
-export { AgentForm } from './agent-form.tsx';
-
 // 管理组件
-export { MemberManagement } from './member-management.tsx'; 
+export { MemberManagement } from './member-management.tsx';
+
+// 功能组件已移动到 features/agents/components
+export * from '@/common/features/agents/components'; 

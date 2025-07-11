@@ -8,7 +8,7 @@ import { cn } from "@/common/lib/utils";
 import { Loader2, PlusCircle, Search } from "lucide-react";
 import match from "pinyin-match";
 import { useCallback, useMemo, useState } from "react";
-import { AgentForm } from "../agent-form";
+import { AgentForm } from "@/common/features/agents/components/forms";
 import { AgentList } from "../lists/agent-list";
 
 // 对话框内容组件

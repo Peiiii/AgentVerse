@@ -3,7 +3,7 @@ import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { useCallback, useRef, useState } from "react";
-import { AgentChatProviderWrapper } from "../chat/agent-chat/agent-chat-provider-wrapper";
+import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { getDefaultPreviewTools } from "./agent-preview-tools";
 
 interface AgentPreviewChatProps {

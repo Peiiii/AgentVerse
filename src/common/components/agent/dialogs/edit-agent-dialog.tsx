@@ -4,7 +4,7 @@ import { useAgents } from "@/core/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
 import { useCallback } from "react";
-import { AgentForm } from "../agent-form";
+import { AgentForm } from "@/common/features/agents/components/forms";
 
 // 对话框内容组件
 export interface EditAgentDialogContentProps {
@@ -22,7 +22,7 @@ export function EditAgentDialogContent({
     <div className="flex flex-col h-full overflow-hidden">
       <AgentForm
         open={true}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           if (!open) onClose();
         }}
         onSubmit={onSubmit}
