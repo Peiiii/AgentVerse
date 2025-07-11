@@ -1,6 +1,6 @@
 import { AgentEmbeddedForm } from "@/common/components/agent/agent-embedded-form";
 import { AiChatCreator } from "@/common/components/agent/ai-chat-creator";
-import { AgentChatContainer, type AgentChatContainerRef } from "@/common/components/chat/agent-chat";
+import { AgentPreviewChat } from "@/common/components/agent/agent-preview-chat";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
@@ -9,11 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui
 import { useEffectFromObservable, useObservableFromState } from "@/common/lib/rx-state";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { ChatMessage } from "@/common/types/chat";
 import { useAgents } from "@/core/hooks/useAgents";
 import { isEqual } from "lodash-es";
 import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { combineLatest, distinctUntilChanged, filter, map, take, tap } from "rxjs";
 import { useAgentChatPageHelper } from "@/core/hooks/use-agent-chat-page-helper";
@@ -27,11 +26,6 @@ export function AgentDetailPage() {
 
   const [agent, setAgent] = useState<AgentDef | null>(null);
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("ai-create");
-  const [chatMessages] = useState<ChatMessage[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
-
-  // 聊天容器ref
-  const chatContainerRef = useRef<AgentChatContainerRef>(null);
 
   // 所有回调函数必须在条件返回之前定义
   const handleAgentUpdate = useCallback((updatedAgentData: Omit<AgentDef, "id">) => {
@@ -40,17 +34,7 @@ export function AgentDetailPage() {
     const updatedAgent = { ...updatedAgentData, id: agent.id };
     setAgent(updatedAgent);
     updateAgent(agent.id, updatedAgentData);
-
-    // 自动显示悬浮层（agent更新后）
-    if (chatContainerRef.current) {
-      chatContainerRef.current.showFloatingInfo();
-    }
   }, [agent, updateAgent]);
-
-  // 处理输入变化
-  const handleInputChange = useCallback((value: string) => {
-    setInputMessage(value);
-  }, []);
 
   // 查找当前agent
   const agentId$ = useObservableFromState(agentId);
@@ -65,12 +49,7 @@ export function AgentDetailPage() {
       setAgent(agent);
     }),
     take(1)
-  ), () => {
-    setTimeout(() => {
-      chatContainerRef.current?.showFloatingInfo();
-    })
-
-  })
+  ), () => {})
 
   // 一键和TA对话逻辑
   const handleChatWithAgent = useCallback(async () => {
@@ -236,18 +215,10 @@ export function AgentDetailPage() {
         </div>
       </div>
 
-      {/* 右侧聊天区 - 使用新的组件 */}
-      <AgentChatContainer
+      {/* 右侧智能体预览聊天区 */}
+      <AgentPreviewChat
         className="w-1/2"
-        ref={chatContainerRef}
-        agent={agent}
-        messages={chatMessages}
-        inputMessage={inputMessage}
-        onInputChange={handleInputChange}
-        showInfoPanel={false}
-        defaultInfoExpanded={false}
-        compactInfo={true}
-        enableFloatingInfo={true}
+        agentDef={agent}
       />
     </div>
   );

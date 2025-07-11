@@ -17,7 +17,7 @@ import { AgentChatInput } from "./agent-chat-input";
 import { AgentChatMessages, AgentChatMessagesRef } from "./agent-chat-messages";
 
 interface AgentChatContainerProps {
-  agent: AgentDef;
+  agentDef: AgentDef;
   messages: ChatMessage[];
   inputMessage: string;
   onInputChange: (value: string) => void;
@@ -36,7 +36,7 @@ export interface AgentChatContainerRef {
 }
 
 export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatContainerProps>(({
-  agent: agentDef,
+  agentDef: agentDef,
   messages,
   inputMessage,
   onInputChange,

@@ -689,7 +689,7 @@ ${toolsStats.totalTools > 0
 
         <div className="flex-1 overflow-hidden min-h-0">
           <AgentChatContainer
-            agent={mcpAssistant}
+            agentDef={mcpAssistant}
             messages={messages}
             inputMessage={inputMessage}
             onInputChange={setInputMessage}

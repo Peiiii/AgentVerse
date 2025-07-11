@@ -1,0 +1,115 @@
+---
+alwaysApply: true
+description: "代码简洁性、可维护性和可扩展性指导原则"
+---
+
+# 代码简洁性与可维护性指导原则
+
+## 核心原则
+
+### 1. 简洁性优先
+- **避免冗余**：不要重复造轮子，优先复用现有类型和组件
+- **减少代码量**：用最少的代码实现功能，避免过度设计
+- **消除重复**：DRY (Don't Repeat Yourself) 原则
+
+### 2. 文件大小控制
+- **单文件限制**：一个文件的代码尽量不要超过 250 行
+- **组件拆分**：当文件过大时，及时拆分为更小的组件
+- **职责单一**：每个文件/组件只负责一个明确的功能
+
+### 3. 可维护性
+- **清晰命名**：变量名严格区分不同概念（如 `agentTools` vs `toolDefinitions`）
+- **类型安全**：充分利用 TypeScript 类型系统，避免 `any`
+- **注释简洁**：只在必要时添加注释，代码本身应该自解释
+
+### 4. 可扩展性
+- **低耦合**：修改已有逻辑时，能不耦合尽量不耦合
+- **可插拔**：尽量以可插拔的方式引入新功能
+- **接口稳定**：保持公共 API 的稳定性
+
+## 具体实践
+
+### 类型定义
+```typescript
+// ✅ 好的做法：复用现有类型
+export interface AgentTool extends ToolDefinition {
+  execute?: ToolExecutor
+  render?: ToolRenderer['render']
+}
+
+// ❌ 避免：重复定义已有类型
+export interface AgentTool {
+  name: string
+  description: string
+  parameters: { /* 重复定义 */ }
+}
+```
+
+### 函数实现
+```typescript
+// ✅ 好的做法：使用现代 API，链式调用
+const toolExecutors = Object.fromEntries(
+  agentTools
+    .filter(agentTool => agentTool.execute)
+    .map(agentTool => [agentTool.name, agentTool.execute!])
+)
+
+// ❌ 避免：手动循环和条件判断
+const toolExecutors = {}
+agentTools.forEach(agentTool => {
+  if (agentTool.execute) {
+    toolExecutors[agentTool.name] = agentTool.execute
+  }
+})
+```
+
+### 组件拆分
+```typescript
+// ✅ 好的做法：职责单一的小组件
+function AgentToolCard({ tool, onEdit, onDelete }) {
+  return <div>...</div>
+}
+
+function AgentToolList({ tools }) {
+  return tools.map(tool => <AgentToolCard key={tool.id} tool={tool} />)
+}
+
+// ❌ 避免：一个组件做太多事情
+function AgentToolManager({ tools, onEdit, onDelete, onAdd, onSearch, ... }) {
+  // 200+ 行的复杂逻辑
+}
+```
+
+### Hook 封装
+```typescript
+// ✅ 好的做法：封装复杂逻辑为可复用 hook
+export function useProvideAgentTools(agentTools: AgentTool[]) {
+  // 简洁的实现，内部处理复杂性
+}
+
+// ❌ 避免：在组件中直接调用多个相关 hook
+function MyComponent() {
+  useProvideAgentToolDefs(toolDefs)
+  useProvideAgentToolExecutors(toolExecutors)
+  useProvideAgentToolRenderers(toolRenderers)
+  // 容易遗漏或出错
+}
+```
+
+## 代码审查检查点
+
+1. **文件大小**：是否超过 250 行？需要拆分吗？
+2. **类型复用**：是否重复定义了已有类型？
+3. **现代 API**：是否使用了 `Object.fromEntries`、链式调用等现代语法？
+4. **命名清晰**：变量名是否严格区分了不同概念？
+5. **职责单一**：每个函数/组件是否只做一件事？
+6. **可插拔**：新功能是否以可插拔的方式引入？
+
+## 重构指导
+
+当发现以下情况时，考虑重构：
+- 文件超过 250 行
+- 函数超过 50 行
+- 重复的类型定义
+- 手动循环可以用现代 API 替代
+- 组件承担
