@@ -2,7 +2,6 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/common/components/ui/dialog";
-import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -30,7 +29,7 @@ export function IndexedDBDataViewer({
 }: IndexedDBDataViewerProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingIndex, setEditingIndex] = useState<number>(-1);
   const [newItemData, setNewItemData] = useState<any>({});
   const [editItemData, setEditItemData] = useState<any>({});
 
@@ -45,28 +44,29 @@ export function IndexedDBDataViewer({
   };
 
   const handleUpdateData = async () => {
-    if (!editingItem) return;
+    if (editingIndex === -1) return;
     
     try {
-      await onUpdateData(editingItem.id, editItemData);
+      // 使用索引作为ID，因为原始值可能没有id属性
+      await onUpdateData(editingIndex.toString(), editItemData);
       setIsEditDialogOpen(false);
-      setEditingItem(null);
+      setEditingIndex(-1);
       setEditItemData({});
     } catch (error) {
       console.error('更新数据失败:', error);
     }
   };
 
-  const handleEditItem = (item: any) => {
-    setEditingItem(item);
-    setEditItemData({ ...item });
+  const handleEditItem = (item: any, index: number) => {
+    setEditingIndex(index);
+    setEditItemData(item);
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteItem = async (id: string) => {
+  const handleDeleteItem = async (index: number) => {
     if (confirm('确定要删除这条数据吗？')) {
       try {
-        await onDeleteData(id);
+        await onDeleteData(index.toString());
       } catch (error) {
         console.error('删除数据失败:', error);
       }
@@ -85,8 +85,187 @@ export function IndexedDBDataViewer({
 
   const formatValue = (value: any): string => {
     if (value === null || value === undefined) return 'null';
-    if (typeof value === 'object') return JSON.stringify(value, null, 2);
+    
+    // 处理 TypedArray 和 ArrayBuffer
+    if (ArrayBuffer.isView(value) || value instanceof ArrayBuffer) {
+      const size = value instanceof ArrayBuffer ? value.byteLength : value.byteLength;
+      const type = value.constructor.name;
+      return `${type}(${size} bytes)`;
+    }
+    
+    // 处理数组
+    if (Array.isArray(value)) {
+      const length = value.length;
+      if (length > 100) {
+        return `Array(${length} items) - 显示前100项`;
+      }
+      return JSON.stringify(value, null, 2);
+    }
+    
+    // 处理对象
+    if (typeof value === 'object') {
+      const keys = Object.keys(value);
+      if (keys.length > 50) {
+        return `Object(${keys.length} properties) - 显示前50个属性`;
+      }
+      return JSON.stringify(value, null, 2);
+    }
+    
     return String(value);
+  };
+
+  const getItemType = (item: any): string => {
+    if (item === null) return 'null';
+    if (item === undefined) return 'undefined';
+    if (Array.isArray(item)) return 'array';
+    if (typeof item === 'object') return 'object';
+    return typeof item;
+  };
+
+  const getItemId = (item: any, index: number): string => {
+    if (item && typeof item === 'object' && item.id !== undefined) {
+      return item.id;
+    }
+    return `索引 ${index}`;
+  };
+
+  const getItemFields = (item: any): number => {
+    if (item === null || item === undefined) return 0;
+    if (typeof item === 'object') {
+      return Object.keys(item).length;
+    }
+    return 1; // 原始值算作1个字段
+  };
+
+  const renderItemContent = (item: any) => {
+    console.log("[IndexedDBDataViewer] renderItemContent item", item);
+    
+    if (item === null || item === undefined) {
+      return (
+        <div className="text-xs text-muted-foreground">
+          {item === null ? 'null' : 'undefined'}
+        </div>
+      );
+    }
+
+    // 处理 TypedArray 和 ArrayBuffer
+    if (ArrayBuffer.isView(item) || item instanceof ArrayBuffer) {
+      const size = item instanceof ArrayBuffer ? item.byteLength : item.byteLength;
+      const type = item.constructor.name;
+      return (
+        <div className="text-xs">
+          <div className="font-medium text-muted-foreground mb-1">
+            {type} ({size} bytes)
+          </div>
+          <div className="text-muted-foreground">
+            {size > 1024 ? `${(size / 1024).toFixed(1)} KB` : `${size} bytes`}
+          </div>
+          {size <= 100 && (
+            <div className="mt-2 p-2 bg-muted/20 rounded text-xs font-mono break-all">
+              {Array.from(new Uint8Array(item instanceof ArrayBuffer ? item : item.buffer)).slice(0, 50).map((byte) => 
+                byte.toString(16).padStart(2, '0')
+              ).join(' ')}
+              {size > 50 ? '...' : ''}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 处理数组
+    if (Array.isArray(item)) {
+      const length = item.length;
+      return (
+        <div className="text-xs">
+          <div className="font-medium text-muted-foreground mb-1">
+            Array ({length} items)
+          </div>
+          {length <= 10 ? (
+            <div className="space-y-1">
+              {item.map((value, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <span className="font-medium text-muted-foreground min-w-0 flex-shrink-0">
+                    [{index}]:
+                  </span>
+                  <span className="break-all">
+                    {formatValue(value)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground">
+              显示前 10 项，共 {length} 项
+              <div className="mt-2 space-y-1">
+                {item.slice(0, 10).map((value, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <span className="font-medium text-muted-foreground min-w-0 flex-shrink-0">
+                      [{index}]:
+                    </span>
+                    <span className="break-all">
+                      {formatValue(value)}
+                    </span>
+                  </div>
+                ))}
+                <div className="text-muted-foreground italic">
+                  ... 还有 {length - 10} 项
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 处理普通对象
+    if (typeof item === 'object') {
+      const keys = Object.keys(item);
+      const length = keys.length;
+      
+      return (
+        <div className="space-y-2">
+          <div className="font-medium text-muted-foreground text-xs">
+            对象 ({length} 属性)
+          </div>
+          {length <= 20 ? (
+            keys.map((key) => (
+              <div key={key} className="flex items-start gap-2 text-xs">
+                <span className="font-medium text-muted-foreground min-w-0 flex-shrink-0">
+                  {key}:
+                </span>
+                <span className="break-all">
+                  {formatValue(item[key])}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="text-muted-foreground">
+              显示前 20 个属性，共 {length} 个
+              {keys.slice(0, 20).map((key) => (
+                <div key={key} className="flex items-start gap-2 text-xs">
+                  <span className="font-medium text-muted-foreground min-w-0 flex-shrink-0">
+                    {key}:
+                  </span>
+                  <span className="break-all">
+                    {formatValue(item[key])}
+                  </span>
+                </div>
+              ))}
+              <div className="text-muted-foreground italic text-xs">
+                ... 还有 {length - 20} 个属性
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 处理原始值
+    return (
+      <div className="text-xs">
+        <span className="break-all">{formatValue(item)}</span>
+      </div>
+    );
   };
 
   return (
@@ -120,15 +299,6 @@ export function IndexedDBDataViewer({
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="new-id">ID</Label>
-                    <Input
-                      id="new-id"
-                      value={newItemData.id || ''}
-                      onChange={(e) => setNewItemData((prev: any) => ({ ...prev, id: e.target.value }))}
-                      placeholder="输入唯一ID"
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="new-data">数据 (JSON)</Label>
                     <Textarea
                       id="new-data"
@@ -141,7 +311,7 @@ export function IndexedDBDataViewer({
                           // 忽略无效的 JSON
                         }
                       }}
-                      placeholder='{"name": "示例", "value": 123}'
+                      placeholder='{"name": "示例", "value": 123} 或 "字符串" 或 123'
                       rows={6}
                     />
                   </div>
@@ -196,7 +366,7 @@ export function IndexedDBDataViewer({
           ) : (
             <div className="p-4 space-y-3">
               {data.map((item, index) => (
-                <Card key={item.id || index} className="hover:shadow-sm transition-shadow">
+                <Card key={index} className="hover:shadow-sm transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -206,20 +376,20 @@ export function IndexedDBDataViewer({
                           </span>
                         </div>
                         <div>
-                          <CardTitle className="text-sm">ID: {item.id}</CardTitle>
+                          <CardTitle className="text-sm">ID: {getItemId(item, index)}</CardTitle>
                           <CardDescription className="text-xs">
-                            数据记录
+                            {getItemType(item)} 类型
                           </CardDescription>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
-                          {Object.keys(item).length} 字段
+                          {getItemFields(item)} 字段
                         </Badge>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEditItem(item)}
+                          onClick={() => handleEditItem(item, index)}
                           className="h-6 w-6 p-0"
                         >
                           <Edit className="w-3 h-3" />
@@ -227,7 +397,7 @@ export function IndexedDBDataViewer({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteItem(item.id)}
+                          onClick={() => handleDeleteItem(index)}
                           className="h-6 w-6 p-0 text-destructive"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -236,18 +406,7 @@ export function IndexedDBDataViewer({
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-2">
-                      {Object.entries(item).map(([key, value]) => (
-                        <div key={key} className="flex items-start gap-2 text-xs">
-                          <span className="font-medium text-muted-foreground min-w-0 flex-shrink-0">
-                            {key}:
-                          </span>
-                          <span className="break-all">
-                            {formatValue(value)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    {renderItemContent(item)}
                   </CardContent>
                 </Card>
               ))}

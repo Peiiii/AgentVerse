@@ -16,7 +16,6 @@ export function IndexedDBDatabaseInfo({
   currentDatabase
 }: IndexedDBDatabaseInfoProps) {
   const totalStores = databases.reduce((sum, db) => sum + db.stores.length, 0);
-  const totalSize = databases.length; // 简化的统计
 
   return (
     <div className="h-full flex flex-col">

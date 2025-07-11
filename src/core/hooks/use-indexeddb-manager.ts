@@ -40,37 +40,58 @@ export function useIndexedDBManager() {
 
   // 刷新数据库列表
   const refreshDatabases = useCallback(async () => {
+    console.log('[useIndexedDBManager] refreshDatabases called');
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
       const dbNames = await IndexedDBProvider.listDatabases();
+      console.log('[useIndexedDBManager] dbNames from listDatabases:', dbNames);
       const databases: DatabaseInfo[] = [];
       
       for (const dbName of dbNames) {
         try {
-          const provider = new IndexedDBProvider({
-            dbName,
-            storeName: 'temp', // 临时存储名，用于获取数据库信息
-            version: 1
+          console.log('[useIndexedDBManager] Getting info for database:', dbName);
+          // 尝试打开数据库来获取信息
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const request = indexedDB.open(dbName);
+            
+            request.onerror = () => {
+              reject(new Error(`Failed to open database ${dbName}: ${request.error?.message}`));
+            };
+            
+            request.onsuccess = () => {
+              resolve(request.result);
+            };
           });
           
-          const info = await provider.getDatabaseInfo();
-          databases.push({
-            name: info.name,
-            version: info.version,
-            stores: info.storeNames
-          });
+          const dbInfo = {
+            name: db.name,
+            version: db.version,
+            stores: Array.from(db.objectStoreNames)
+          };
+          console.log('[useIndexedDBManager] Database info:', dbInfo);
+          databases.push(dbInfo);
+          
+          db.close();
         } catch (error) {
-          console.warn(`Failed to get info for database ${dbName}:`, error);
+          console.warn(`[useIndexedDBManager] Failed to get info for database ${dbName}:`, error);
+          // 如果无法获取信息，至少添加数据库名称
+          databases.push({
+            name: dbName,
+            version: 1,
+            stores: []
+          });
         }
       }
       
+      console.log('[useIndexedDBManager] Final databases array:', databases);
       setState(prev => ({ 
         ...prev, 
         databases, 
         isLoading: false 
       }));
     } catch (error) {
+      console.error('[useIndexedDBManager] refreshDatabases error:', error);
       setState(prev => ({ 
         ...prev, 
         error: error instanceof Error ? error.message : '刷新数据库列表失败',
@@ -150,12 +171,6 @@ export function useIndexedDBManager() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
-      const provider = new IndexedDBProvider({
-        dbName,
-        storeName: stores[0] || 'default',
-        version: 1
-      });
-
       // 创建数据库和存储
       for (const storeName of stores) {
         const storeProvider = new IndexedDBProvider({
@@ -164,8 +179,41 @@ export function useIndexedDBManager() {
           version: 1
         });
         
-        // 添加一些测试数据
-        await storeProvider.create({ id: 'test', name: 'Test Item' });
+        // 添加各种类型的测试数据
+        await storeProvider.create({ 
+          id: 'test-object', 
+          name: 'Test Object',
+          number: 123,
+          boolean: true,
+          nullValue: null,
+          array: [1, 2, 3, 'string', true],
+          nestedObject: { a: 1, b: 'test' }
+        });
+        
+        // 添加 TypedArray 测试数据
+        const smallArray = new Uint8Array([1, 2, 3, 4, 5]);
+        await storeProvider.create({ 
+          id: 'test-typedarray-small', 
+          name: 'Small TypedArray',
+          data: smallArray
+        });
+        
+        // 添加大型 TypedArray 测试数据（但不会太大）
+        const largeArray = new Uint8Array(1000);
+        for (let i = 0; i < largeArray.length; i++) {
+          largeArray[i] = i % 256;
+        }
+        await storeProvider.create({ 
+          id: 'test-typedarray-large', 
+          name: 'Large TypedArray',
+          data: largeArray
+        });
+        
+        // 添加原始值测试数据
+        await storeProvider.create('test-string');
+        await storeProvider.create(123);
+        await storeProvider.create(true);
+        await storeProvider.create(null);
       }
 
       await refreshDatabases();
@@ -178,27 +226,32 @@ export function useIndexedDBManager() {
     }
   }, [refreshDatabases]);
 
+  console.log("[useIndexedDBManager] render", {
+    currentProvider,
+    state
+  });
   // 获取存储数据
   const getStoreData = useCallback(async (storeName: string) => {
-    if (!currentProvider || !state.currentDatabase) return;
-    
+    if (!currentProvider || !state.currentDatabase) {
+      setState(prev => ({ ...prev, isLoading: false, error: '未选择数据库或存储' }));
+      return;
+    }
     setState(prev => ({ ...prev, isLoading: true, error: null }));
-    
     try {
       const storeProvider = new IndexedDBProvider({
         dbName: state.currentDatabase.name,
         storeName,
         version: state.currentDatabase.version
       });
-
       const data = await storeProvider.list();
-      
+      console.log("[useIndexedDBManager] getStoreData data", data);
       setState(prev => ({ 
         ...prev, 
         storeData: data,
         isLoading: false 
       }));
     } catch (error) {
+      console.error("[useIndexedDBManager] getStoreData error", error);
       setState(prev => ({ 
         ...prev, 
         error: error instanceof Error ? error.message : '获取存储数据失败',
@@ -208,20 +261,21 @@ export function useIndexedDBManager() {
   }, [currentProvider, state.currentDatabase]);
 
   // 添加数据
-  const addData = useCallback(async (data: any) => {
+  const addData = useCallback(async (data: any, storeName?: string) => {
     if (!currentProvider || !state.currentDatabase) return;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
+      const targetStoreName = storeName || state.currentStore?.name || 'default';
       const storeProvider = new IndexedDBProvider({
         dbName: state.currentDatabase.name,
-        storeName: 'default', // 这里需要根据实际选择的存储来设置
+        storeName: targetStoreName,
         version: state.currentDatabase.version
       });
 
       await storeProvider.create(data);
-      await getStoreData('default'); // 刷新数据
+      await getStoreData(targetStoreName); // 刷新数据
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
@@ -229,23 +283,24 @@ export function useIndexedDBManager() {
         isLoading: false 
       }));
     }
-  }, [currentProvider, state.currentDatabase, getStoreData]);
+  }, [currentProvider, state.currentDatabase, state.currentStore, getStoreData]);
 
   // 更新数据
-  const updateData = useCallback(async (id: string, data: any) => {
+  const updateData = useCallback(async (id: string, data: any, storeName?: string) => {
     if (!currentProvider || !state.currentDatabase) return;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
+      const targetStoreName = storeName || state.currentStore?.name || 'default';
       const storeProvider = new IndexedDBProvider({
         dbName: state.currentDatabase.name,
-        storeName: 'default',
+        storeName: targetStoreName,
         version: state.currentDatabase.version
       });
 
       await storeProvider.update(id, data);
-      await getStoreData('default');
+      await getStoreData(targetStoreName);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
@@ -253,23 +308,24 @@ export function useIndexedDBManager() {
         isLoading: false 
       }));
     }
-  }, [currentProvider, state.currentDatabase, getStoreData]);
+  }, [currentProvider, state.currentDatabase, state.currentStore, getStoreData]);
 
   // 删除数据
-  const deleteData = useCallback(async (id: string) => {
+  const deleteData = useCallback(async (id: string, storeName?: string) => {
     if (!currentProvider || !state.currentDatabase) return;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
+      const targetStoreName = storeName || state.currentStore?.name || 'default';
       const storeProvider = new IndexedDBProvider({
         dbName: state.currentDatabase.name,
-        storeName: 'default',
+        storeName: targetStoreName,
         version: state.currentDatabase.version
       });
 
       await storeProvider.delete(id);
-      await getStoreData('default');
+      await getStoreData(targetStoreName);
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
@@ -277,7 +333,7 @@ export function useIndexedDBManager() {
         isLoading: false 
       }));
     }
-  }, [currentProvider, state.currentDatabase, getStoreData]);
+  }, [currentProvider, state.currentDatabase, state.currentStore, getStoreData]);
 
   // 清空存储
   const clearStore = useCallback(async (storeName: string) => {

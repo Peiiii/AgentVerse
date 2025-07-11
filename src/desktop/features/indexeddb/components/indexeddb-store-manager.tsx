@@ -1,10 +1,9 @@
 import { Badge } from "@/common/components/ui/badge";
-import { Button } from "@/common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Separator } from "@/common/components/ui/separator";
 import { DatabaseInfo } from "@/core/hooks/use-indexeddb-manager";
-import { Database, FileText, Hash, Key, List, Trash2 } from "lucide-react";
+import { Database, FileText, Hash, Key } from "lucide-react";
 
 interface IndexedDBStoreManagerProps {
   database: DatabaseInfo | null;

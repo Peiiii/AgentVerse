@@ -15,7 +15,7 @@ import {
     RefreshCw,
     Search
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { IndexedDBDataViewer } from "../components/indexeddb-data-viewer";
 
 export function IndexedDBManagerPage() {
@@ -26,13 +26,10 @@ export function IndexedDBManagerPage() {
   const {
     databases,
     currentDatabase,
-    currentStore,
     storeData,
     isLoading,
     refreshDatabases,
     openDatabase,
-    closeDatabase,
-    deleteDatabase,
     createDatabase,
     getStoreData,
     addData,
@@ -51,17 +48,42 @@ export function IndexedDBManagerPage() {
   }, [databases, searchQuery]);
 
   // 处理数据库选择
-  const handleDatabaseSelect = async (dbName: string) => {
+  const handleDatabaseSelect = useCallback(async (dbName: string) => {
     setSelectedDatabase(dbName);
     setSelectedStore("");
     await openDatabase(dbName);
-  };
+    
+    // 自动选择第一个存储对象
+    const database = databases.find(db => db.name === dbName);
+    if (database && database.stores.length > 0) {
+      const firstStore = database.stores[0];
+      setSelectedStore(firstStore);
+      await getStoreData(firstStore);
+    }
+  }, [databases, openDatabase, getStoreData]);
 
   // 处理存储选择
   const handleStoreSelect = async (storeName: string) => {
     setSelectedStore(storeName);
     await getStoreData(storeName);
   };
+
+  // 当数据库信息更新时，自动选择第一个存储对象
+  useEffect(() => {
+    if (currentDatabase && currentDatabase.stores.length > 0 && !selectedStore) {
+      const firstStore = currentDatabase.stores[0];
+      setSelectedStore(firstStore);
+      getStoreData(firstStore);
+    }
+  }, [currentDatabase, selectedStore, getStoreData]);
+
+  // 当数据库列表加载完成后，自动选择第一个数据库
+  useEffect(() => {
+    if (databases.length > 0 && !selectedDatabase) {
+      const firstDatabase = databases[0];
+      handleDatabaseSelect(firstDatabase.name);
+    }
+  }, [databases, selectedDatabase, handleDatabaseSelect]);
 
   // 面包屑导航
   const renderBreadcrumb = () => (
@@ -105,6 +127,15 @@ export function IndexedDBManagerPage() {
           disabled={isLoading}
         >
           <RefreshCw className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => createDatabase('test-db-' + Date.now(), ['users', 'posts'])}
+          disabled={isLoading}
+        >
+          <Plus className="w-4 h-4" />
+          创建测试数据库
         </Button>
       </div>
       
@@ -225,9 +256,9 @@ export function IndexedDBManagerPage() {
         <IndexedDBDataViewer
           storeName={selectedStore}
           data={storeData}
-          onAddData={addData}
-          onUpdateData={updateData}
-          onDeleteData={deleteData}
+          onAddData={(data) => addData(data, selectedStore)}
+          onUpdateData={(id, data) => updateData(id, data, selectedStore)}
+          onDeleteData={(id) => deleteData(id, selectedStore)}
           onClearStore={clearStore}
           isLoading={isLoading}
         />
