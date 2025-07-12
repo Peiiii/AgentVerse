@@ -1,5 +1,14 @@
 // 智能体配置预览组件
-export function AgentConfigurationPreview({ args }: { args: any }) {
+interface AgentConfigArgs {
+  name: string;
+  role: string;
+  personality: string;
+  expertise?: string[];
+  prompt: string;
+  responseStyle?: string;
+}
+
+export function AgentConfigurationPreview({ args }: { args: AgentConfigArgs }) {
   return (
     <div className="p-4 border rounded-lg bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-900/60 dark:to-blue-900/60 shadow dark:border-gray-700">
       <h3 className="font-bold mb-2 text-violet-700 dark:text-violet-200 flex items-center gap-2">

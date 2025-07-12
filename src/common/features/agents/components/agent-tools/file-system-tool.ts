@@ -1,70 +1,5 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
-import { AgentDef } from "@/common/types/agent";
 import { defaultFileManager } from "@/common/lib/file-manager.service";
-
-// 基础工具：获取当前时间
-export const getCurrentTimeTool: AgentTool = {
-  name: "getCurrentTime",
-  description: "获取当前时间",
-  parameters: {
-    type: "object",
-    properties: {},
-    required: [],
-  },
-  execute: async (toolCall) => {
-    return {
-      toolCallId: toolCall.id,
-      result: {
-        currentTime: new Date().toISOString(),
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        message: "当前时间已获取",
-      },
-      status: "success" as const,
-    };
-  },
-};
-
-// 智能体分析工具：基于真实数据
-export const createAgentAnalysisTool = (agentDef: AgentDef): AgentTool => ({
-  name: "analyzeAgentCapability",
-  description: "分析当前智能体的能力和配置",
-  parameters: {
-    type: "object",
-    properties: {},
-    required: [],
-  },
-  execute: async (toolCall) => {
-    // 基于真实的 agent 数据进行分析
-    const capabilities = [];
-    
-    if (agentDef.prompt) {
-      capabilities.push("系统提示词配置");
-    }
-    if (agentDef.expertise && agentDef.expertise.length > 0) {
-      capabilities.push(`${agentDef.expertise.length} 个专业领域`);
-    }
-    if (agentDef.personality) {
-      capabilities.push("个性化性格特征");
-    }
-    if (agentDef.role) {
-      capabilities.push(`${agentDef.role === 'moderator' ? '主持人' : '参与者'}角色`);
-    }
-    
-    return {
-      toolCallId: toolCall.id,
-      result: {
-        agentName: agentDef.name,
-        role: agentDef.role,
-        expertise: agentDef.expertise || [],
-        personality: agentDef.personality,
-        promptLength: agentDef.prompt?.length || 0,
-        capabilities,
-        message: `智能体 "${agentDef.name}" 具备 ${capabilities.length} 项能力`,
-      },
-      status: "success" as const,
-    };
-  },
-});
 
 // 文件系统工具：基于 LightningFS 的完整文件操作
 export const fileSystemTool: AgentTool = {
@@ -260,7 +195,7 @@ export const fileSystemTool: AgentTool = {
               status: "error" as const,
             };
           }
-          const searchResult = await defaultFileManager.searchFiles(args.pattern, args.path);
+          const searchResult = await defaultFileManager.searchFiles(args.pattern);
           return {
             toolCallId: toolCall.id,
             result: {
@@ -280,7 +215,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "info",
-                error: "缺少路径参数",
+                error: "缺少文件路径参数",
               },
               status: "error" as const,
             };
@@ -300,12 +235,12 @@ export const fileSystemTool: AgentTool = {
         }
           
         case "upload": {
-          // 上传文件需要用户交互，返回提示信息
+          // 上传功能需要特殊处理，这里返回提示信息
           return {
             toolCallId: toolCall.id,
             result: {
               operation: "upload",
-              message: "请使用文件管理器界面上传文件，或使用 uploadFile API",
+              message: "文件上传功能需要通过界面操作，请使用文件管理器界面",
             },
             status: "success" as const,
           };
@@ -340,7 +275,7 @@ export const fileSystemTool: AgentTool = {
             toolCallId: toolCall.id,
             result: {
               operation: args.operation,
-              error: `不支持的操作: ${args.operation}`,
+              error: `不支持的操作类型: ${args.operation}`,
             },
             status: "error" as const,
           };
@@ -350,91 +285,10 @@ export const fileSystemTool: AgentTool = {
         toolCallId: toolCall.id,
         result: {
           operation: args.operation,
-          error: error instanceof Error ? error.message : "未知错误",
+          error: `文件系统操作失败: ${error instanceof Error ? error.message : "未知错误"}`,
         },
         status: "error" as const,
       };
     }
   },
-};
-
-// 网络工具：基于真实的 fetch API
-export const networkTool: AgentTool = {
-  name: "network",
-  description: "网络请求工具（基于 fetch API）",
-  parameters: {
-    type: "object",
-    properties: {
-      url: {
-        type: "string",
-        description: "请求的 URL"
-      },
-      method: {
-        type: "string",
-        enum: ["GET", "POST", "PUT", "DELETE"],
-        default: "GET",
-        description: "HTTP 方法"
-      },
-      headers: {
-        type: "object",
-        description: "请求头（可选）"
-      },
-      body: {
-        type: "string",
-        description: "请求体（可选）"
-      }
-    },
-    required: ["url"],
-  },
-  execute: async (toolCall) => {
-    const args = JSON.parse(toolCall.function.arguments);
-    
-    try {
-      const response = await fetch(args.url, {
-        method: args.method || "GET",
-        headers: args.headers || {},
-        body: args.body || undefined,
-      });
-      
-      const contentType = response.headers.get("content-type");
-      let data;
-      
-      if (contentType?.includes("application/json")) {
-        data = await response.json();
-      } else {
-        data = await response.text();
-      }
-      
-      return {
-        toolCallId: toolCall.id,
-        result: {
-          url: args.url,
-          method: args.method || "GET",
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-          data: typeof data === "string" ? data.substring(0, 500) + (data.length > 500 ? "..." : "") : data,
-          message: `请求成功，状态码: ${response.status}`,
-        },
-        status: "success" as const,
-      };
-    } catch (error) {
-      return {
-        toolCallId: toolCall.id,
-        result: {
-          url: args.url,
-          error: error instanceof Error ? error.message : "网络请求失败",
-        },
-        status: "error" as const,
-      };
-    }
-  },
-};
-
-// 默认工具集合
-export const getDefaultPreviewTools = (agentDef: AgentDef): AgentTool[] => [
-  getCurrentTimeTool,
-  createAgentAnalysisTool(agentDef),
-  fileSystemTool,
-  networkTool,
-]; 
+}; 

@@ -4,8 +4,7 @@ import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { useCallback, useRef, useState } from "react";
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
-import { getDefaultPreviewTools } from "./agent-preview-tools";
-import { getEnhancedPreviewTools } from "./agent-preview-enhanced-tools";
+import { getDefaultPreviewTools, getEnhancedPreviewTools } from "../agent-tools/tool-factories";
 
 interface AgentPreviewChatProps {
   agentDef: AgentDef;

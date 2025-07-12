@@ -1,6 +1,6 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
-import { getCurrentTimeTool, createAgentAnalysisTool } from "./agent-preview-tools";
+import { getCurrentTimeTool, createAgentAnalysisTool } from "../agent-tools";
 
 // 示例：自定义工具集合
 export const createCustomPreviewTools = (agentDef: AgentDef): AgentTool[] => {
