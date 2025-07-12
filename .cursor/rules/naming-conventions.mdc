@@ -21,7 +21,16 @@
   - ❌ `discussion-member.ts`
   - ❌ `agentService.ts`
 
-### 3. 文件夹命名规范
+### 3. Tool文件特殊规范
+- Agent工具文件必须以 `.tool.ts` 结尾
+- 示例：
+  - ✅ `agent-analysis.tool.ts`
+  - ✅ `file-system.tool.ts`
+  - ✅ `code-analysis.tool.ts`
+  - ❌ `agent-analysis-tool.ts`
+  - ❌ `fileSystemTool.ts`
+
+### 4. 文件夹命名规范
 - 文件夹也必须使用 kebab-case
 - 示例：
   - ✅ `agent-detail/`
