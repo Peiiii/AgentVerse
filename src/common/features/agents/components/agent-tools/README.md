@@ -8,41 +8,46 @@
 agent-tools/
 ├── index.ts                    # 主导出文件
 ├── tool-factories.ts           # 工具集合工厂函数
-├── get-current-time-tool.ts    # 获取当前时间工具
-├── agent-analysis-tool.ts      # 智能体分析工具
-├── file-system-tool.ts         # 文件系统工具
-├── network-tool.ts             # 网络请求工具
-├── code-analysis-tool.ts       # 代码分析工具
-
+├── get-current-time.tool.ts    # 获取当前时间工具
+├── agent-analysis.tool.ts      # 智能体分析工具
+├── file-system.tool.ts         # 文件系统工具
+├── network.tool.ts             # 网络请求工具
+├── code-analysis.tool.ts       # 代码分析工具
+├── update-agent.tool.ts        # 智能体配置工具
 └── README.md                   # 本文档
 ```
 
 ## 工具列表
 
-### 1. get-current-time-tool.ts
+### 1. get-current-time.tool.ts
 - **功能**: 获取当前时间和时区信息
 - **参数**: 无
 - **返回**: 当前时间、时区、状态消息
 
-### 2. agent-analysis-tool.ts
+### 2. agent-analysis.tool.ts
 - **功能**: 分析智能体的能力和配置
 - **参数**: 无（基于传入的agentDef）
 - **返回**: 智能体能力分析结果
 
-### 3. file-system-tool.ts
+### 3. file-system.tool.ts
 - **功能**: 基于LightningFS的文件系统操作
 - **支持操作**: list, read, write, create, delete, rename, search, info, upload, download
 - **参数**: operation, path, content, newPath, pattern, isDirectory
 
-### 4. network-tool.ts
+### 4. network.tool.ts
 - **功能**: HTTP网络请求工具
 - **支持方法**: GET, POST, PUT, DELETE, PATCH
 - **参数**: method, url, headers, body, timeout
 
-### 5. code-analysis-tool.ts
+### 5. code-analysis.tool.ts
 - **功能**: 代码分析工具
 - **分析类型**: structure, complexity, quality, summary
 - **参数**: type, code, language
+
+### 6. update-agent.tool.ts
+- **功能**: 智能体配置工具
+- **主要功能**: 创建和更新智能体配置
+- **参数**: name, prompt, personality, role, expertise, bias, responseStyle, avatar
 
 
 

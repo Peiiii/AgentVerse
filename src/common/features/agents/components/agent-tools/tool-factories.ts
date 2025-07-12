@@ -1,10 +1,10 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
-import { getCurrentTimeTool } from './get-current-time-tool';
-import { createAgentAnalysisTool } from './agent-analysis-tool';
-import { fileSystemTool } from './file-system-tool';
-import { networkTool } from './network-tool';
-import { codeAnalysisTool } from './code-analysis-tool';
+import { getCurrentTimeTool } from './get-current-time.tool';
+import { createAgentAnalysisTool } from './agent-analysis.tool';
+import { fileSystemTool } from './file-system.tool';
+import { networkTool } from './network.tool';
+import { codeAnalysisTool } from './code-analysis.tool';
 
 // 默认工具集合
 export const getDefaultPreviewTools = (agentDef: AgentDef): AgentTool[] => [

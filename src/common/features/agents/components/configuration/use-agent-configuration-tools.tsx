@@ -1,7 +1,7 @@
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { useProvideAgentContexts } from "@agent-labs/agent-chat";
 import { AgentDef } from "@/common/types/agent";
-import { createUpdateAgentTool } from "../agent-tools/update-agent-tool";
+import { createUpdateAgentTool } from "../agent-tools/update-agent.tool";
 
 // Hook：提供智能体配置工具
 export function useAgentConfigurationTools(
