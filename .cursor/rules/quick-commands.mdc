@@ -1,6 +1,3 @@
----
-title: Quick Commands & Communication Conventions
----
 
 # Quick Commands & Communication Conventions
 
@@ -18,6 +15,31 @@ When user types `/commit`, automatically:
 - `feat: add new agent configuration assistant`
 - `fix: resolve lint errors in agent preview component`
 - `docs: update README with new features`
+
+## Discussion & Planning
+
+### `/readonly` - Read-Only Discussion Mode
+When user types `/readonly`, enter discussion-only mode:
+1. **No Code Changes**: Do not modify any files or run commands
+2. **Analysis Only**: Provide insights, suggestions, and recommendations
+3. **Creative Discussion**: Focus on ideas, concepts, and planning
+4. **Architecture Review**: Discuss design patterns and approaches
+5. **Problem Solving**: Brainstorm solutions without implementation
+
+**Use cases:**
+- Creative brainstorming sessions
+- Architecture and design discussions
+- Feature planning and requirements analysis
+- Code review and feedback sessions
+- Problem analysis and solution exploration
+- Technology selection and comparison
+
+**Response format:**
+- Start with `[MODE: DISCUSSION]`
+- Provide detailed analysis and insights
+- Suggest multiple approaches when applicable
+- Focus on concepts and ideas rather than implementation
+- Ask clarifying questions to better understand requirements
 
 ## Code Quality & Architecture
 
@@ -71,7 +93,7 @@ When user requests refactoring:
 ## Communication Patterns
 
 ### Code Review Responses
-- Always start with current mode declaration: `[MODE: RESEARCH/PLAN/EXECUTE/REVIEW]`
+- Always start with current mode declaration: `[MODE: RESEARCH/PLAN/EXECUTE/REVIEW/DISCUSSION]`
 - Provide clear, actionable feedback
 - Suggest specific improvements with examples
 - Consider both immediate fixes and long-term architectural benefits
