@@ -5,10 +5,11 @@
 
 ### `/commit` - Auto Commit with English Message
 When user types `/commit`, automatically:
-1. Run `git add .` to stage all changes
-2. Generate a descriptive English commit message based on changes
-3. Execute `git commit -m "message"`
-4. Follow conventional commit format: `type(scope): description`
+1. Run `git status` to review changes before committing
+2. Run `git add .` to stage all changes
+3. Generate a descriptive English commit message based on changes
+4. Execute `git commit -m "message"`
+5. Follow conventional commit format: `type(scope): description`
 
 **Example commit messages:**
 - `refactor: optimize component structure and naming`
