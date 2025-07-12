@@ -1,5 +1,5 @@
 import { AgentEmbeddedForm } from "@/common/features/agents/components/forms";
-import { AiChatCreator } from "@/common/features/agents/components/creation";
+import { AgentConfigurationAssistant } from "@/common/features/agents/components/configuration";
 import { AgentPreviewChat } from "@/common/features/agents/components/preview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
@@ -205,7 +205,7 @@ export function AgentDetailPage() {
             </TabsContent>
 
             <TabsContent value="ai-create" className="h-full m-0">
-              <AiChatCreator
+              <AgentConfigurationAssistant
                 onAgentCreate={handleAgentUpdate}
                 className="h-full" 
                 editingAgent={agent}

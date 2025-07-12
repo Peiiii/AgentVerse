@@ -2,7 +2,7 @@
 export * from './preview';
 
 // Creation components  
-export * from './creation';
+export * from './configuration';
 
 // Form components
 export * from './forms';
