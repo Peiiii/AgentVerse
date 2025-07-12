@@ -1,0 +1,100 @@
+---
+title: Quick Commands & Communication Conventions
+---
+
+# Quick Commands & Communication Conventions
+
+## Git Operations
+
+### `/commit` - Auto Commit with English Message
+When user types `/commit`, automatically:
+1. Run `git add .` to stage all changes
+2. Generate a descriptive English commit message based on changes
+3. Execute `git commit -m "message"`
+4. Follow conventional commit format: `type(scope): description`
+
+**Example commit messages:**
+- `refactor: optimize component structure and naming`
+- `feat: add new agent configuration assistant`
+- `fix: resolve lint errors in agent preview component`
+- `docs: update README with new features`
+
+## Code Quality & Architecture
+
+### `/architect` - Architect's Perspective Review
+When user requests "架构师视角" or "/architect", provide:
+1. **Code Structure Analysis**: Evaluate file organization and component hierarchy
+2. **Naming Conventions**: Check for semantic clarity and consistency
+3. **Separation of Concerns**: Identify mixed responsibilities and suggest splits
+4. **Maintainability**: Assess code complexity and suggest improvements
+5. **Scalability**: Consider future extensibility and potential bottlenecks
+6. **Best Practices**: Recommend architectural patterns and conventions
+
+**Key evaluation criteria:**
+- File size (keep under 250 lines)
+- Single responsibility principle
+- Clear naming conventions (kebab-case for files, PascalCase for components)
+- Proper separation of UI, logic, and data layers
+- Reusability and modularity
+
+## Development Workflow
+
+### `/build` - Build and Validate
+When user types `/build`, automatically:
+1. Run `pnpm build` to compile and build
+2. Run `pnpm lint` to check code quality
+3. Report any errors or warnings
+4. Suggest fixes if issues found
+
+### `/refactor` - Code Refactoring
+When user requests refactoring:
+1. Analyze current code structure
+2. Identify areas for improvement
+3. Suggest specific refactoring steps
+4. Maintain functionality while improving code quality
+5. Follow established naming conventions and patterns
+
+## File Organization Rules
+
+### Directory Structure
+- Use kebab-case for directory and file names
+- Group related functionality in feature directories
+- Separate UI components, hooks, and utilities
+- Keep index.ts files for clean exports
+
+### Component Organization
+- Split large components (>250 lines) into smaller, focused files
+- Separate UI components from business logic
+- Use descriptive, semantic names for components and functions
+- Maintain clear import/export relationships
+
+## Communication Patterns
+
+### Code Review Responses
+- Always start with current mode declaration: `[MODE: RESEARCH/PLAN/EXECUTE/REVIEW]`
+- Provide clear, actionable feedback
+- Suggest specific improvements with examples
+- Consider both immediate fixes and long-term architectural benefits
+
+### Error Handling
+- When encountering errors, provide clear explanations
+- Suggest multiple solutions when possible
+- Prioritize fixes based on impact and effort
+- Always verify fixes work before proceeding
+
+## Naming Conventions
+
+### Files and Directories
+- Use kebab-case: `agent-configuration-assistant.tsx`
+- Be descriptive and semantic: `use-agent-configuration-tools.tsx`
+- Group related files in feature directories
+
+### Components and Functions
+- Use PascalCase for components: `AgentConfigurationAssistant`
+- Use camelCase for functions and hooks: `useAgentConfigurationTools`
+- Use descriptive names that clearly indicate purpose
+
+### Types and Interfaces
+- Use PascalCase with descriptive names: `AgentConfigurationAssistantProps`
+- Include type information in names when helpful
+- Be consistent across related types

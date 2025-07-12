@@ -1,0 +1,115 @@
+# AgentVerse Project Rules
+
+## Project Architecture
+
+### Directory Structure
+```
+src/
+├── common/                    # Shared components and utilities
+│   ├── components/           # UI components
+│   ├── features/             # Feature-based organization
+│   │   └── agents/          # Agent-related features
+│   │       ├── components/  # Agent components
+│   │       └── extensions/  # Feature extensions
+│   ├── hooks/               # Custom hooks
+│   ├── lib/                 # Core libraries
+│   └── types/               # Type definitions
+├── core/                     # Application core
+│   ├── config/              # Configuration
+│   ├── hooks/               # App-level hooks
+│   ├── services/            # Business services
+│   └── stores/              # State management
+├── desktop/                  # Desktop-specific features
+└── mobile/                   # Mobile-specific features
+```
+
+### Feature Organization
+- **Platform Separation**: Keep desktop/mobile specific code separate
+- **Feature-First**: Organize by business features, not technical layers
+- **Reusability**: Common components in `common/`, platform-specific in respective directories
+
+## Agent Configuration System
+
+### Component Structure
+- **Configuration**: AI-driven agent configuration assistant
+- **Preview**: Agent testing and preview environment
+- **Tools**: Reusable agent tools and utilities
+
+### Naming Conventions
+- **Components**: `AgentConfigurationAssistant`, `AgentPreviewChat`
+- **Files**: `agent-configuration-assistant.tsx`, `agent-preview-chat.tsx`
+- **Hooks**: `useAgentConfigurationTools`, `useAgentPreviewTools`
+- **Directories**: `configuration/`, `preview/`, `tools/`
+
+## Code Quality Standards
+
+### File Size Limits
+- **Components**: Keep under 250 lines
+- **Functions**: Keep under 50 lines
+- **Split when needed**: Break large files into focused modules
+
+### Component Splitting Guidelines
+- **UI Components**: Pure presentation components
+- **Logic Components**: Business logic and state management
+- **Hook Files**: Custom hooks and utilities
+- **Tool Files**: Tool definitions and executors
+
+### Separation of Concerns
+- **UI Layer**: React components, styling, layout
+- **Logic Layer**: Hooks, business logic, state management
+- **Data Layer**: API calls, data transformation, storage
+- **Tool Layer**: Agent tools, executors, renderers
+
+## Development Workflow
+
+### Component Development
+1. **Analyze Requirements**: Understand feature needs
+2. **Design Structure**: Plan component hierarchy and responsibilities
+3. **Implement**: Follow naming conventions and file organization
+4. **Test**: Build and lint validation
+5. **Refactor**: Optimize structure and naming if needed
+
+### Refactoring Process
+1. **Identify Issues**: Large files, mixed responsibilities, unclear naming
+2. **Plan Changes**: Design new structure and naming
+3. **Execute Carefully**: Make minimal, focused changes
+4. **Validate**: Build and test to ensure functionality
+5. **Commit**: Use descriptive English commit messages
+
+## Common Patterns
+
+### Agent Tools
+- Define tools in separate files
+- Use TypeScript for type safety
+- Provide clear descriptions and parameters
+- Include renderers for UI feedback
+
+### Component Composition
+- Use composition over inheritance
+- Keep components focused and reusable
+- Maintain clear prop interfaces
+- Use proper TypeScript types
+
+### State Management
+- Use React hooks for local state
+- Keep state close to where it's used
+- Avoid prop drilling with context when needed
+- Use proper dependency arrays in useEffect
+
+## Error Handling
+
+### Development Errors
+- Provide clear error messages
+- Suggest specific solutions
+- Prioritize fixes by impact
+- Always verify solutions work
+
+### Code Quality Issues
+- Address lint warnings promptly
+- Follow established patterns
+- Maintain consistency across codebase
+- Document complex logic when needed
+---
+alwaysApply: true
+description: AgentVerse project specific rules and architecture guidelines
+---
