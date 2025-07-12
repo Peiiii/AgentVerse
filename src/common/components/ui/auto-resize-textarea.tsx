@@ -34,7 +34,7 @@ export const AutoResizeTextarea = React.forwardRef<
     const computedStyle = window.getComputedStyle(textarea);
     const lineHeight = parseInt(computedStyle.lineHeight);
     lineHeightRef.current = isNaN(lineHeight) ? 20 : lineHeight;
-  }, []);
+  }, [getTextarea]);
 
   // 调整高度的函数
   const adjustHeight = () => {
@@ -67,7 +67,7 @@ export const AutoResizeTextarea = React.forwardRef<
   // 初始化时调整高度
   useEffect(() => {
     adjustHeight();
-  }, [props.value, props.defaultValue]);
+  }, [props.value, props.defaultValue, adjustHeight]);
 
   return (
     <Textarea

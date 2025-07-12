@@ -10,9 +10,9 @@ import { useState } from "react";
 
 interface IndexedDBDataViewerProps {
   storeName: string;
-  data: any[];
-  onAddData: (data: any) => Promise<void>;
-  onUpdateData: (id: string, data: any) => Promise<void>;
+  data: unknown[];
+  onAddData: (data: unknown) => Promise<void>;
+  onUpdateData: (id: string, data: unknown) => Promise<void>;
   onDeleteData: (id: string) => Promise<void>;
   onClearStore: (storeName: string) => Promise<void>;
   isLoading: boolean;
@@ -30,8 +30,8 @@ export function IndexedDBDataViewer({
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number>(-1);
-  const [newItemData, setNewItemData] = useState<any>({});
-  const [editItemData, setEditItemData] = useState<any>({});
+  const [newItemData, setNewItemData] = useState<Record<string, unknown>>({});
+  const [editItemData, setEditItemData] = useState<Record<string, unknown>>({});
 
   const handleAddData = async () => {
     try {
@@ -57,9 +57,9 @@ export function IndexedDBDataViewer({
     }
   };
 
-  const handleEditItem = (item: any, index: number) => {
+  const handleEditItem = (item: unknown, index: number) => {
     setEditingIndex(index);
-    setEditItemData(item);
+    setEditItemData(item as Record<string, unknown>);
     setIsEditDialogOpen(true);
   };
 
@@ -83,7 +83,7 @@ export function IndexedDBDataViewer({
     }
   };
 
-  const formatValue = (value: any): string => {
+  const formatValue = (value: unknown): string => {
     if (value === null || value === undefined) return 'null';
     
     // 处理 TypedArray 和 ArrayBuffer
@@ -114,7 +114,7 @@ export function IndexedDBDataViewer({
     return String(value);
   };
 
-  const getItemType = (item: any): string => {
+  const getItemType = (item: unknown): string => {
     if (item === null) return 'null';
     if (item === undefined) return 'undefined';
     if (Array.isArray(item)) return 'array';
@@ -122,14 +122,14 @@ export function IndexedDBDataViewer({
     return typeof item;
   };
 
-  const getItemId = (item: any, index: number): string => {
-    if (item && typeof item === 'object' && item.id !== undefined) {
-      return item.id;
+  const getItemId = (item: unknown, index: number): string => {
+    if (item && typeof item === 'object' && (item as Record<string, unknown>).id !== undefined) {
+      return String((item as Record<string, unknown>).id);
     }
     return `索引 ${index}`;
   };
 
-  const getItemFields = (item: any): number => {
+  const getItemFields = (item: unknown): number => {
     if (item === null || item === undefined) return 0;
     if (typeof item === 'object') {
       return Object.keys(item).length;
@@ -137,7 +137,7 @@ export function IndexedDBDataViewer({
     return 1; // 原始值算作1个字段
   };
 
-  const renderItemContent = (item: any) => {
+  const renderItemContent = (item: unknown) => {
     console.log("[IndexedDBDataViewer] renderItemContent item", item);
     
     if (item === null || item === undefined) {
@@ -234,7 +234,7 @@ export function IndexedDBDataViewer({
                   {key}:
                 </span>
                 <span className="break-all">
-                  {formatValue(item[key])}
+                  {formatValue((item as Record<string, unknown>)[key])}
                 </span>
               </div>
             ))
@@ -246,9 +246,9 @@ export function IndexedDBDataViewer({
                   <span className="font-medium text-muted-foreground min-w-0 flex-shrink-0">
                     {key}:
                   </span>
-                  <span className="break-all">
-                    {formatValue(item[key])}
-                  </span>
+                                  <span className="break-all">
+                  {formatValue((item as Record<string, unknown>)[key])}
+                </span>
                 </div>
               ))}
               <div className="text-muted-foreground italic text-xs">

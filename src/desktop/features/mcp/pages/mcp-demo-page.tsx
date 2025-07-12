@@ -129,22 +129,22 @@ ${toolsStats.totalTools > 0
         configs = parsed;
       } else if (typeof parsed === 'object' && parsed !== null) {
         // 处理嵌套对象格式
-        const extractServers = (obj: any, prefix = ''): Array<Omit<MCPServerConfig, 'id'>> => {
+        const extractServers = (obj: Record<string, unknown>, prefix = ''): Array<Omit<MCPServerConfig, 'id'>> => {
           const servers: Array<Omit<MCPServerConfig, 'id'>> = [];
 
           for (const [key, value] of Object.entries(obj)) {
             if (typeof value === 'object' && value !== null && 'url' in value) {
               // 这是一个服务器配置
-              const serverConfig = value as any;
-              servers.push({
-                name: prefix ? `${prefix}-${key}` : key,
-                url: String(serverConfig.url),
-                type: (serverConfig.type as 'sse' | 'streamable-http') || 'streamable-http',
-                description: serverConfig.description || `${key} MCP服务器`,
-              });
+              const serverConfig = value as Record<string, unknown>;
+                              servers.push({
+                  name: prefix ? `${prefix}-${key}` : key,
+                  url: String(serverConfig.url || ''),
+                  type: (serverConfig.type as 'sse' | 'streamable-http') || 'streamable-http',
+                  description: String(serverConfig.description || `${key} MCP服务器`),
+                });
             } else if (typeof value === 'object' && value !== null) {
               // 继续递归查找
-              const nestedServers = extractServers(value, prefix ? `${prefix}-${key}` : key);
+              const nestedServers = extractServers(value as Record<string, unknown>, prefix ? `${prefix}-${key}` : key);
               servers.push(...nestedServers);
             }
           }
@@ -152,7 +152,7 @@ ${toolsStats.totalTools > 0
           return servers;
         };
 
-        configs = extractServers(parsed);
+        configs = extractServers(parsed as Record<string, unknown>);
       } else {
         throw new Error("JSON格式不支持");
       }
@@ -203,7 +203,7 @@ ${toolsStats.totalTools > 0
 
   // 通用MCP传输层演示
   const [universalMCPStatus, setUniversalMCPStatus] = useState<string>("未连接");
-  const [universalMCPTools, setUniversalMCPTools] = useState<any[]>([]);
+  const [universalMCPTools, setUniversalMCPTools] = useState<unknown[]>([]);
   const [universalMCPResult, setUniversalMCPResult] = useState<string>("");
   const universalMCPRef = useRef<MCPClient | null>(null);
   const mockServerRef = useRef<MockMCPServer | null>(null);
@@ -257,7 +257,7 @@ ${toolsStats.totalTools > 0
     try {
       if (!universalMCPRef.current) return;
 
-      let args: any;
+      let args: Record<string, unknown>;
       switch (toolName) {
         case "file_read":
           args = { path: "/demo/test.txt" };
@@ -540,20 +540,23 @@ ${toolsStats.totalTools > 0
                               <CardContent className="pt-0">
                                 {connection.tools.length > 0 ? (
                                   <div className="space-y-1">
-                                    {connection.tools.map((tool: any) => (
-                                      <div
-                                        key={tool.name}
-                                        className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm"
-                                      >
-                                        <Wrench className="w-3 h-3 text-muted-foreground" />
-                                        <div className="flex-1">
-                                          <span className="font-medium">{tool.name}</span>
-                                          {tool.description && (
-                                            <p className="text-xs text-muted-foreground">{tool.description}</p>
-                                          )}
+                                    {connection.tools.map((tool: unknown) => {
+                                      const toolObj = tool as { name: string; description?: string };
+                                      return (
+                                        <div
+                                          key={toolObj.name}
+                                          className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm"
+                                        >
+                                          <Wrench className="w-3 h-3 text-muted-foreground" />
+                                          <div className="flex-1">
+                                            <span className="font-medium">{toolObj.name}</span>
+                                            {toolObj.description && (
+                                              <p className="text-xs text-muted-foreground">{toolObj.description}</p>
+                                            )}
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
+                                      );
+                                    })}
                                   </div>
                                 ) : (
                                   <p className="text-xs text-muted-foreground">暂无可用工具</p>
@@ -618,25 +621,28 @@ ${toolsStats.totalTools > 0
                         </CardHeader>
                         <CardContent className="pt-0">
                           <div className="space-y-2">
-                            {universalMCPTools.map((tool: any) => (
-                              <div key={tool.name} className="space-y-2">
-                                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm">
-                                  <Wrench className="w-3 h-3 text-muted-foreground" />
-                                  <div className="flex-1">
-                                    <span className="font-medium">{tool.name}</span>
-                                    {tool.description && (
-                                      <p className="text-xs text-muted-foreground">{tool.description}</p>
-                                    )}
+                            {universalMCPTools.map((tool: unknown) => {
+                              const toolObj = tool as { name: string; description?: string };
+                              return (
+                                <div key={toolObj.name} className="space-y-2">
+                                  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm">
+                                    <Wrench className="w-3 h-3 text-muted-foreground" />
+                                    <div className="flex-1">
+                                      <span className="font-medium">{toolObj.name}</span>
+                                      {toolObj.description && (
+                                        <p className="text-xs text-muted-foreground">{toolObj.description}</p>
+                                      )}
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleCallUniversalTool(toolObj.name)}
+                                    >
+                                      调用
+                                    </Button>
                                   </div>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleCallUniversalTool(tool.name)}
-                                  >
-                                    调用
-                                  </Button>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </CardContent>
                       </Card>

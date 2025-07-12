@@ -62,7 +62,7 @@ export class MockMCPServer {
 
   private async handleMessage(message: MCPMessage) {
     try {
-      let result: any;
+      let result: unknown;
 
       switch (message.method) {
         case "tools/list":
@@ -70,7 +70,7 @@ export class MockMCPServer {
           break;
 
         case "tools/call":
-          result = await this.handleToolCall(message.params);
+          result = await this.handleToolCall(message.params as { name: string; arguments: Record<string, unknown> });
           break;
 
         case "resources/list":
@@ -106,7 +106,7 @@ export class MockMCPServer {
     }
   }
 
-  private async handleToolCall(params: any): Promise<any> {
+  private async handleToolCall(params: { name: string; arguments: Record<string, unknown> }): Promise<unknown> {
     const { name, arguments: args } = params;
 
     switch (name) {
@@ -120,9 +120,9 @@ export class MockMCPServer {
       case "file_write":
         return {
           success: true,
-          path: args.path,
-          size: args.content.length,
-          message: `文件 ${args.path} 写入成功`
+          path: args.path as string,
+          size: (args.content as string)?.length || 0,
+          message: `文件 ${args.path as string} 写入成功`
         };
 
       case "search_web":

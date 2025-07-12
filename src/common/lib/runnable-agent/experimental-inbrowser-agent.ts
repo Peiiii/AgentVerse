@@ -55,7 +55,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
 
           createChunkObservable(generator).pipe(
             decodeEventStream(), // event解码步骤
-            filter((event: any) => !!event && event.type),  // 业务处理可继续扩展
+            filter((event: unknown) => !!event && !!(event as { type?: unknown }).type),  // 业务处理可继续扩展
             // 你可以在这里继续添加更多 operator
             catchError(err => {
               observer.next({
@@ -69,7 +69,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
               return [];
             })
           ).subscribe({
-            next: event => observer.next(event),
+            next: (event: unknown) => observer.next(event as BaseEvent),
             error: err => observer.error(err),
             complete: () => {
               observer.complete();

@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { defaultFileManager, type FsEntry } from '@/common/lib/file-manager.service';
 
+// 文件信息类型定义
+interface FileInfo {
+  name: string;
+  path: string;
+  size: number;
+  type: 'file' | 'dir';
+  modifiedTime: Date;
+  createdTime: Date;
+}
+
 export interface AgentFileManagerState {
   currentPath: string;
   entries: FsEntry[];
@@ -27,7 +37,7 @@ export interface AgentFileManagerActions {
   searchFiles: (pattern: string) => Promise<FsEntry[]>;
   
   // 工具操作
-  getFileInfo: (path: string) => Promise<any>;
+  getFileInfo: (path: string) => Promise<FileInfo | null>;
   downloadFile: (path: string) => Promise<boolean>;
   
   // 状态操作
@@ -127,7 +137,14 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
           fileContent: content,
           loading: false,
         }));
-        await refresh();
+        // 直接刷新当前目录，避免循环依赖
+        const refreshResult = await defaultFileManager.listDirectory(state.currentPath);
+        if (refreshResult.success && refreshResult.data?.entries) {
+          setState(prev => ({
+            ...prev,
+            entries: refreshResult.data!.entries,
+          }));
+        }
         return true;
       } else {
         setState(prev => ({
@@ -145,7 +162,7 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
       }));
       return false;
     }
-  }, []);
+  }, [state.currentPath]);
 
   // 创建文件
   const createFile = useCallback(async (name: string, content: string = ""): Promise<boolean> => {
@@ -154,7 +171,17 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
       const path = state.currentPath.endsWith('/') ? state.currentPath + name : state.currentPath + '/' + name;
       const result = await defaultFileManager.writeFile(path, content);
       if (result.success) {
-        await refresh();
+        // 直接刷新当前目录，避免循环依赖
+        const refreshResult = await defaultFileManager.listDirectory(state.currentPath);
+        if (refreshResult.success && refreshResult.data?.entries) {
+          setState(prev => ({
+            ...prev,
+            entries: refreshResult.data!.entries,
+            loading: false,
+          }));
+        } else {
+          setState(prev => ({ ...prev, loading: false }));
+        }
         return true;
       } else {
         setState(prev => ({
@@ -181,7 +208,17 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
       const path = state.currentPath.endsWith('/') ? state.currentPath + name : state.currentPath + '/' + name;
       const result = await defaultFileManager.createDirectory(path);
       if (result.success) {
-        await refresh();
+        // 直接刷新当前目录，避免循环依赖
+        const refreshResult = await defaultFileManager.listDirectory(state.currentPath);
+        if (refreshResult.success && refreshResult.data?.entries) {
+          setState(prev => ({
+            ...prev,
+            entries: refreshResult.data!.entries,
+            loading: false,
+          }));
+        } else {
+          setState(prev => ({ ...prev, loading: false }));
+        }
         return true;
       } else {
         setState(prev => ({
@@ -207,7 +244,17 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
     try {
       const result = await defaultFileManager.deleteEntry(path);
       if (result.success) {
-        await refresh();
+        // 直接刷新当前目录，避免循环依赖
+        const refreshResult = await defaultFileManager.listDirectory(state.currentPath);
+        if (refreshResult.success && refreshResult.data?.entries) {
+          setState(prev => ({
+            ...prev,
+            entries: refreshResult.data!.entries,
+            loading: false,
+          }));
+        } else {
+          setState(prev => ({ ...prev, loading: false }));
+        }
         return true;
       } else {
         setState(prev => ({
@@ -225,7 +272,7 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
       }));
       return false;
     }
-  }, []);
+  }, [state.currentPath]);
 
   // 重命名文件或目录
   const renameEntry = useCallback(async (oldPath: string, newName: string): Promise<boolean> => {
@@ -235,7 +282,17 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
       const newPath = dir + '/' + newName;
       const result = await defaultFileManager.renameEntry(oldPath, newPath);
       if (result.success) {
-        await refresh();
+        // 直接刷新当前目录，避免循环依赖
+        const refreshResult = await defaultFileManager.listDirectory(state.currentPath);
+        if (refreshResult.success && refreshResult.data?.entries) {
+          setState(prev => ({
+            ...prev,
+            entries: refreshResult.data!.entries,
+            loading: false,
+          }));
+        } else {
+          setState(prev => ({ ...prev, loading: false }));
+        }
         return true;
       } else {
         setState(prev => ({
@@ -253,14 +310,14 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
       }));
       return false;
     }
-  }, []);
+  }, [state.currentPath]);
 
   // 搜索文件
   const searchFiles = useCallback(async (pattern: string): Promise<FsEntry[]> => {
     try {
       const result = await defaultFileManager.searchFiles(pattern, state.currentPath);
-      if (result.success && result.data) {
-        return result.data.entries;
+      if (result.success && result.data && typeof result.data === 'object' && result.data !== null && 'entries' in result.data) {
+        return (result.data as { entries: FsEntry[] }).entries;
       }
       return [];
     } catch (error) {
@@ -273,11 +330,11 @@ export function useAgentFileManager(initialPath: string = "/"): AgentFileManager
   }, [state.currentPath]);
 
   // 获取文件信息
-  const getFileInfo = useCallback(async (path: string): Promise<any> => {
+  const getFileInfo = useCallback(async (path: string): Promise<FileInfo | null> => {
     try {
       const result = await defaultFileManager.getFileInfo(path);
-      if (result.success && result.data) {
-        return result.data;
+      if (result.success && result.data && typeof result.data === 'object' && result.data !== null) {
+        return result.data as FileInfo;
       }
       return null;
     } catch (error) {

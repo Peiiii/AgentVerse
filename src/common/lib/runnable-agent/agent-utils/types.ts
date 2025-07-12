@@ -25,7 +25,7 @@ export interface StateSnapshot {
 }
 
 export interface StreamHandler {
-  handle(chunk: any, context: StreamContext): AsyncGenerator<string, void, unknown>;
+  handle(chunk: unknown, context: StreamContext): AsyncGenerator<string, void, unknown>;
   finalize(context: StreamContext): AsyncGenerator<string, void, unknown>;
 }
 
@@ -71,7 +71,7 @@ export interface EventData {
 }
 
 export interface StreamProcessor {
-  process(stream: AsyncIterable<any>): AsyncGenerator<string, void, unknown>;
+  process(stream: AsyncIterable<unknown>): AsyncGenerator<string, void, unknown>;
   handleError(error: Error): AsyncGenerator<string, void, unknown>;
   addHandler(type: string, handler: StreamHandler): void;
 } 

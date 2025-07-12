@@ -16,9 +16,9 @@ export interface MCPServerConnection {
   config: MCPServerConfig;
   status: 'disconnected' | 'connecting' | 'connected' | 'error';
   error?: string;
-  tools: any[];
-  resources: any[];
-  prompts: any[];
+  tools: unknown[];
+  resources: unknown[];
+  prompts: unknown[];
   lastConnected?: Date;
   client?: Client;
 }
@@ -43,7 +43,7 @@ export interface MCPServerState {
   
   // 获取数据
   getConnection: (serverId: string) => MCPServerConnection | undefined;
-  getAllTools: () => Array<{ serverId: string; serverName: string; tool: any }>;
+  getAllTools: () => Array<{ serverId: string; serverName: string; tool: unknown }>;
   getConnectedServers: () => MCPServerConfig[];
   isConnected: (serverId: string) => boolean;
   getServerStatus: (serverId: string) => 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -303,7 +303,7 @@ export const useMCPServerStore = create<MCPServerState>()(
 
       getAllTools: () => {
         const state = get();
-        const allTools: Array<{ serverId: string; serverName: string; tool: any }> = [];
+        const allTools: Array<{ serverId: string; serverName: string; tool: unknown }> = [];
         
         state.connections.forEach((connection, serverId) => {
           if (connection.status === 'connected') {

@@ -21,7 +21,7 @@ export interface IndexedDBManagerState {
   databases: DatabaseInfo[];
   currentDatabase: DatabaseInfo | null;
   currentStore: StoreInfo | null;
-  storeData: any[];
+  storeData: unknown[];
   isLoading: boolean;
   error: string | null;
 }
@@ -36,7 +36,7 @@ export function useIndexedDBManager() {
     error: null
   });
 
-  const [currentProvider, setCurrentProvider] = useState<IndexedDBProvider<any> | null>(null);
+  const [currentProvider, setCurrentProvider] = useState<IndexedDBProvider<unknown> | null>(null);
 
   // 刷新数据库列表
   const refreshDatabases = useCallback(async () => {
@@ -261,7 +261,7 @@ export function useIndexedDBManager() {
   }, [currentProvider, state.currentDatabase]);
 
   // 添加数据
-  const addData = useCallback(async (data: any, storeName?: string) => {
+  const addData = useCallback(async (data: unknown, storeName?: string) => {
     if (!currentProvider || !state.currentDatabase) return;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -286,7 +286,7 @@ export function useIndexedDBManager() {
   }, [currentProvider, state.currentDatabase, state.currentStore, getStoreData]);
 
   // 更新数据
-  const updateData = useCallback(async (id: string, data: any, storeName?: string) => {
+  const updateData = useCallback(async (id: string, data: unknown, storeName?: string) => {
     if (!currentProvider || !state.currentDatabase) return;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -299,7 +299,7 @@ export function useIndexedDBManager() {
         version: state.currentDatabase.version
       });
 
-      await storeProvider.update(id, data);
+      await storeProvider.update(id, data as Record<string, unknown>);
       await getStoreData(targetStoreName);
     } catch (error) {
       setState(prev => ({ 

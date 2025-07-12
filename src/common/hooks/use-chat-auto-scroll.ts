@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface UseChatAutoScrollOptions {
   threshold?: number // px，距离底部多少像素内自动 sticky
-  deps?: any[] // 依赖项，通常是消息数组
+  deps?: unknown[] // 依赖项，通常是消息数组
 }
 
 export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>({

@@ -32,7 +32,7 @@ export interface IndexedDBQueryOptions {
   offset?: number;
 }
 
-export class IndexedDBProvider<T = any> implements DataProvider<T> {
+export class IndexedDBProvider<T = unknown> implements DataProvider<T> {
   private dbName: string;
   private storeName: string;
   private version: number;

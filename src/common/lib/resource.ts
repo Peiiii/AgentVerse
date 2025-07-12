@@ -255,7 +255,7 @@ export function useParameterizedResource<T, P>(
       return createResource<T>(() => Promise.resolve(fallbackValue));
     }
     return resourceFactory(params);
-  }, [params]); // 仅在参数变化时重新创建
+  }, [params, resourceFactory, fallback]); // 添加所有依赖项
 
   // 使用现有的 useResourceState 来管理状态
   return useResourceState(resource);

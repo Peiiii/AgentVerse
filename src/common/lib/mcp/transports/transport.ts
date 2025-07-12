@@ -8,9 +8,13 @@ export interface MCPMessage {
   jsonrpc: "2.0";
   id: string | number;
   method?: string;
-  params?: any;
-  result?: any;
-  error?: any;
+  params?: unknown;
+  result?: unknown;
+  error?: {
+    code: number;
+    message: string;
+    data?: unknown;
+  };
 }
 
 // 传输层抽象接口
@@ -27,7 +31,7 @@ export interface MCPTransport {
 // 通用MCP客户端
 export class MCPClient {
   private transport: MCPTransport;
-  private messageHandlers = new Map<string | number, (result: any) => void>();
+  private messageHandlers = new Map<string | number, (result: unknown) => void>();
   private messageIdCounter = 0;
   
   constructor(transport: MCPTransport) {
@@ -36,30 +40,30 @@ export class MCPClient {
   }
   
   // 工具发现
-  async listTools(): Promise<any[]> {
-    const result = await this.request("tools/list", {});
+  async listTools(): Promise<unknown[]> {
+    const result = await this.request("tools/list", {}) as { tools?: unknown[] };
     return result.tools || [];
   }
   
   // 工具调用
-  async callTool(name: string, args: any): Promise<any> {
+  async callTool(name: string, args: unknown): Promise<unknown> {
     const result = await this.request("tools/call", { name, arguments: args });
     return result;
   }
   
   // 资源发现
-  async listResources(): Promise<any[]> {
-    const result = await this.request("resources/list", {});
+  async listResources(): Promise<unknown[]> {
+    const result = await this.request("resources/list", {}) as { resources?: unknown[] };
     return result.resources || [];
   }
   
   // 提示发现
-  async listPrompts(): Promise<any[]> {
-    const result = await this.request("prompts/list", {});
+  async listPrompts(): Promise<unknown[]> {
+    const result = await this.request("prompts/list", {}) as { prompts?: unknown[] };
     return result.prompts || [];
   }
   
-  private async request(method: string, params: any): Promise<any> {
+  private async request(method: string, params: unknown): Promise<unknown> {
     const id = this.generateId();
     
     return new Promise((resolve) => {

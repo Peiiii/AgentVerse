@@ -22,7 +22,7 @@ app.get('/health', (req, res) => {
 });
 
 // 错误处理
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response) => {
   console.error(err.stack);
   res.status(500).json({ error: err.message });
 });

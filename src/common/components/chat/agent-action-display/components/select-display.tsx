@@ -19,7 +19,7 @@ export function SelectDisplay({
     if (defaultValue !== undefined && !selected) {
       setSelected(defaultValue);
     }
-  }, []); // 移除 defaultValue 依赖
+  }, [defaultValue, selected]); // 添加依赖项
 
   const handleSelect = (value: string) => {
     if (disabled) return;

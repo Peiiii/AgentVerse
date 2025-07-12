@@ -15,21 +15,23 @@ export function useAllTools() {
     const mcpTools = getAllTools();
     
     return mcpTools.map(({ serverId, serverName, tool }) => {
+      const toolObj = tool as { name: string; description?: string; inputSchema?: unknown };
       // 创建唯一的工具名称，避免冲突
-      const toolName = `${serverName}-${tool.name}`;
+      const toolName = `${serverName}-${toolObj.name}`;
       
       // 转换MCP工具参数为JSON Schema格式
       const parameters = {
         type: 'object' as const,
-        properties: {} as Record<string, any>,
+        properties: {} as Record<string, unknown>,
         required: [] as string[],
       };
 
       // 处理MCP工具的输入schema
-      if (tool.inputSchema) {
-        if (tool.inputSchema.type === 'object' && tool.inputSchema.properties) {
-          parameters.properties = tool.inputSchema.properties;
-          parameters.required = tool.inputSchema.required || [];
+      if (toolObj.inputSchema) {
+        const inputSchema = toolObj.inputSchema as { type?: string; properties?: unknown; required?: string[] };
+        if (inputSchema.type === 'object' && inputSchema.properties) {
+          parameters.properties = inputSchema.properties as Record<string, unknown>;
+          parameters.required = inputSchema.required || [];
         } else {
           // 如果MCP工具没有详细的schema，创建一个通用的参数
           parameters.properties = {
@@ -53,16 +55,16 @@ export function useAllTools() {
 
       return {
         name: toolName,
-        description: `${tool.description || tool.name} (来自 ${serverName})`,
+        description: `${toolObj.description || toolObj.name} (来自 ${serverName})`,
         parameters,
         // 添加元数据，便于后续处理
         metadata: {
           serverId,
           serverName,
-          originalToolName: tool.name,
+          originalToolName: toolObj.name,
           mcpTool: tool,
         },
-      } as ToolDefinition & { metadata: any };
+      } as ToolDefinition & { metadata: unknown };
     });
   }, [getAllTools]);
 
@@ -73,7 +75,8 @@ export function useAllTools() {
     const mcpTools = getAllTools();
     
     mcpTools.forEach(({ serverId, serverName, tool }) => {
-      const toolName = `${serverName}-${tool.name}`;
+      const toolObj = tool as { name: string; description?: string };
+      const toolName = `${serverName}-${toolObj.name}`;
       
       executors[toolName] = async (toolCall) => {
         try {
@@ -88,7 +91,7 @@ export function useAllTools() {
           
           // 调用MCP工具
           const result = await connection.client.callTool({
-            name: tool.name,
+            name: toolObj.name,
             arguments: args.args ? JSON.parse(args.args) : args,
           });
 
@@ -98,12 +101,12 @@ export function useAllTools() {
               success: true,
               data: result,
               serverName,
-              toolName: tool.name,
+              toolName: toolObj.name,
             },
             status: 'success' as const,
           };
         } catch (error) {
-          console.error(`MCP工具执行失败: ${tool.name}`, error);
+          console.error(`MCP工具执行失败: ${toolObj.name}`, error);
           
           return {
             toolCallId: toolCall.id,
@@ -111,7 +114,7 @@ export function useAllTools() {
               success: false,
               error: error instanceof Error ? error.message : '执行失败',
               serverName,
-              toolName: tool.name,
+              toolName: toolObj.name,
             },
             status: 'error' as const,
           };
@@ -129,8 +132,9 @@ export function useAllTools() {
       totalTools: mcpTools.length,
       servers: [...new Set(mcpTools.map(t => t.serverName))],
       toolsByServer: mcpTools.reduce((acc, { serverName, tool }) => {
+        const toolObj = tool as { name: string };
         if (!acc[serverName]) acc[serverName] = [];
-        acc[serverName].push(tool.name);
+        acc[serverName].push(toolObj.name);
         return acc;
       }, {} as Record<string, string[]>),
     };

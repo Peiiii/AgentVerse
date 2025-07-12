@@ -10,7 +10,7 @@ export interface FsEntry {
 
 export interface FileOperationResult {
   success: boolean;
-  data?: any;
+  data?: unknown;
   error?: string;
   message?: string;
 }
@@ -40,7 +40,7 @@ export interface FileWriteResult extends FileOperationResult {
 }
 
 export class FileManagerService {
-  private fs: any;
+  private fs: LightningFS;
   private currentPath: string = "/";
 
   constructor(fsName: string = 'file-manager') {
@@ -74,7 +74,7 @@ export class FileManagerService {
           path: entryPath,
           type: stat.isDirectory() ? 'dir' : 'file',
           size: stat.isFile() ? stat.size : undefined,
-          modifiedTime: new Date(stat.mtime),
+          modifiedTime: new Date(stat.mtimeMs),
         });
       }
 
@@ -107,7 +107,7 @@ export class FileManagerService {
           content,
           path,
           size: stat.size,
-          modifiedTime: new Date(stat.mtime),
+          modifiedTime: new Date(stat.mtimeMs),
         },
         message: `成功读取文件 ${path}`,
       };
@@ -122,7 +122,7 @@ export class FileManagerService {
   // 写入文件内容
   async writeFile(path: string, content: string): Promise<FileWriteResult> {
     try {
-      await this.fs.promises.writeFile(path, content, { encoding: 'utf8' });
+      await this.fs.promises.writeFile(path, content, { encoding: 'utf8', mode: 0o666 });
       const stat = await this.fs.promises.stat(path);
       
       return {
@@ -200,7 +200,7 @@ export class FileManagerService {
     try {
       const path = targetPath || (this.currentPath.endsWith('/') ? this.currentPath + file.name : this.currentPath + '/' + file.name);
       const content = await file.text();
-      await this.fs.promises.writeFile(path, content, { encoding: 'utf8' });
+      await this.fs.promises.writeFile(path, content, { encoding: 'utf8', mode: 0o666 });
       
       return {
         success: true,
@@ -259,8 +259,8 @@ export class FileManagerService {
           path,
           type: stat.isDirectory() ? 'dir' : 'file',
           size: stat.isFile() ? stat.size : undefined,
-          modifiedTime: new Date(stat.mtime),
-          createdTime: new Date(stat.birthtime),
+          modifiedTime: new Date(stat.mtimeMs),
+          createdTime: new Date(stat.ctimeMs),
         },
       };
     } catch (error) {
@@ -289,7 +289,7 @@ export class FileManagerService {
             path: entryPath,
             type: stat.isDirectory() ? 'dir' : 'file',
             size: stat.isFile() ? stat.size : undefined,
-            modifiedTime: new Date(stat.mtime),
+            modifiedTime: new Date(stat.mtimeMs),
           });
         }
       }

@@ -54,7 +54,7 @@ export function DiscussionList({
         }
       }
     });
-  }, []);
+  }, [updateDiscussion]);
 
   const handleSelectDiscussion = (discussionId: string) => {
     selectDiscussion(discussionId);

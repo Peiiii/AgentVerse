@@ -9,12 +9,6 @@ export function useLightningFSManager() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // 初始化文件管理器
-  useEffect(() => {
-    defaultFileManager.setCurrentPath(cwd);
-    refreshEntries(cwd);
-  }, []);
-
   // 读取目录内容
   const refreshEntries = useCallback(async (dir: string) => {
     setLoading(true);
@@ -27,13 +21,19 @@ export function useLightningFSManager() {
         setEntries([]);
         setError(result.error || '读取目录失败');
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       setEntries([]);
-      setError(e.message || '读取目录失败');
+      setError((e as Error)?.message || '读取目录失败');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // 初始化文件管理器
+  useEffect(() => {
+    defaultFileManager.setCurrentPath(cwd);
+    refreshEntries(cwd);
+  }, [cwd, refreshEntries]);
 
   // 进入目录
   const enterDir = useCallback((dir: string) => {
@@ -57,9 +57,9 @@ export function useLightningFSManager() {
         setFileContent("");
         setError(result.error || '读取文件失败');
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       setFileContent("");
-      setError(e.message || '读取文件失败');
+      setError((e as Error)?.message || '读取文件失败');
     } finally {
       setLoading(false);
     }
@@ -77,8 +77,8 @@ export function useLightningFSManager() {
       } else {
         setError(result.error || '创建目录失败');
       }
-    } catch (e: any) {
-      setError(e.message || '创建目录失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '创建目录失败');
     } finally {
       setLoading(false);
     }
@@ -96,8 +96,8 @@ export function useLightningFSManager() {
       } else {
         setError(result.error || '创建文件失败');
       }
-    } catch (e: any) {
-      setError(e.message || '创建文件失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '创建文件失败');
     } finally {
       setLoading(false);
     }
@@ -114,8 +114,8 @@ export function useLightningFSManager() {
       } else {
         setError(result.error || '删除失败');
       }
-    } catch (e: any) {
-      setError(e.message || '删除失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '删除失败');
     } finally {
       setLoading(false);
     }
@@ -134,8 +134,8 @@ export function useLightningFSManager() {
       } else {
         setError(result.error || '重命名失败');
       }
-    } catch (e: any) {
-      setError(e.message || '重命名失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '重命名失败');
     } finally {
       setLoading(false);
     }
@@ -153,8 +153,8 @@ export function useLightningFSManager() {
       } else {
         setError(result.error || '写入失败');
       }
-    } catch (e: any) {
-      setError(e.message || '写入失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '写入失败');
     } finally {
       setLoading(false);
     }
@@ -171,8 +171,8 @@ export function useLightningFSManager() {
       } else {
         setError(result.error || '上传失败');
       }
-    } catch (e: any) {
-      setError(e.message || '上传失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '上传失败');
     } finally {
       setLoading(false);
     }
@@ -187,8 +187,8 @@ export function useLightningFSManager() {
       if (!result.success) {
         setError(result.error || '下载失败');
       }
-    } catch (e: any) {
-      setError(e.message || '下载失败');
+    } catch (e: unknown) {
+      setError((e as Error)?.message || '下载失败');
     } finally {
       setLoading(false);
     }
