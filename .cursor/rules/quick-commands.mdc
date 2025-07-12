@@ -3,6 +3,11 @@
 
 ## Git Operations
 
+### ⚠️ 重要：禁止擅自提交
+- **严格禁止**：在用户没有明确要求的情况下，禁止擅自进行任何 git commit 操作
+- **必须等待**：只有用户明确使用 `/commit` 命令或明确要求提交时，才能执行提交
+- **安全第一**：宁可等待用户确认，也不要冒险擅自提交
+
 ### `/commit` - Auto Commit with English Message
 When user types `/commit`, automatically:
 1. Run `git status` to review changes before committing
