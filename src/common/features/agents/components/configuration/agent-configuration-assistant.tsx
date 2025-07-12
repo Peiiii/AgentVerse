@@ -1,3 +1,6 @@
+import { AgentChatInput, AgentChatMessages } from "@/common/components/chat/agent-chat";
+import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
+import { ChatWelcomeHeader } from "@/common/components/chat/chat-welcome-header";
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
@@ -7,9 +10,6 @@ import {
   Wand2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { AgentChatInput, AgentChatMessages } from "@/common/components/chat/agent-chat";
-import { ChatWelcomeHeader } from "@/common/components/chat/chat-welcome-header";
-import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { useAgentConfigurationTools } from "./use-agent-configuration-tools";
 
 interface AgentConfigurationAssistantProps {
@@ -21,7 +21,7 @@ interface AgentConfigurationAssistantProps {
 function AgentConfigurationAssistantInner({ onAgentCreate, className, editingAgent }: AgentConfigurationAssistantProps) {
   // 使用拆分的工具Hook
   useAgentConfigurationTools(onAgentCreate, editingAgent);
-  
+
   // 使用useMemo缓存agentCreatorDef，避免每次渲染重新创建
   const agentCreatorDef = useMemo((): Omit<AgentDef, "id"> => ({
     name: "Agent Creator",
@@ -75,8 +75,6 @@ function AgentConfigurationAssistantInner({ onAgentCreate, className, editingAge
     contexts,
   });
 
-  console.log("[AgentConfigurationAssistant] uiMessages", uiMessages);
-
   const [inputValue, setInputValue] = useState("");
 
   const handleSendMessage = async () => {
@@ -105,22 +103,18 @@ function AgentConfigurationAssistantInner({ onAgentCreate, className, editingAge
 
   return (
     <div className={cn("h-full flex flex-col", className)}>
-      {/* 聊天区域 - 使用AgentChatMessages替换 */}
-      <div className="flex-1 overflow-hidden">
-        <AgentChatMessages
-          agent={{ id: "creator", ...agentCreatorDef }}
-          uiMessages={uiMessages}
-          isResponding={isAgentResponding}
-          messageTheme="creator"
-          avatarTheme="creator"
-          emptyState={{
-            title: "", // 不会被使用，因为有customWelcomeHeader
-            description: "", // 不会被使用，因为有customWelcomeHeader
-            customWelcomeHeader: customWelcomeHeader,
-          }}
-        />
-      </div>
-      {/* 使用AgentChatInput替换原有输入区域 */}
+      <AgentChatMessages
+        agent={{ id: "creator", ...agentCreatorDef }}
+        uiMessages={uiMessages}
+        isResponding={isAgentResponding}
+        messageTheme="creator"
+        avatarTheme="creator"
+        emptyState={{
+          title: "", // 不会被使用，因为有customWelcomeHeader
+          description: "", // 不会被使用，因为有customWelcomeHeader
+          customWelcomeHeader: customWelcomeHeader,
+        }}
+      />
       <AgentChatInput
         agent={{ id: "creator", ...agentCreatorDef }}
         value={inputValue}
@@ -137,7 +131,7 @@ function AgentConfigurationAssistantInner({ onAgentCreate, className, editingAge
 export function AgentConfigurationAssistant(props: AgentConfigurationAssistantProps) {
   return (
     <AgentChatProviderWrapper>
-      <AgentConfigurationAssistantInner {...props}/>
+      <AgentConfigurationAssistantInner {...props} />
     </AgentChatProviderWrapper>
   );
 } 
