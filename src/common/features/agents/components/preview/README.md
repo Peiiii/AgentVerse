@@ -7,9 +7,6 @@
 ### 1. AgentPreviewChat
 基础的 Agent 预览聊天组件，支持可插拔的工具配置。
 
-### 2. AgentPreviewWithFileManager
-增强的 Agent 预览组件，集成了完整的文件管理器功能。
-
 ## 文件管理功能
 
 ### 核心服务
@@ -34,22 +31,7 @@ function MyComponent() {
   return (
     <AgentPreviewChat
       agentDef={agentDef}
-      useEnhancedTools={true} // 启用增强工具
-    />
-  );
-}
-```
-
-### 带文件管理器的使用
-
-```tsx
-import { AgentPreviewWithFileManager } from "@/common/features/agents/components/preview";
-
-function MyComponent() {
-  return (
-    <AgentPreviewWithFileManager
-      agentDef={agentDef}
-      className="h-screen"
+      // 可选：tools={...} 传入自定义工具
     />
   );
 }
@@ -58,10 +40,14 @@ function MyComponent() {
 ### 自定义工具配置
 
 ```tsx
-import { getEnhancedPreviewTools } from "@/common/features/agents/components/preview";
+import { AgentPreviewChat } from "@/common/features/agents/components/preview";
+import { getCurrentTimeTool, fileSystemTool, codeAnalysisTool, networkTool } from "@/common/features/agents/components/agent-tools";
+import { createSuggestionsTool } from "@/common/features/agents/components/agent-tools/show-suggestion.tool";
 
 function MyComponent() {
-  const customTools = getEnhancedPreviewTools(agentDef);
+  const [suggestions, setSuggestions] = useState([]);
+  const suggestionTool = createSuggestionsTool(setSuggestions);
+  const customTools = [getCurrentTimeTool, fileSystemTool, codeAnalysisTool, networkTool, suggestionTool];
   
   return (
     <AgentPreviewChat
@@ -97,16 +83,6 @@ function MyComponent() {
 
 ### 网络工具
 支持 HTTP 请求操作。
-
-## 文件管理器界面
-
-`AgentPreviewWithFileManager` 提供了完整的文件管理器界面：
-
-- **侧边栏**: 可折叠的文件管理器
-- **文件列表**: 显示当前目录的文件和文件夹
-- **搜索功能**: 实时搜索文件
-- **文件预览**: 预览文件内容
-- **操作按钮**: 下载、删除等操作
 
 ## 代码复用
 

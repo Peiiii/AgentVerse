@@ -1,25 +1,43 @@
-import { AgentChatContainer, type AgentChatContainerRef } from "@/common/components/chat/agent-chat";
-import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
+import { AgentChatContainer } from "@/common/components/chat/agent-chat";
+import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
+import { SuggestionsProvider } from "@/common/components/chat/suggestions";
+import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import { AgentTool, useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
-import { useCallback, useRef, useState } from "react";
-import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
-import { getDefaultPreviewTools, getEnhancedPreviewTools } from "../agent-tools/tool-factories";
+import { useCallback, useState } from "react";
+import { codeAnalysisTool, fileSystemTool, getCurrentTimeTool, networkTool } from "../agent-tools";
+import { createSuggestionsTool } from "../agent-tools/show-suggestion.tool";
 
 interface AgentPreviewChatProps {
   agentDef: AgentDef;
   className?: string;
-  tools?: ReturnType<typeof getDefaultPreviewTools>;
-  useEnhancedTools?: boolean;
+  tools?: AgentTool[];
+  enableSuggestions?: boolean;
 }
 
-function AgentPreviewChatInner({ agentDef, className, tools, useEnhancedTools = false }: AgentPreviewChatProps) {
+function AgentPreviewChatInner({
+  agentDef,
+  className,
+  tools,
+  enableSuggestions = true
+}: AgentPreviewChatProps) {
   const [chatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
-  const chatContainerRef = useRef<AgentChatContainerRef>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
-  // 使用可插拔的工具配置
-  const previewTools = tools || (useEnhancedTools ? getEnhancedPreviewTools(agentDef) : getDefaultPreviewTools(agentDef));
+  // 创建 suggestion tool
+  const suggestionTool = createSuggestionsTool(setSuggestions);
+
+  // 工具集合，包含 suggestion tool
+  const previewTools = [
+    ...(tools || []),
+    getCurrentTimeTool,
+    fileSystemTool,
+    codeAnalysisTool,
+    networkTool,
+    suggestionTool
+  ];
   useProvideAgentTools(previewTools);
 
   // 处理输入变化
@@ -27,10 +45,24 @@ function AgentPreviewChatInner({ agentDef, className, tools, useEnhancedTools = 
     setInputMessage(value);
   }, []);
 
+  // 处理建议点击
+  const handleSuggestionClick = useCallback((suggestion: Suggestion) => {
+    setInputMessage(suggestion.content);
+  }, []);
+
+  // 作为bottomContent插槽传递
+  const suggestionsNode = enableSuggestions ? (
+    <SuggestionsProvider
+      suggestions={suggestions}
+      onSuggestionClick={handleSuggestionClick}
+      onClose={() => setSuggestions([])}
+      className="mt-2"
+    />
+  ) : null;
+
   return (
     <AgentChatContainer
       className={className}
-      ref={chatContainerRef}
       agentDef={agentDef}
       messages={chatMessages}
       inputMessage={inputMessage}
@@ -39,6 +71,7 @@ function AgentPreviewChatInner({ agentDef, className, tools, useEnhancedTools = 
       defaultInfoExpanded={false}
       compactInfo={true}
       enableFloatingInfo={true}
+      bottomContent={suggestionsNode}
     />
   );
 }

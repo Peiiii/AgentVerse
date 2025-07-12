@@ -19,13 +19,28 @@ Agent Chat 是一套完整的智能体聊天界面组件，提供消息显示、
 // agent-preview-chat.tsx
 import { AgentChatContainer } from "@/common/components/chat/agent-chat";
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
+import { getCurrentTimeTool, fileSystemTool, codeAnalysisTool, networkTool } from "@/common/features/agents/components/agent-tools";
+import { createSuggestionsTool } from "@/common/features/agents/components/agent-tools/show-suggestion.tool";
+import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
+import { useState } from "react";
 
-function AgentPreviewChat({ agentDef, className, tools, useEnhancedTools = false }) {
+function AgentPreviewChat({ agentDef, className, tools, enableSuggestions = true }) {
   const [chatMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
-  // 使用可插拔的工具配置
-  const previewTools = tools || (useEnhancedTools ? getEnhancedPreviewTools(agentDef) : getDefaultPreviewTools(agentDef));
+  // 创建 suggestion tool
+  const suggestionTool = createSuggestionsTool(setSuggestions);
+
+  // 工具集合，直接组合单个工具
+  const previewTools = [
+    ...(tools || []),
+    getCurrentTimeTool,
+    fileSystemTool,
+    codeAnalysisTool,
+    networkTool,
+    suggestionTool
+  ];
   useProvideAgentTools(previewTools);
 
   return (
@@ -40,6 +55,7 @@ function AgentPreviewChat({ agentDef, className, tools, useEnhancedTools = false
         defaultInfoExpanded={false}
         compactInfo={true}
         enableFloatingInfo={true}
+        // bottomContent={...} // 可选：建议区等自定义内容
       />
     </AgentChatProviderWrapper>
   );
@@ -48,7 +64,8 @@ function AgentPreviewChat({ agentDef, className, tools, useEnhancedTools = false
 
 **特点：**
 - 使用 `AgentChatContainer` 提供完整功能
-- 支持工具配置（默认/增强）
+- 工具直接用数组组合，无需 getXxxTools 工厂函数
+- 支持自定义扩展工具
 - 启用悬浮信息面板
 - 紧凑的信息显示
 
@@ -174,6 +191,7 @@ interface AgentChatInputProps {
 - **简单预览**：使用 `AgentChatContainer` + `enableFloatingInfo`
 
 ### 工具集成
+- 直接用数组组合单个工具（如 getCurrentTimeTool、fileSystemTool、codeAnalysisTool、networkTool、suggestionTool 等）
 - 使用 `useProvideAgentTools` 注册工具
 - 使用 `useProvideAgentContexts` 提供上下文
 - 工具在 `AgentChatProviderWrapper` 内生效

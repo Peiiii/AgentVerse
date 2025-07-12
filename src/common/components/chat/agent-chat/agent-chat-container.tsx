@@ -26,6 +26,7 @@ interface AgentChatContainerProps {
   compactInfo?: boolean;
   enableFloatingInfo?: boolean;
   className?: string;
+  bottomContent?: React.ReactNode; // 新增插槽
 }
 
 export interface AgentChatContainerRef {
@@ -45,6 +46,7 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
   compactInfo = false,
   enableFloatingInfo = false,
   className,
+  bottomContent, // 新增
 }, ref) => {
   const agentDef$ = useObservableFromState(agentDef);
   const [initialAgent] = useState(() => {
@@ -152,6 +154,8 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
         messageTheme="default"
         avatarTheme="default"
       />
+      {/* 新增：底部插槽 */}
+      {bottomContent}
       <AgentChatInput
         agent={agentDef}
         value={inputMessage}
