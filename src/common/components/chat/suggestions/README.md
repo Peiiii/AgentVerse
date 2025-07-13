@@ -23,9 +23,9 @@
 interface SuggestionItem {
   id: string;
   type: 'question' | 'action' | 'link' | 'tool' | 'topic';
-  title: string;
+  actionName: string; // 显示名称，对于 action 类型也用作发送的指令名
   description?: string;
-  content: string; // 点击后要执行的内容
+  content: string; // 编辑时填入输入框的内容
   icon?: string; // 自定义图标
   metadata?: Record<string, any>; // 额外数据
 }
@@ -39,9 +39,9 @@ interface SuggestionItem {
 import { SuggestionsProvider } from '@/common/components/chat/suggestions';
 
 function ChatComponent() {
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion, action) => {
     // 处理建议点击
-    console.log('Suggestion clicked:', suggestion);
+    console.log('Suggestion clicked:', suggestion, action);
     // 可以发送消息、执行操作等
   };
 
@@ -68,7 +68,7 @@ const customSuggestions: SuggestionItem[] = [
   {
     id: 'custom-1',
     type: 'question',
-    title: '自定义问题',
+    actionName: '自定义问题',
     description: '这是一个自定义的问题建议',
     content: '请回答我的自定义问题',
     metadata: { custom: true }
@@ -76,7 +76,7 @@ const customSuggestions: SuggestionItem[] = [
   {
     id: 'custom-2',
     type: 'action',
-    title: '执行操作',
+    actionName: '执行操作',
     description: '点击执行特定操作',
     content: 'execute:some-action',
     metadata: { action: 'some-action' }
@@ -102,9 +102,14 @@ function CustomSuggestions() {
 import { SuggestionsProvider } from '@/common/components/chat/suggestions';
 
 function AgentChatMessages({ uiMessages, agent, ...props }) {
-  const handleSuggestionClick = (suggestion) => {
-    // 将建议内容发送为消息
-    sendMessage(suggestion.content);
+  const handleSuggestionClick = (suggestion, action) => {
+    if (action === 'send') {
+      // 直接发送消息
+      sendMessage(suggestion.actionName);
+    } else {
+      // 填入输入框
+      setInputMessage(suggestion.content);
+    }
   };
 
   return (
@@ -176,7 +181,7 @@ const generateCustomSuggestions = (messages, agent) => {
       suggestions.push({
         id: 'follow-up',
         type: 'question',
-        title: '继续深入',
+        actionName: '继续深入',
         content: '请继续详细说明',
         metadata: { followUp: true }
       });
@@ -189,7 +194,7 @@ const generateCustomSuggestions = (messages, agent) => {
       suggestions.push({
         id: `expertise-${expertise}`,
         type: 'topic',
-        title: `探讨${expertise}`,
+        actionName: `探讨${expertise}`,
         content: `请详细介绍${expertise}`,
         metadata: { expertise }
       });

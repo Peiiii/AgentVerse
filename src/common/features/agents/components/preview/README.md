@@ -42,11 +42,11 @@ function MyComponent() {
 ```tsx
 import { AgentPreviewChat } from "@/common/features/agents/components/preview";
 import { getCurrentTimeTool, fileSystemTool, codeAnalysisTool, networkTool } from "@/common/features/agents/components/agent-tools";
-import { createSuggestionsTool } from "@/common/features/agents/components/agent-tools/show-suggestion.tool";
+import { createDisplayQuickActionsTool } from "@/common/features/agents/components/agent-tools/show-suggestion.tool";
 
 function MyComponent() {
   const [suggestions, setSuggestions] = useState([]);
-  const suggestionTool = createSuggestionsTool(setSuggestions);
+  const suggestionTool = createDisplayQuickActionsTool(setSuggestions);
   const customTools = [getCurrentTimeTool, fileSystemTool, codeAnalysisTool, networkTool, suggestionTool];
   
   return (

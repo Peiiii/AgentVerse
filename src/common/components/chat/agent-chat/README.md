@@ -20,7 +20,7 @@ Agent Chat 是一套完整的智能体聊天界面组件，提供消息显示、
 import { AgentChatContainer } from "@/common/components/chat/agent-chat";
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { getCurrentTimeTool, fileSystemTool, codeAnalysisTool, networkTool } from "@/common/features/agents/components/agent-tools";
-import { createSuggestionsTool } from "@/common/features/agents/components/agent-tools/show-suggestion.tool";
+import { createDisplayQuickActionsTool } from "@/common/features/agents/components/agent-tools/show-suggestion.tool";
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { useState } from "react";
 
@@ -30,7 +30,7 @@ function AgentPreviewChat({ agentDef, className, tools, enableSuggestions = true
   const [suggestions, setSuggestions] = useState([]);
 
   // 创建 suggestion tool
-  const suggestionTool = createSuggestionsTool(setSuggestions);
+  const suggestionTool = createDisplayQuickActionsTool(setSuggestions);
 
   // 工具集合，直接组合单个工具
   const previewTools = [

@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { SuggestionItem, type SuggestionItem as SuggestionItemType } from "./suggestion-item";
+import type { Suggestion } from "./suggestion.types";
 
 interface SuggestionsListProps {
   suggestions: SuggestionItemType[];
-  onSuggestionClick: (suggestion: SuggestionItemType) => void;
+  onSuggestionClick: (suggestion: SuggestionItemType, action: 'send' | 'edit') => void;
+  onSendMessage?: (message: string) => void;
   layout?: 'grid' | 'list' | 'horizontal';
   maxItems?: number;
   className?: string;
@@ -14,6 +16,7 @@ interface SuggestionsListProps {
 export function SuggestionsList({
   suggestions,
   onSuggestionClick,
+  onSendMessage,
   layout = 'list',
   maxItems = 4,
   className,
@@ -33,6 +36,17 @@ export function SuggestionsList({
     : "space-y-3";
 
   const itemClass = layout === 'horizontal' ? "flex-none w-64" : "";
+
+  const handleSuggestionClick = (suggestion: SuggestionItemType, action: 'send' | 'edit') => {
+    if (action === 'send' && onSendMessage) {
+      // 发送消息时使用 actionName
+      const messageToSend = suggestion.actionName;
+      onSendMessage(messageToSend);
+    } else {
+      // 编辑模式，调用原有的 onClick
+      onSuggestionClick(suggestion, action);
+    }
+  };
 
   return (
     <motion.div
@@ -60,7 +74,7 @@ export function SuggestionsList({
           >
             <SuggestionItem
               suggestion={suggestion}
-              onClick={onSuggestionClick}
+              onClick={handleSuggestionClick}
             />
           </motion.div>
         ))}

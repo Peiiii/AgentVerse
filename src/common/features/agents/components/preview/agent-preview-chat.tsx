@@ -7,7 +7,7 @@ import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { useCallback, useState } from "react";
 import { codeAnalysisTool, fileSystemTool, getCurrentTimeTool, networkTool } from "../agent-tools";
-import { createSuggestionsTool } from "../agent-tools/show-suggestion.tool";
+import { createDisplayQuickActionsTool } from "../agent-tools/display-quick-actions.tool";
 
 interface AgentPreviewChatProps {
   agentDef: AgentDef;
@@ -27,7 +27,7 @@ function AgentPreviewChatInner({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   // 创建 suggestion tool
-  const suggestionTool = createSuggestionsTool(setSuggestions);
+  const suggestionTool = createDisplayQuickActionsTool(setSuggestions);
 
   // 工具集合，包含 suggestion tool
   const previewTools = [
@@ -46,8 +46,17 @@ function AgentPreviewChatInner({
   }, []);
 
   // 处理建议点击
-  const handleSuggestionClick = useCallback((suggestion: Suggestion) => {
-    setInputMessage(suggestion.content);
+  const handleSuggestionClick = useCallback((suggestion: Suggestion, action: 'send' | 'edit') => {
+    if (action === 'edit') {
+      setInputMessage(suggestion.content);
+    }
+  }, []);
+
+  // 处理发送消息
+  const handleSendMessage = useCallback((message: string) => {
+    // 这里可以添加发送消息的逻辑
+    console.log('Sending message:', message);
+    // 可以调用聊天组件的发送方法
   }, []);
 
   // 作为bottomContent插槽传递
@@ -55,6 +64,7 @@ function AgentPreviewChatInner({
     <SuggestionsProvider
       suggestions={suggestions}
       onSuggestionClick={handleSuggestionClick}
+      onSendMessage={handleSendMessage}
       onClose={() => setSuggestions([])}
       className="mt-2"
     />
