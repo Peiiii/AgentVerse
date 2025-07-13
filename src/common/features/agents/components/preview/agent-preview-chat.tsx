@@ -1,11 +1,11 @@
-import { AgentChatContainer } from "@/common/components/chat/agent-chat";
+import { AgentChatContainer, AgentChatContainerRef } from "@/common/components/chat/agent-chat";
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
 import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
 import { AgentTool, useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { codeAnalysisTool, fileSystemTool, getCurrentTimeTool, networkTool } from "../agent-tools";
 import { createDisplayQuickActionsTool } from "../agent-tools/display-quick-actions.tool";
 
@@ -25,6 +25,7 @@ function AgentPreviewChatInner({
   const [chatMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const chatContainerRef = useRef<AgentChatContainerRef>(null);
 
   // 创建 suggestion tool
   const suggestionTool = createDisplayQuickActionsTool(setSuggestions);
@@ -54,9 +55,15 @@ function AgentPreviewChatInner({
 
   // 处理发送消息
   const handleSendMessage = useCallback((message: string) => {
-    // 这里可以添加发送消息的逻辑
     console.log('Sending message:', message);
-    // 可以调用聊天组件的发送方法
+    // 设置输入消息并触发发送
+    setInputMessage(message);
+    // 使用 setTimeout 确保状态更新后再发送
+    setTimeout(() => {
+      if (chatContainerRef.current?.handleSendMessage) {
+        chatContainerRef.current.handleSendMessage();
+      }
+    }, 0);
   }, []);
 
   // 作为bottomContent插槽传递
@@ -72,6 +79,7 @@ function AgentPreviewChatInner({
 
   return (
     <AgentChatContainer
+      ref={chatContainerRef}
       className={className}
       agentDef={agentDef}
       messages={chatMessages}

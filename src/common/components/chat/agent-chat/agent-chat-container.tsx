@@ -34,6 +34,7 @@ export interface AgentChatContainerRef {
   hideFloatingInfo: () => void;
   toggleFloatingInfo: () => void;
   isFloatingInfoVisible: () => boolean;
+  handleSendMessage: () => Promise<void>;
 }
 
 export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatContainerProps>(({
@@ -93,21 +94,6 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
   // 悬浮层状态管理
   const [isFloatingInfoVisible, setIsFloatingInfoVisible] = useState(false);
 
-  // 暴露给外部的控制接口
-  useImperativeHandle(ref, () => ({
-    showFloatingInfo: () => setIsFloatingInfoVisible(true),
-    hideFloatingInfo: () => setIsFloatingInfoVisible(false),
-    toggleFloatingInfo: () => setIsFloatingInfoVisible(prev => !prev),
-    isFloatingInfoVisible: () => isFloatingInfoVisible,
-  }), [isFloatingInfoVisible]);
-
-  // 简单的自动滚动：当消息数量变化时滚动到底部
-  useEffect(() => {
-    if (messagesRef.current) {
-      messagesRef.current.scrollToBottom();
-    }
-  }, [uiMessages.length]);
-
   // 处理输入变化 - 不再自动隐藏悬浮层
   const handleInputChange = useCallback((value: string) => {
     onInputChange(value);
@@ -128,6 +114,22 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
       console.error("发送消息失败:", error);
     }
   };
+
+  // 暴露给外部的控制接口
+  useImperativeHandle(ref, () => ({
+    showFloatingInfo: () => setIsFloatingInfoVisible(true),
+    hideFloatingInfo: () => setIsFloatingInfoVisible(false),
+    toggleFloatingInfo: () => setIsFloatingInfoVisible(prev => !prev),
+    isFloatingInfoVisible: () => isFloatingInfoVisible,
+    handleSendMessage,
+  }), [isFloatingInfoVisible, handleSendMessage]);
+
+  // 简单的自动滚动：当消息数量变化时滚动到底部
+  useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollToBottom();
+    }
+  }, [uiMessages.length]);
 
   return (
     <div className={cn("min-w-0 flex flex-col", className)}>
