@@ -1,15 +1,17 @@
 import { AgentChatContainer } from "@/common/components/chat/agent-chat";
-import { MCPImportForm, MCPServerForm, MCPServerManager, MCPToolsDisplay, MCPToolsStats } from "@/common/components/mcp";
 import { Badge } from "@/common/components/ui/badge";
+import { Button } from "@/common/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
+import { MCPServerManager, MCPToolsDisplay, MCPToolsStats, MCPServerForm, MCPImportForm } from "@/common/components/mcp";
 import { useAllTools } from "@/common/hooks/use-all-tools";
 import { useMCPServers } from "@/common/hooks/use-mcp-servers";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { type MCPServerConfig } from "@/core/stores/mcp-server.store";
 import { useProvideAgentToolDefs, useProvideAgentToolExecutors } from "@agent-labs/agent-chat";
-import { MessageSquare, Server } from "lucide-react";
-import React from "react";
+import { MessageSquare, Server, Copy, Play, FileText, Terminal, Check } from "lucide-react";
+import React, { useRef, useState } from "react";
 
 function MCPDemoContent() {
   const {
@@ -130,6 +132,103 @@ ${toolsStats.totalTools > 0
     removeServer(serverId);
   };
 
+  // 复制反馈状态
+  const [quickCopied, setQuickCopied] = useState<number | null>(null);
+  const [templateCopied, setTemplateCopied] = useState<number | null>(null);
+  const quickCopyTimeout = useRef<NodeJS.Timeout | null>(null);
+  const templateCopyTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // 复制到剪贴板并反馈
+  const handleQuickCopy = async (text: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setQuickCopied(idx);
+      if (quickCopyTimeout.current) clearTimeout(quickCopyTimeout.current);
+      quickCopyTimeout.current = setTimeout(() => setQuickCopied(null), 1500);
+    } catch (error) {
+      console.error('复制失败:', error);
+    }
+  };
+  const handleTemplateCopy = async (text: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setTemplateCopied(idx);
+      if (templateCopyTimeout.current) clearTimeout(templateCopyTimeout.current);
+      templateCopyTimeout.current = setTimeout(() => setTemplateCopied(null), 1500);
+    } catch (error) {
+      console.error('复制失败:', error);
+    }
+  };
+
+  // 快速启动命令模板
+  const quickStartCommands = [
+    {
+      name: "文件系统服务器",
+      description: "提供文件读写、目录操作等文件系统功能",
+      command: "uvx mcp-proxy --port=8080 --allow-origin \"*\" -- npx -y @modelcontextprotocol/server-filesystem /path/to/your/directory",
+      config: {
+        name: "文件系统服务器",
+        url: "http://localhost:8080",
+        type: "streamable-http" as const,
+        description: "本地文件系统操作"
+      }
+    },
+    {
+      name: "GitHub服务器",
+      description: "提供GitHub仓库操作、Issue管理等功能",
+      command: "uvx mcp-proxy --port=8081 --allow-origin \"*\" -- npx -y @modelcontextprotocol/server-github",
+      config: {
+        name: "GitHub服务器",
+        url: "http://localhost:8081",
+        type: "streamable-http" as const,
+        description: "GitHub API集成"
+      }
+    },
+    {
+      name: "PostgreSQL服务器",
+      description: "提供数据库查询、表操作等功能",
+      command: "uvx mcp-proxy --port=8082 --allow-origin \"*\" -- npx -y @modelcontextprotocol/server-postgresql postgresql://user:password@localhost:5432/dbname",
+      config: {
+        name: "PostgreSQL服务器",
+        url: "http://localhost:8082",
+        type: "streamable-http" as const,
+        description: "PostgreSQL数据库操作"
+      }
+    }
+  ];
+
+  // JSON配置模板
+  const jsonTemplates = [
+    {
+      name: "基础配置",
+      description: "单个MCP服务器配置",
+      template: `{
+  "name": "我的MCP服务器",
+  "url": "http://localhost:8080",
+  "type": "streamable-http",
+  "description": "服务器描述"
+}`
+    },
+    {
+      name: "批量配置",
+      description: "多个MCP服务器配置",
+      template: `[
+  {
+    "name": "文件系统服务器",
+    "url": "http://localhost:8080",
+    "type": "streamable-http",
+    "description": "本地文件系统操作"
+  },
+  {
+    "name": "GitHub服务器", 
+    "url": "http://localhost:8081",
+    "type": "streamable-http",
+    "description": "GitHub API集成"
+  }
+]`
+    }
+  ];
+
   return (
     <div className="h-full w-full flex overflow-hidden">
       {/* 左侧MCP管理区 */}
@@ -153,10 +252,108 @@ ${toolsStats.totalTools > 0
 
         <div className="flex-1 overflow-hidden min-h-0">
           <Tabs defaultValue="servers" className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-4 flex-shrink-0">
+              <TabsTrigger value="quickstart" className="text-xs">快速开始</TabsTrigger>
               <TabsTrigger value="servers" className="text-xs">服务器管理</TabsTrigger>
               <TabsTrigger value="tools" className="text-xs">工具列表</TabsTrigger>
+              <TabsTrigger value="templates" className="text-xs">配置模板</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="quickstart" className="flex-1 overflow-hidden m-0">
+              <div className="p-6 overflow-y-auto h-full space-y-6 pb-6">
+                {/* 快速开始指南 */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <Play className="w-4 h-4" />
+                    快速启动MCP服务器
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    选择下面的服务器类型，复制启动命令到终端执行，然后添加服务器配置。
+                  </p>
+                  
+                  {quickStartCommands.map((item, index) => (
+                    <Card key={index} className="border-dashed">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm flex items-center justify-between">
+                          <span>{item.name}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              addServer(item.config);
+                              handleQuickCopy(item.command, index);
+                            }}
+                          >
+                            <Play className="w-3 h-3 mr-1" />
+                            一键添加
+                          </Button>
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          {item.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="relative">
+                          <div className="p-3 bg-muted/50 rounded text-xs font-mono whitespace-pre-wrap overflow-x-auto">
+                            {item.command}
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="absolute top-1 right-1 h-6 w-6 p-0"
+                            onClick={() => handleQuickCopy(item.command, index)}
+                          >
+                            {quickCopied === index ? (
+                              <Check className="w-3 h-3 text-green-600" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* 使用步骤 */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <Terminal className="w-4 h-4" />
+                    使用步骤
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-bold text-blue-600">1</div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">启动MCP服务器</p>
+                        <p className="text-xs text-muted-foreground">复制上面的命令到终端执行，确保服务器正常运行</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-bold text-blue-600">2</div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">添加服务器配置</p>
+                        <p className="text-xs text-muted-foreground">点击"一键添加"或手动填写服务器信息</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-bold text-blue-600">3</div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">连接服务器</p>
+                        <p className="text-xs text-muted-foreground">点击"连接"按钮，等待连接成功</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-bold text-blue-600">4</div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">开始对话</p>
+                        <p className="text-xs text-muted-foreground">在右侧与AI助手对话，AI会自动使用可用的MCP工具</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
 
             <TabsContent value="servers" className="flex-1 overflow-hidden m-0">
               <div className="p-6 overflow-y-auto h-full space-y-6 pb-6">
@@ -206,6 +403,103 @@ ${toolsStats.totalTools > 0
                       showServerInfo={true}
                       showToolCount={true}
                     />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="templates" className="flex-1 overflow-hidden m-0">
+              <div className="p-6 overflow-y-auto h-full space-y-6 pb-6">
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    JSON配置模板
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    复制下面的JSON配置模板，修改后导入到系统中。
+                  </p>
+                  
+                  {jsonTemplates.map((template, index) => (
+                    <Card key={index}>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm flex items-center justify-between">
+                          <span>{template.name}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleTemplateCopy(template.template, index)}
+                          >
+                            {templateCopied === index ? (
+                              <Check className="w-3 h-3 text-green-600 mr-1" />
+                            ) : (
+                              <Copy className="w-3 h-3 mr-1" />
+                            )}
+                            复制模板
+                          </Button>
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          {template.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="relative">
+                          <div className="p-3 bg-muted/50 rounded text-xs font-mono whitespace-pre-wrap overflow-x-auto max-h-40">
+                            {template.template}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* 常用服务器列表 */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm">常用MCP服务器</h3>
+                  <div className="grid gap-3">
+                    <Card className="border-dashed">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-sm">@modelcontextprotocol/server-filesystem</h4>
+                            <p className="text-xs text-muted-foreground">文件系统操作</p>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">文件</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-dashed">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-sm">@modelcontextprotocol/server-github</h4>
+                            <p className="text-xs text-muted-foreground">GitHub API集成</p>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">GitHub</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-dashed">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-sm">@modelcontextprotocol/server-postgresql</h4>
+                            <p className="text-xs text-muted-foreground">PostgreSQL数据库</p>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">数据库</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-dashed">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-sm">@modelcontextprotocol/server-web</h4>
+                            <p className="text-xs text-muted-foreground">网页浏览和搜索</p>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">网络</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </div>
