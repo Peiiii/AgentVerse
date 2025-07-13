@@ -1,4 +1,3 @@
-import mermaid from "mermaid";
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, filter, map, switchMap, of, timer, catchError, tap, merge, delay } from "rxjs";
 
 // 渲染状态枚举
@@ -40,11 +39,11 @@ export class MermaidRenderer {
   private readonly DEBOUNCE_TIME_FOR_ERROR = 20000; // 20秒防抖
 
   constructor() {
-    this.initializeMermaid();
     this.setupRenderPipeline();
   }
 
-  private initializeMermaid() {
+  private async initializeMermaid() {
+    const mermaid = (await import("mermaid")).default;
     mermaid.initialize({
       startOnLoad: false,
       theme: 'default',
@@ -133,6 +132,10 @@ export class MermaidRenderer {
           state: MermaidRenderState.FALLBACK
         };
       }
+
+      // 异步加载并初始化 mermaid
+      const mermaid = (await import("mermaid")).default;
+      await this.initializeMermaid();
 
       // 渲染图表
       const id = `mermaid-${Math.random().toString(36).slice(2)}`;
