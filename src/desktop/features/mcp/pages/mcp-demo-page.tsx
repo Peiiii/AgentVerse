@@ -135,8 +135,10 @@ ${toolsStats.totalTools > 0
   // 复制反馈状态
   const [quickCopied, setQuickCopied] = useState<number | null>(null);
   const [templateCopied, setTemplateCopied] = useState<number | null>(null);
+  const [quickAdded, setQuickAdded] = useState<number | null>(null);
   const quickCopyTimeout = useRef<NodeJS.Timeout | null>(null);
   const templateCopyTimeout = useRef<NodeJS.Timeout | null>(null);
+  const quickAddTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // 复制到剪贴板并反馈
   const handleQuickCopy = async (text: string, idx: number) => {
@@ -157,6 +159,19 @@ ${toolsStats.totalTools > 0
       templateCopyTimeout.current = setTimeout(() => setTemplateCopied(null), 1500);
     } catch (error) {
       console.error('复制失败:', error);
+    }
+  };
+
+  // 一键添加并复制
+  const handleQuickAdd = async (config: Omit<MCPServerConfig, 'id'>, command: string, index: number) => {
+    try {
+      addServer(config);
+      await navigator.clipboard.writeText(command);
+      setQuickAdded(index);
+      if (quickAddTimeout.current) clearTimeout(quickAddTimeout.current);
+      quickAddTimeout.current = setTimeout(() => setQuickAdded(null), 1500);
+    } catch (error) {
+      console.error('添加服务器失败:', error);
     }
   };
 
@@ -279,13 +294,14 @@ ${toolsStats.totalTools > 0
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
-                              addServer(item.config);
-                              handleQuickCopy(item.command, index);
-                            }}
+                            onClick={() => handleQuickAdd(item.config, item.command, index)}
                           >
-                            <Play className="w-3 h-3 mr-1" />
-                            一键添加
+                            {quickAdded === index ? (
+                              <Check className="w-3 h-3 text-green-600 mr-1" />
+                            ) : (
+                              <Play className="w-3 h-3 mr-1" />
+                            )}
+                            {quickAdded === index ? "已添加" : "一键添加"}
                           </Button>
                         </CardTitle>
                         <CardDescription className="text-xs">
