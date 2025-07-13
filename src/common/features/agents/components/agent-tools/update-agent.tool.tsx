@@ -62,6 +62,32 @@ function AgentUpdateResult({ args }: { args: AgentUpdateArgs }) {
 }
 
 export function createUpdateAgentTool(onAgentCreate?: (agent: Omit<AgentDef, "id">) => void): AgentTool {
+  interface UpdateAgentToolResult {
+    toolCallId: string;
+    result: { confirmed: boolean } & AgentUpdateArgs;
+    status: "success";
+  }
+  function UpdateAgentToolRender({ toolInvocation, onResult }: { toolInvocation: ToolInvocationLike; onResult: (result: UpdateAgentToolResult) => void }) {
+    const args: AgentUpdateArgs = useMemo(() => {
+      try {
+        return JSON.parse(toolInvocation.function.arguments);
+      } catch {
+        return {
+          name: '', prompt: '', personality: '', role: 'participant', expertise: [], bias: '', responseStyle: '', avatar: ''
+        };
+      }
+    }, [toolInvocation.function.arguments]);
+    useMemo(() => {
+      setTimeout(() => {
+        onResult({
+          toolCallId: toolInvocation.id,
+          result: { confirmed: true, ...args },
+          status: "success",
+        });
+      }, 300);
+    }, [args, onResult, toolInvocation.id]);
+    return <AgentUpdateResult args={args} />;
+  }
   return {
     name: "updateAgent",
     description: "更新或创建智能体配置。当用户要求创建或修改智能体时使用此工具。",
@@ -127,7 +153,7 @@ export function createUpdateAgentTool(onAgentCreate?: (agent: Omit<AgentDef, "id
           toolCallId: toolCall.id,
           result: {
             success: true,
-            message: `智能体 \"${args.name}\" 已成功创建！配置已应用。`,
+            message: `智能体 "${args.name}" 已成功创建！配置已应用。`,
             agentConfig: agentConfig
           },
           status: "success" as const
@@ -145,24 +171,6 @@ export function createUpdateAgentTool(onAgentCreate?: (agent: Omit<AgentDef, "id
         };
       }
     },
-    render: (toolInvocation: ToolInvocationLike, onResult) => {
-      const args: AgentUpdateArgs = useMemo(() => {
-        try {
-          return JSON.parse(toolInvocation.function.arguments);
-        } catch {
-          return {
-            name: '', prompt: '', personality: '', role: 'participant', expertise: [], bias: '', responseStyle: '', avatar: ''
-          };
-        }
-      }, [toolInvocation.function.arguments]);
-      setTimeout(() => {
-        onResult({
-          toolCallId: toolInvocation.id,
-          result: { confirmed: true, ...args },
-          status: "success",
-        });
-      }, 300);
-      return <AgentUpdateResult args={args} />;
-    },
+    render: (toolInvocation, onResult) => <UpdateAgentToolRender toolInvocation={toolInvocation} onResult={onResult} />,
   };
 } 

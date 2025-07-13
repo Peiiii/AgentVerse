@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useMCPServers } from './use-mcp-servers';
+import { useMCPServerStore } from '@/core/stores/mcp-server.store';
 import type { ToolDefinition, ToolExecutor } from '@agent-labs/agent-chat';
 
 /**
@@ -8,11 +8,11 @@ import type { ToolDefinition, ToolExecutor } from '@agent-labs/agent-chat';
  * 这个hook避免了耦合和重复实现，通过适配器模式将MCP工具转换为agent-chat需要的格式
  */
 export function useAllTools() {
-  const { getAllTools, getConnection } = useMCPServers();
+  const store = useMCPServerStore();
 
   // 转换MCP工具为ToolDefinition格式
   const toolDefinitions = useMemo(() => {
-    const mcpTools = getAllTools();
+    const mcpTools = store.getAllTools();
     
     return mcpTools.map(({ serverId, serverName, tool }) => {
       const toolObj = tool as { name: string; description?: string; inputSchema?: unknown };
@@ -66,13 +66,13 @@ export function useAllTools() {
         },
       } as ToolDefinition & { metadata: unknown };
     });
-  }, [getAllTools]);
+  }, [store, store.connections]); // 加入 store
 
   // 创建工具执行器
   const toolExecutors = useMemo(() => {
     const executors: Record<string, ToolExecutor> = {};
     
-    const mcpTools = getAllTools();
+    const mcpTools = store.getAllTools();
     
     mcpTools.forEach(({ serverId, serverName, tool }) => {
       const toolObj = tool as { name: string; description?: string };
@@ -81,7 +81,7 @@ export function useAllTools() {
       executors[toolName] = async (toolCall) => {
         try {
           // 获取连接
-          const connection = getConnection(serverId);
+          const connection = store.getConnection(serverId);
           if (!connection?.client) {
             throw new Error(`MCP服务器 ${serverName} 未连接`);
           }
@@ -123,11 +123,11 @@ export function useAllTools() {
     });
 
     return executors;
-  }, [getAllTools, getConnection]);
+  }, [store, store.connections]); // 直接依赖connections状态
 
   // 统计信息
   const stats = useMemo(() => {
-    const mcpTools = getAllTools();
+    const mcpTools = store.getAllTools();
     return {
       totalTools: mcpTools.length,
       servers: [...new Set(mcpTools.map(t => t.serverName))],
@@ -138,7 +138,7 @@ export function useAllTools() {
         return acc;
       }, {} as Record<string, string[]>),
     };
-  }, [getAllTools]);
+  }, [store, store.connections]); // 加入 store
 
   return {
     // 工具定义，可直接传递给@agent-labs/agent-chat
@@ -148,6 +148,6 @@ export function useAllTools() {
     // 统计信息
     stats,
     // 原始MCP工具数据
-    mcpTools: getAllTools(),
+    mcpTools: store.getAllTools(),
   };
 } 

@@ -1,6 +1,7 @@
 import { Textarea } from "@/common/components/ui/textarea";
 import { cn } from "@/common/lib/utils";
-import React, { useEffect, useRef } from "react";
+import React from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export interface AutoResizeTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -16,7 +17,7 @@ export const AutoResizeTextarea = React.forwardRef<
   const lineHeightRef = useRef<number>(0);
 
   // 获取实际引用
-  const getTextarea = () => {
+  const getTextarea = useCallback(() => {
     if (ref) {
       if (typeof ref === "function") {
         return textareaRef.current;
@@ -24,7 +25,7 @@ export const AutoResizeTextarea = React.forwardRef<
       return (ref as React.MutableRefObject<HTMLTextAreaElement>).current;
     }
     return textareaRef.current;
-  };
+  }, []);
 
   // 计算行高
   useEffect(() => {
@@ -37,7 +38,7 @@ export const AutoResizeTextarea = React.forwardRef<
   }, [getTextarea]);
 
   // 调整高度的函数
-  const adjustHeight = () => {
+  const adjustHeight = useCallback(() => {
     const textarea = getTextarea();
     if (!textarea) return;
 
@@ -56,7 +57,7 @@ export const AutoResizeTextarea = React.forwardRef<
     
     // 如果内容超出最大高度，显示滚动条
     textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
-  };
+  }, [getTextarea, minRows, maxRows]);
 
   // 处理内容变化
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

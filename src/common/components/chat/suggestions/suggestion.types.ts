@@ -5,5 +5,5 @@ export interface Suggestion {
   description?: string;
   content: string;
   icon?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 } 

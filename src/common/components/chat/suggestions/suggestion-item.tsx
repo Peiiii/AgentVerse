@@ -17,7 +17,7 @@ export interface SuggestionItem {
   description?: string;
   content: string; // 点击后要执行的内容
   icon?: string; // 自定义图标
-  metadata?: Record<string, any>; // 额外数据
+  metadata?: Record<string, unknown>; // 额外数据
 }
 
 interface SuggestionItemProps {

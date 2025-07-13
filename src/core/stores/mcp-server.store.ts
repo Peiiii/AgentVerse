@@ -152,6 +152,18 @@ export const useMCPServerStore = create<MCPServerState>()(
         const connection = state.connections.get(serverId);
         if (!connection) throw new Error(`Server ${serverId} not found`);
 
+        // 检查是否已经连接
+        if (connection.status === 'connected') {
+          console.warn(`Server ${serverId} is already connected`);
+          return;
+        }
+
+        // 检查是否正在连接中
+        if (connection.status === 'connecting') {
+          console.warn(`Server ${serverId} is already connecting`);
+          return;
+        }
+
         // 更新状态为连接中
         set((state) => {
           const newConnections = new Map(state.connections);
