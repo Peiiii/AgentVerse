@@ -3,14 +3,14 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
-import { MCPServerManager, MCPToolsDisplay, MCPToolsStats, MCPServerForm, MCPImportForm } from "@/common/components/mcp";
+import { MCPServerManager, MCPToolsDisplay, MCPServerForm, MCPImportForm } from "@/common/components/mcp";
 import { useAllTools } from "@/common/hooks/use-all-tools";
 import { useMCPServers } from "@/common/hooks/use-mcp-servers";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { type MCPServerConfig } from "@/core/stores/mcp-server.store";
 import { useProvideAgentToolDefs, useProvideAgentToolExecutors } from "@agent-labs/agent-chat";
-import { MessageSquare, Server, Copy, Play, FileText, Terminal, Check } from "lucide-react";
+import { MessageSquare, Server, Copy, Play, FileText, Terminal, Check, Wrench, Wifi, Database } from "lucide-react";
 import React, { useRef, useState } from "react";
 
 function MCPDemoContent() {
@@ -248,21 +248,42 @@ ${toolsStats.totalTools > 0
     <div className="h-full w-full flex overflow-hidden">
       {/* 左侧MCP管理区 */}
       <div className="w-1/3 border-r flex flex-col min-h-0">
-        <div className="p-6 border-b flex-shrink-0">
-          <h1 className="text-xl font-bold flex items-center gap-2">
+        <div className="p-4 border-b flex-shrink-0">
+          <div className="flex items-center gap-2 mb-2">
             <Server className="w-5 h-5 text-blue-600" />
-            MCP工具演示平台
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+            <h1 className="text-lg font-bold">MCP工具演示平台</h1>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">
             体验基于MCP官方SDK的AI工具调用和服务集成
           </p>
 
-          {/* 统计信息 */}
-          <MCPToolsStats
-            servers={servers}
-            getConnection={getConnection}
-            className="mt-4"
-          />
+          {/* 统计信息 - 优化布局 */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs">
+              <Server className="w-3 h-3 text-blue-600" />
+              <span className="font-medium">服务器</span>
+              <span className="text-blue-600 font-bold">{servers.length}</span>
+            </div>
+            <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs">
+              <Wifi className="w-3 h-3 text-green-600" />
+              <span className="font-medium">已连接</span>
+              <span className="text-green-600 font-bold">
+                {Array.from(getConnection ? servers.map(s => getConnection(s.id)).filter(Boolean) : []).length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded text-xs">
+              <Wrench className="w-3 h-3 text-purple-600" />
+              <span className="font-medium">工具</span>
+              <span className="text-purple-600 font-bold">{toolsStats.totalTools}</span>
+            </div>
+            <div className="flex items-center gap-2 p-2 bg-orange-50 dark:bg-orange-900/20 rounded text-xs">
+              <Database className="w-3 h-3 text-orange-600" />
+              <span className="font-medium">可用</span>
+              <span className="text-orange-600 font-bold">
+                {toolsStats.servers.length}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="flex-1 overflow-hidden min-h-0">
