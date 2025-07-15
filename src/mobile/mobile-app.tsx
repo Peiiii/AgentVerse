@@ -13,6 +13,7 @@ import { Switch } from "@/common/components/ui/switch";
 import { commonAgentsExtension } from "@/common/features/agents/extensions";
 import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
+import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
 import { cn } from "@/common/lib/utils";
 import { Discussion } from "@/common/types/discussion";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
@@ -33,7 +34,13 @@ type Scene = "discussions" | "chat" | "agents" | "settings";
 
 export function MobileAppInner() {
   useSetupApp({
-    extensions: [mobileChatExtension, commonAgentsExtension, settingsExtension, githubExtension],
+    extensions: [
+      allInOneAgentExtension,
+      mobileChatExtension,
+      commonAgentsExtension,
+      settingsExtension,
+      githubExtension,
+    ],
   });
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();
