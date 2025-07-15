@@ -84,33 +84,51 @@ export const WorldClassToolCallRenderer: React.FC<WorldClassToolCallRendererProp
 
   if (!expanded) return header;
 
-  // 展开时，header+body两部分，body为精美JSON区块，极简pop art风格
+  // 展开时，优先自定义渲染，否则降级为JSON
   return (
     <div style={{ margin: '16px 0', borderRadius: 12, boxShadow: '0 2px 12px 0 rgba(99,102,241,0.06)', border: '1px solid #e0e7ef', maxWidth: 520, background: '#fff', overflow: 'hidden' }} ref={detailRef}>
       {header}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f7fafd', padding: '0 0 0 0' }}>
-        <pre style={{
-          fontFamily: 'Menlo, monospace',
-          fontSize: 15,
-          background: '#fff',
-          borderRadius: 0,
-          padding: '20px 24px',
-          margin: 0,
-          color: '#22223b',
-          border: 'none',
-          maxHeight: 240,
-          minWidth: 0,
-          maxWidth: 480,
-          overflow: 'auto',
-          lineHeight: 1.7,
-          letterSpacing: 0.01,
-          textAlign: 'left',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all',
-          boxShadow: 'none',
-        }}>
-          {JSON.stringify(toolInvocation, null, 2)}
-        </pre>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f7fafd', padding: 0 }}>
+        {renderer && typeof renderer.render === 'function' ? (
+          <div style={{ width: '100%' }}>
+            {renderer.render(
+              Object.assign({
+                id: toolInvocation.toolCallId,
+                type: 'function',
+                function: {
+                  name: toolInvocation.toolName,
+                  arguments: JSON.stringify(toolInvocation.args),
+                },
+              },
+                (toolInvocation as any).result !== undefined ? { result: (toolInvocation as any).result } : {}
+              ) as any,
+              onToolResult || (() => {})
+            )}
+          </div>
+        ) : (
+          <pre style={{
+            fontFamily: 'Menlo, monospace',
+            fontSize: 15,
+            background: '#fff',
+            borderRadius: 0,
+            padding: '20px 24px',
+            margin: 0,
+            color: '#22223b',
+            border: 'none',
+            maxHeight: 240,
+            minWidth: 0,
+            maxWidth: 480,
+            overflow: 'auto',
+            lineHeight: 1.7,
+            letterSpacing: 0.01,
+            textAlign: 'left',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all',
+            boxShadow: 'none',
+          }}>
+            {JSON.stringify(toolInvocation, null, 2)}
+          </pre>
+        )}
       </div>
       <style>{`
         pre::-webkit-scrollbar {
