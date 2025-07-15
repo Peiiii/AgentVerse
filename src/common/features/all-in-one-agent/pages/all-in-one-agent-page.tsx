@@ -1,5 +1,9 @@
 import { AgentDef } from "@/common/types/agent";
 import { WorldClassChatContainer } from "@/common/components/world-class-chat";
+import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
+import { getCurrentTimeTool } from "@/common/features/agents/components/agent-tools/get-current-time.tool";
+import { calculatorTool, weatherTool } from "../components/agent-tools";
+import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 
 const AGENT_DEF: AgentDef = {
   id: "atlas-all-in-one",
@@ -13,11 +17,19 @@ const AGENT_DEF: AgentDef = {
   responseStyle: "专业、友好",
 };
 
+// 示例工具集合
+const EXAMPLE_TOOLS: AgentTool[] = [
+  getCurrentTimeTool,
+  weatherTool,
+  calculatorTool,
+];
+
 export function AllInOneAgentPage() {
+  useProvideAgentTools(EXAMPLE_TOOLS);
   return (
     <div style={{
-      width: "100vw",
-      height: "100vh",
+      width: "100%",
+      height: "100%",
       background: "linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%)",
       display: "flex",
       flexDirection: "column",
@@ -25,7 +37,7 @@ export function AllInOneAgentPage() {
       justifyContent: "flex-start",
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
     }}>
-      <WorldClassChatContainer agentDef={AGENT_DEF} />
+      <WorldClassChatContainer agentDef={AGENT_DEF} tools={EXAMPLE_TOOLS} />
     </div>
   );
 }
