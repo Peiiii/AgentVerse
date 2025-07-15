@@ -1,7 +1,7 @@
 import { AgentDef } from "@/common/types/agent";
 import { WorldClassChatContainer } from "@/common/components/world-class-chat";
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
-import { getCurrentTimeTool } from "@/common/features/agents/components/agent-tools/get-current-time.tool";
+import { getCurrentTimeTool } from "../components/agent-tools/get-current-time.tool";
 import { calculatorTool, weatherTool } from "../components/agent-tools";
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 

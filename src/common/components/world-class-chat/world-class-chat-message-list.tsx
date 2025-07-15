@@ -1,6 +1,6 @@
 import type { AgentDef } from "@/common/types/agent";
 import type { UIMessage } from "@ai-sdk/ui-utils";
-import { ToolCallRenderer } from "@/common/components/chat/agent-chat/tool-call-renderer";
+import { WorldClassToolCallRenderer } from "./world-class-tool-call-renderer";
 import { User } from "lucide-react";
 import { useEffect, useRef } from "react";
 
@@ -44,7 +44,7 @@ export function WorldClassChatMessageList({ messages, agentDef, isResponding }: 
     if (!msg.parts) return <span>{msg.content}</span>;
     return msg.parts.map((part, idx) => {
       if (part.type === "tool-invocation") {
-        return <ToolCallRenderer key={idx} {...part} />;
+        return <WorldClassToolCallRenderer key={idx} {...part} />;
       }
       if (part.type === "reasoning") {
         // ReasoningUIPart: { type: "reasoning", reasoning: string }
