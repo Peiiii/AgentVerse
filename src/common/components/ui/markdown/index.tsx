@@ -6,11 +6,11 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import type { Plugin } from "unified";
 import { MarkdownErrorBoundary } from "./components/error-boundary";
-import { CopyCodeButton } from "./copy-code-button";
 import { MarkdownProps } from "./types";
 // 新增：引入 react-syntax-highlighter 及主题
 import type { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { CodeBlockContainer } from "./code-block-container";
 
 // 新增：自定义代码块组件，支持高亮
 function CodeBlock({ className = "", children, ...props }: React.ComponentPropsWithoutRef<'code'>) {
@@ -24,15 +24,16 @@ function CodeBlock({ className = "", children, ...props }: React.ComponentPropsW
       : Array.isArray(children)
         ? children.join("")
         : "";
-    // oneLight 主题类型声明兼容处理
     return (
-      <SyntaxHighlighter
-        language={language}
-        PreTag="div"
-        customStyle={{ margin: 0, background: "none", boxShadow: "none" }}
-      >
-        {codeStr}
-      </SyntaxHighlighter>
+      <CodeBlockContainer language={language} code={codeStr}>
+        <SyntaxHighlighter
+          language={language}
+          PreTag="div"
+          customStyle={{ margin: 0, background: "none", boxShadow: "none" }}
+        >
+          {codeStr}
+        </SyntaxHighlighter>
+      </CodeBlockContainer>
     );
   }
   // 行内代码或无语言
@@ -66,13 +67,7 @@ export function Markdown({
       const language = /language-(\w+)/.exec(className)?.[1];
       if (language) {
         return (
-          <div className="code-block-container">
-            <div className="code-block-header">
-              <span className="code-lang-tag">{language.charAt(0).toUpperCase() + language.slice(1)}</span>
-              <span className="copy-btn-wrapper">
-                <CopyCodeButton text={code} />
-              </span>
-            </div>
+          <CodeBlockContainer language={language} code={code}>
             <SyntaxHighlighter
               language={language}
               PreTag="pre"
@@ -80,7 +75,7 @@ export function Markdown({
             >
               {code}
             </SyntaxHighlighter>
-          </div>
+          </CodeBlockContainer>
         );
       }
       return <pre {...props}>{props.children}</pre>;
