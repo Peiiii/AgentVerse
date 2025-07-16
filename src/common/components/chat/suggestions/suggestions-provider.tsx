@@ -6,7 +6,6 @@ import type { Suggestion } from "./suggestion.types";
 interface SuggestionsProviderProps {
   suggestions: Suggestion[];
   onSuggestionClick: (suggestion: Suggestion, action: 'send' | 'edit') => void;
-  onSendMessage?: (message: string) => void;
   onClose?: () => void;
   className?: string;
 }
@@ -14,24 +13,12 @@ interface SuggestionsProviderProps {
 export function SuggestionsProvider({
   suggestions = [],
   onSuggestionClick,
-  onSendMessage,
   onClose,
   className
 }: SuggestionsProviderProps) {
   if (!suggestions || suggestions.length === 0) {
     return null;
   }
-
-  const handleSuggestionClick = (suggestion: Suggestion) => {
-    if (suggestion.type === 'action' && onSendMessage) {
-      // action 类型直接发送消息
-      const messageToSend = suggestion.actionName;
-      onSendMessage(messageToSend);
-    } else {
-      // 其他类型填入输入框
-      onSuggestionClick(suggestion, 'edit');
-    }
-  };
 
   return (
     <div className={cn('w-full px-4 py-2', className)}>
@@ -41,7 +28,7 @@ export function SuggestionsProvider({
             <div key={suggestion.id} className="relative group">
               <button
                 className="inline-flex items-center h-9 px-4 rounded-full bg-muted hover:bg-accent transition text-sm font-normal focus:outline-none focus:ring-2 focus:ring-primary/30"
-                onClick={() => handleSuggestionClick(suggestion)}
+                onClick={() => onSuggestionClick(suggestion, 'send')}
                 type="button"
               >
                 <span>{suggestion.actionName}</span>

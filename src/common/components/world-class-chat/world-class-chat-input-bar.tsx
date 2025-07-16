@@ -36,11 +36,12 @@ export function WorldClassChatInputBar({ value, onChange, onSend, disabled, plac
         background: "#f8fafc",
         borderRadius: 16,
         boxShadow: isFocused ? "0 0 0 2px #6366f1" : "0 1px 4px #a5b4fc22",
-        border: isFocused ? "2px solid #6366f1" : "1px solid #e0e7ff",
+        border: "2px solid",
+        borderColor: isFocused ? "#6366f1" : "#e0e7ff",
         padding: "10px 16px",
         display: "flex",
         alignItems: "flex-end",
-        transition: "box-shadow 0.2s, border 0.2s",
+        transition: "box-shadow 0.2s, border-color 0.2s",
         marginBottom: 24, // 底部外边距
         // 移除左右外边距
       }}
