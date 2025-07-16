@@ -10,6 +10,9 @@ import { WorldClassChatMessageList } from "./world-class-chat-message-list";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
 import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
+import React from "react";
+import { Message } from "@ag-ui/core";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
@@ -34,15 +37,28 @@ export function WorldClassChatContainer({
     baseURL: providerConfig.baseUrl,
     apiKey: providerConfig.apiKey,
   });
+  // 聊天消息缓存（可插拔）
+  const cacheKey = `chat-messages-${agentDef.id}`;
+  const { initialMessages, handleMessagesChange } = useChatMessageCache<Message>(cacheKey);
   const {
     uiMessages,
+    messages,
     isAgentResponding,
-    sendMessage
+    sendMessage,
+    reset
   } = useAgentChat({
     agent,
     tools,
     contexts,
+    initialMessages,
   });
+
+  console.log("[WorldClassChatContainer] messages", messages);
+
+  // 监听消息变化并缓存
+  React.useEffect(() => {
+    handleMessagesChange(messages);
+  }, [messages, handleMessagesChange]);
 
   // 推荐项（模拟智能推荐，后续可接入AI/运营配置）
   const suggestions: Suggestion[] = [
@@ -74,11 +90,18 @@ export function WorldClassChatContainer({
 
   // 推荐项点击：自动发送消息并清空输入
   const handleSuggestionClick = (suggestion: Suggestion, action: 'send' | 'edit') => {
-    if (action === 'send' ) {
+    if (action === 'send') {
       sendMessage(suggestion.content);
     } else {
       setInput(suggestion.content);
     }
+  };
+
+  // 清空消息处理（只需 reset，缓存会自动同步）
+  const handleClear = () => {
+    reset();
+    setInput("");
+    if (onClear) onClear();
   };
 
   return (
@@ -94,7 +117,7 @@ export function WorldClassChatContainer({
         overflow: "hidden",
         padding: "0 16px 0 16px", // 新增左右内边距
       }} className={className}>
-        <WorldClassChatTopBar agentDef={agentDef} onClear={onClear} />
+        <WorldClassChatTopBar agentDef={agentDef} onClear={handleClear} />
         <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           <WorldClassChatMessageList messages={uiMessages} agentDef={agentDef} isResponding={isAgentResponding} />
         </div>

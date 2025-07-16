@@ -267,3 +267,9 @@
   color: inherit;
   margin: 0;
 } 
+
+/* 修复高亮 markdown 代码块内容被强制换行问题 */
+.world-class-markdown pre code.hljs,
+.world-class-markdown pre code.hljs * {
+  white-space: pre !important;
+} 
