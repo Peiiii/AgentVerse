@@ -1,19 +1,18 @@
-import { useState } from "react";
-import type { AgentDef } from "@/common/types/agent";
-import type { ToolDefinition, Context } from "@agent-labs/agent-chat";
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
-import { useAgentChat } from "@agent-labs/agent-chat";
-import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experimental-inbrowser-agent";
-import { getLLMProviderConfig } from "@/core/services/ai.service";
-import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
-import { WorldClassChatMessageList } from "./world-class-chat-message-list";
-import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
 import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
 import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
-import React from "react";
+import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experimental-inbrowser-agent";
+import type { AgentDef } from "@/common/types/agent";
+import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { Message } from "@ag-ui/core";
-import { X } from "lucide-react";
+import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
+import { useAgentChat } from "@agent-labs/agent-chat";
+import React, { useState } from "react";
+import { WorldClassChatHtmlPreview } from "./world-class-chat-html-preview";
+import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
+import { WorldClassChatMessageList } from "./world-class-chat-message-list";
+import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
@@ -121,7 +120,7 @@ export function WorldClassChatContainer({
         {/* 左侧：聊天主界面 */}
         <div
           className={
-            `flex flex-col h-full min-w-0 transition-all duration-300 ${previewHtml ? 'flex-1 w-1/2 p-0' : 'w-full p-0'}`
+            `flex flex-col h-full min-w-0 flex-1 transition-all duration-300 ${previewHtml ? 'w-1/2 p-0' : 'w-full p-0'}`
           }
           style={{
             boxSizing: "border-box",
@@ -149,53 +148,7 @@ export function WorldClassChatContainer({
         </div>
         {/* 右侧：HTML 预览 */}
         {previewHtml && (
-          <div
-            style={{
-              flex: 1,
-              width: "50%",
-              minWidth: 0,
-              background: "#fff",
-              boxShadow: "-2px 0 16px 0 rgba(99,102,241,0.06)",
-              display: "flex",
-              flexDirection: "column",
-              position: "relative",
-              animation: "fadeInRight 0.4s cubic-bezier(.4,0,.2,1)",
-            }}
-          >
-            {/* 关闭按钮 */}
-            <button
-              onClick={() => setPreviewHtml(null)}
-              style={{
-                position: "absolute",
-                top: 18,
-                right: 18,
-                zIndex: 10,
-                background: "#f4f6fb",
-                border: "none",
-                borderRadius: 8,
-                padding: 4,
-                cursor: "pointer",
-                boxShadow: "0 1px 4px #a5b4fc22",
-                transition: "background 0.18s",
-              }}
-              title="关闭预览"
-            >
-              <X size={18} color="#6366f1" />
-            </button>
-            <div style={{ flex: 1, overflow: "auto", padding: 32 }}>
-              <div style={{ borderRadius: 12, boxShadow: "0 2px 12px 0 rgba(99,102,241,0.04)", overflow: "hidden", background: "#fff", minHeight: 200 }}>
-                {/* SSR/CSR 安全警告：如有需要可用 sandboxed iframe 替换 */}
-                <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-              </div>
-            </div>
-            {/* 动画 keyframes */}
-            <style>{`
-              @keyframes fadeInRight {
-                from { opacity: 0; transform: translateX(48px); }
-                to { opacity: 1; transform: none; }
-              }
-            `}</style>
-          </div>
+          <div className="min-w-0 flex-1 max-w-1/2 h-full"><WorldClassChatHtmlPreview html={previewHtml} onClose={() => setPreviewHtml(null)} /></div>
         )}
       </div>
     </AgentChatProviderWrapper>
