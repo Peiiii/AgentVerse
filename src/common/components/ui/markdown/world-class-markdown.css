@@ -1,0 +1,119 @@
+/* 世界级体验的 markdown 代码块和表格样式，仅作用于 .world-class-markdown 区域 */
+.world-class-markdown table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  background: transparent;
+  font-size: 15px;
+  margin: 18px 0;
+  box-shadow: 0 2px 12px 0 rgba(99,102,241,0.04);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.world-class-markdown th, .world-class-markdown td {
+  border: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  text-align: left;
+  transition: background 0.18s;
+}
+.world-class-markdown th {
+  background: #f4f6fb;
+  font-weight: 700;
+  color: #22223b;
+}
+.world-class-markdown tr {
+  background: #fff;
+  transition: background 0.18s;
+}
+.world-class-markdown tr:hover {
+  background: #f0f4ff;
+}
+.world-class-markdown td {
+  color: #22223b;
+}
+.dark .world-class-markdown table {
+  background: transparent;
+  box-shadow: 0 2px 12px 0 rgba(99,102,241,0.10);
+}
+.dark .world-class-markdown th {
+  background: #23263a;
+  color: #e0e7ff;
+}
+.dark .world-class-markdown td {
+  color: #e0e7ff;
+  border-color: #374151;
+}
+.dark .world-class-markdown tr {
+  background: #181a29;
+}
+.dark .world-class-markdown tr:hover {
+  background: #23263a;
+}
+/* 代码块样式 */
+.world-class-markdown pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 18px 18px 16px 18px;
+  border-radius: 12px;
+  background: #f4f6fb;
+  font-size: 15px;
+  line-height: 1.7;
+  box-shadow: 0 2px 12px 0 rgba(99,102,241,0.04);
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'monospace';
+  transition: background 0.18s;
+}
+.world-class-markdown pre {
+  margin: 18px 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.world-class-markdown code.hljs {
+  background: none;
+  border: none;
+}
+.dark .world-class-markdown pre code.hljs {
+  background: #23263a;
+  color: #e0e7ff;
+  box-shadow: 0 2px 12px 0 rgba(99,102,241,0.10);
+}
+.world-class-markdown .hljs-comment,
+.world-class-markdown .hljs-quote {
+  color: #64748b;
+  font-style: italic;
+}
+.world-class-markdown .hljs-keyword,
+.world-class-markdown .hljs-selector-tag,
+.world-class-markdown .hljs-literal {
+  color: #6366f1;
+  font-weight: 600;
+}
+.world-class-markdown .hljs-string,
+.world-class-markdown .hljs-title,
+.world-class-markdown .hljs-section,
+.world-class-markdown .hljs-attribute {
+  color: #059669;
+}
+.world-class-markdown .hljs-number,
+.world-class-markdown .hljs-meta {
+  color: #eab308;
+}
+.world-class-markdown .hljs-built_in,
+.world-class-markdown .hljs-builtin-name {
+  color: #f43f5e;
+}
+.world-class-markdown .hljs-symbol,
+.world-class-markdown .hljs-bullet {
+  color: #f59e42;
+}
+.world-class-markdown .hljs-code {
+  color: #2563eb;
+}
+.world-class-markdown .hljs-addition {
+  background: #d1fae5;
+  color: #059669;
+}
+.world-class-markdown .hljs-deletion {
+  background: #fee2e2;
+  color: #b91c1c;
+} 

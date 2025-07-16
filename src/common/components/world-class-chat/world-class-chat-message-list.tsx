@@ -1,10 +1,11 @@
+import { Markdown } from "@/common/components/ui/markdown";
+import "@/common/components/ui/markdown/world-class-markdown.css";
+import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
 import type { AgentDef } from "@/common/types/agent";
 import type { UIMessage } from "@ai-sdk/ui-utils";
-import { WorldClassToolCallRenderer } from "./world-class-tool-call-renderer";
 import { User } from "lucide-react";
-import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
-import { Markdown } from "@/common/components/ui/markdown";
 import { forwardRef, useImperativeHandle } from "react";
+import { WorldClassToolCallRenderer } from "./world-class-tool-call-renderer";
 
 export interface WorldClassChatMessageListProps {
   messages: UIMessage[];
@@ -64,6 +65,59 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
 
     return (
       <div style={{ position: "relative", flex: 1, height: "100%", display: "flex", flexDirection: "column" }}>
+        {/* 世界级表格样式，仅作用于 world-class-markdown 区域 */}
+        <style>{`
+          .world-class-markdown table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            background: transparent;
+            font-size: 15px;
+            margin: 18px 0;
+            box-shadow: 0 2px 12px 0 rgba(99,102,241,0.04);
+            border-radius: 12px;
+            overflow: hidden;
+          }
+          .world-class-markdown th, .world-class-markdown td {
+            border: 1px solid #e5e7eb;
+            padding: 10px 16px;
+            text-align: left;
+            transition: background 0.18s;
+          }
+          .world-class-markdown th {
+            background: #f4f6fb;
+            font-weight: 700;
+            color: #22223b;
+          }
+          .world-class-markdown tr {
+            background: #fff;
+            transition: background 0.18s;
+          }
+          .world-class-markdown tr:hover {
+            background: #f0f4ff;
+          }
+          .world-class-markdown td {
+            color: #22223b;
+          }
+          .dark .world-class-markdown table {
+            background: transparent;
+            box-shadow: 0 2px 12px 0 rgba(99,102,241,0.10);
+          }
+          .dark .world-class-markdown th {
+            background: #23263a;
+            color: #e0e7ff;
+          }
+          .dark .world-class-markdown td {
+            color: #e0e7ff;
+            border-color: #374151;
+          }
+          .dark .world-class-markdown tr {
+            background: #181a29;
+          }
+          .dark .world-class-markdown tr:hover {
+            background: #23263a;
+          }
+        `}</style>
         <div
           ref={containerRef}
           className={isSticky ? "sticky-bottom" : undefined}
@@ -206,7 +260,7 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
             }}
             title="滚动到底部"
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 9l5 5 5-5" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 9l5 5 5-5" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         )}
       </div>
