@@ -95,7 +95,9 @@ export function WorldClassChatContainer({
         padding: "0 16px 0 16px", // 新增左右内边距
       }} className={className}>
         <WorldClassChatTopBar agentDef={agentDef} onClear={onClear} />
-        <WorldClassChatMessageList messages={uiMessages} agentDef={agentDef} isResponding={isAgentResponding} />
+        <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+          <WorldClassChatMessageList messages={uiMessages} agentDef={agentDef} isResponding={isAgentResponding} />
+        </div>
         <SuggestionsProvider
           suggestions={suggestions}
           onSuggestionClick={handleSuggestionClick}
