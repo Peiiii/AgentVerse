@@ -171,10 +171,12 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
                   }}
                   className="world-class-message-bubble"
                 >
-                  {/* 复制按钮，仅 hover 时显示 */}
-                  <span style={{ position: "absolute", bottom: 0, right: 0, opacity: 0, pointerEvents: "none", transition: "opacity 0.18s" }} className="copy-btn-wrapper">
-                    <CopyMessageButton text={plainText} />
-                  </span>
+                  {/* 仅 assistant 消息显示复制按钮 */}
+                  {!isUser && (
+                    <span style={{ position: "absolute", bottom: 0, right: 0, opacity: 0, pointerEvents: "none", transition: "opacity 0.18s" }} className="copy-btn-wrapper">
+                      <CopyMessageButton text={plainText} />
+                    </span>
+                  )}
                   <span style={{ display: "block" }}>{renderMessageContent(msg)}</span>
                 </div>
               </div>
