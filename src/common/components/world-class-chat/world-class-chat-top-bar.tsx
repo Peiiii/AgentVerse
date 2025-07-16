@@ -1,4 +1,5 @@
 import type { AgentDef } from "@/common/types/agent";
+import { Trash2 } from "lucide-react";
 
 export interface WorldClassChatTopBarProps {
   agentDef: AgentDef;
@@ -32,7 +33,29 @@ export function WorldClassChatTopBar({ agentDef, onClear }: WorldClassChatTopBar
       </div>
       <div style={{ display: "flex", gap: 12 }}>
         {onClear && (
-          <button onClick={onClear} title="清空对话" style={{ background: "rgba(255,255,255,0.12)", border: "none", borderRadius: 8, color: "#fff", fontWeight: 500, fontSize: 15, padding: "8px 18px", cursor: "pointer", transition: "background 0.2s" }}>清空</button>
+          <button
+            onClick={onClear}
+            title="清空对话"
+            style={{
+              background: "rgba(255,255,255,0.12)",
+              border: "none",
+              borderRadius: 8,
+              color: "#fff",
+              padding: 8,
+              cursor: "pointer",
+              transition: "background 0.2s, box-shadow 0.2s",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 36,
+              height: 36,
+              boxShadow: "0 1px 4px #6366f133"
+            }}
+            onMouseOver={e => (e.currentTarget.style.background = "rgba(255,255,255,0.22)")}
+            onMouseOut={e => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}
+          >
+            <Trash2 style={{ width: 20, height: 20 }} />
+          </button>
         )}
       </div>
     </div>
