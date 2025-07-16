@@ -50,28 +50,23 @@ function AgentPreviewChatInner({
   const handleSuggestionClick = useCallback((suggestion: Suggestion, action: 'send' | 'edit') => {
     if (action === 'edit') {
       setInputMessage(suggestion.content);
+    } else {
+      setInputMessage(suggestion.content);
+      // 使用 setTimeout 确保状态更新后再发送
+      setTimeout(() => {
+        if (chatContainerRef.current?.handleSendMessage) {
+          chatContainerRef.current.handleSendMessage();
+        }
+      }, 0);
     }
   }, []);
 
-  // 处理发送消息
-  const handleSendMessage = useCallback((message: string) => {
-    console.log('Sending message:', message);
-    // 设置输入消息并触发发送
-    setInputMessage(message);
-    // 使用 setTimeout 确保状态更新后再发送
-    setTimeout(() => {
-      if (chatContainerRef.current?.handleSendMessage) {
-        chatContainerRef.current.handleSendMessage();
-      }
-    }, 0);
-  }, []);
 
   // 作为bottomContent插槽传递
   const suggestionsNode = enableSuggestions ? (
     <SuggestionsProvider
       suggestions={suggestions}
       onSuggestionClick={handleSuggestionClick}
-      onSendMessage={handleSendMessage}
       onClose={() => setSuggestions([])}
       className="mt-2"
     />

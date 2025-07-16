@@ -41,6 +41,7 @@ export function SuggestionsProvider({
                 className="absolute -top-1 -right-1 h-5 w-5 p-0 bg-white/90 hover:bg-white shadow-md border border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log('编辑', suggestion);
                   onSuggestionClick(suggestion, 'edit');
                 }}
                 title="编辑"

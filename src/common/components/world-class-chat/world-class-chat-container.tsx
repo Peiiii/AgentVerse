@@ -74,9 +74,10 @@ export function WorldClassChatContainer({
 
   // 推荐项点击：自动发送消息并清空输入
   const handleSuggestionClick = (suggestion: Suggestion, action: 'send' | 'edit') => {
-    if (action === 'send' || action === 'edit') {
+    if (action === 'send' ) {
       sendMessage(suggestion.content);
-      setInput("");
+    } else {
+      setInput(suggestion.content);
     }
   };
 
