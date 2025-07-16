@@ -140,6 +140,9 @@ importers:
       react-router-dom:
         specifier: ^7.6.2
         version: 7.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-syntax-highlighter:
+        specifier: ^15.6.1
+        version: 15.6.1(react@19.1.0)
       rehype-highlight:
         specifier: ^7.0.2
         version: 7.0.2
@@ -231,6 +234,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.5
         version: 18.3.5(@types/react@18.3.18)
+      '@types/react-syntax-highlighter':
+        specifier: ^15.5.13
+        version: 15.5.13
       '@types/unist':
         specifier: ^3.0.3
         version: 3.0.3

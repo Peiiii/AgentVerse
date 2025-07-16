@@ -2,47 +2,41 @@ import { cn } from "@/common/lib/utils";
 import type { Root } from "mdast";
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import type { Plugin } from "unified";
-import type { Node } from "unist";
 import { MarkdownErrorBoundary } from "./components/error-boundary";
-import { MermaidChart } from "./components/mermaid";
 import { CopyCodeButton } from "./copy-code-button";
 import { MarkdownProps } from "./types";
+// 新增：引入 react-syntax-highlighter 及主题
+import type { Components } from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
-// 新增：自定义代码块组件
-function CodeBlock({ className, children, ...props }: any) {
-  const isBlock = typeof className === "string" && className.includes("language-");
-  let code = "";
-  if (Array.isArray(children)) {
-    code = children.join("");
-  } else if (typeof children === "string") {
-    code = children;
-  }
-  const match = /language-(\w+)/.exec(className || "");
+// 新增：自定义代码块组件，支持高亮
+function CodeBlock({ className = "", children, ...props }: React.ComponentPropsWithoutRef<'code'>) {
+  // 提取语言
+  const match = /language-(\w+)/.exec(className);
   const language = match?.[1];
-  if (language === "mermaid") {
-    return <MermaidChart chart={code} />;
+  // 只对有语言的块级代码高亮
+  if (language) {
+    const codeStr = typeof children === "string"
+      ? children
+      : Array.isArray(children)
+        ? children.join("")
+        : "";
+    // oneLight 主题类型声明兼容处理
+    return (
+      <SyntaxHighlighter
+        language={language}
+        PreTag="div"
+        customStyle={{ margin: 0, background: "none", boxShadow: "none" }}
+      >
+        {codeStr}
+      </SyntaxHighlighter>
+    );
   }
-  if (!isBlock) {
-    return <code className={className} {...props}>{children}</code>;
-  }
-  // 块级代码：header+内容分离
-  return (
-    <div className="code-block-container" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div className="code-block-header">
-        <span className="code-lang-tag">{language ? language.charAt(0).toUpperCase() + language.slice(1) : "Code"}</span>
-        <span className="copy-btn-wrapper">
-          <CopyCodeButton text={code} />
-        </span>
-      </div>
-      <div className="code-block-content" style={{ flex: 1, minHeight: 0 }}>
-        <code className={className} {...props}>{children}</code>
-      </div>
-    </div>
-  );
+  // 行内代码或无语言
+  return <code className={className} {...props}>{children}</code>;
 }
 
 /**
@@ -54,15 +48,42 @@ export function Markdown({
   className,
   components,
   remarkPlugins = [remarkGfm as unknown as Plugin<[], Root>],
-  rehypePlugins = [rehypeRaw as any, rehypeHighlight as unknown as Plugin<[], Node>],
+  rehypePlugins = [rehypeRaw as any],
 }: MarkdownProps) {
   // 使用 useMemo 缓存组件配置，避免每次重新渲染
-  const defaultComponents = useMemo(() => ({
-    ...components,
+  const defaultComponents: Partial<Components> = useMemo(() => ({
+    ...(components as Partial<Components>),
     code: CodeBlock,
-    // pre 只做包裹，交给 code 处理复制按钮
-    pre: ({ children, ...props }: React.ComponentPropsWithoutRef<"pre">) => {
-      return <pre {...props}>{children}</pre>;
+    pre: (props: React.HTMLAttributes<HTMLPreElement>) => {
+      const children: React.ReactElement<{ children: string | string[]; className?: string }> | undefined = props.children as React.ReactElement<{ children: string | string[]; className?: string }>;
+      let code = "";
+      if (children && typeof children.props?.children === 'string') {
+        code = children.props.children;
+      } else if (children && Array.isArray(children.props?.children)) {
+        code = (children.props.children as string[]).join("");
+      }
+      const className = children?.props?.className ?? "";
+      const language = /language-(\w+)/.exec(className)?.[1];
+      if (language) {
+        return (
+          <div className="code-block-container">
+            <div className="code-block-header">
+              <span className="code-lang-tag">{language.charAt(0).toUpperCase() + language.slice(1)}</span>
+              <span className="copy-btn-wrapper">
+                <CopyCodeButton text={code} />
+              </span>
+            </div>
+            <SyntaxHighlighter
+              language={language}
+              PreTag="pre"
+              customStyle={{ margin: 0, background: "none", boxShadow: "none" }}
+            >
+              {code}
+            </SyntaxHighlighter>
+          </div>
+        );
+      }
+      return <pre {...props}>{props.children}</pre>;
     },
   }), [components]);
 
