@@ -8,51 +8,22 @@ export interface WorldClassChatTopBarProps {
 
 export function WorldClassChatTopBar({ agentDef, onClear }: WorldClassChatTopBarProps) {
   return (
-    <div style={{
-      width: "100%",
-      minHeight: 80,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 40px",
-      background: "linear-gradient(90deg, #6366f1 0%, #818cf8 100%)",
-      boxShadow: "0 4px 24px 0 rgba(99,102,241,0.08)",
-      position: "sticky",
-      top: 0,
-      zIndex: 10,
-      color: "#fff",
-      borderBottomLeftRadius: 24,
-      borderBottomRightRadius: 24,
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <img src={agentDef.avatar} alt="avatar" style={{ width: 54, height: 54, borderRadius: 16, background: "#fff", boxShadow: "0 2px 8px #6366f133" }} />
+    <div
+      className="w-full min-h-[80px] flex items-center justify-between px-10 bg-gradient-to-r from-indigo-500 to-indigo-400 shadow-lg sticky top-0 z-10 text-white"
+    >
+      <div className="flex items-center gap-5">
+        <img src={agentDef.avatar} alt="avatar" className="w-[54px] h-[54px] rounded-2xl bg-white shadow-md" />
         <div>
-          <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: 1 }}>{agentDef.name}</div>
-          <div style={{ fontWeight: 400, fontSize: 15, opacity: 0.85 }}>World-Class AI Copilot</div>
+          <div className="font-extrabold text-2xl tracking-wide">{agentDef.name}</div>
+          <div className="font-normal text-base opacity-85">World-Class AI Copilot</div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 12 }}>
+      <div className="flex gap-3">
         {onClear && (
           <button
             onClick={onClear}
             title="清空对话"
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "none",
-              borderRadius: 8,
-              color: "#fff",
-              padding: 8,
-              cursor: "pointer",
-              transition: "background 0.2s, box-shadow 0.2s",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 36,
-              height: 36,
-              boxShadow: "0 1px 4px #6366f133"
-            }}
-            onMouseOver={e => (e.currentTarget.style.background = "rgba(255,255,255,0.22)")}
-            onMouseOut={e => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}
+            className="bg-white/15 hover:bg-white/25 border-none rounded-lg text-white p-2 cursor-pointer transition-colors duration-200 flex items-center justify-center w-9 h-9 shadow-md"
           >
             <Trash2 style={{ width: 20, height: 20 }} />
           </button>

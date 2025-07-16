@@ -31,19 +31,12 @@ export function WorldClassChatInputBar({ value, onChange, onSend, disabled, plac
 
   return (
     <div
+      className="flex items-end mb-6 bg-slate-50 rounded-2xl mx-4"
       style={{
-        width: "100%",
-        background: "#f8fafc",
-        borderRadius: 16,
         boxShadow: isFocused ? "0 0 0 2px #6366f1" : "0 1px 4px #a5b4fc22",
         border: "2px solid",
         borderColor: isFocused ? "#6366f1" : "#e0e7ff",
-        padding: "10px 16px",
-        display: "flex",
-        alignItems: "flex-end",
-        transition: "box-shadow 0.2s, border-color 0.2s",
-        marginBottom: 24, // 底部外边距
-        // 移除左右外边距
+        padding: "10px 16px"
       }}
     >
       <textarea
@@ -55,37 +48,19 @@ export function WorldClassChatInputBar({ value, onChange, onSend, disabled, plac
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder || "请输入内容..."}
         rows={1}
-        style={{
-          flex: 1,
-          resize: "none",
-          border: "none",
-          outline: "none",
-          background: "transparent",
-          fontSize: 16,
-          color: "#22223b",
-          minHeight: 32,
-          maxHeight: 120,
-          lineHeight: 1.7,
-          padding: 0,
-        }}
+        className="flex-1 resize-none border-none outline-none bg-transparent text-base text-neutral-900 min-h-[32px] max-h-[120px] leading-[1.7] p-0"
+        style={{ fontSize: 16 }}
         disabled={disabled}
       />
       <button
         onClick={onSend}
         disabled={disabled || !value.trim()}
-        style={{
-          marginLeft: 12,
-          background: disabled || !value.trim() ? "#e0e7ff" : "linear-gradient(90deg,#6366f1 60%,#818cf8 100%)",
-          color: disabled || !value.trim() ? "#a5b4fc" : "#fff",
-          border: "none",
-          borderRadius: 12,
-          padding: "8px 18px",
-          fontSize: 15,
-          fontWeight: 500,
-          cursor: disabled || !value.trim() ? "not-allowed" : "pointer",
-          boxShadow: "0 1px 4px #a5b4fc22",
-          transition: "background 0.2s, color 0.2s",
-        }}
+        className={
+          `ml-3 rounded-xl px-[18px] py-2 text-[15px] font-medium shadow-md transition-colors duration-200 ` +
+          (disabled || !value.trim()
+            ? 'bg-indigo-100 text-indigo-200 cursor-not-allowed'
+            : 'bg-gradient-to-r from-indigo-500 to-indigo-400 text-white cursor-pointer hover:from-indigo-600 hover:to-indigo-500')
+        }
       >
         发送
       </button>

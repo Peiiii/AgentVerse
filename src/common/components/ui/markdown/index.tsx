@@ -7,54 +7,30 @@ import remarkGfm from "remark-gfm";
 import type { Plugin } from "unified";
 import { MarkdownErrorBoundary } from "./components/error-boundary";
 import { MarkdownProps } from "./types";
-// 新增：引入 react-syntax-highlighter 及主题
 import type { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { CodeBlockContainer } from "./code-block-container";
+import { CodeBlock, CodeBlockAction } from "./code-block";
 
-// 新增：自定义代码块组件，支持高亮
-function CodeBlock({ className = "", children, ...props }: React.ComponentPropsWithoutRef<'code'>) {
-  // 提取语言
-  const match = /language-(\w+)/.exec(className);
-  const language = match?.[1];
-  // 只对有语言的块级代码高亮
-  if (language) {
-    const codeStr = typeof children === "string"
-      ? children
-      : Array.isArray(children)
-        ? children.join("")
-        : "";
-    return (
-      <CodeBlockContainer language={language} code={codeStr}>
-        <SyntaxHighlighter
-          language={language}
-          PreTag="div"
-          customStyle={{ margin: 0, background: "none", boxShadow: "none" }}
-        >
-          {codeStr}
-        </SyntaxHighlighter>
-      </CodeBlockContainer>
-    );
-  }
-  // 行内代码或无语言
-  return <code className={className} {...props}>{children}</code>;
+export type { CodeBlockAction } from "./code-block";
+
+// Markdown 组件 props 扩展
+export interface MarkdownWithActionsProps extends MarkdownProps {
+  codeBlockActions?: CodeBlockAction[];
 }
 
-/**
- * 基础 Markdown 组件
- * 提供基本的 Markdown 渲染功能，支持自定义插件
- */
 export function Markdown({
   content,
   className,
   components,
   remarkPlugins = [remarkGfm as unknown as Plugin<[], Root>],
   rehypePlugins = [rehypeRaw as any],
-}: MarkdownProps) {
-  // 使用 useMemo 缓存组件配置，避免每次重新渲染
+  codeBlockActions = [],
+}: MarkdownWithActionsProps) {
+  // 组件配置，注入 codeBlockActions
   const defaultComponents: Partial<Components> = useMemo(() => ({
     ...(components as Partial<Components>),
-    code: CodeBlock,
+    code: (props: any) => <CodeBlock {...props} codeBlockActions={codeBlockActions} />, // 注入 actions
     pre: (props: React.HTMLAttributes<HTMLPreElement>) => {
       const children: React.ReactElement<{ children: string | string[]; className?: string }> | undefined = props.children as React.ReactElement<{ children: string | string[]; className?: string }>;
       let code = "";
@@ -65,9 +41,26 @@ export function Markdown({
       }
       const className = children?.props?.className ?? "";
       const language = /language-(\w+)/.exec(className)?.[1];
+      console.log("[Markdown] ", { code, language });
+      // 生成 actions
+      const actions = codeBlockActions?.filter(a => !a.show || a.show(code, language)).map(a => (
+        <button
+          key={a.key}
+          className="code-block-action-btn"
+          title={a.label}
+          style={{ marginLeft: 4 }}
+          onClick={e => {
+            e.stopPropagation();
+            a.onClick(code, language);
+          }}
+        >
+          {a.icon || a.label}
+        </button>
+      ));
+      console.log("[Markdown] actions", actions);
       if (language) {
         return (
-          <CodeBlockContainer language={language} code={code}>
+          <CodeBlockContainer language={language} code={code} actions={actions}>
             <SyntaxHighlighter
               language={language}
               PreTag="pre"
@@ -80,7 +73,7 @@ export function Markdown({
       }
       return <pre {...props}>{props.children}</pre>;
     },
-  }), [components]);
+  }), [components, codeBlockActions]);
 
   return (
     <MarkdownErrorBoundary content={content}>

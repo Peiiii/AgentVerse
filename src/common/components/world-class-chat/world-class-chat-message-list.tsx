@@ -1,4 +1,4 @@
-import { Markdown } from "@/common/components/ui/markdown";
+import { Markdown, CodeBlockAction } from "@/common/components/ui/markdown";
 import "@/common/components/ui/markdown/world-class-markdown.css";
 import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
 import type { AgentDef } from "@/common/types/agent";
@@ -12,6 +12,10 @@ export interface WorldClassChatMessageListProps {
   messages: UIMessage[];
   agentDef: AgentDef;
   isResponding?: boolean;
+  /**
+   * 代码块 HTML 预览回调
+   */
+  onPreviewHtml?: (html: string) => void;
 }
 
 export interface WorldClassChatMessageListRef {
@@ -19,34 +23,41 @@ export interface WorldClassChatMessageListRef {
 }
 
 export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef, WorldClassChatMessageListProps>(
-  ({ messages, agentDef, isResponding }, ref) => {
+  ({ messages, agentDef, isResponding, onPreviewHtml }, ref) => {
     // 自动滚动到底部和 sticky 支持
     const { containerRef, isSticky, scrollToBottom } = useChatAutoScroll({ deps: [messages, isResponding] });
     useImperativeHandle(ref, () => ({ scrollToBottom }), [scrollToBottom]);
+
+    // 预览按钮 action
+    const codeBlockActions: CodeBlockAction[] = onPreviewHtml ? [
+      {
+        key: "preview-html",
+        label: "预览",
+        icon: <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2h12v12H2z" fill="none" stroke="#6366f1" strokeWidth="1.5"/><path d="M4 4h8v8H4z" fill="#6366f1" opacity="0.12"/></svg>,
+        onClick: (code: string, language?: string) => {
+          if (language === "html") onPreviewHtml(code);
+        },
+        show: (_code: string, language?: string) => language === "html",
+      },
+    ] : [];
 
     // 渲染头像
     const renderAvatar = (role: "user" | "assistant") => {
       const isUser = role === "user";
       return (
-        <div style={{
-          width: 44,
-          height: 44,
-          borderRadius: 16,
-          background: isUser ? "#6366f1" : "#fff",
-          boxShadow: isUser ? "0 2px 8px #6366f133" : "0 1px 4px #a5b4fc22",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginRight: 12,
-        }}>
-          {isUser ? <User color="#fff" size={28} /> : <img src={agentDef.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: 12 }} />}
+        <div
+          className={
+            `w-11 h-11 rounded-2xl flex items-center justify-center mr-4 shadow-md ${isUser ? 'bg-indigo-500 shadow-indigo-200' : 'bg-white shadow-indigo-100 ml-4'} flex-shrink-0`
+          }
+        >
+          {isUser ? <User color="#fff" size={28} /> : <img src={agentDef.avatar} alt="avatar" className="w-8 h-8 rounded-xl" />}
         </div>
       );
     };
 
     // 渲染消息内容（支持 parts）
     const renderMessageContent = (msg: UIMessage) => {
-      if (!msg.parts) return <Markdown content={msg.content || ""} className="world-class-markdown" />;
+      if (!msg.parts) return <Markdown content={msg.content || ""} className="world-class-markdown" codeBlockActions={codeBlockActions} />;
       return msg.parts.map((part, idx) => {
         if (part.type === "tool-invocation") {
           return <WorldClassToolCallRenderer key={idx} {...part} />;
@@ -57,7 +68,7 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
         }
         if (part.type === "text") {
           // TextUIPart: { type: "text", text: string }
-          return <Markdown key={idx} content={part.text} className="world-class-markdown" />;
+          return <Markdown key={idx} content={part.text} className="world-class-markdown" codeBlockActions={codeBlockActions} />;
         }
         // 其他类型 fallback
         return <span key={idx} style={{ color: "#64748b" }}>{JSON.stringify(part)}</span>;
@@ -154,22 +165,9 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
               >
                 {renderAvatar(msg.role === "user" ? "user" : "assistant")}
                 <div
-                  style={{
-                    background: isUser ? "linear-gradient(90deg,#6366f1 60%,#818cf8 100%)" : "#fff",
-                    color: isUser ? "#fff" : "#22223b",
-                    borderRadius: 18,
-                    padding: "14px 20px",
-                    fontSize: 16,
-                    boxShadow: isUser ? "0 2px 8px #6366f133" : "0 1px 4px #a5b4fc22",
-                    maxWidth: "70vw",
-                    minWidth: 60,
-                    marginLeft: isUser ? 0 : 8,
-                    marginRight: isUser ? 8 : 0,
-                    transition: "background 0.2s",
-                    wordBreak: "break-word",
-                    position: "relative",
-                  }}
-                  className="world-class-message-bubble"
+                  className={
+                    `relative ${isUser ? 'bg-gradient-to-r from-indigo-500 to-indigo-400 text-white shadow-indigo-200' : 'bg-white text-neutral-900 shadow-indigo-100'} rounded-2xl px-5 py-3 text-base max-w-[70vw] min-w-[60px] ${isUser ? 'ml-3 mr-2' : 'ml-2 mr-3'} transition-colors duration-200 break-words world-class-message-bubble flex-shrink`
+                  }
                 >
                   {/* 仅 assistant 消息显示复制按钮 */}
                   {!isUser && (
