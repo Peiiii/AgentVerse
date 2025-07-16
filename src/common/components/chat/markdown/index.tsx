@@ -38,7 +38,7 @@ export function DiscussionMarkdown({
         { actionResults: typeof actionResults }
       ],
       remarkMdastToHast as Plugin<[], Root>,
-      ...remarkPlugins,
+      ...((remarkPlugins ?? []) as any[]),
     ],
     [actionResults, remarkPlugins]
   );
@@ -47,7 +47,7 @@ export function DiscussionMarkdown({
     () =>
       [
         rehypeHighlight as unknown as Plugin<[], Node>,
-        ...rehypePlugins,
+        ...((rehypePlugins ?? []) as any[]),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ] as any[],
     [rehypePlugins]
@@ -88,5 +88,6 @@ export type {
   ActionData,
   ActionNode,
   DiscussionMarkdownProps,
-  MarkdownActionResults,
+  MarkdownActionResults
 };
+

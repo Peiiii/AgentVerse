@@ -49,33 +49,101 @@
 .dark .world-class-markdown tr:hover {
   background: #23263a;
 }
-/* 代码块样式 */
-.world-class-markdown pre code.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 18px 18px 16px 18px;
-  border-radius: 12px;
-  background: #f4f6fb;
-  font-size: 15px;
-  line-height: 1.7;
-  box-shadow: 0 2px 12px 0 rgba(99,102,241,0.04);
-  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'monospace';
-  transition: background 0.18s;
-}
+/* 代码块样式升级 */
 .world-class-markdown pre {
-  margin: 18px 0;
+  margin: 0;
   background: transparent;
   border: none;
   box-shadow: none;
+  position: relative;
+  border-radius: 0;
+  overflow: visible;
+  transition: background 0.18s;
+  padding: 0;
 }
-.world-class-markdown code.hljs {
-  background: none;
-  border: none;
+/* 移除 hover 提亮和阴影 */
+/* .world-class-markdown pre:hover { ... } 相关样式全部删除 */
+.dark .world-class-markdown pre {
+  background: transparent;
+}
+.world-class-markdown pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 22px 22px 18px 22px;
+  border-radius: 14px;
+  background: #f4f6fb;
+  font-size: 15px;
+  line-height: 1.7;
+  box-shadow: none;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'monospace';
+  transition: background 0.18s;
+  color: #22223b;
 }
 .dark .world-class-markdown pre code.hljs {
   background: #23263a;
   color: #e0e7ff;
-  box-shadow: 0 2px 12px 0 rgba(99,102,241,0.10);
+}
+.world-class-markdown .code-lang-tag {
+  font-size: 13px;
+  color: #6366f1;
+  background: none;
+  border-radius: 6px;
+  padding: 0 6px;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'monospace';
+  user-select: none;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+  min-width: 36px;
+  min-height: 24px;
+}
+.dark .world-class-markdown .code-lang-tag {
+  color: #a5b4fc;
+  background: rgba(99,102,241,0.18);
+}
+.world-class-markdown pre::-webkit-scrollbar {
+  height: 8px;
+  background: transparent;
+}
+.world-class-markdown pre::-webkit-scrollbar-thumb {
+  background: #e0e7ef;
+  border-radius: 8px;
+}
+.dark .world-class-markdown pre::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+.world-class-markdown pre code.hljs::selection {
+  background: #e0e7ff;
+  color: #22223b;
+}
+.dark .world-class-markdown pre code.hljs::selection {
+  background: #6366f1;
+  color: #fff;
+}
+.world-class-markdown .copy-btn-wrapper, .world-class-markdown .copy-btn-wrapper button {
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.world-class-markdown .copy-btn-wrapper button:hover {
+  background: #e0e7ff !important;
+  box-shadow: 0 2px 8px #6366f133;
+}
+.world-class-markdown pre:hover .copy-btn-wrapper {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.world-class-markdown .copy-btn-wrapper {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  transition: opacity 0.18s;
+}
+.world-class-markdown code.hljs {
+  background: none;
+  border: none;
 }
 .world-class-markdown .hljs-comment,
 .world-class-markdown .hljs-quote {
@@ -116,4 +184,86 @@
 .world-class-markdown .hljs-deletion {
   background: #fee2e2;
   color: #b91c1c;
+}
+.world-class-markdown .code-block-container {
+  position: relative;
+  border-radius: 14px;
+  margin: 20px 0;
+  background: #f4f6fb;
+  box-shadow: none;
+  overflow: hidden;
+  transition: background 0.18s;
+  display: flex;
+  flex-direction: column;
+}
+.dark .world-class-markdown .code-block-container {
+  background: #23263a;
+}
+.world-class-markdown .code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 12px;
+  background: rgba(99,102,241,0.04);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  border-bottom: 1px solid #e0e7ef;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.dark .world-class-markdown .code-block-header {
+  background: rgba(99,102,241,0.10);
+  border-bottom: 1px solid #374151;
+}
+.world-class-markdown .copy-btn-wrapper {
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  pointer-events: auto;
+  position: static;
+  transition: opacity 0.18s;
+  height: 24px;
+}
+.world-class-markdown .copy-code-btn {
+  background: rgba(244,246,251,0.9);
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 4px #a5b4fc22;
+  border: none;
+  padding: 0;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+.world-class-markdown .copy-code-btn:hover {
+  background: #e0e7ff !important;
+  box-shadow: 0 2px 8px #6366f133;
+}
+.world-class-markdown .copy-code-btn:active {
+  background: #c7d2fe !important;
+}
+.world-class-markdown .code-block-content {
+  padding: 0 12px 14px 12px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.world-class-markdown .code-block-content code.hljs {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'monospace';
+  color: inherit;
+  margin: 0;
 } 
