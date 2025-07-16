@@ -26,7 +26,7 @@ export function CopyMessageButton({ text, className }: CopyMessageButtonProps) {
       className={className}
       style={{
         position: "absolute",
-        top: 8,
+        bottom: 8,
         right: 8,
         zIndex: 2,
         background: "rgba(244,246,251,0.9)", 
