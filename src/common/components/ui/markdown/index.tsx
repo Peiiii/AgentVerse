@@ -32,37 +32,17 @@ export function Markdown({
           ?.split(" ")
           .find((l: string) => l.startsWith("language-"))
           ?.replace("language-", "");
-
+        
         if (language === "mermaid" && typeof code === "string") {
           return <MermaidChart chart={code} />;
         }
-
-        // 代码块复制按钮，仅在 hover 时右上角浮现
+        // 代码块复制按钮（非 mermaid）
         if (typeof code === "string") {
           return (
-            <div style={{ position: "relative" }} className="world-class-code-block-wrapper">
-              <pre {...props}>{children}</pre>
-              <span
-                style={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  zIndex: 2,
-                  opacity: 0,
-                  pointerEvents: "none",
-                  transition: "opacity 0.18s",
-                }}
-                className="code-copy-btn-wrapper"
-              >
-                <CopyMessageButton text={code} />
-              </span>
-              <style>{`
-                .world-class-code-block-wrapper:hover .code-copy-btn-wrapper {
-                  opacity: 1 !important;
-                  pointer-events: auto !important;
-                }
-              `}</style>
-            </div>
+            <pre {...props} style={{ position: "relative" }}>
+              <CopyMessageButton text={code} />
+              {children}
+            </pre>
           );
         }
       }
