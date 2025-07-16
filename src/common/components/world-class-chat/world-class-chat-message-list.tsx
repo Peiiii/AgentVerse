@@ -6,6 +6,7 @@ import type { UIMessage } from "@ai-sdk/ui-utils";
 import { User } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 import { WorldClassToolCallRenderer } from "./world-class-tool-call-renderer";
+import { CopyMessageButton } from "./copy-message-button";
 
 export interface WorldClassChatMessageListProps {
   messages: UIMessage[];
@@ -117,6 +118,15 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
           .dark .world-class-markdown tr:hover {
             background: #23263a;
           }
+          .world-class-message-bubble:hover .copy-btn-wrapper {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+          }
+          .copy-btn-wrapper {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s;
+          }
         `}</style>
         <div
           ref={containerRef}
@@ -125,6 +135,10 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
         >
           {messages.map((msg) => {
             const isUser = msg.role === "user";
+            // 提取纯文本内容用于复制
+            const plainText = msg.parts
+              ? msg.parts.map(part => part.type === "text" ? part.text : (part.type === "reasoning" ? part.reasoning : "")).join("\n")
+              : msg.content || "";
             return (
               <div
                 key={msg.id}
@@ -153,9 +167,15 @@ export const WorldClassChatMessageList = forwardRef<WorldClassChatMessageListRef
                     marginRight: isUser ? 8 : 0,
                     transition: "background 0.2s",
                     wordBreak: "break-word",
+                    position: "relative",
                   }}
+                  className="world-class-message-bubble"
                 >
-                  {renderMessageContent(msg)}
+                  {/* 复制按钮，仅 hover 时显示 */}
+                  <span style={{ position: "absolute", top: 0, right: 0, opacity: 0, pointerEvents: "none", transition: "opacity 0.18s" }} className="copy-btn-wrapper">
+                    <CopyMessageButton text={plainText} />
+                  </span>
+                  <span style={{ display: "block" }}>{renderMessageContent(msg)}</span>
                 </div>
               </div>
             );
