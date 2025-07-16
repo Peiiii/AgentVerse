@@ -26,25 +26,37 @@ export function Markdown({
   const defaultComponents = useMemo(() => ({
     ...components,
     pre: ({ children, ...props }: React.ComponentPropsWithoutRef<"pre">) => {
-      if (React.isValidElement(children) && children.props) {
-        const code = children.props.children;
-        const language = children.props.className
+      // 统一处理 children 可能为数组或单个元素
+      let code = "";
+      let language = undefined;
+      if (Array.isArray(children)) {
+        // 取第一个有效 code 元素
+        const codeElem = children.find(child => React.isValidElement(child) && child.props && typeof (child.props as any).children === "string");
+        if (codeElem && React.isValidElement(codeElem)) {
+          const props = codeElem.props as { children: string; className?: string };
+          code = props.children;
+          language = props.className
+            ?.split(" ")
+            .find((l: string) => l.startsWith("language-"))
+            ?.replace("language-", "");
+        }
+      } else if (React.isValidElement(children) && children.props) {
+        code = children.props.children;
+        language = children.props.className
           ?.split(" ")
           .find((l: string) => l.startsWith("language-"))
           ?.replace("language-", "");
-        
-        if (language === "mermaid" && typeof code === "string") {
-          return <MermaidChart chart={code} />;
-        }
-        // 代码块复制按钮（非 mermaid）
-        if (typeof code === "string") {
-          return (
-            <pre {...props} style={{ position: "relative" }}>
-              <CopyMessageButton text={code} />
-              {children}
-            </pre>
-          );
-        }
+      }
+      if (language === "mermaid" && typeof code === "string") {
+        return <MermaidChart chart={code} />;
+      }
+      if (typeof code === "string" && code.length > 0) {
+        return (
+          <pre {...props} style={{ position: "relative" }}>
+            <CopyMessageButton text={code} />
+            {children}
+          </pre>
+        );
       }
       return <pre {...props}>{children}</pre>;
     },
