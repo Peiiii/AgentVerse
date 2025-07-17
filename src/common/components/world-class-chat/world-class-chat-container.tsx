@@ -8,11 +8,13 @@ import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { Message } from "@ag-ui/core";
 import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
 import { useAgentChat } from "@agent-labs/agent-chat";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { WorldClassChatHtmlPreview } from "./world-class-chat-html-preview";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
 import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
+import { WorldClassChatSettingsPanel } from "./world-class-chat-settings-panel";
+import { SidePanel } from "./side-panel";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
@@ -30,7 +32,10 @@ export function WorldClassChatContainer({
   onClear,
 }: WorldClassChatContainerProps) {
   const [input, setInput] = useState("");
-  const [previewHtml, setPreviewHtml] = useState<string | null>(null); // 新增预览状态
+  const [customPrompt, setCustomPrompt] = useState(""); // 自定义prompt
+  // 统一面板状态与参数
+  const [activePanel, setActivePanel] = useState<{ key: string; props?: any } | null>(null);
+  const sidePanelActive = !!activePanel;
   const { providerConfig } = getLLMProviderConfig();
   const agent = new ExperimentalInBrowserAgent({
     ...agentDef,
@@ -41,6 +46,17 @@ export function WorldClassChatContainer({
   // 聊天消息缓存（可插拔）
   const cacheKey = `chat-messages-${agentDef.id}`;
   const { initialMessages, handleMessagesChange } = useChatMessageCache<Message>(cacheKey);
+  // mergedContexts 需考虑 customPrompt
+  const mergedContexts = React.useMemo(() => {
+    const base = Array.isArray(contexts) ? contexts : [];
+    if (customPrompt) {
+      return [
+        ...base,
+        { description: "自定义Prompt", value: customPrompt },
+      ];
+    }
+    return base;
+  }, [contexts, customPrompt]);
   const {
     uiMessages,
     messages,
@@ -50,7 +66,7 @@ export function WorldClassChatContainer({
   } = useAgentChat({
     agent,
     tools,
-    contexts,
+    contexts: mergedContexts,
     initialMessages,
   });
 
@@ -105,35 +121,70 @@ export function WorldClassChatContainer({
     if (onClear) onClear();
   };
 
+  // 配置驱动 SidePanel 注册表
+  const sidePanelConfigs = useMemo(() => [
+    {
+      key: 'settings',
+      hideCloseButton: false,
+      render: (panelProps: any, close: () => void) => (
+        <WorldClassChatSettingsPanel
+          {...panelProps}
+          onPromptChange={setCustomPrompt}
+          onClose={close}
+        />
+      ),
+    },
+    {
+      key: 'preview',
+      hideCloseButton: true,
+      render: (panelProps: any, close: () => void) => (
+        <WorldClassChatHtmlPreview
+          {...panelProps}
+          onClose={close}
+        />
+      ),
+    },
+    // 未来可继续扩展更多面板
+  ], []);
+
+  const activePanelConfig = sidePanelConfigs.find(cfg => cfg.key === activePanel?.key);
+  const openPanel = (key: string, props?: any) => setActivePanel({ key, props });
+  const closePanel = () => setActivePanel(null);
+
   return (
     <AgentChatProviderWrapper>
       <div
         className={
-          `w-full h-full flex ${previewHtml ? 'flex-row' : 'flex-col'} bg-gradient-to-br from-indigo-100 to-indigo-50 shadow-lg overflow-hidden transition-all duration-300 ${className ?? ''}`
+          `w-full h-full flex flex-row bg-gradient-to-br from-indigo-100 to-indigo-50 shadow-lg overflow-hidden transition-all duration-300 ${className ?? ''}`
         }
         style={{
-          // 保留渐变背景和阴影
           background: "linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%)",
           boxShadow: "0 4px 24px 0 rgba(99,102,241,0.08)",
         }}
       >
-        {/* 左侧：聊天主界面 */}
+        {/* 左侧：聊天主界面，宽度动画与右侧面板同步 */}
         <div
           className={
-            `flex flex-col h-full min-w-0 flex-1 transition-all duration-300 ${previewHtml ? 'w-1/2 p-0' : 'w-full p-0'}`
+            `flex flex-col h-full min-w-0 transition-all duration-350 ease-[cubic-bezier(.4,0,.2,1)] ${sidePanelActive ? 'basis-1/2' : 'basis-full'} p-0`
           }
           style={{
             boxSizing: "border-box",
-            transition: "width 0.35s cubic-bezier(.4,0,.2,1)",
+            transition: "width 0.35s cubic-bezier(.4,0,.2,1), flex-basis 0.35s cubic-bezier(.4,0,.2,1)",
+            width: sidePanelActive ? '50%' : '100%',
+            flexBasis: sidePanelActive ? '50%' : '100%',
           }}
         >
-          <WorldClassChatTopBar agentDef={agentDef} onClear={handleClear} />
+          <WorldClassChatTopBar
+            agentDef={agentDef}
+            onClear={handleClear}
+            onSettings={() => openPanel('settings', { prompt: customPrompt })}
+          />
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
             <WorldClassChatMessageList
               messages={uiMessages}
               agentDef={agentDef}
               isResponding={isAgentResponding}
-              onPreviewHtml={setPreviewHtml}
+              onPreviewHtml={html => openPanel('preview', { html: html || '' })}
             />
           </div>
           <SuggestionsProvider
@@ -146,10 +197,14 @@ export function WorldClassChatContainer({
             setInput("");
           }} />
         </div>
-        {/* 右侧：HTML 预览 */}
-        {previewHtml && (
-          <div className="min-w-0 flex-1 max-w-1/2 h-full"><WorldClassChatHtmlPreview html={previewHtml} onClose={() => setPreviewHtml(null)} /></div>
-        )}
+        {/* 右侧统一 SidePanel 容器，内容配置驱动，体验自动继承 */}
+        <SidePanel
+          visible={!!activePanelConfig}
+          onClose={closePanel}
+          hideCloseButton={activePanelConfig?.hideCloseButton}
+        >
+          {activePanelConfig?.render(activePanel?.props, closePanel)}
+        </SidePanel>
       </div>
     </AgentChatProviderWrapper>
   );
