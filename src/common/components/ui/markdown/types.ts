@@ -9,6 +9,6 @@ export interface MarkdownProps {
   content: string;
   className?: string;
   components?: Partial<Components>;
-  remarkPlugins?: ComponentProps<typeof ReactMarkdown>["remarkPlugins"];
-  rehypePlugins?: ComponentProps<typeof ReactMarkdown>["rehypePlugins"];
+  extraRemarkPlugins?: ComponentProps<typeof ReactMarkdown>["remarkPlugins"];
+  extraRehypePlugins?: ComponentProps<typeof ReactMarkdown>["rehypePlugins"];
 }

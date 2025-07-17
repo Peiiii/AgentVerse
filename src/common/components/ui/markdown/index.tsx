@@ -23,10 +23,12 @@ export function Markdown({
   content,
   className,
   components,
-  remarkPlugins = [remarkGfm as unknown as Plugin<[], Root>],
-  rehypePlugins = [rehypeRaw as any],
+  extraRemarkPlugins = [remarkGfm as unknown as Plugin<[], Root>],
+  extraRehypePlugins = [rehypeRaw as any],
   codeBlockActions = [],
 }: MarkdownWithActionsProps) {
+  const remarkPlugins = useMemo(() => [...(extraRemarkPlugins ?? []), remarkGfm as unknown as Plugin<[], Root>], [extraRemarkPlugins]);
+  const rehypePlugins = useMemo(() => [...(extraRehypePlugins ?? []), rehypeRaw as any], [extraRehypePlugins]);
   // 组件配置，注入 codeBlockActions
   const defaultComponents: Partial<Components> = useMemo(() => ({
     ...(components as Partial<Components>),

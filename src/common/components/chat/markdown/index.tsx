@@ -2,12 +2,8 @@ import { Action } from "@/common/components/chat/agent-action-display";
 import { Markdown } from "@/common/components/ui/markdown";
 import type { Root } from "mdast";
 import { useMemo } from "react";
-import rehypeHighlight from "rehype-highlight";
-import remarkGfm from "remark-gfm";
 import type { Plugin } from "unified";
-import type { Node } from "unist";
 import { remarkAction } from "./plugins/remark-action";
-import { remarkMdastToHast } from "./plugins/remark-mdast-to-hast";
 import {
   ActionComponentProps,
   ActionData,
@@ -26,31 +22,16 @@ export function DiscussionMarkdown({
   components,
   actionResults,
   ActionComponent = Action,
-  remarkPlugins = [],
-  rehypePlugins = [],
 }: DiscussionMarkdownProps) {
   // 使用 useMemo 缓存插件配置
-  const finalRemarkPlugins = useMemo(
+  const extraRemarkPlugins = useMemo(
     () => [
-      remarkGfm as Plugin<[], Root>,
       [remarkAction, { actionResults }] as [
         Plugin<[], Root>,
         { actionResults: typeof actionResults }
       ],
-      remarkMdastToHast as Plugin<[], Root>,
-      ...((remarkPlugins ?? []) as any[]),
     ],
-    [actionResults, remarkPlugins]
-  );
-
-  const finalRehypePlugins = useMemo(
-    () =>
-      [
-        rehypeHighlight as unknown as Plugin<[], Node>,
-        ...((rehypePlugins ?? []) as any[]),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ] as any[],
-    [rehypePlugins]
+    [actionResults]
   );
 
   // 使用 useMemo 缓存组件映射
@@ -78,8 +59,8 @@ export function DiscussionMarkdown({
       content={content}
       className={className}
       components={finalComponents}
-      remarkPlugins={finalRemarkPlugins}
-      rehypePlugins={finalRehypePlugins}
+      extraRemarkPlugins={extraRemarkPlugins}
+      extraRehypePlugins={[]}
     />
   );
 }
