@@ -14,6 +14,10 @@ import { CodeBlock, CodeBlockAction } from "./code-block";
 
 export type { CodeBlockAction } from "./code-block";
 
+
+export type RehypePlugin = Plugin<[], Root>;
+export type RemarkPlugin = Plugin<[], Root>;
+
 // Markdown 组件 props 扩展
 export interface MarkdownWithActionsProps extends MarkdownProps {
   codeBlockActions?: CodeBlockAction[];
@@ -23,8 +27,8 @@ export function Markdown({
   content,
   className,
   components,
-  extraRemarkPlugins = [remarkGfm as unknown as Plugin<[], Root>],
-  extraRehypePlugins = [rehypeRaw as any],
+  extraRemarkPlugins = [remarkGfm as unknown as RemarkPlugin],
+  extraRehypePlugins = [rehypeRaw as unknown as RehypePlugin],
   codeBlockActions = [],
 }: MarkdownWithActionsProps) {
   const remarkPlugins = useMemo(() => [...(extraRemarkPlugins ?? []), remarkGfm as unknown as Plugin<[], Root>], [extraRemarkPlugins]);
