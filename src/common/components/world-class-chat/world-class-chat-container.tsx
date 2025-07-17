@@ -10,11 +10,14 @@ import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
 import { useAgentChat } from "@agent-labs/agent-chat";
 import React, { useState, useMemo } from "react";
 import { WorldClassChatHtmlPreview } from "./world-class-chat-html-preview";
+import type { WorldClassChatHtmlPreviewProps } from "./world-class-chat-html-preview";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
 import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
 import { WorldClassChatSettingsPanel } from "./world-class-chat-settings-panel";
+import type { WorldClassChatSettingsPanelProps } from "./world-class-chat-settings-panel";
 import { SidePanel } from "./side-panel";
+import { useSidePanelManager, SidePanelConfig } from "./hooks/use-side-panel-manager";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
@@ -34,8 +37,41 @@ export function WorldClassChatContainer({
   const [input, setInput] = useState("");
   const [customPrompt, setCustomPrompt] = useState(""); // 自定义prompt
   // 统一面板状态与参数
-  const [activePanel, setActivePanel] = useState<{ key: string; props?: any } | null>(null);
-  const sidePanelActive = !!activePanel;
+  // 配置驱动 SidePanel 注册表
+  const sidePanelConfigs: SidePanelConfig[] = useMemo(() => [
+    {
+      key: 'settings',
+      hideCloseButton: false,
+      render: (panelProps: Omit<WorldClassChatSettingsPanelProps, 'onPromptChange' | 'onClose'>, close: () => void) => (
+        <WorldClassChatSettingsPanel
+          {...panelProps}
+          onPromptChange={setCustomPrompt}
+          onClose={close}
+        />
+      ),
+    },
+    {
+      key: 'preview',
+      hideCloseButton: true,
+      render: (panelProps: Omit<WorldClassChatHtmlPreviewProps, 'onClose'>, close: () => void) => (
+        <WorldClassChatHtmlPreview
+          {...panelProps}
+          onClose={close}
+        />
+      ),
+    },
+    // 未来可继续扩展更多面板
+  ], [setCustomPrompt]);
+
+  // 使用 SidePanelManager hook
+  const {
+    activePanel,
+    activePanelConfig,
+    sidePanelActive,
+    openPanel,
+    closePanel,
+  } = useSidePanelManager(sidePanelConfigs);
+
   const { providerConfig } = getLLMProviderConfig();
   const agent = new ExperimentalInBrowserAgent({
     ...agentDef,
@@ -120,36 +156,6 @@ export function WorldClassChatContainer({
     setInput("");
     if (onClear) onClear();
   };
-
-  // 配置驱动 SidePanel 注册表
-  const sidePanelConfigs = useMemo(() => [
-    {
-      key: 'settings',
-      hideCloseButton: false,
-      render: (panelProps: any, close: () => void) => (
-        <WorldClassChatSettingsPanel
-          {...panelProps}
-          onPromptChange={setCustomPrompt}
-          onClose={close}
-        />
-      ),
-    },
-    {
-      key: 'preview',
-      hideCloseButton: true,
-      render: (panelProps: any, close: () => void) => (
-        <WorldClassChatHtmlPreview
-          {...panelProps}
-          onClose={close}
-        />
-      ),
-    },
-    // 未来可继续扩展更多面板
-  ], []);
-
-  const activePanelConfig = sidePanelConfigs.find(cfg => cfg.key === activePanel?.key);
-  const openPanel = (key: string, props?: any) => setActivePanel({ key, props });
-  const closePanel = () => setActivePanel(null);
 
   return (
     <AgentChatProviderWrapper>
