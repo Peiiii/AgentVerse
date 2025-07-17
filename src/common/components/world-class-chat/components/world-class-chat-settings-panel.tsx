@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useWorldClassChatSettingsStore } from "../stores/world-class-chat-settings.store";
 
-export interface WorldClassChatSettingsPanelProps {
-  prompt: string;
-  onPromptChange: (prompt: string) => void;
-  onClose: () => void;
-}
-
-export function WorldClassChatSettingsPanel({ prompt, onPromptChange, onClose }: WorldClassChatSettingsPanelProps) {
+export function WorldClassChatSettingsPanel({ onClose }: { onClose: () => void }) {
+  const prompt = useWorldClassChatSettingsStore(s => s.prompt);
+  const setPrompt = useWorldClassChatSettingsStore(s => s.setPrompt);
   const [localPrompt, setLocalPrompt] = useState(prompt);
+
+  // 输入变化时自动同步到AI（不持久化）
+  useEffect(() => {
+    setPrompt(localPrompt, { persist: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localPrompt]);
+
   const handleSave = () => {
-    onPromptChange(localPrompt);
-    onClose();
+    setPrompt(localPrompt, { persist: true }); // 持久化到 localStorage
   };
 
   return (
@@ -30,7 +33,6 @@ export function WorldClassChatSettingsPanel({ prompt, onPromptChange, onClose }:
         <div className="text-xs text-gray-400 mt-1">可为当前会话定制 AI 行为</div>
       </div>
       <div className="flex justify-end gap-2">
-        <button className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700" onClick={onClose}>取消</button>
         <button className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white" onClick={handleSave}>保存</button>
       </div>
     </div>

@@ -1,24 +1,23 @@
 import React, { useMemo, useState } from "react";
 // 类型与hooks
+import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
 import type { AgentDef } from "@/common/types/agent";
 import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
-import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
-import type { WorldClassChatHtmlPreviewProps } from "./world-class-chat-html-preview";
-import type { WorldClassChatSettingsPanelProps } from "./world-class-chat-settings-panel";
 import { useAgentChat } from "@agent-labs/agent-chat";
-import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
-import { useSidePanelManager, SidePanelConfig } from "./hooks/use-side-panel-manager";
+import { SidePanelConfig, useSidePanelManager } from "./hooks/use-side-panel-manager";
+import { useWorldClassChatSettingsStore } from "./stores/world-class-chat-settings.store";
 // 业务组件
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experimental-inbrowser-agent";
 import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { Message } from "@ag-ui/core";
+import { WorldClassChatHtmlPreview } from "./components/world-class-chat-html-preview";
+import { WorldClassChatSettingsPanel } from "./components/world-class-chat-settings-panel";
 import { SidePanel } from "./side-panel";
-import { WorldClassChatHtmlPreview } from "./world-class-chat-html-preview";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
-import { WorldClassChatSettingsPanel } from "./world-class-chat-settings-panel";
 import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
 
 export interface WorldClassChatContainerProps {
@@ -38,30 +37,26 @@ export function WorldClassChatContainer({
 }: WorldClassChatContainerProps) {
   // 1. State & SidePanel
   const [input, setInput] = useState("");
-  const [customPrompt, setCustomPrompt] = useState("");
+  const prompt = useWorldClassChatSettingsStore(s => s.prompt);
   const sidePanelConfigs: SidePanelConfig[] = useMemo(() => [
     {
       key: 'settings',
       hideCloseButton: false,
-      render: (panelProps: Omit<WorldClassChatSettingsPanelProps, 'onPromptChange' | 'onClose'>, close: () => void) => (
-        <WorldClassChatSettingsPanel
-          {...panelProps}
-          onPromptChange={setCustomPrompt}
-          onClose={close}
-        />
+      render: (_panelProps, close: () => void) => (
+        <WorldClassChatSettingsPanel onClose={close} />
       ),
     },
     {
       key: 'preview',
       hideCloseButton: true,
-      render: (panelProps: Omit<WorldClassChatHtmlPreviewProps, 'onClose'>, close: () => void) => (
+      render: (panelProps, close: () => void) => (
         <WorldClassChatHtmlPreview
           {...panelProps}
           onClose={close}
         />
       ),
     },
-  ], [setCustomPrompt]);
+  ], []);
   const {
     activePanel,
     activePanelConfig,
@@ -80,16 +75,17 @@ export function WorldClassChatContainer({
   });
   const cacheKey = `chat-messages-${agentDef.id}`;
   const { initialMessages, handleMessagesChange } = useChatMessageCache<Message>(cacheKey);
+  // mergedContexts 需直接从 store 读取 prompt
   const mergedContexts = useMemo(() => {
     const base = Array.isArray(contexts) ? contexts : [];
-    if (customPrompt) {
+    if (prompt) {
       return [
         ...base,
-        { description: "自定义Prompt", value: customPrompt },
+        { description: "系统指令", value: prompt },
       ];
     }
     return base;
-  }, [contexts, customPrompt]);
+  }, [contexts, prompt]);
   const {
     uiMessages,
     messages,
@@ -155,7 +151,7 @@ export function WorldClassChatContainer({
           <WorldClassChatTopBar
             agentDef={agentDef}
             onClear={handleClear}
-            onSettings={() => openPanel('settings', { prompt: customPrompt })}
+            onSettings={() => openPanel('settings', { prompt: prompt })}
           />
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
             <WorldClassChatMessageList
