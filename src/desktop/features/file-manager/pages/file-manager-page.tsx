@@ -39,7 +39,7 @@ export function FileManagerPage() {
         // 构造每一级的完整路径
         const paths = parts.map((_, i) => '/' + parts.slice(0, i + 1).join('/'));
         return (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground px-6 py-3 border-b bg-white/80 sticky top-0 z-10" style={{ backdropFilter: 'blur(4px)' }}>
+            <div className="h-12 flex items-center gap-2 text-sm text-muted-foreground px-6 py-3 border-b bg-white/80 sticky top-0 z-10" style={{ backdropFilter: 'blur(4px)' }}>
                 <span
                     className={`flex items-center gap-1 cursor-pointer hover:text-primary font-semibold ${cwd === '/' ? 'text-primary' : ''}`}
                     onClick={() => setCwd('/')}
