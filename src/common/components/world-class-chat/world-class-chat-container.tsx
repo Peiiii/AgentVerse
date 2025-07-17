@@ -1,23 +1,25 @@
+import React, { useMemo, useState } from "react";
+// 类型与hooks
+import type { AgentDef } from "@/common/types/agent";
+import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
+import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import type { WorldClassChatHtmlPreviewProps } from "./world-class-chat-html-preview";
+import type { WorldClassChatSettingsPanelProps } from "./world-class-chat-settings-panel";
+import { useAgentChat } from "@agent-labs/agent-chat";
+import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
+import { useSidePanelManager, SidePanelConfig } from "./hooks/use-side-panel-manager";
+// 业务组件
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
-import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
-import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experimental-inbrowser-agent";
-import type { AgentDef } from "@/common/types/agent";
 import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { Message } from "@ag-ui/core";
-import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
-import { useAgentChat } from "@agent-labs/agent-chat";
-import React, { useState, useMemo } from "react";
+import { SidePanel } from "./side-panel";
 import { WorldClassChatHtmlPreview } from "./world-class-chat-html-preview";
-import type { WorldClassChatHtmlPreviewProps } from "./world-class-chat-html-preview";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
-import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
 import { WorldClassChatSettingsPanel } from "./world-class-chat-settings-panel";
-import type { WorldClassChatSettingsPanelProps } from "./world-class-chat-settings-panel";
-import { SidePanel } from "./side-panel";
-import { useSidePanelManager, SidePanelConfig } from "./hooks/use-side-panel-manager";
+import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
@@ -34,10 +36,9 @@ export function WorldClassChatContainer({
   className,
   onClear,
 }: WorldClassChatContainerProps) {
+  // 1. State & SidePanel
   const [input, setInput] = useState("");
-  const [customPrompt, setCustomPrompt] = useState(""); // 自定义prompt
-  // 统一面板状态与参数
-  // 配置驱动 SidePanel 注册表
+  const [customPrompt, setCustomPrompt] = useState("");
   const sidePanelConfigs: SidePanelConfig[] = useMemo(() => [
     {
       key: 'settings',
@@ -60,10 +61,7 @@ export function WorldClassChatContainer({
         />
       ),
     },
-    // 未来可继续扩展更多面板
   ], [setCustomPrompt]);
-
-  // 使用 SidePanelManager hook
   const {
     activePanel,
     activePanelConfig,
@@ -72,6 +70,7 @@ export function WorldClassChatContainer({
     closePanel,
   } = useSidePanelManager(sidePanelConfigs);
 
+  // 2. Agent & Message
   const { providerConfig } = getLLMProviderConfig();
   const agent = new ExperimentalInBrowserAgent({
     ...agentDef,
@@ -79,11 +78,9 @@ export function WorldClassChatContainer({
     baseURL: providerConfig.baseUrl,
     apiKey: providerConfig.apiKey,
   });
-  // 聊天消息缓存（可插拔）
   const cacheKey = `chat-messages-${agentDef.id}`;
   const { initialMessages, handleMessagesChange } = useChatMessageCache<Message>(cacheKey);
-  // mergedContexts 需考虑 customPrompt
-  const mergedContexts = React.useMemo(() => {
+  const mergedContexts = useMemo(() => {
     const base = Array.isArray(contexts) ? contexts : [];
     if (customPrompt) {
       return [
@@ -106,42 +103,18 @@ export function WorldClassChatContainer({
     initialMessages,
   });
 
-  console.log("[WorldClassChatContainer] messages", messages);
-
-  // 监听消息变化并缓存
+  // 3. Effect
   React.useEffect(() => {
     handleMessagesChange(messages);
   }, [messages, handleMessagesChange]);
 
-  // 推荐项（模拟智能推荐，后续可接入AI/运营配置）
+  // 4. 业务事件
   const suggestions: Suggestion[] = [
-    {
-      id: "1",
-      type: "question",
-      actionName: "你能做什么？",
-      content: "你能做什么？",
-    },
-    {
-      id: "2",
-      type: "action",
-      actionName: "清空对话",
-      content: "清空对话",
-    },
-    {
-      id: "3",
-      type: "question",
-      actionName: "帮我总结一下今天的工作",
-      content: "帮我总结一下今天的工作",
-    },
-    {
-      id: "4",
-      type: "question",
-      actionName: "推荐几个提升效率的AI工具",
-      content: "推荐几个提升效率的AI工具",
-    },
+    { id: "1", type: "question", actionName: "你能做什么？", content: "你能做什么？" },
+    { id: "2", type: "action", actionName: "清空对话", content: "清空对话" },
+    { id: "3", type: "question", actionName: "帮我总结一下今天的工作", content: "帮我总结一下今天的工作" },
+    { id: "4", type: "question", actionName: "推荐几个提升效率的AI工具", content: "推荐几个提升效率的AI工具" },
   ];
-
-  // 推荐项点击：自动发送消息并清空输入
   const handleSuggestionClick = (suggestion: Suggestion, action: 'send' | 'edit') => {
     if (action === 'send') {
       sendMessage(suggestion.content);
@@ -149,14 +122,13 @@ export function WorldClassChatContainer({
       setInput(suggestion.content);
     }
   };
-
-  // 清空消息处理（只需 reset，缓存会自动同步）
   const handleClear = () => {
     reset();
     setInput("");
     if (onClear) onClear();
   };
 
+  // 5. 渲染
   return (
     <AgentChatProviderWrapper>
       <div
