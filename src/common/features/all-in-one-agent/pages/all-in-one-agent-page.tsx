@@ -4,6 +4,7 @@ import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { getCurrentTimeTool } from "../components/agent-tools/get-current-time.tool";
 import { calculatorTool, weatherTool } from "../components/agent-tools";
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
+import { fileSystemTool } from "../components/agent-tools/file-system.tool";
 
 const AGENT_DEF: AgentDef = {
   id: "atlas-all-in-one",
@@ -22,6 +23,7 @@ const EXAMPLE_TOOLS: AgentTool[] = [
   getCurrentTimeTool,
   weatherTool,
   calculatorTool,
+  fileSystemTool
 ];
 
 export function AllInOneAgentPage() {
