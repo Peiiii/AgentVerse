@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { defaultFileManager, type FsEntry } from '@/common/lib/file-manager.service';
+import { defaultFileManager, type FsEntry, type StatResult } from '@/common/lib/file-manager.service';
 
 export function useLightningFSManager() {
   const [cwd, setCwd] = useState<string>("/");
@@ -8,6 +8,7 @@ export function useLightningFSManager() {
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [fileSize, setFileSize] = useState<number>(0);
 
   // 读取目录内容
   const refreshEntries = useCallback(async (dir: string) => {
@@ -38,11 +39,9 @@ export function useLightningFSManager() {
   // 进入目录
   const enterDir = useCallback((dir: string) => {
     setCwd(dir);
-    defaultFileManager.setCurrentPath(dir);
-    refreshEntries(dir);
     setSelectedFile("");
     setFileContent("");
-  }, [refreshEntries]);
+  }, []);
 
   // 选择文件并读取内容
   const openFile = useCallback(async (filePath: string) => {
@@ -50,6 +49,13 @@ export function useLightningFSManager() {
     setError("");
     setLoading(true);
     try {
+      const statResult: StatResult = await defaultFileManager.stat(filePath);
+      if (statResult.success && statResult.data) {
+        setFileSize(statResult.data.size || 0);
+      } else {
+        setFileSize(0);
+      }
+      // 再读取内容
       const result = await defaultFileManager.readFile(filePath);
       if (result.success && result.data) {
         setFileContent(result.data.content);
@@ -60,6 +66,7 @@ export function useLightningFSManager() {
     } catch (e: unknown) {
       setFileContent("");
       setError((e as Error)?.message || '读取文件失败');
+      setFileSize(0);
     } finally {
       setLoading(false);
     }
@@ -199,6 +206,7 @@ export function useLightningFSManager() {
     entries,
     fileContent,
     selectedFile,
+    fileSize,
     error,
     loading,
     enterDir,

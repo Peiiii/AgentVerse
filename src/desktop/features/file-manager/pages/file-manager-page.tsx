@@ -7,6 +7,7 @@ export function FileManagerPage() {
         cwd,
         entries,
         fileContent,
+        selectedFile,
         loading,
         enterDir,
         openFile,
@@ -14,7 +15,9 @@ export function FileManagerPage() {
         createFile,
         deleteEntry,
         uploadFile,
-        downloadFile
+        downloadFile,
+        writeFile,
+        fileSize
     } = useLightningFSManager();
 
     const [showNewDir, setShowNewDir] = useState(false);
@@ -53,7 +56,7 @@ export function FileManagerPage() {
         </div>
     );
 
-    // 文件列表区域
+    // 文件列表区域（编辑入口修正）
     const renderFileList = () => (
         <div className="w-96 border-r bg-muted/10 flex flex-col">
             <div className="p-4 border-b font-semibold flex items-center gap-2">
@@ -62,11 +65,11 @@ export function FileManagerPage() {
             </div>
             <div className="flex-1 overflow-auto p-2 text-sm">
                 {entries.filter(e => e.type === 'file').map(file => (
-                    <div key={file.path} className={`cursor-pointer hover:bg-muted/40 rounded p-2 ${cwd === file.path ? 'bg-primary/10' : ''}`} onClick={() => openFile(file.path)}>
+                    <div key={file.path} className={`cursor-pointer hover:bg-muted/40 rounded p-2 ${selectedFile === file.path ? 'bg-primary/10' : ''}`} onClick={() => openFile(file.path)}>
                         <FileText className="inline w-4 h-4 mr-1" />{file.name}
                         <button className="ml-2 text-xs text-destructive" onClick={e => { e.stopPropagation(); deleteEntry(file.path); }}><Trash2 className="w-3 h-3" /></button>
                         <button className="ml-1 text-xs" onClick={e => { e.stopPropagation(); downloadFile(file.path); }}><Download className="w-3 h-3" /></button>
-                        <button className="ml-1 text-xs" onClick={e => { e.stopPropagation(); setIsEditing(true); setEditContent(fileContent); openFile(file.path); }}><Edit className="w-3 h-3" /></button>
+                        <button className="ml-1 text-xs" onClick={async e => { e.stopPropagation(); await openFile(file.path); setIsEditing(true); setEditContent(fileContent); }}><Edit className="w-3 h-3" /></button>
                     </div>
                 ))}
             </div>
@@ -88,6 +91,7 @@ export function FileManagerPage() {
         </div>
     );
 
+    const MAX_PREVIEW_SIZE = 1048576; // 1MB
     // 文件预览/编辑区域
     const renderFilePreview = () => (
         <div className="flex-1 flex flex-col">
@@ -96,17 +100,21 @@ export function FileManagerPage() {
                 文件预览
             </div>
             <div className="flex-1 overflow-auto p-4">
-                {cwd ? (
+                {selectedFile ? (
                     isEditing ? (
                         <div>
                             <textarea className="w-full h-64 border rounded p-2" value={editContent} onChange={e => setEditContent(e.target.value)} />
                             <div className="mt-2 flex gap-2">
-                                <button className="btn btn-sm" onClick={async () => { await createFile(cwd, editContent); setIsEditing(false); }}>{loading ? '保存中...' : '保存'}</button>
+                                <button className="btn btn-sm" onClick={async () => { await writeFile(selectedFile, editContent); setIsEditing(false); }}>{loading ? '保存中...' : '保存'}</button>
                                 <button className="btn btn-sm" onClick={() => setIsEditing(false)}>取消</button>
                             </div>
                         </div>
                     ) : (
-                        <pre className="bg-muted/30 rounded p-4 whitespace-pre-wrap break-all">{cwd}</pre>
+                        fileSize > MAX_PREVIEW_SIZE ? (
+                            <div className="text-red-500 font-bold">文件过大（{(fileSize/1024/1024).toFixed(2)} MB），无法预览内容。</div>
+                        ) : (
+                            <pre className="bg-muted/30 rounded p-4 whitespace-pre-wrap break-all">{fileContent}</pre>
+                        )
                     )
                 ) : (
                     <div className="text-muted-foreground">请选择文件</div>
@@ -138,7 +146,6 @@ export function FileManagerPage() {
     return (
         <div className="h-full w-full flex flex-col">
             {renderBreadcrumb()}
-            {loading && <div className="text-red-500 px-6 py-2">加载中...</div>}
             <div className="flex-1 flex min-h-0">
                 {renderDirTree()}
                 {renderFileList()}

@@ -39,6 +39,18 @@ export interface FileWriteResult extends FileOperationResult {
   };
 }
 
+export interface StatResultData {
+  size: number;
+  isDirectory: boolean;
+  isFile: boolean;
+  mtimeMs: number;
+}
+export interface StatResult {
+  success: boolean;
+  data?: StatResultData;
+  error?: string;
+}
+
 export class FileManagerService {
   private fs: LightningFS;
   private currentPath: string = "/";
@@ -307,6 +319,27 @@ export class FileManagerService {
       return {
         success: false,
         error: error instanceof Error ? error.message : '搜索文件失败',
+      };
+    }
+  }
+
+  // 获取文件/目录 stat 信息
+  async stat(path: string): Promise<StatResult> {
+    try {
+      const stat = await this.fs.promises.stat(path);
+      return {
+        success: true,
+        data: {
+          size: stat.size,
+          isDirectory: stat.isDirectory(),
+          isFile: stat.isFile(),
+          mtimeMs: stat.mtimeMs,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'stat 失败',
       };
     }
   }
