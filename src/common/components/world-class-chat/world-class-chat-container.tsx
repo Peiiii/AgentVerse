@@ -45,6 +45,9 @@ export interface WorldClassChatContainerRef {
   openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => string | null;
   suggestionsManager: SuggestionsManager;
   iframeManager: ReturnType<typeof useIframeManager>;
+  addMessages: (messages: Message[], options?: {
+    triggerAgent?: boolean;
+  }) => Promise<void>;
 }
 
 export const WorldClassChatContainer = forwardRef<
@@ -94,6 +97,7 @@ export const WorldClassChatContainer = forwardRef<
 
   // 1.5 暴露 openPanel 和 suggestions 管理能力
   useImperativeHandle(ref, () => ({ 
+    addMessages,
     openPanel,
     openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => {
       addPanel(config);
@@ -149,7 +153,7 @@ export const WorldClassChatContainer = forwardRef<
     
     return contextList;
   }, [contexts, prompt, memories]);
-  const { uiMessages, messages, isAgentResponding, sendMessage, reset } =
+  const { uiMessages, messages, isAgentResponding,addMessages, sendMessage, reset } =
     useAgentChat({
       agent,
       tools,

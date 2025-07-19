@@ -177,35 +177,34 @@ export function useIframeManager() {
 
   const manager = managerRef.current;
 
-  // 更新 iframes 状态
-  const updateIframes = useCallback(() => {
-    setIframes(manager.getAllIframes());
-  }, [manager]);
-
   // 创建 iframe
   const createIframe = useCallback((key: string, type: IframeInfo['type'] = 'custom') => {
     const id = manager.createIframe(key, type);
-    updateIframes();
+    // 直接更新状态，避免依赖 updateIframes
+    setIframes(manager.getAllIframes());
     return id;
-  }, [manager, updateIframes]);
+  }, [manager]);
 
   // 注册 iframe 元素
   const registerElement = useCallback((id: string, element: HTMLIFrameElement) => {
     manager.registerElement(id, element);
-    updateIframes();
-  }, [manager, updateIframes]);
+    // 直接更新状态，避免依赖 updateIframes
+    setIframes(manager.getAllIframes());
+  }, [manager]);
 
   // 移除 iframe
   const removeIframe = useCallback((id: string) => {
     manager.removeIframe(id);
-    updateIframes();
-  }, [manager, updateIframes]);
+    // 直接更新状态，避免依赖 updateIframes
+    setIframes(manager.getAllIframes());
+  }, [manager]);
 
   // 清理过期 iframe
   const cleanupExpired = useCallback((maxAge?: number) => {
     manager.cleanupExpired(maxAge);
-    updateIframes();
-  }, [manager, updateIframes]);
+    // 直接更新状态，避免依赖 updateIframes
+    setIframes(manager.getAllIframes());
+  }, [manager]);
 
   // 组件卸载时清理
   const destroy = useCallback(() => {

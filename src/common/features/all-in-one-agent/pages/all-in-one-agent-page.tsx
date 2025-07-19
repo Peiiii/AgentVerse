@@ -76,7 +76,8 @@ export function AllInOneAgentPage() {
   const subscribeIframeMessagesTool = useMemo(
     () =>
       createSubscribeIframeMessagesTool(
-        () => chatRef.current?.iframeManager || null
+        () => chatRef.current?.iframeManager || null,
+        () => chatRef.current?.addMessages || null
       ),
     []
   );

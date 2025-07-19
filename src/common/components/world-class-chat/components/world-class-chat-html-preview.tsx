@@ -35,7 +35,7 @@ export function WorldClassChatHtmlPreview({
     if (iframeRef.current && onIframeReady) {
       onIframeReady(iframeRef.current);
     }
-  }, [onIframeReady]);
+  }, []); // 只在组件挂载时执行一次
 
   // 复制源码
   const handleCopy = () => {
@@ -48,9 +48,14 @@ export function WorldClassChatHtmlPreview({
   const handleRefresh = async () => {
     if (!onRefresh) return;
     setRefreshing(true);
-    setLoading(true);
     try {
       await onRefresh();
+      // 刷新完成后，重置加载状态
+      setLoading(false);
+      setError(null);
+    } catch (error) {
+      setError("刷新失败");
+      setLoading(false);
     } finally {
       setRefreshing(false);
     }

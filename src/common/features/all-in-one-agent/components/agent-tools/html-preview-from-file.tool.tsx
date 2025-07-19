@@ -3,6 +3,7 @@ import type { ToolCall } from "@agent-labs/agent-chat";
 import { SidePanelConfig } from "@/common/components/world-class-chat/hooks/use-side-panel-manager";
 import { WorldClassChatHtmlPreview } from "@/common/components/world-class-chat/components/world-class-chat-html-preview";
 import { useIframeManager } from "@/common/components/world-class-chat/hooks/use-iframe-manager";
+import { defaultFileManager } from "@/common/lib/file-manager.service";
 
 export interface HtmlPreviewFromFileToolParams {
   filePath: string;
@@ -19,35 +20,37 @@ export interface HtmlPreviewFromFileToolResult {
 // 读取 HTML 文件的函数
 async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlContent?: string; error?: string }> {
   try {
-    // 这里应该实现实际的文件读取逻辑
-    // 目前返回模拟数据
-    const mockHtmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>HTML Preview</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            h1 { color: #333; }
-            .content { background: #f5f5f5; padding: 20px; border-radius: 8px; }
-          </style>
-        </head>
-        <body>
-          <h1>HTML 预览</h1>
-          <div class="content">
-            <p>这是从文件 <strong>${filePath}</strong> 读取的 HTML 内容。</p>
-            <p>当前时间: <span id="time"></span></p>
-            <script>
-              document.getElementById('time').textContent = new Date().toLocaleString();
-            </script>
-          </div>
-        </body>
-      </html>
-    `;
+    // 使用真实的文件系统读取文件
+    const readResult = await defaultFileManager.readFile(filePath);
     
+    if (!readResult.success) {
+      return {
+        success: false,
+        error: readResult.error || "文件读取失败",
+      };
+    }
+
+    const fileData = readResult.data as { content: string; path: string; size: number; modifiedTime: Date } | undefined;
+    const htmlContent = fileData?.content;
+    
+    if (!htmlContent) {
+      return {
+        success: false,
+        error: "文件内容为空",
+      };
+    }
+
+    // 检查文件内容是否包含 HTML 标签
+    if (!htmlContent.includes("<html") && !htmlContent.includes("<!DOCTYPE") && !htmlContent.includes("<html")) {
+      return {
+        success: false,
+        error: "文件内容不包含 HTML 标签，可能不是有效的 HTML 文件",
+      };
+    }
+
     return {
       success: true,
-      htmlContent: mockHtmlContent,
+      htmlContent,
     };
   } catch (error) {
     return {
@@ -130,39 +133,28 @@ export function createHtmlPreviewFromFileTool(
       const handleRefresh = async () => {
         if (!currentPreviewInfo) return;
         
-        const refreshResult = await readHtmlFile(currentPreviewInfo.filePath);
-        if (refreshResult.success && refreshResult.htmlContent) {
-          // 更新存储的内容
-          currentPreviewInfo.htmlContent = refreshResult.htmlContent;
-          
-          // 重新打开面板（这会触发重新渲染）
-          const newIframeId = openCustomPanel(
-            currentPreviewInfo.panelKey,
-            {
-              key: currentPreviewInfo.panelKey,
-              hideCloseButton: true,
-              render: (_panelProps: any, close: () => void) => (
-                <WorldClassChatHtmlPreview
-                  html={currentPreviewInfo!.htmlContent}
-                  onClose={close}
-                  onRefresh={handleRefresh}
-                  showRefreshButton={true}
-                  iframeId={currentPreviewInfo!.iframeId}
-                  onIframeReady={(element) => {
-                    if (iframeManager && currentPreviewInfo?.iframeId) {
-                      iframeManager.registerElement(currentPreviewInfo.iframeId, element);
-                    }
-                  }}
-                />
-              ),
-            },
-            { filePath: currentPreviewInfo.filePath }
-          );
-          
-          // 更新 iframe ID
-          if (newIframeId) {
-            currentPreviewInfo.iframeId = newIframeId;
+        try {
+          const refreshResult = await readHtmlFile(currentPreviewInfo.filePath);
+          if (refreshResult.success && refreshResult.htmlContent) {
+            // 更新存储的内容
+            currentPreviewInfo.htmlContent = refreshResult.htmlContent;
+            
+            // 直接更新 iframe 内容，而不是重新创建面板
+            if (iframeManager && currentPreviewInfo.iframeId) {
+              const iframeElement = iframeManager.getElement(currentPreviewInfo.iframeId);
+              if (iframeElement && iframeElement.contentDocument) {
+                iframeElement.contentDocument.open();
+                iframeElement.contentDocument.write(refreshResult.htmlContent);
+                iframeElement.contentDocument.close();
+              }
+            }
+          } else {
+            // 如果刷新失败，抛出错误
+            throw new Error(refreshResult.error || "刷新失败");
           }
+        } catch (error) {
+          // 重新抛出错误，让组件处理
+          throw error;
         }
       };
 

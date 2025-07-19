@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import { useIframeManager } from "@/common/components/world-class-chat/hooks/use-iframe-manager";
+import { Message } from "@ag-ui/core";
 
 export interface SubscribeIframeMessagesToolParams {
   iframeId: string;
@@ -150,11 +151,12 @@ if (typeof window !== 'undefined') {
 }
 
 export function createSubscribeIframeMessagesTool(
-  getIframeManager?: () => ReturnType<typeof useIframeManager> | null
+  getIframeManager?: () => ReturnType<typeof useIframeManager> | null,
+  getAddMessages?: () => ((messages: Message[], options?: { triggerAgent?: boolean }) => Promise<void>) | null
 ): AgentTool {
   return {
     name: "subscribeIframeMessages",
-    description: "订阅特定 iframe 的消息，监听 iframe 内部发送的 postMessage 消息",
+    description: "订阅特定 iframe 的消息，监听 iframe 内部发送的 postMessage 消息，收到消息后自动通知 agent",
     parameters: {
       type: "object",
       properties: {
@@ -174,6 +176,10 @@ export function createSubscribeIframeMessagesTool(
         description: {
           type: "string",
           description: "订阅描述，用于标识订阅目的",
+        },
+        autoNotifyAgent: {
+          type: "boolean",
+          description: "是否在收到消息时自动通知 agent，默认为 true",
         },
       },
       required: ["iframeId"],
@@ -196,6 +202,7 @@ export function createSubscribeIframeMessagesTool(
       const iframeId = args.iframeId;
       const messageTypes = args.messageTypes || ['*'];
       const timeout = args.timeout;
+      const autoNotifyAgent = args.autoNotifyAgent !== false; // 默认为 true
 
       // 验证 iframe 是否存在
       const iframeManager = getIframeManager?.();
@@ -222,6 +229,28 @@ export function createSubscribeIframeMessagesTool(
         (message) => {
           // 这里可以添加消息处理逻辑
           console.log(`收到来自 ${iframeId} 的消息:`, message);
+          
+          // 如果启用了自动通知 agent，则发送系统消息
+          if (autoNotifyAgent) {
+            const addMessages = getAddMessages?.();
+            if (addMessages) {
+              const systemMessage = {
+                id: `iframe-message-${Date.now()}`,
+                role: 'system' as const,
+                content: `收到来自 iframe ${iframeId} 的消息：
+                
+消息类型: ${message.type}
+消息内容: ${JSON.stringify(message.data, null, 2)}
+时间戳: ${new Date(message.timestamp).toLocaleString()}
+来源: ${message.source}
+
+请根据这个消息内容进行相应的处理或回复。`,
+                timestamp: new Date().toISOString(),
+              };
+              
+              addMessages([systemMessage], { triggerAgent: true });
+            }
+          }
         }
       );
 
@@ -229,7 +258,7 @@ export function createSubscribeIframeMessagesTool(
         toolCallId: toolCall.id,
         result: {
           success: true,
-          message: `已成功订阅 iframe ${iframeId} 的消息`,
+          message: `已成功订阅 iframe ${iframeId} 的消息${autoNotifyAgent ? '，收到消息时将自动通知 agent' : ''}`,
           subscriptionId,
         },
         status: "success" as const,
