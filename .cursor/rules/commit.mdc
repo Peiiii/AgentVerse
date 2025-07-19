@@ -1,9 +1,14 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 不要未经授权就commit
+不要自作主张就提交commit !!!
+不要自作主张就提交commit !!!
+除非用户明确提出要commit代码，否则不要自作主张就提交commit !!!
+如果用户需要commit，请使用英文message， 默认git add .
+
+前端项目commit前必须先运行 `pnpm build` 验证构建成功，确保代码质量。
+
 不要自作主张就提交commit !!!
 不要自作主张就提交commit !!!
 除非用户明确提出要commit代码，否则不要自作主张就提交commit !!!

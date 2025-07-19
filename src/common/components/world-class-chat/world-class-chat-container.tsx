@@ -15,6 +15,7 @@ import {
   useSidePanelManager,
 } from "./hooks/use-side-panel-manager";
 import { useWorldClassChatSettingsStore } from "./stores/world-class-chat-settings.store";
+import { useMemoryStore } from "./stores/memory.store";
 // 业务组件
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
@@ -22,7 +23,7 @@ import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experime
 import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { Message } from "@ag-ui/core";
 import { WorldClassChatHtmlPreview } from "./components/world-class-chat-html-preview";
-import { WorldClassChatSettingsPanel } from "./components/world-class-chat-settings-panel";
+import { WorldClassSettingsPanel } from "./components/settings-panel";
 import { SidePanel } from "./side-panel";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
@@ -55,9 +56,9 @@ export const WorldClassChatContainer = forwardRef<
     () => [
       {
         key: "settings",
-        hideCloseButton: false,
+        hideCloseButton: true,
         render: (_panelProps, close: () => void) => (
-          <WorldClassChatSettingsPanel onClose={close} />
+          <WorldClassSettingsPanel onClose={close} />
         ),
       },
       {
@@ -99,14 +100,33 @@ export const WorldClassChatContainer = forwardRef<
   const cacheKey = `chat-messages-${agentDef.id}`;
   const { initialMessages, handleMessagesChange } =
     useChatMessageCache<Message>(cacheKey);
-  // mergedContexts 需直接从 store 读取 prompt
+  
+  // 获取 memories
+  const { memories } = useMemoryStore();
+  
+  // mergedContexts 需直接从 store 读取 prompt 和 memories
   const mergedContexts = useMemo(() => {
     const base = Array.isArray(contexts) ? contexts : [];
+    const contextList = [...base];
+    
+    // 添加系统指令
     if (prompt) {
-      return [...base, { description: "系统指令", value: prompt }];
+      contextList.push({ description: "系统指令", value: prompt });
     }
-    return base;
-  }, [contexts, prompt]);
+    
+    // 添加 Agent 记忆
+    if (memories.length > 0) {
+      const memoriesText = memories
+        .map(memory => `- ${memory.content}`)
+        .join('\n');
+      contextList.push({ 
+        description: "Agent 记忆", 
+        value: `以下是 AI Agent 的重要记忆信息，这些信息帮助 Agent 更好地理解对话历史和用户偏好：\n\n${memoriesText}` 
+      });
+    }
+    
+    return contextList;
+  }, [contexts, prompt, memories]);
   const { uiMessages, messages, isAgentResponding, sendMessage, reset } =
     useAgentChat({
       agent,
