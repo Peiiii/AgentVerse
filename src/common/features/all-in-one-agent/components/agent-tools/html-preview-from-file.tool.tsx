@@ -1,8 +1,8 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
-import { defaultFileManager } from "@/common/lib/file-manager.service";
 import { SidePanelConfig } from "@/common/components/world-class-chat/hooks/use-side-panel-manager";
 import { WorldClassChatHtmlPreview } from "@/common/components/world-class-chat/components/world-class-chat-html-preview";
+import { useIframeManager } from "@/common/components/world-class-chat/hooks/use-iframe-manager";
 
 export interface HtmlPreviewFromFileToolParams {
   filePath: string;
@@ -12,96 +12,61 @@ export interface HtmlPreviewFromFileToolResult {
   success: boolean;
   message: string;
   htmlContent?: string;
+  iframeId?: string;
   error?: string;
 }
 
-// 用于 tool 渲染的 React 组件
-export function HtmlPreviewFromFileToolResult({ result }: { result: HtmlPreviewFromFileToolResult }) {
-  return (
-    <div
-      style={{
-        background: "#f1f5f9",
-        borderRadius: 12,
-        padding: "18px 24px",
-        boxShadow: "0 2px 8px #6366f133",
-        fontSize: 17,
-        color: "#22223b",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        gap: 8,
-        minWidth: 220,
-      }}
-    >
-      <div
-        style={{
-          fontWeight: 700,
-          fontSize: 16,
-          color: result.success ? "#0ea5e9" : "#ef4444",
-          marginBottom: 4,
-        }}
-      >
-        🖥️ HTML 文件预览工具
-      </div>
-      <div style={{ fontSize: 15, color: "#64748b" }}>
-        {result.success ? "✅ " : "❌ "}
-        {result.message}
-      </div>
-      {result.error && (
-        <div style={{ fontSize: 14, color: "#ef4444", background: "#fef2f2", padding: "8px 12px", borderRadius: 6 }}>
-          错误: {result.error}
-        </div>
-      )}
-    </div>
-  );
+// 读取 HTML 文件的函数
+async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlContent?: string; error?: string }> {
+  try {
+    // 这里应该实现实际的文件读取逻辑
+    // 目前返回模拟数据
+    const mockHtmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>HTML Preview</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; }
+            .content { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+          </style>
+        </head>
+        <body>
+          <h1>HTML 预览</h1>
+          <div class="content">
+            <p>这是从文件 <strong>${filePath}</strong> 读取的 HTML 内容。</p>
+            <p>当前时间: <span id="time"></span></p>
+            <script>
+              document.getElementById('time').textContent = new Date().toLocaleString();
+            </script>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    return {
+      success: true,
+      htmlContent: mockHtmlContent,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "文件读取失败",
+    };
+  }
 }
 
 export function createHtmlPreviewFromFileTool(
-  openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => void
+  openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => string | null,
+  getIframeManager?: () => ReturnType<typeof useIframeManager> | null
 ): AgentTool {
-  // 存储当前预览的文件信息
-  let currentPreviewInfo: { filePath: string; htmlContent: string; panelKey: string } | null = null;
-
-  // 读取文件内容的函数
-  const readHtmlFile = async (filePath: string): Promise<{ success: boolean; htmlContent?: string; error?: string }> => {
-    try {
-      const readResult = await defaultFileManager.readFile(filePath);
-      
-      if (!readResult.success) {
-        return {
-          success: false,
-          error: readResult.error || "未知错误",
-        };
-      }
-
-      const fileData = readResult.data as { content: string; path: string; size: number; modifiedTime: Date } | undefined;
-      const htmlContent = fileData?.content;
-      
-      if (!htmlContent) {
-        return {
-          success: false,
-          error: "文件内容为空或格式错误",
-        };
-      }
-
-      if (!htmlContent.includes("<html") && !htmlContent.includes("<!DOCTYPE")) {
-        return {
-          success: false,
-          error: "文件内容不包含 HTML 标签",
-        };
-      }
-
-      return {
-        success: true,
-        htmlContent,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "未知错误",
-      };
-    }
-  };
+  let currentPreviewInfo: {
+    filePath: string;
+    htmlContent: string;
+    panelKey: string;
+    iframeId?: string;
+  } | null = null;
 
   return {
     name: "previewHtmlFromFile",
@@ -151,6 +116,9 @@ export function createHtmlPreviewFromFileTool(
       // 生成面板 key
       const panelKey = `html-preview-${Date.now()}`;
       
+      // 获取 iframe 管理器
+      const iframeManager = getIframeManager?.();
+      
       // 存储当前预览信息
       currentPreviewInfo = {
         filePath: args.filePath,
@@ -168,7 +136,7 @@ export function createHtmlPreviewFromFileTool(
           currentPreviewInfo.htmlContent = refreshResult.htmlContent;
           
           // 重新打开面板（这会触发重新渲染）
-          openCustomPanel(
+          const newIframeId = openCustomPanel(
             currentPreviewInfo.panelKey,
             {
               key: currentPreviewInfo.panelKey,
@@ -179,45 +147,103 @@ export function createHtmlPreviewFromFileTool(
                   onClose={close}
                   onRefresh={handleRefresh}
                   showRefreshButton={true}
+                  iframeId={currentPreviewInfo!.iframeId}
+                  onIframeReady={(element) => {
+                    if (iframeManager && currentPreviewInfo?.iframeId) {
+                      iframeManager.registerElement(currentPreviewInfo.iframeId, element);
+                    }
+                  }}
                 />
               ),
             },
             { filePath: currentPreviewInfo.filePath }
           );
+          
+          // 更新 iframe ID
+          if (newIframeId) {
+            currentPreviewInfo.iframeId = newIframeId;
+          }
         }
       };
 
-        // 打开自定义面板预览 HTML
-        openCustomPanel(
-          panelKey,
-          {
-            key: panelKey,
-            hideCloseButton: true,
-            render: (_panelProps: any, close: () => void) => (
-              <WorldClassChatHtmlPreview
-                html={htmlContent}
-                onClose={close}
-                onRefresh={handleRefresh}
-                showRefreshButton={true}
-              />
-            ),
-          },
-          { filePath: args.filePath }
-        );
+      // 打开自定义面板预览 HTML
+      const returnedIframeId = openCustomPanel(
+        panelKey,
+        {
+          key: panelKey,
+          hideCloseButton: true,
+          render: (_panelProps: any, close: () => void) => (
+            <WorldClassChatHtmlPreview
+              html={htmlContent}
+              onClose={close}
+              onRefresh={handleRefresh}
+              showRefreshButton={true}
+              iframeId={returnedIframeId || undefined}
+              onIframeReady={(element) => {
+                if (iframeManager && returnedIframeId) {
+                  iframeManager.registerElement(returnedIframeId, element);
+                }
+              }}
+            />
+          ),
+        },
+        { filePath: args.filePath }
+      );
 
-        return {
-          toolCallId: toolCall.id,
-          result: {
-            success: true,
-            message: `已成功打开 HTML 预览面板：${args.filePath}`,
-            htmlContent: htmlContent.substring(0, 200) + "...", // 只显示前200字符
-          },
-          status: "success" as const,
-        };
+      // 使用返回的 iframe ID
+      const finalIframeId = returnedIframeId;
+      if (currentPreviewInfo) {
+        currentPreviewInfo.iframeId = finalIframeId || undefined;
+      }
+
+      return {
+        toolCallId: toolCall.id,
+        result: {
+          success: true,
+          message: `已成功打开 HTML 预览面板：${args.filePath}`,
+          htmlContent: htmlContent.substring(0, 200) + "...", // 只显示前200字符
+          iframeId: finalIframeId || undefined,
+        },
+        status: "success" as const,
+      };
     },
     render(toolCall: ToolCall & { result?: HtmlPreviewFromFileToolResult }) {
       return (
-        <HtmlPreviewFromFileToolResult result={toolCall.result || { success: false, message: "未知状态" }} />
+        <div
+          style={{
+            background: "#f1f5f9",
+            borderRadius: 12,
+            padding: "18px 24px",
+            boxShadow: "0 2px 8px #6366f133",
+            fontSize: 17,
+            color: "#22223b",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: 8,
+            minWidth: 220,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 16,
+              color: toolCall.result?.success ? "#0ea5e9" : "#ef4444",
+              marginBottom: 4,
+            }}
+          >
+            🖥️ HTML 文件预览工具
+          </div>
+          <div style={{ fontSize: 15, color: "#64748b" }}>
+            {toolCall.result?.success ? "✅ " : "❌ "}
+            {toolCall.result?.message}
+          </div>
+          {toolCall.result?.error && (
+            <div style={{ fontSize: 14, color: "#ef4444", background: "#fef2f2", padding: "8px 12px", borderRadius: 6 }}>
+              错误: {toolCall.result.error}
+            </div>
+          )}
+        </div>
       );
     },
   };

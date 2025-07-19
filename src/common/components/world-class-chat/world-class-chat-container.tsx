@@ -14,6 +14,7 @@ import {
   SidePanelConfig,
   useSidePanelManager,
 } from "./hooks/use-side-panel-manager";
+import { useSuggestionsManager, type SuggestionsManager } from "./hooks/use-suggestions-manager";
 import { useWorldClassChatSettingsStore } from "./stores/world-class-chat-settings.store";
 import { useMemoryStore } from "./stores/memory.store";
 // 业务组件
@@ -28,6 +29,7 @@ import { SidePanel } from "./side-panel";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
 import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
+import { useIframeManager } from "./hooks/use-iframe-manager";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
@@ -35,23 +37,33 @@ export interface WorldClassChatContainerProps {
   contexts?: Context[];
   className?: string;
   onClear?: () => void;
+  initialSuggestions?: Suggestion[];
 }
 
 export interface WorldClassChatContainerRef {
   openPanel: (key: string, props?: any) => void;
-  openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => void;
+  openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => string | null;
+  suggestionsManager: SuggestionsManager;
+  iframeManager: ReturnType<typeof useIframeManager>;
 }
 
 export const WorldClassChatContainer = forwardRef<
   WorldClassChatContainerRef,
   WorldClassChatContainerProps
 >(function WorldClassChatContainer(
-  { agentDef, tools = [], contexts = [], className, onClear },
+  { agentDef, tools = [], contexts = [], className, onClear, initialSuggestions = [] },
   ref
 ) {
   // 1. State & SidePanel
   const [input, setInput] = useState("");
   const prompt = useWorldClassChatSettingsStore((s) => s.prompt);
+  
+  // 使用 suggestions manager hook
+  const suggestionsManager = useSuggestionsManager(initialSuggestions);
+  
+  // 使用 iframe 管理器
+  const iframeManager = useIframeManager();
+  
   const sidePanelConfigs: SidePanelConfig[] = useMemo(
     () => [
       {
@@ -80,14 +92,24 @@ export const WorldClassChatContainer = forwardRef<
     addPanel,
   } = useSidePanelManager(sidePanelConfigs);
 
-  // 1.5 暴露 openPanel 能力
+  // 1.5 暴露 openPanel 和 suggestions 管理能力
   useImperativeHandle(ref, () => ({ 
     openPanel,
     openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => {
       addPanel(config);
       openPanel(key, props);
-    }
-  }), [openPanel, addPanel]);
+      
+      // 使用 iframe 管理器创建 iframe ID（如果是 HTML 预览面板）
+      if (config.key.includes('html-preview') || config.key.includes('preview')) {
+        const iframeId = iframeManager.createIframe(key, 'html-preview');
+        return iframeId;
+      }
+      
+      return null;
+    },
+    suggestionsManager,
+    iframeManager,
+  }), [openPanel, addPanel, suggestionsManager, iframeManager]);
 
   // 2. Agent & Message
   const { providerConfig } = getLLMProviderConfig();
@@ -141,27 +163,6 @@ export const WorldClassChatContainer = forwardRef<
   }, [messages, handleMessagesChange]);
 
   // 4. 业务事件
-  const suggestions: Suggestion[] = [
-    {
-      id: "1",
-      type: "question",
-      actionName: "你能做什么？",
-      content: "你能做什么？",
-    },
-    { id: "2", type: "action", actionName: "清空对话", content: "清空对话" },
-    {
-      id: "3",
-      type: "question",
-      actionName: "帮我总结一下今天的工作",
-      content: "帮我总结一下今天的工作",
-    },
-    {
-      id: "4",
-      type: "question",
-      actionName: "推荐几个提升效率的AI工具",
-      content: "推荐几个提升效率的AI工具",
-    },
-  ];
   const handleSuggestionClick = (
     suggestion: Suggestion,
     action: "send" | "edit"
@@ -226,8 +227,11 @@ export const WorldClassChatContainer = forwardRef<
             />
           </div>
           <SuggestionsProvider
-            suggestions={suggestions}
+            suggestions={suggestionsManager.suggestions}
             onSuggestionClick={handleSuggestionClick}
+            onClose={() => {
+              suggestionsManager.clearSuggestions();
+            }}
           />
           <WorldClassChatInputBar
             value={input}

@@ -44,6 +44,13 @@ export const AI_PROVIDER_CONFIG: ProviderConfigs = {
     model: import.meta.env.VITE_DASHSCOPE_MODEL || "deepseek-v3",
     maxTokens: Number(import.meta.env.VITE_DASHSCOPE_MAX_TOKENS) || 1000,
   },
+
+  [SupportedAIProvider.OPENROUTER]: {
+    apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
+    baseUrl: import.meta.env.VITE_OPENROUTER_API_URL || "https://openrouter.ai/api/v1",
+    model: import.meta.env.VITE_OPENROUTER_MODEL || "gpt-3.5-turbo",
+    maxTokens: Number(import.meta.env.VITE_OPENROUTER_MAX_TOKENS) || 1000,
+  },
 };
 
 export const BasicAIConfig = {

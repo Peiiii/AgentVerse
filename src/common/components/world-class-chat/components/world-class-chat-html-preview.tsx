@@ -1,5 +1,5 @@
 import { Code2, Eye, X, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -8,14 +8,34 @@ export interface WorldClassChatHtmlPreviewProps {
   onClose: () => void;
   onRefresh?: () => void;
   showRefreshButton?: boolean;
+  iframeId?: string;
+  onIframeReady?: (element: HTMLIFrameElement) => void;
 }
 
-export function WorldClassChatHtmlPreview({ html, onClose, onRefresh, showRefreshButton = false }: WorldClassChatHtmlPreviewProps) {
+export function WorldClassChatHtmlPreview({ 
+  html, 
+  onClose, 
+  onRefresh, 
+  showRefreshButton = false, 
+  iframeId,
+  onIframeReady 
+}: WorldClassChatHtmlPreviewProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<'preview' | 'source'>('preview');
   const [copied, setCopied] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // 生成 iframe ID
+  const finalIframeId = iframeId || `html-preview-${Date.now()}`;
+
+  // 注册 iframe 元素
+  useEffect(() => {
+    if (iframeRef.current && onIframeReady) {
+      onIframeReady(iframeRef.current);
+    }
+  }, [onIframeReady]);
 
   // 复制源码
   const handleCopy = () => {
@@ -92,6 +112,8 @@ export function WorldClassChatHtmlPreview({ html, onClose, onRefresh, showRefres
         <div className="rounded-xl shadow-lg overflow-hidden bg-white h-full border border-slate-100 flex flex-col">
           {tab === 'preview' ? (
             <iframe
+              ref={iframeRef}
+              id={finalIframeId}
               srcDoc={html}
               title="HTML 预览"
               className="w-full h-full bg-white flex-1"
