@@ -1,4 +1,4 @@
-import { Code2, Eye, X } from "lucide-react";
+import { Code2, Eye, X, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -6,19 +6,34 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 export interface WorldClassChatHtmlPreviewProps {
   html: string;
   onClose: () => void;
+  onRefresh?: () => void;
+  showRefreshButton?: boolean;
 }
 
-export function WorldClassChatHtmlPreview({ html, onClose }: WorldClassChatHtmlPreviewProps) {
+export function WorldClassChatHtmlPreview({ html, onClose, onRefresh, showRefreshButton = false }: WorldClassChatHtmlPreviewProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<'preview' | 'source'>('preview');
   const [copied, setCopied] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // 复制源码
   const handleCopy = () => {
     navigator.clipboard.writeText(html);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
+  };
+
+  // 刷新功能
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+    setRefreshing(true);
+    setLoading(true);
+    try {
+      await onRefresh();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   return (
@@ -39,13 +54,25 @@ export function WorldClassChatHtmlPreview({ html, onClose }: WorldClassChatHtmlP
             <Code2 size={16} className="mr-1" /> 源码
           </button>
         </div>
-        <button
-          onClick={onClose}
-          className="bg-slate-100 hover:bg-slate-200 border-none rounded-lg p-2 cursor-pointer shadow transition-colors"
-          title="关闭预览"
-        >
-          <X size={18} color="#6366f1" />
-        </button>
+        <div className="flex items-center gap-2">
+          {showRefreshButton && onRefresh && (
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="bg-indigo-100 hover:bg-indigo-200 border-none rounded-lg p-2 cursor-pointer shadow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="刷新文件内容"
+            >
+              <RefreshCw size={18} color="#6366f1" className={refreshing ? "animate-spin" : ""} />
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="bg-slate-100 hover:bg-slate-200 border-none rounded-lg p-2 cursor-pointer shadow transition-colors"
+            title="关闭预览"
+          >
+            <X size={18} color="#6366f1" />
+          </button>
+        </div>
       </div>
       {/* loading 动画 */}
       {loading && tab === 'preview' && !error && (
