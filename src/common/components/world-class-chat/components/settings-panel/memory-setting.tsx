@@ -4,7 +4,8 @@ import { useState } from "react";
 import type { SettingItemComponent } from "./types";
 import { useMemoryStore, type MemoryItem } from "../../stores/memory.store";
 
-export function MemorySetting({}: SettingItemComponent) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function MemorySetting(_props: SettingItemComponent) {
   // 使用 Memory Store
   const { memories, addMemory, updateMemory, deleteMemory } = useMemoryStore();
   

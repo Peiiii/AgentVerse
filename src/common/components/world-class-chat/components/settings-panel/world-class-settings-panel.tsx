@@ -2,6 +2,7 @@ import { cn } from "@/common/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { getAllSettings, getSettingById } from "./settings-registry";
+import { ChevronDown, ArrowRight } from "lucide-react";
 
 export interface WorldClassSettingsPanelProps {
   onClose: () => void;
@@ -9,10 +10,26 @@ export interface WorldClassSettingsPanelProps {
 
 export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProps) {
   const [activeSetting, setActiveSetting] = useState<string | null>(null);
+  const [expandedInlineSettings, setExpandedInlineSettings] = useState<Set<string>>(new Set());
   const settings = getAllSettings();
 
   const handleSettingClick = (settingId: string) => {
-    setActiveSetting(settingId);
+    const setting = getSettingById(settingId);
+    if (setting?.inline) {
+      // 对于 inline 设置项，切换展开/收起状态
+      setExpandedInlineSettings(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(settingId)) {
+          newSet.delete(settingId);
+        } else {
+          newSet.add(settingId);
+        }
+        return newSet;
+      });
+    } else {
+      // 对于非 inline 设置项，进入详情页面
+      setActiveSetting(settingId);
+    }
   };
 
   const handleBack = () => {
@@ -35,7 +52,7 @@ export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProp
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="w-full h-full flex flex-col p-6"
+            className="w-full h-full flex flex-col p-6 overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold">设置</h2>
@@ -48,52 +65,92 @@ export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProp
               </button>
             </div>
 
-            <div className="space-y-3">
-              {settings.map((setting) => (
-                <motion.div
-                  key={setting.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={cn(
-                    "p-4 border rounded-lg cursor-pointer transition-all duration-200",
-                    "hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-md"
-                  )}
-                  onClick={() => handleSettingClick(setting.id)}
-                >
-                  <div className="flex items-center gap-3">
-                    {setting.icon && (
-                      <div className="flex-shrink-0">
-                        <setting.icon className="w-5 h-5 text-indigo-600" />
-                      </div>
+            <div className="space-y-4">
+              {settings.map((setting) => {
+                const isExpanded = expandedInlineSettings.has(setting.id);
+                const isInline = setting.inline;
+                
+                return (
+                  <div
+                    key={setting.id}
+                    className={cn(
+                      "border rounded-xl overflow-hidden transition-all duration-200",
+                      "hover:border-indigo-300 hover:shadow-md",
+                      isExpanded && "border-indigo-300 shadow-md bg-indigo-50/20"
                     )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 mb-1">
-                        {setting.name}
-                      </h3>
-                      {setting.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2">
-                          {setting.description}
-                        </p>
+                  >
+                    {/* 设置项头部 */}
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      className={cn(
+                        "p-4 cursor-pointer transition-all duration-200",
+                        "hover:bg-indigo-50/30",
+                        isExpanded && "bg-indigo-50/40 border-b border-indigo-200/50"
                       )}
-                    </div>
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </div>
+                      onClick={() => handleSettingClick(setting.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        {setting.icon && (
+                          <div className="flex-shrink-0">
+                            <setting.icon className="w-5 h-5 text-indigo-600" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 mb-1">
+                            {setting.name}
+                          </h3>
+                          {setting.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {setting.description}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex-shrink-0">
+                          {isInline ? (
+                            // inline 设置项：展开/收起图标
+                            <motion.div
+                              animate={{ rotate: isExpanded ? 180 : 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="text-gray-500"
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </motion.div>
+                          ) : (
+                            // 非 inline 设置项：进入详情图标
+                            <div className="text-gray-500">
+                              <ArrowRight className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                    
+                    {/* inline 设置项的展开内容 - 在卡片内部 */}
+                    {isInline && (
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ 
+                              duration: 0.25, 
+                              ease: "easeInOut",
+                              opacity: { duration: 0.2 }
+                            }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-4 bg-white">
+                              <setting.component item={setting} />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    )}
                   </div>
-                </motion.div>
-              ))}
+                );
+              })}
             </div>
           </motion.div>
         ) : (

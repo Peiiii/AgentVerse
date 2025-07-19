@@ -11,6 +11,7 @@ export const settingsRegistry: BaseSettingItem[] = [
     description: "自定义 AI 的思考方式和表达风格",
     icon: Sparkles,
     component: PromptSetting,
+    inline: true, // 直接在设置面板中展开显示
   },
   {
     id: "memory",

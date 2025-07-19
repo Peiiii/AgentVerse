@@ -7,6 +7,7 @@ export interface BaseSettingItem {
   description?: string;
   icon?: React.ComponentType<{ className?: string }>;
   component: React.ComponentType<SettingItemComponent>;
+  inline?: boolean; // 是否直接在设置面板中展开显示
 }
 
 // 设置项组件接口
