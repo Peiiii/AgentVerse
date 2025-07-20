@@ -71,8 +71,8 @@ function AgentConfigurationAssistantInner({ onAgentCreate, className, editingAge
     sendMessage,
   } = useAgentChat({
     agent: agentCreatorAgent,
-    tools: [], // 工具已由useAgentConfigurationTools注册
-    contexts,
+    defaultToolDefs: [], // 工具已由useAgentConfigurationTools注册
+    defaultContexts: contexts,
   });
 
   const [inputValue, setInputValue] = useState("");

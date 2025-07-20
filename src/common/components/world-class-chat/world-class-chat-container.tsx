@@ -156,8 +156,8 @@ export const WorldClassChatContainer = forwardRef<
   const { uiMessages, messages, isAgentResponding,addMessages, sendMessage, reset } =
     useAgentChat({
       agent,
-      tools,
-      contexts: mergedContexts,
+      defaultToolDefs: [],
+      defaultContexts: mergedContexts,
       initialMessages,
     });
 

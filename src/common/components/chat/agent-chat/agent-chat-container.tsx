@@ -6,7 +6,7 @@ import {
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
 import { getLLMProviderConfig } from "@/core/services/ai.service";
-import { tools, useAgentChat } from "@agent-labs/agent-chat";
+import { useAgentChat } from "@agent-labs/agent-chat";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { map } from "rxjs";
 
@@ -77,8 +77,8 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
 
   const { uiMessages, isAgentResponding, sendMessage, abortAgentRun } = useAgentChat({
     agent,
-    tools: tools,
-    contexts: [{
+    defaultToolDefs: [],
+    defaultContexts: [{
       description: "你的设定",
       value: JSON.stringify(agentDef),
     }],
