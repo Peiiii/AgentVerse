@@ -1,4 +1,4 @@
-import { ChevronRight, Download, Edit, FileText, Folder, Home, Plus, Trash2, Upload } from "lucide-react";
+import { ChevronRight, Download, Edit, FileText, Folder, Home, Plus, Trash2, Upload, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useState } from "react";
 import { FilePreview } from "../components/file-preview";
 import { FileTree } from "../components/file-tree";
@@ -45,6 +45,7 @@ export function FileManagerPage() {
     const [showNewFile, setShowNewFile] = useState(false);
     const [newDirName, setNewDirName] = useState("");
     const [newFileName, setNewFileName] = useState("");
+    const [fileListCollapsed, setFileListCollapsed] = useState(false);
 
     // 世界级面包屑导航
     const renderBreadcrumb = () => {
@@ -87,9 +88,22 @@ export function FileManagerPage() {
     // 递归目录树区域
     const renderDirTree = () => (
         <div className="w-80 min-w-[18rem] max-w-[22rem] flex flex-col flex-1 h-full p-4 border-r" style={{ background: CARD_BG, borderRadius: `0 0 ${CARD_RADIUS}px ${CARD_RADIUS}px`, boxShadow: CARD_SHADOW, borderColor: BORDER_COLOR }}>
-            <div className="mb-4 flex items-center gap-2 text-lg font-bold text-[#6a82fb]">
-                <Folder className="w-6 h-6" />
-                目录树
+            <div className="mb-4 flex items-center justify-between text-lg font-bold text-[#6a82fb]">
+                <div className="flex items-center gap-2">
+                    <Folder className="w-6 h-6" />
+                    目录树
+                </div>
+                <button
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    onClick={() => setFileListCollapsed(!fileListCollapsed)}
+                    title={fileListCollapsed ? "展开文件列表" : "收起文件列表"}
+                >
+                    {fileListCollapsed ? (
+                        <PanelLeftOpen className="w-5 h-5 text-gray-600" />
+                    ) : (
+                        <PanelLeftClose className="w-5 h-5 text-gray-600" />
+                    )}
+                </button>
             </div>
             <div className="flex-1 overflow-auto rounded-lg bg-white/80 p-2 shadow-inner">
             <FileTree
@@ -120,7 +134,19 @@ export function FileManagerPage() {
     // 文件列表区域（当前 cwd 下文件）
     const files = treeData && treeData.children ? treeData.children.filter((e: FileTreeNode) => e.type === 'file') : [];
     const renderFileList = () => (
-        <div className="w-96 min-w-[22rem] max-w-[28rem] flex flex-col flex-1 h-full p-4 border-r" style={{ background: CARD_BG, borderRadius: `0 0 ${CARD_RADIUS}px ${CARD_RADIUS}px`, boxShadow: CARD_SHADOW, borderColor: BORDER_COLOR }}>
+        <div 
+            className={`flex flex-col flex-1 h-full p-4 border-r transition-all duration-300 ease-in-out ${
+                fileListCollapsed ? 'w-0 min-w-0 max-w-0 opacity-0 overflow-hidden' : 'w-96 min-w-[22rem] max-w-[28rem] opacity-100'
+            }`} 
+            style={{ 
+                background: CARD_BG, 
+                borderRadius: `0 0 ${CARD_RADIUS}px ${CARD_RADIUS}px`, 
+                boxShadow: CARD_SHADOW, 
+                borderColor: BORDER_COLOR,
+                // 收起时完全移除元素，避免影响布局
+                display: fileListCollapsed ? 'none' : 'flex'
+            }}
+        >
             <div className="mb-4 flex items-center gap-2 text-lg font-bold text-[#fc5c7d]">
                 <FileText className="w-6 h-6" />
                 文件列表
@@ -185,7 +211,7 @@ export function FileManagerPage() {
     return (
         <div className="h-full w-full flex flex-col" style={{ background: MAIN_BG }}>
             {renderBreadcrumb()}
-            <div className="flex-1 flex min-h-0 gap-6 p-6 items-stretch">
+            <div className={`flex-1 flex min-h-0 items-stretch transition-all duration-300 ease-in-out ${fileListCollapsed ? 'gap-6' : 'gap-6'} p-6`}>
                 {renderDirTree()}
                 {renderFileList()}
                 {renderFilePreview()}
