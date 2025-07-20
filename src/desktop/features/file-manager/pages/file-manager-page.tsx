@@ -1,10 +1,11 @@
 import { ChevronRight, Download, Edit, FileText, Folder, Home, Plus, Trash2, Upload, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { useState } from "react";
-import { FilePreview } from "../components/file-preview";
+import { useState, useEffect } from "react";
+import { PluggableFilePreview } from "../components/pluggable-file-preview";
 import { FileTree } from "../components/file-tree";
 import { useFileOps } from "../hooks/use-file-ops";
 import { useFileTree } from "../hooks/use-file-tree";
 import { useWorkingDirectory } from "../hooks/use-working-directory";
+import { registerFilePreviewers } from "../previewers";
 
 // 极简主色
 const MAIN_BG = '#f7f8fa';
@@ -25,6 +26,11 @@ interface FileTreeNode {
 }
 
 export function FileManagerPage() {
+    // 注册文件预览器
+    useEffect(() => {
+        registerFilePreviewers();
+    }, []);
+
     // 目录树和 cwd
     const { cwd, setCwd } = useWorkingDirectory("/");
     // 当前目录树节点（用于文件列表）
@@ -199,7 +205,7 @@ export function FileManagerPage() {
     // 文件预览区
     const renderFilePreview = () => (
         <div className="flex-1 flex flex-col h-full p-4" style={{ background: CARD_BG, borderRadius: `0 0 ${CARD_RADIUS}px ${CARD_RADIUS}px`, boxShadow: CARD_SHADOW }}>
-        <FilePreview
+        <PluggableFilePreview
             selectedFile={selectedFile}
             cwd={cwd}
             refreshNode={refreshNode}
