@@ -10,7 +10,7 @@ export interface WorldClassSettingsPanelProps {
 
 export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProps) {
   const [activeSetting, setActiveSetting] = useState<string | null>(null);
-  const [expandedInlineSettings, setExpandedInlineSettings] = useState<Set<string>>(new Set());
+  const [expandedInlineSettings, setExpandedInlineSettings] = useState<Set<string>>(new Set(["prompt"]));
   const settings = getAllSettings();
 
   const handleSettingClick = (settingId: string) => {

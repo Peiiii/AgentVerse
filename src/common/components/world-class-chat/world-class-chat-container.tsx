@@ -8,32 +8,31 @@ import React, {
 import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
 import { useChatMessageCache } from "@/common/hooks/use-chat-message-cache";
 import type { AgentDef } from "@/common/types/agent";
-import type { Context, ToolDefinition } from "@agent-labs/agent-chat";
+import type { Context } from "@agent-labs/agent-chat";
 import { useAgentChat } from "@agent-labs/agent-chat";
 import {
   SidePanelConfig,
   useSidePanelManager,
 } from "./hooks/use-side-panel-manager";
 import { useSuggestionsManager, type SuggestionsManager } from "./hooks/use-suggestions-manager";
-import { useWorldClassChatSettingsStore } from "./stores/world-class-chat-settings.store";
 import { useMemoryStore } from "./stores/memory.store";
+import { useWorldClassChatSettingsStore } from "./stores/world-class-chat-settings.store";
 // 业务组件
 import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
 import { SuggestionsProvider } from "@/common/components/chat/suggestions";
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experimental-inbrowser-agent";
 import { getLLMProviderConfig } from "@/core/services/ai.service";
 import { Message } from "@ag-ui/core";
-import { WorldClassChatHtmlPreview } from "./components/world-class-chat-html-preview";
 import { WorldClassSettingsPanel } from "./components/settings-panel";
+import { WorldClassChatHtmlPreview } from "./components/world-class-chat-html-preview";
+import { useIframeManager } from "./hooks/use-iframe-manager";
 import { SidePanel } from "./side-panel";
 import { WorldClassChatInputBar } from "./world-class-chat-input-bar";
 import { WorldClassChatMessageList } from "./world-class-chat-message-list";
 import { WorldClassChatTopBar } from "./world-class-chat-top-bar";
-import { useIframeManager } from "./hooks/use-iframe-manager";
 
 export interface WorldClassChatContainerProps {
   agentDef: AgentDef;
-  tools?: ToolDefinition[];
   contexts?: Context[];
   className?: string;
   onClear?: () => void;
@@ -54,7 +53,7 @@ export const WorldClassChatContainer = forwardRef<
   WorldClassChatContainerRef,
   WorldClassChatContainerProps
 >(function WorldClassChatContainer(
-  { agentDef, tools = [], contexts = [], className, onClear, initialSuggestions = [] },
+  { agentDef, contexts = [], className, onClear, initialSuggestions = [] },
   ref
 ) {
   // 1. State & SidePanel
