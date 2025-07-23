@@ -3,7 +3,7 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { Shield } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { AllInOneAgentPage } from "../pages/all-in-one-agent-page";
 
 export const allInOneAgentExtension = defineExtension({
@@ -13,13 +13,13 @@ export const allInOneAgentExtension = defineExtension({
     description: "全局超级智能体，系统级控制台",
     version: "1.0.0",
     author: "AgentVerse",
-    icon: "shield",
+    icon: "sparkles",
   },
   activate: ({ subscriptions }) => {
     subscriptions.push(
       Disposable.from(
         useIconStore.getState().addIcons({
-          shield: Shield,
+          sparkles: Sparkles,
         })
       )
     );
@@ -30,7 +30,7 @@ export const allInOneAgentExtension = defineExtension({
           label: "All-in-One Agent",
           title: "全局超级智能体",
           group: "main",
-          icon: "shield",
+          icon: "sparkles",
           order: 5,
         })
       )
