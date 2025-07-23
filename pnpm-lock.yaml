@@ -18,8 +18,8 @@ importers:
         specifier: ^0.0.30
         version: 0.0.30
       '@agent-labs/agent-chat':
-        specifier: ^1.6.0
-        version: 1.6.0(@ag-ui/client@0.0.30)(@ag-ui/core@0.0.30)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)
+        specifier: ^1.7.3
+        version: 1.7.3(@ag-ui/client@0.0.30)(@ag-ui/core@0.0.30)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)
       '@ai-sdk/ui-utils':
         specifier: ^1.2.11
         version: 1.2.11(zod@3.25.67)
@@ -339,8 +339,8 @@ packages:
   '@ag-ui/proto@0.0.30':
     resolution: {integrity: sha512-5yObohnpAhuzkIrcbgBuT7xrXLThuhsBl+vh85uNeUlb6CNJ7W2rdwApJGTj/3HbitK4iLq2BiY3U18Bno+qqg==}
 
-  '@agent-labs/agent-chat@1.6.0':
-    resolution: {integrity: sha512-4aBpcGKyJwVcvnUhAthboDbGVUTv1Y54AN7fSk5dAtmN+THGocj/mwKmSGjU9a5DrowvwYEOeToDBkI8F7VZlg==}
+  '@agent-labs/agent-chat@1.7.3':
+    resolution: {integrity: sha512-YU5ukTFcqMFlFWXsWnoZYRB6iYSVLng9ygxFiLjJvIN75AlA/hQO3/COTiSIGvSZpbiKf5gfFtNyZ6p+Lr0pBg==}
     peerDependencies:
       '@ag-ui/client': ^0.0.30
       '@ag-ui/core': ^0.0.30
@@ -6253,7 +6253,7 @@ snapshots:
       '@ag-ui/core': 0.0.30
       '@bufbuild/protobuf': 2.5.2
 
-  '@agent-labs/agent-chat@1.6.0(@ag-ui/client@0.0.30)(@ag-ui/core@0.0.30)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)':
+  '@agent-labs/agent-chat@1.7.3(@ag-ui/client@0.0.30)(@ag-ui/core@0.0.30)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))(zod@3.25.67)':
     dependencies:
       '@ag-ui/client': 0.0.30
       '@ag-ui/core': 0.0.30

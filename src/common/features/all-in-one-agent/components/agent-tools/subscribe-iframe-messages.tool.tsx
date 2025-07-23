@@ -167,7 +167,7 @@ export function createSubscribeIframeMessagesTool(
         messageTypes: {
           type: "array",
           items: { type: "string" },
-          description: "要监听的消息类型数组，使用 '*' 监听所有类型",
+          description: "要监听的消息类型数组，使用 \"*\" 监听所有类型",
         },
         timeout: {
           type: "number",
