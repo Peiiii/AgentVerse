@@ -35,6 +35,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     <ActivityBar.Root
       expanded={expanded}
       activeId={activeId}
+      expandedWidth={200}
       onExpandedChange={handleExpandedChange}
       onActiveChange={handleActiveChange}
       className={cn("flex-shrink-0", className)}
