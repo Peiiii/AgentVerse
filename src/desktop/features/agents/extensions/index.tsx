@@ -6,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Bot } from "lucide-react";
 import { AgentsPage } from "../pages/agents-page";
 import { AgentDetailPage } from "../pages/agent-detail-page";
+import { ModuleOrderEnum } from "@/core/config/module-order";
 
 
 export const desktopAgentsExtension = defineExtension({
@@ -27,7 +28,7 @@ export const desktopAgentsExtension = defineExtension({
             title: "Agents",
             group: "main",
             icon: "bot",
-            order: 20,
+            order: ModuleOrderEnum.AGENTS,
         })))
         subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([
             {

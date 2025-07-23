@@ -6,6 +6,7 @@ import { MessageSquare } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { RedirectToChat } from "@/common/components/common/redirect";
+import { ModuleOrderEnum } from "@/core/config/module-order";
 
 // 重定向组件
 
@@ -28,7 +29,7 @@ export const desktopChatExtension = defineExtension({
             title: "Chat with the user",
             group: "main",
             icon: "message",
-            order: 10,
+            order: ModuleOrderEnum.CHAT,
         })))
 
         subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([{

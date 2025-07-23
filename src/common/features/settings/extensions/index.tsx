@@ -1,3 +1,4 @@
+import { ModuleOrderEnum } from "@/core/config/module-order";
 import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { defineExtension, Disposable } from "@cardos/extension";
@@ -18,11 +19,11 @@ export const settingsExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
             id: "settings",
-            label: "设置",
-            title: "设置",
+            label: "Settings",
+            title: "Settings",
             group: "footer",
             icon: "settings",
-            order: 30,
+            order: ModuleOrderEnum.SETTINGS,
         })))
     },
 });

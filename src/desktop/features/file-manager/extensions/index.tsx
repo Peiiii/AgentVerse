@@ -5,12 +5,13 @@ import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-a
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Folder } from "lucide-react";
 import { FileManagerPage } from "../pages/file-manager-page";
+import { ModuleOrderEnum } from "@/core/config/module-order";
 
 export const desktopFileManagerExtension = defineExtension({
     manifest: {
         id: "file-manager",
-        name: "文件管理",
-        description: "浏览器文件管理器（基于 LightningFS）",
+        name: "File Manager",
+        description: "Browser file manager (powered by LightningFS)",
         version: "1.0.0",
         author: "AgentVerse",
         icon: "folder",
@@ -21,11 +22,11 @@ export const desktopFileManagerExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
             id: "file-manager",
-            label: "文件管理",
-            title: "文件管理",
+            label: "File Manager",
+            title: "File Manager",
             group: "main",
             icon: "folder",
-            order: 25,
+            order: ModuleOrderEnum.FILE_MANAGER,
         })))
         subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([
             {

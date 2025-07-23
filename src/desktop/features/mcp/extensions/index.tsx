@@ -5,6 +5,7 @@ import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-a
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Cpu } from "lucide-react";
 import { MCPDemoPage } from "../pages/mcp-demo-page";
+import { ModuleOrderEnum } from "@/core/config/module-order";
 
 export const desktopMCPExtension = defineExtension({
     manifest: {
@@ -25,7 +26,7 @@ export const desktopMCPExtension = defineExtension({
             title: "Model Context Protocol tools",
             group: "main",
             icon: "cpu",
-            order: 30,
+            order: ModuleOrderEnum.MCP,
         })))
         subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([
             {
