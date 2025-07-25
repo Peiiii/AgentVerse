@@ -8,7 +8,6 @@ import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-a
 import { RedirectToChat } from "@/common/components/common/redirect";
 import { ModuleOrderEnum } from "@/core/config/module-order";
 
-// 重定向组件
 
 export const desktopChatExtension = defineExtension({
     manifest: {
