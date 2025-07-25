@@ -5,7 +5,6 @@ import { useIframeManager } from "@/common/components/world-class-chat/hooks/use
 export interface SendMessageToIframeToolParams {
   iframeId: string;
   message: any;
-  messageType?: string;
   targetOrigin?: string;
 }
 
@@ -25,7 +24,7 @@ export function createSendMessageToIframeTool(
 ): AgentTool {
   return {
     name: "sendMessageToIframe",
-    description: "向特定 iframe 发送 postMessage 消息",
+    description: "向特定 iframe 发送 postMessage 消息，message 参数会被原样发送，无结构变换。",
     parameters: {
       type: "object",
       properties: {
@@ -35,11 +34,7 @@ export function createSendMessageToIframeTool(
         },
         message: {
           type: "object",
-          description: "要发送的消息内容",
-        },
-        messageType: {
-          type: "string",
-          description: "消息类型标识符",
+          description: "要发送的消息内容（会被原样 postMessage）",
         },
         targetOrigin: {
           type: "string",
@@ -50,7 +45,7 @@ export function createSendMessageToIframeTool(
     },
     async execute(toolCall: ToolCall) {
       const args = JSON.parse(toolCall.function.arguments);
-      
+
       if (!args || !args.iframeId || !args.message) {
         return {
           toolCallId: toolCall.id,
@@ -65,7 +60,6 @@ export function createSendMessageToIframeTool(
 
       const iframeId = args.iframeId;
       const message = args.message;
-      const messageType = args.messageType || 'agent-message';
       const targetOrigin = args.targetOrigin || '*';
 
       // 验证 iframe 是否存在
@@ -85,17 +79,8 @@ export function createSendMessageToIframeTool(
         }
       }
 
-      // 构造发送的消息
-      const messageToSend = {
-        type: messageType,
-        data: message,
-        timestamp: Date.now(),
-        source: 'agent',
-      };
-
-      // 发送消息
-      const success = iframeManager?.postMessage(iframeId, messageToSend, targetOrigin) || false;
-
+      // 直接发送 message 参数
+      const success = iframeManager?.postMessage(iframeId, message, targetOrigin) || false;
       if (!success) {
         return {
           toolCallId: toolCall.id,
@@ -113,18 +98,14 @@ export function createSendMessageToIframeTool(
         result: {
           success: true,
           message: `已成功向 iframe ${iframeId} 发送消息`,
-          sentMessage: {
-            type: messageType,
-            data: message,
-            targetOrigin,
-          },
+          sentMessage: message,
         },
         status: "success" as const,
       };
     },
     render(toolCall: ToolCall & { result?: SendMessageToIframeToolResult }) {
       const result = toolCall.result;
-      
+
       return (
         <div
           style={{

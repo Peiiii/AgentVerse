@@ -47,7 +47,6 @@ export function Markdown({
       }
       const className = children?.props?.className ?? "";
       const language = /language-(\w+)/.exec(className)?.[1];
-      console.log("[Markdown] ", { code, language });
       // 生成 actions
       const actions = codeBlockActions?.filter(a => !a.show || a.show(code, language)).map(a => (
         <button
@@ -63,7 +62,7 @@ export function Markdown({
           {a.icon || a.label}
         </button>
       ));
-      console.log("[Markdown] actions", actions);
+      // console.log("[Markdown] actions", actions);
       if (language) {
         return (
           <CodeBlockContainer language={language} code={code} actions={actions}>

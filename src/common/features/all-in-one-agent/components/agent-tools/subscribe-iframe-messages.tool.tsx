@@ -164,11 +164,11 @@ export function createSubscribeIframeMessagesTool(
           type: "string",
           description: "要订阅消息的 iframe ID",
         },
-        messageTypes: {
-          type: "array",
-          items: { type: "string" },
-          description: "要监听的消息类型数组，使用 \"*\" 监听所有类型",
-        },
+        // messageTypes: {
+        //   type: "array",
+        //   items: { type: "string" },
+        //   description: "要监听的消息类型数组，使用 \"*\" 监听所有类型",
+        // },
         timeout: {
           type: "number",
           description: "订阅超时时间（毫秒），超时后自动取消订阅",
