@@ -1,6 +1,6 @@
 {
   "name": "@cardos/service-bus-portal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A modular, composable cross-context communication system for Web Workers, iframes, Shared Workers, and Service Workers",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -60,5 +60,8 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
