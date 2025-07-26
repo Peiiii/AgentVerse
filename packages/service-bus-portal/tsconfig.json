@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+} 

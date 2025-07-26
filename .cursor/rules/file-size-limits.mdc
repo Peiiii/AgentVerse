@@ -1,0 +1,124 @@
+# File Size Limits and Code Organization
+
+## Core Principle: Keep Files Small and Focused
+
+### File Size Guidelines
+- **Target**: Under 100 lines per file
+- **Maximum**: 250 lines per file
+- **When to split**: If a file exceeds 200 lines, consider refactoring
+
+### Why Small Files Matter
+1. **Maintainability**: Easier to understand and modify
+2. **Testability**: Smaller units are easier to test
+3. **Reusability**: Focused modules can be reused independently
+4. **Collaboration**: Multiple developers can work on different files simultaneously
+5. **Code Review**: Smaller changes are easier to review
+
+## Refactoring Patterns
+
+### When a File Gets Too Large
+
+#### 1. Extract Types and Interfaces
+```typescript
+// Before: 300+ lines with mixed types and implementation
+// After: Separate types.ts file
+export interface MyInterface { ... }
+export type MyType = ...;
+```
+
+#### 2. Split by Responsibility
+```typescript
+// Before: One large class with multiple responsibilities
+// After: Multiple focused classes
+- base-class.ts
+- implementation-a.ts
+- implementation-b.ts
+```
+
+#### 3. Extract Utilities
+```typescript
+// Before: Utility functions mixed with business logic
+// After: Dedicated utils file
+export function utilityFunction() { ... }
+```
+
+#### 4. Separate Concerns
+```typescript
+// Before: UI, logic, and data access in one file
+// After: Separate files for each concern
+- component.tsx (UI only)
+- logic.ts (Business logic)
+- data.ts (Data access)
+```
+
+## Directory Organization
+
+### Service Bus Portal Example
+The portal system demonstrates proper file organization:
+
+```
+portal/
+├── types.ts                    # 80 lines - Type definitions only
+├── base-portal.ts              # 50 lines - Abstract base class
+├── postmessage-portal.ts       # 90 lines - PostMessage implementation
+├── event-target-portal.ts      # 70 lines - EventTarget implementation
+├── portal-factory.ts           # 60 lines - Factory methods
+├── service-bus-portal-connector.ts  # 80 lines - Service integration
+├── service-bus-portal-proxy.ts      # 90 lines - Proxy implementation
+├── portal-composer.ts          # 80 lines - Multi-portal management
+├── compatibility.ts            # 70 lines - Legacy support
+└── index.ts                    # 30 lines - Exports only
+```
+
+## Refactoring Checklist
+
+When a file approaches 200 lines:
+
+- [ ] Can types be extracted to a separate file?
+- [ ] Can the class be split into multiple classes?
+- [ ] Can utility functions be moved to a utils file?
+- [ ] Can the file be split by feature or responsibility?
+- [ ] Are there clear boundaries between different concerns?
+- [ ] Can some logic be moved to a separate service or hook?
+
+## Benefits of Small Files
+
+1. **Single Responsibility**: Each file has one clear purpose
+2. **Easier Navigation**: Developers can quickly find relevant code
+3. **Better Testing**: Smaller units are easier to test in isolation
+4. **Reduced Conflicts**: Less chance of merge conflicts
+5. **Improved Performance**: Smaller files load and parse faster
+6. **Better IDE Support**: Faster autocomplete and navigation
+
+## Examples of Good File Organization
+
+### Before (Monolithic - 650 lines)
+```typescript
+// connect-service-bus-with-portal.ts - 650 lines
+// Contains: types, implementations, factories, adapters, compatibility
+```
+
+### After (Modular - 10 files, each under 100 lines)
+```typescript
+// types.ts - 80 lines
+// base-portal.ts - 50 lines  
+// postmessage-portal.ts - 90 lines
+// event-target-portal.ts - 70 lines
+// portal-factory.ts - 60 lines
+// service-bus-portal-connector.ts - 80 lines
+// service-bus-portal-proxy.ts - 90 lines
+// portal-composer.ts - 80 lines
+// compatibility.ts - 70 lines
+// index.ts - 30 lines
+```
+
+## Enforcement
+
+- **Code Review**: Always flag files over 250 lines
+- **Linting**: Consider adding file size limits to linting rules
+- **Documentation**: Document the reasoning for any files over 200 lines
+- **Refactoring**: Prioritize splitting large files in technical debt reviews
+description:
+globs:
+alwaysApply: false
+---

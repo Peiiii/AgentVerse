@@ -71,6 +71,7 @@
     "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",
     "rx-nested-bean": "workspace:*",
+    "@cardos/service-bus-portal": "workspace:*",
     "rxjs": "^7.8.1",
     "tailwind-merge": "^2.5.5",
     "unified": "^11.0.5",

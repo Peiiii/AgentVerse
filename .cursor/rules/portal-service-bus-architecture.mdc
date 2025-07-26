@@ -1,0 +1,138 @@
+# Portal Service Bus Architecture
+
+## Overview
+
+The Portal Service Bus is a modular, composable cross-context communication system that supports Web Workers, iframes, Shared Workers, and Service Workers. It follows a layered architecture with clear separation of concerns.
+
+## Directory Structure
+
+```
+src/common/lib/service-bus/portal/
+├── types.ts                     # Type definitions (86 lines)
+├── core.ts                      # Core implementations (200 lines)
+├── service-bus.ts               # Service bus adapters (180 lines)
+├── factory.ts                   # Factory and composer (140 lines)
+├── usage-examples.ts            # Usage examples (341 lines)
+└── index.ts                     # Unified exports (8 lines)
+```
+
+## Core Principles
+
+### 1. Clear Type Separation
+- **Types**: All interfaces and type definitions in [types.ts](mdc:src/common/lib/service-bus/portal/types.ts)
+- **Implementations**: Core classes and logic in [core.ts](mdc:src/common/lib/service-bus/portal/core.ts)
+- **Service Integration**: Service bus adapters in [service-bus.ts](mdc:src/common/lib/service-bus/portal/service-bus.ts)
+- **Creation Utilities**: Factories and composers in [factory.ts](mdc:src/common/lib/service-bus/portal/factory.ts)
+
+### 2. Balanced File Sizes
+- **Target**: 100-300 lines per file
+- **Maximum**: 400 lines per file
+- **Rationale**: Large enough to group related functionality, small enough to maintain
+
+### 3. Clean Architecture
+- Types are imported from [types.ts](mdc:src/common/lib/service-bus/portal/types.ts)
+- No legacy compatibility layer (removed for simplicity)
+- Clear separation between types and implementations
+
+## Key Components
+
+### Type Definitions ([types.ts](mdc:src/common/lib/service-bus/portal/types.ts))
+```typescript
+interface CommunicationPortal {
+  readonly id: string;
+  readonly type: PortalType;
+  send(message: PortalMessage): Promise<void>;
+  onMessage(handler: (message: PortalMessage) => void): void;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  isConnected(): boolean;
+  getTargetInfo(): PortalTargetInfo;
+  generateMessageId(): string;
+}
+```
+
+### Core Implementations ([core.ts](mdc:src/common/lib/service-bus/portal/core.ts))
+- `BasePortal`: Abstract base class for all portals
+- `PostMessagePortal`: PostMessage-based communication
+- `EventTargetPortal`: EventTarget-based communication
+
+### Service Bus Integration ([service-bus.ts](mdc:src/common/lib/service-bus/portal/service-bus.ts))
+- `PortalServiceBusConnector`: Exposes services through portals
+- `PortalServiceBusProxy`: Creates proxies for remote service calls
+
+### Factory and Composition ([factory.ts](mdc:src/common/lib/service-bus/portal/factory.ts))
+- `PortalFactory`: Creates different types of portals
+- `PortalComposer`: Manages multiple portals together
+
+## Portal Types
+- `window-to-worker`: Main thread ↔ Web Worker
+- `window-to-iframe`: Main page ↔ iframe
+- `worker-to-window`: Web Worker → Main thread
+- `iframe-to-window`: iframe → Main page
+- `shared-worker`: Shared Worker communication
+- `service-worker`: Service Worker communication
+
+## Usage Patterns
+
+### Single Portal
+```typescript
+import { PortalFactory, PortalServiceBusProxy } from './portal';
+
+const portal = PortalFactory.createWorkerPortal(worker);
+const proxy = new PortalServiceBusProxy(portal);
+await proxy.connect();
+const serviceProxy = proxy.createProxy();
+```
+
+### Multi-Portal Composition
+```typescript
+import { PortalComposer } from './portal';
+
+const composer = new PortalComposer();
+composer.addPortal(workerPortal);
+composer.addPortal(iframePortal);
+composer.createConnector(portalId, serviceBus);
+await composer.connectAll();
+```
+
+## File Organization Rules
+
+1. **Types First**: All type definitions in [types.ts](mdc:src/common/lib/service-bus/portal/types.ts)
+2. **Core Implementation**: Base classes and portal implementations in [core.ts](mdc:src/common/lib/service-bus/portal/core.ts)
+3. **Service Integration**: Service bus adapters in [service-bus.ts](mdc:src/common/lib/service-bus/portal/service-bus.ts)
+4. **Creation Utilities**: Factories and composers in [factory.ts](mdc:src/common/lib/service-bus/portal/factory.ts)
+5. **Examples**: Usage examples in [usage-examples.ts](mdc:src/common/lib/service-bus/portal/usage-examples.ts)
+6. **Exports**: Unified exports in [index.ts](mdc:src/common/lib/service-bus/portal/index.ts)
+
+## Migration Guide
+
+### From Monolithic to Modular
+- Old: Single 650-line file
+- New: 6 focused files, each under 400 lines
+- Import from `./portal` instead of individual files
+- Clean architecture without legacy compatibility
+
+### Adding New Portal Types
+1. Define new type in [types.ts](mdc:src/common/lib/service-bus/portal/types.ts)
+2. Create implementation extending `BasePortal` in [core.ts](mdc:src/common/lib/service-bus/portal/core.ts)
+3. Add factory method to [factory.ts](mdc:src/common/lib/service-bus/portal/factory.ts)
+4. Export from [index.ts](mdc:src/common/lib/service-bus/portal/index.ts)
+
+## Best Practices
+
+1. **Type separation**: Keep types separate from implementations
+2. **Balanced sizes**: Keep files between 100-400 lines
+3. **Type safety**: Use TypeScript interfaces for all public APIs
+4. **Error handling**: Consistent error patterns across all portals
+5. **Resource cleanup**: Always implement proper disconnect logic
+6. **Testing**: Each module can be tested independently
+7. **Documentation**: JSDoc comments for all public APIs
+
+## File Size Guidelines
+
+- **types.ts**: 86 lines - Type definitions only
+- **core.ts**: 200 lines - Core implementations
+- **service-bus.ts**: 180 lines - Service bus integration
+- **factory.ts**: 140 lines - Creation utilities and composition
+- **usage-examples.ts**: 341 lines - Comprehensive examples
+- **index.ts**: 8 lines - Exports only
