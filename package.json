@@ -23,6 +23,7 @@
     "@agent-labs/agent-chat": "^1.7.5",
     "@ai-sdk/ui-utils": "^1.2.11",
     "@cardos/extension": "0.2.0-beta.3",
+    "@cardos/service-bus-portal": "workspace:*",
     "@isomorphic-git/lightning-fs": "^4.6.2",
     "@modelcontextprotocol/sdk": "^1.15.0",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -71,7 +72,6 @@
     "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",
     "rx-nested-bean": "workspace:*",
-    "@cardos/service-bus-portal": "workspace:*",
     "rxjs": "^7.8.1",
     "tailwind-merge": "^2.5.5",
     "unified": "^11.0.5",
@@ -115,6 +115,7 @@
     "unist-util-visit": "^5.0.0",
     "vite": "^6.0.3",
     "vite-plugin-babel": "^1.3.0",
+    "vite-plugin-remove-console": "^2.2.0",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

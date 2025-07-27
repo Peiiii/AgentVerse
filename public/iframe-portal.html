@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iframe Portal Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .portal-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .service-list {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .service-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Iframe Portal Demo</h2>
+        
+        <div class="portal-info">
+            <strong>@cardos/service-bus-portal</strong> - Cross-context communication system
+        </div>
+        
+        <div class="status" id="status">Initializing portal connector...</div>
+        
+        <div class="service-list">
+            <h3>Available Portal Services:</h3>
+            <div class="service-item">
+                <strong>ui.render</strong> - Render UI components with props
+            </div>
+            <div class="service-item">
+                <strong>data.fetch</strong> - Fetch data from APIs
+            </div>
+            <div class="service-item">
+                <strong>auth.validate</strong> - Validate authentication tokens
+            </div>
+            <div class="service-item">
+                <strong>storage.get/set</strong> - Local storage operations
+            </div>
+        </div>
+        
+        <div>
+            <h3>Portal Status:</h3>
+            <div id="portal-status">Connecting...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import real @cardos/service-bus-portal from CDN
+        import { PortalFactory, PortalServiceBusProxy } from 'https://esm.sh/@cardos/service-bus-portal@latest';
+        
+        // Iframe is a CONSUMER of services from parent window
+        // Create a portal to communicate with parent window
+        const portal = PortalFactory.createIframePortal(window.parent);
+        
+        // Create a proxy to consume services from parent window
+        const proxy = new PortalServiceBusProxy(portal);
+        await proxy.connect();
+        
+        // Create a typed proxy for parent window services
+        const parentServices = proxy.createProxy();
+        
+        // Update status
+        document.getElementById('status').textContent = 'Portal consumer ready (using real @cardos/service-bus-portal)';
+        document.getElementById('portal-status').textContent = 'Connected to parent window - ready to consume services';
+        // Actually call parent window services to demonstrate portal functionality
+        async function demonstrateIframeServices() {
+            try {
+                // Call UI rendering service
+                const buttonHtml = await parentServices['ui.render']('button', { text: 'Click Me!' });
+                const inputHtml = await parentServices['ui.render']('input', { type: 'text', placeholder: 'Enter text...' });
+                const cardHtml = await parentServices['ui.render']('card', { content: 'This is a card from iframe!' });
+                // Call data fetching service
+                const fetchedData = await parentServices['data.fetch']('https://api.example.com/data');
+                // Call auth validation service
+                const authResult = await parentServices['auth.validate']('user-token-12345');
+                // Call storage services
+                await parentServices['storage.set']('iframe-data', { timestamp: Date.now(), source: 'iframe' });
+                const storedData = await parentServices['storage.get']('iframe-data');
+                // Update UI to show results
+                const resultsDiv = document.createElement('div');
+                resultsDiv.innerHTML = `
+                    <h3>Service Call Results:</h3>
+                    <p><strong>Button HTML:</strong> ${buttonHtml}</p>
+                    <p><strong>Input HTML:</strong> ${inputHtml}</p>
+                    <p><strong>Card HTML:</strong> ${cardHtml}</p>
+                    <p><strong>Fetched Data:</strong> ${JSON.stringify(fetchedData)}</p>
+                    <p><strong>Auth Result:</strong> ${authResult}</p>
+                    <p><strong>Stored Data:</strong> ${JSON.stringify(storedData)}</p>
+                `;
+                document.querySelector('.container').appendChild(resultsDiv);
+                
+            } catch (error) {
+                console.error('Iframe: Error calling parent window services:', error);
+                document.getElementById('portal-status').textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        // Start demonstrating services after a short delay
+        setTimeout(demonstrateIframeServices, 500);
+    </script>
+</body>
+</html> 

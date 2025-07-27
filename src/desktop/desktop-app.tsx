@@ -13,6 +13,7 @@ import { desktopChatExtension } from "@/desktop/features/chat/extensions";
 import { desktopIndexedDBExtension } from "@/desktop/features/indexeddb/extensions";
 import { desktopMCPExtension } from "@/desktop/features/mcp/extensions";
 import { desktopFileManagerExtension } from "@/desktop/features/file-manager/extensions";
+import { desktopPortalDemoExtension } from "@/desktop/features/portal-demo";
 import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
 import { useEffect } from "react";
 import { HashRouter } from "react-router-dom";
@@ -27,6 +28,7 @@ export function DesktopAppInner() {
       desktopMCPExtension,
       desktopIndexedDBExtension,
       desktopFileManagerExtension,
+      desktopPortalDemoExtension,
       githubExtension,
     ],
   });

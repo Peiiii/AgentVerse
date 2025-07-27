@@ -1,10 +1,10 @@
 // service-bus-portal/src/core.ts
-import type { 
-  CommunicationPortal, 
-  PortalMessage, 
-  PortalType, 
-  PortalConfig, 
-  PortalTargetInfo 
+import type {
+  CommunicationPortal,
+  PortalMessage,
+  PortalType,
+  PortalConfig,
+  PortalTargetInfo
 } from './types';
 
 // ==================== Base Portal Implementation ====================
@@ -21,7 +21,7 @@ export abstract class BasePortal implements CommunicationPortal {
     public readonly id: string,
     public readonly type: PortalType,
     protected config: PortalConfig
-  ) {}
+  ) { }
 
   abstract send(message: PortalMessage): Promise<void>;
   abstract connect(): Promise<void>;
@@ -41,6 +41,7 @@ export abstract class BasePortal implements CommunicationPortal {
   }
 
   protected notifyHandlers(message: PortalMessage): void {
+
     this.messageHandlers.forEach(handler => {
       try {
         handler(message);
@@ -62,15 +63,15 @@ export abstract class BasePortal implements CommunicationPortal {
  */
 export class PostMessagePortal extends BasePortal {
   private target: Window | Worker;
-  private listener: ((event: MessageEvent) => void) | undefined;
+  private messageListener: ((event: MessageEvent) => void) | undefined;
 
   constructor(
     id: string,
-    type: PortalType,
+    direction: PortalType,
     target: Window | Worker,
     config: PortalConfig
   ) {
-    super(id, type, config);
+    super(id, direction, config);
     this.target = target;
   }
 
@@ -85,8 +86,13 @@ export class PostMessagePortal extends BasePortal {
       data: message
     };
 
-    if (this.target instanceof Window) {
+
+
+    if (typeof Window !== 'undefined' && this.target instanceof Window) {
       this.target.postMessage(wrappedMessage, this.getTargetOrigin());
+    } else if (typeof self !== 'undefined' && this.target === self) {
+      // In worker context, send to parent (main thread)
+      self.postMessage(wrappedMessage);
     } else {
       this.target.postMessage(wrappedMessage);
     }
@@ -95,26 +101,28 @@ export class PostMessagePortal extends BasePortal {
   async connect(): Promise<void> {
     if (this.connected) return;
 
-    this.listener = (event: MessageEvent) => {
+
+    this.messageListener = (event: MessageEvent) => {
       const data = event.data;
       if (data?.__portal && data.portalId === this.id) {
-        const message = data.data as PortalMessage;
+                const message = data.data as PortalMessage;
         if (this.validateMessage(message)) {
           this.notifyHandlers(message);
         }
       }
     };
 
-    this.getEventTarget().addEventListener('message', this.listener as EventListener);
+    const eventTarget = this.getEventTarget();
+        eventTarget.addEventListener('message', this.messageListener as EventListener);
     this.connected = true;
-  }
+      }
 
   async disconnect(): Promise<void> {
     if (!this.connected) return;
 
-    if (this.listener) {
-      this.getEventTarget().removeEventListener('message', this.listener as EventListener);
-      this.listener = undefined;
+    if (this.messageListener) {
+      this.getEventTarget().removeEventListener('message', this.messageListener as EventListener);
+      this.messageListener = undefined;
     }
 
     this.connected = false;
@@ -130,11 +138,11 @@ export class PostMessagePortal extends BasePortal {
   }
 
   private getEventTarget(): EventTarget {
-    return typeof window !== 'undefined' ? window : self;
+    return this.target as EventTarget;
   }
 
   private getTargetOrigin(): string {
-    if (this.target instanceof Window) {
+    if (typeof Window !== 'undefined' && this.target instanceof Window) {
       return this.target.location.origin;
     }
     return '*';
@@ -153,12 +161,12 @@ export class EventTargetPortal extends BasePortal {
 
   constructor(
     id: string,
-    type: PortalType,
+    direction: PortalType,
     eventTarget: EventTarget,
     channel: string,
     config: PortalConfig
   ) {
-    super(id, type, config);
+    super(id, direction, config);
     this.eventTarget = eventTarget;
     this.channel = channel;
   }

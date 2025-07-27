@@ -8,7 +8,7 @@ export type TypedKey<T> = {
 
 export type ExtractKeyType<T> = T extends TypedKey<infer U> ? U : never;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export type Key<T = any> = string | TypedKey<T>;
 
 export const typedKey = <T = undefined>(name: string) => {

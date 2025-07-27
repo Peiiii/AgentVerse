@@ -14,19 +14,19 @@ export class PortalFactory {
    */
   static createPostMessagePortal(
     id: string,
-    type: PortalType,
+    direction: PortalType,
     target: Window | Worker,
     config: Partial<PortalConfig> = {}
   ): PostMessagePortal {
     const fullConfig: PortalConfig = {
       id,
-      type,
+      type: direction,
       timeoutMs: 10000,
       retryAttempts: 3,
       ...config
     };
 
-    return new PostMessagePortal(id, type, target, fullConfig);
+    return new PostMessagePortal(id, direction, target, fullConfig);
   }
 
   /**
@@ -34,50 +34,99 @@ export class PortalFactory {
    */
   static createEventTargetPortal(
     id: string,
-    type: PortalType,
+    direction: PortalType,
     eventTarget: EventTarget,
     channel: string,
     config: Partial<PortalConfig> = {}
   ): EventTargetPortal {
     const fullConfig: PortalConfig = {
       id,
-      type,
+      type: direction,
       timeoutMs: 10000,
       retryAttempts: 3,
       ...config
     };
 
-    return new EventTargetPortal(id, type, eventTarget, channel, fullConfig);
+    return new EventTargetPortal(id, direction, eventTarget, channel, fullConfig);
   }
 
   /**
    * Create a portal for Web Worker communication
+   * Automatically determines the correct configuration based on current context
    */
   static createWorkerPortal(
     worker: Worker,
-    config: Partial<PortalConfig> = {}
+    config: Partial<PortalConfig> = {},
+    portalId?: string
   ): PostMessagePortal {
+    const id = portalId || `worker-${Date.now()}`;
+    
+    // Check if we're in a worker context
+    if (typeof window !== 'undefined' && window === self) {
+      // Main thread context - create listener portal
+      return this.createPostMessagePortal(
+        id,
+        'worker-to-window',
+        worker,
+        config
+      );
+    } else {
+      // Worker context - create sender portal
+      return this.createPostMessagePortal(
+        id,
+        'worker-to-window',
+        worker,
+        config
+      );
+    }
+  }
+
+  /**
+   * Create a portal for window communication from worker context
+   */
+  static createWindowPortal(
+    config: Partial<PortalConfig> = {},
+    portalId?: string
+  ): PostMessagePortal {
+    const id = portalId || `window-${Date.now()}`;
+
+    // Worker context - create sender portal
     return this.createPostMessagePortal(
-      `worker-${Date.now()}`,
-      'window-to-worker',
-      worker,
+      id,
+      'worker-to-window',
+      self,
       config
     );
   }
 
   /**
    * Create a portal for iframe communication
+   * Automatically determines the correct configuration based on current context
    */
   static createIframePortal(
     iframe: HTMLIFrameElement,
     config: Partial<PortalConfig> = {}
   ): PostMessagePortal {
-    return this.createPostMessagePortal(
-      `iframe-${Date.now()}`,
-      'window-to-iframe',
-      iframe.contentWindow!,
-      config
-    );
+    const id = `iframe-${Date.now()}`;
+
+    // Check if we're in a main thread context
+    if (typeof window !== 'undefined' && window !== self) {
+      // Main thread context - create listener portal
+      return this.createPostMessagePortal(
+        id,
+        'iframe-to-window',
+        window,
+        config
+      );
+    } else {
+      // Iframe context - create sender portal
+      return this.createPostMessagePortal(
+        id,
+        'iframe-to-window',
+        self,
+        config
+      );
+    }
   }
 }
 

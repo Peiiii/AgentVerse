@@ -33,7 +33,7 @@ export class PortalServiceBusConnector {
 
   private setupMessageHandling(): void {
     this.portal.onMessage(async (message) => {
-      if (message.type === 'invoke') {
+            if (message.type === 'invoke') {
         await this.handleInvoke(message);
       }
     });
@@ -46,11 +46,13 @@ export class PortalServiceBusConnector {
         throw new Error('Missing service key');
       }
 
+      
       const result = await Promise.resolve(
         this.serviceBus.invoke(key, ...args)
       );
 
-      await this.portal.send({
+      
+      const responseMessage: PortalMessage = {
         id: this.portal.generateMessageId(),
         type: 'result',
         timestamp: Date.now(),
@@ -58,10 +60,14 @@ export class PortalServiceBusConnector {
         target: message.source,
         data: { result },
         metadata: { originalMessageId: message.id }
-      });
+      };
+
+            await this.portal.send(responseMessage);
 
     } catch (error) {
-      await this.portal.send({
+      console.error(`[PortalServiceBusConnector] Error handling invoke:`, error);
+      
+      const errorMessage: PortalMessage = {
         id: this.portal.generateMessageId(),
         type: 'error',
         timestamp: Date.now(),
@@ -71,7 +77,9 @@ export class PortalServiceBusConnector {
           error: error instanceof Error ? error.message : String(error) 
         },
         metadata: { originalMessageId: message.id }
-      });
+      };
+
+            await this.portal.send(errorMessage);
     }
   }
 }
@@ -111,15 +119,20 @@ export class PortalServiceBusProxy<T = unknown> {
 
   private setupMessageHandling(): void {
     this.portal.onMessage((message) => {
+            
       const pending = this.pending.get(message.metadata?.originalMessageId as string);
-      if (!pending) return;
+      if (!pending) {
+        console.warn(`[PortalServiceBusProxy] No pending request found for messageId: ${message.metadata?.originalMessageId}`);
+        return;
+      }
 
-      clearTimeout(pending.timer);
+            clearTimeout(pending.timer);
       this.pending.delete(message.metadata?.originalMessageId as string);
 
       if (message.type === 'result') {
-        pending.resolve(message.data.result);
+                pending.resolve(message.data.result);
       } else if (message.type === 'error') {
+        console.error(`[PortalServiceBusProxy] Rejecting with error:`, message.data.error);
         pending.reject(new Error(message.data.error));
       }
     });
@@ -132,15 +145,18 @@ export class PortalServiceBusProxy<T = unknown> {
 
     const messageId = this.portal.generateMessageId();
     
+            
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
+        console.error(`[PortalServiceBusProxy] Service invocation timeout for: ${key} (messageId: ${messageId})`);
+        console.error(`[PortalServiceBusProxy] Pending requests:`, Array.from(this.pending.keys()));
         this.pending.delete(messageId);
-        reject(new Error('Service invocation timeout'));
+        reject(new Error(`Service invocation timeout for: ${key}`));
       }, 10000);
 
       this.pending.set(messageId, { resolve, reject, timer });
 
-      this.portal.send({
+      const message: PortalMessage = {
         id: messageId,
         type: 'invoke',
         timestamp: Date.now(),
@@ -148,6 +164,14 @@ export class PortalServiceBusProxy<T = unknown> {
         target: '*',
         data: { key, args },
         metadata: { messageId }
+      };
+
+            
+      this.portal.send(message).catch(error => {
+        console.error(`[PortalServiceBusProxy] Failed to send message:`, error);
+        this.pending.delete(messageId);
+        clearTimeout(timer);
+        reject(error);
       });
     });
   }

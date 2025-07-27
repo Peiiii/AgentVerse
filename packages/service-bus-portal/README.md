@@ -252,58 +252,49 @@ Disconnects all portals.
 
 ## Examples
 
-### Web Worker Communication
+For comprehensive examples demonstrating Web Worker, iframe, and multi-portal communication, see the [examples directory](./examples/README.md).
 
-**Main Thread:**
-```typescript
-import { PortalFactory, PortalComposer } from '@cardos/service-bus-portal';
+### Quick Examples
 
-const composer = new PortalComposer();
-const workerPortal = PortalFactory.createWorkerPortal(new Worker('/worker.js'));
-
-composer.addPortal(workerPortal);
-composer.createConnector(workerPortal.id, serviceBus);
-await composer.connectAll();
-```
-
-**Worker:**
+**Web Worker Communication:**
 ```typescript
 import { PortalFactory, PortalServiceBusProxy } from '@cardos/service-bus-portal';
 
-const portal = PortalFactory.createPostMessagePortal(
-  'worker-to-main',
-  'worker-to-window',
-  self
-);
-
+// Create worker portal
+const worker = new Worker('/worker.js');
+const portal = PortalFactory.createWorkerPortal(worker);
 const proxy = new PortalServiceBusProxy(portal);
 await proxy.connect();
 
-const serviceProxy = proxy.createProxy() as MainThreadServices;
-const result = await serviceProxy['math.add'](5, 3);
+// Use worker services
+const services = proxy.createProxy() as WorkerServices;
+const result = await services['math.add'](5, 3);
 ```
 
-### Iframe Communication
-
-**Parent Window:**
+**Iframe Communication:**
 ```typescript
-const iframePortal = PortalFactory.createIframePortal(iframe);
+import { PortalFactory, PortalServiceBusProxy } from '@cardos/service-bus-portal';
+
+// Create iframe portal
+const iframe = document.createElement('iframe');
+iframe.src = '/iframe-page.html';
+const portal = PortalFactory.createIframePortal(iframe);
+const proxy = new PortalServiceBusProxy(portal);
+await proxy.connect();
+
+// Use iframe services
+const services = proxy.createProxy() as IframeServices;
+const html = await services['ui.render']('button', { text: 'Click me' });
+```
+
+**Multi-Portal Composition:**
+```typescript
+import { PortalComposer } from '@cardos/service-bus-portal';
+
+const composer = new PortalComposer();
+composer.addPortal(workerPortal);
 composer.addPortal(iframePortal);
-composer.createConnector(iframePortal.id, serviceBus);
-```
-
-**Iframe:**
-```typescript
-const portal = PortalFactory.createPostMessagePortal(
-  'iframe-to-parent',
-  'iframe-to-window',
-  parent
-);
-
-const proxy = new PortalServiceBusProxy(portal);
-await proxy.connect();
-
-const serviceProxy = proxy.createProxy() as ParentServices;
+await composer.connectAll();
 ```
 
 ## Contributing
