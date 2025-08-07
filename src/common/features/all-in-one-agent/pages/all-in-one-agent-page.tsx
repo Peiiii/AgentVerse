@@ -18,6 +18,8 @@ import { createRequestUserChoiceTool } from "../components/agent-tools/request-u
 import { createRecommendTopicsTool } from "../components/agent-tools/recommend-topics.tool";
 import { createProvideNextStepsTool } from "../components/agent-tools/provide-next-steps.tool";
 import { createClearSuggestionsTool } from "../components/agent-tools/clear-suggestions.tool";
+import { createShowAgentCardTool } from "../components/agent-tools/show-agent-card.tool";
+import { navigationStore } from "@/core/stores/navigation.store";
 
 const AGENT_DEF: AgentDef = {
   id: "atlas-all-in-one",
@@ -113,6 +115,14 @@ export function AllInOneAgentPage() {
     []
   );
 
+  const showAgentCardTool = useMemo(
+    () =>
+      createShowAgentCardTool((agentId) =>
+        navigationStore.getState().navigate(`/agents/${agentId}`)
+      ),
+    []
+  );
+
   // 基础工具列表
   const baseTools: AgentTool[] = useMemo(
     () => [
@@ -128,8 +138,9 @@ export function AllInOneAgentPage() {
       provideNextStepsTool,
       clearSuggestionsTool,
       agentManagementTool,
+      showAgentCardTool,
     ],
-    [htmlPreviewFromFileTool, subscribeIframeMessagesTool, sendMessageToIframeTool, requestUserChoiceTool, recommendTopicsTool, provideNextStepsTool, clearSuggestionsTool]
+    [htmlPreviewFromFileTool, subscribeIframeMessagesTool, sendMessageToIframeTool, requestUserChoiceTool, recommendTopicsTool, provideNextStepsTool, clearSuggestionsTool, showAgentCardTool]
   );
 
   // 提供工具给 agent
