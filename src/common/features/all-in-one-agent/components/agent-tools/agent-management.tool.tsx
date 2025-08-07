@@ -106,19 +106,18 @@ export const agentManagementTool: AgentTool = {
     const error = toolCall.result?.error;
     const message = toolCall.result?.message;
 
-    const renderAgent = (agent: AgentDef) => (
-        React.createElement("div", { key: agent.id, style: { border: '1px solid #eee', borderRadius: 8, padding: 12, marginBottom: 8 } },
-            React.createElement("strong", null, agent.name),
-            React.createElement("div", { style: { fontSize: 12, color: '#888' } }, `ID: ${agent.id}`),
-            React.createElement("div", null, `角色: ${agent.role}`),
-            React.createElement("div", null, `性格: ${agent.personality}`),
-        )
+    const Agent = ({ agent }: { agent: AgentDef }) => (
+      <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 12, marginBottom: 8 }}>
+        <strong>{agent.name}</strong>
+        <div style={{ fontSize: 12, color: '#888' }}>ID: {agent.id}</div>
+        <div>角色: {agent.role}</div>
+        <div>性格: {agent.personality}</div>
+      </div>
     );
 
-    return React.createElement(
-      "div",
-      {
-        style: {
+    return (
+      <div
+        style={{
           background: '#f8fafc',
           borderRadius: 12,
           padding: '18px 24px',
@@ -130,14 +129,15 @@ export const agentManagementTool: AgentTool = {
           alignItems: 'flex-start',
           gap: 8,
           minWidth: 220,
-        }
-      },
-      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#6366f1', marginBottom: 4 } }, "🧑‍💼 代理管理"),
-      React.createElement("div", null, `命令: ${command}`),
-      message && React.createElement("div", { style: { color: 'green' } }, message),
-      error && React.createElement("div", { style: { color: 'red' } }, error),
-      result && command === 'list' && Array.isArray(result) && result.map(renderAgent),
-      result && (command === 'get' || command === 'create' || command === 'update') && renderAgent(result)
+        }}
+      >
+        <div style={{ fontWeight: 700, fontSize: 16, color: '#6366f1', marginBottom: 4 }}>🧑‍💼 代理管理</div>
+        <div>命令: {command}</div>
+        {message && <div style={{ color: 'green' }}>{message}</div>}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {result && command === 'list' && Array.isArray(result) && result.map(agent => <Agent key={agent.id} agent={agent} />)}
+        {result && (command === 'get' || command === 'create' || command === 'update') && <Agent agent={result} />}
+      </div>
     );
   },
 };
