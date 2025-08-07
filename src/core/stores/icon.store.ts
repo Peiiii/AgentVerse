@@ -168,8 +168,4 @@ export const useIconStore = create<IconState>()((set, get) => ({
   },
 }));
 
-// 选择器hooks
-export const useIcons = () => useIconStore((state) => state.icons);
 export const useIcon = (id: string) => useIconStore((state) => state.icons[id]);
-export const useIconIds = () =>
-  useIconStore((state) => Object.keys(state.icons));

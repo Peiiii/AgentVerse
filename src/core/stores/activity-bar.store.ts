@@ -15,64 +15,23 @@ export interface ActivityItem {
 }
 
 export interface ActivityBarState {
-  // 活动项列表
   items: ActivityItem[];
-  // 当前激活的活动项ID
   activeId?: string;
-  // 是否展开
   expanded: boolean;
-  // 添加活动项
-  addItem: (item: ActivityItem) => ()=>void;
-  // 移除活动项
+  addItem: (item: ActivityItem) => () => void;
   removeItem: (id: string) => void;
-  // 更新活动项
   updateItem: (id: string, updates: Partial<ActivityItem>) => void;
-  // 设置激活项
   setActiveId: (id: string) => void;
-  // 切换展开状态
   toggleExpanded: () => void;
-  // 设置展开状态
   setExpanded: (expanded: boolean) => void;
-  // 重置状态
   reset: () => void;
 }
 
-const defaultItems: ActivityItem[] = [
-  // {
-  //   id: 'chat',
-  //   label: '聊天',
-  //   group: '主要功能',
-  //   isActive: true,
-  //   icon: "message"
-  // },
-  // {
-  //   id: 'agents',
-  //   label: '智能体',
-  //   group: 'main',
-  //   icon: "bot",
-  //   order: 100,
-  // },
-  // {
-  //   id: 'settings',
-  //   label: '设置',
-  //   group: 'footer',
-  //   icon: "settings",
-  //   order: 200,
-  // },
-  // {
-  //   id: 'github',
-  //   label: 'GitHub',
-  //   title: '访问 GitHub 仓库',
-  //   group: 'footer',
-  //   icon: "github",
-  //   order: 300,
-  // },
-];
 
 export const useActivityBarStore = create<ActivityBarState>()(
   persist(
     (set) => ({
-      items: defaultItems,
+      items: [],
       activeId: undefined,
       expanded: false,
 
@@ -129,7 +88,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
 
       reset: () => {
         set({
-          items: defaultItems,
+          items: [],
           activeId: 'chat',
           expanded: false,
         });
@@ -142,11 +101,3 @@ export const useActivityBarStore = create<ActivityBarState>()(
   )
 );
 
-// 选择器hooks
-export const useActivityItems = () => useActivityBarStore((state) => state.items);
-export const useActiveId = () => useActivityBarStore((state) => state.activeId);
-export const useExpanded = () => useActivityBarStore((state) => state.expanded);
-
-// 按组获取活动项
-export const useActivityItemsByGroup = (group: string) =>
-  useActivityBarStore((state) => state.items.filter(item => item.group === group));

@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import type { RouteNode } from '@/common/types/route';
+import { create } from 'zustand';
 
 export interface RouteTreeState {
   routes: RouteNode[];
@@ -68,7 +68,6 @@ export const useRouteTreeStore = create<RouteTreeState>()((set, get) => ({
     set((state: RouteTreeState) => ({
       routes: addRouteToTree(state.routes, route, parentId),
     }));
-    // 返回unregister函数
     return () => {
       set((state: RouteTreeState) => ({
         routes: removeRouteFromTree(state.routes, route.id),
@@ -79,7 +78,6 @@ export const useRouteTreeStore = create<RouteTreeState>()((set, get) => ({
     set((state: RouteTreeState) => ({
       routes: addRoutesToTree(state.routes, routes, parentId),
     }));
-    // 返回unregister函数
     return () => {
       set((state: RouteTreeState) => ({
         routes: routes.reduce((currentRoutes, route) => 
