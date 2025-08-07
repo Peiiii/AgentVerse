@@ -7,6 +7,7 @@ import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
 import { useMemo, useRef, useEffect } from "react";
+import { agentManagementTool } from "../components/agent-tools/agent-management.tool";
 import { calculatorTool, weatherTool } from "../components/agent-tools";
 import { fileSystemTool } from "../components/agent-tools/file-system.tool";
 import { getCurrentTimeTool } from "../components/agent-tools/get-current-time.tool";
@@ -126,6 +127,7 @@ export function AllInOneAgentPage() {
       recommendTopicsTool,
       provideNextStepsTool,
       clearSuggestionsTool,
+      agentManagementTool,
     ],
     [htmlPreviewFromFileTool, subscribeIframeMessagesTool, sendMessageToIframeTool, requestUserChoiceTool, recommendTopicsTool, provideNextStepsTool, clearSuggestionsTool]
   );
