@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BreakpointProvider } from "@/common/components/common/breakpoint-provider.tsx";
 import { TooltipProvider } from "@/common/components/ui/tooltip.tsx";
 import {
   discussionMembersResource,
@@ -29,13 +28,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Suspense fallback={<AppLoading />}>
       <TooltipProvider>
-        <BreakpointProvider>
-          <ThemeProvider>
-            <ModalProvider>
-              <App />
-            </ModalProvider>
-          </ThemeProvider>
-        </BreakpointProvider>
+        <ThemeProvider>
+          <ModalProvider>
+            <App />
+          </ModalProvider>
+        </ThemeProvider>
       </TooltipProvider>
     </Suspense>
   </React.StrictMode>

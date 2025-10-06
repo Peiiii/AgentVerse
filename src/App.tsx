@@ -1,9 +1,17 @@
 import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
+import { ClientBreakpointProvider } from "@/common/components/common/client-breakpoint-provider";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 
-
-export const App = () => {
+function AppContent() {
   const { isMobile } = useBreakpointContext();
   return !isMobile ? <DesktopApp /> : <MobileApp />;
+}
+
+export const App = () => {
+  return (
+    <ClientBreakpointProvider>
+      <AppContent />
+    </ClientBreakpointProvider>
+  );
 };
