@@ -135,7 +135,7 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
         </div>
 
         {/* 浮动按钮组 */}
-        <div className="absolute right-4 bottom-4 flex flex-col gap-2">
+        <div className="absolute right-4 bottom-4 flex flex-col gap-2" data-ignore-capture>
           <MessageCapture
             containerRef={messagesContainerRef}
             className="rounded-full shadow-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"

@@ -116,7 +116,7 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
           </div>
 
           {/* 浮动按钮组 */}
-          <div className="fixed right-3 bottom-24 flex flex-col gap-2 z-10">
+          <div className="fixed right-3 bottom-24 flex flex-col gap-2 z-10" data-ignore-capture>
             {/* 消息捕获按钮 */}
             <MessageCapture
               containerRef={messagesContainerRef}

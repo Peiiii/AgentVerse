@@ -25,45 +25,60 @@ export function MessageCapture({
   const [error, setError] = useState<string | null>(null);
   const { isMobile } = useBreakpointContext();
 
+  // 使用 html-to-image，规避 html2canvas 对 oklch 等新色彩语法不兼容的问题
   const captureImage = async () => {
     if (!containerRef.current || isCapturing) return null;
-    
+
+    const node = containerRef.current;
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const container = containerRef.current;
-      
-      // 获取计算后的背景色
-      const computedStyle = window.getComputedStyle(document.body);
-      const backgroundColor = computedStyle.backgroundColor;
-      
-      // 准备截图：展开所有消息
-      const originalHeight = container.style.height;
-      const originalOverflow = container.style.overflow;
-      
-      // 临时修改样式以确保完整捕获
-      container.style.height = 'auto';
-      container.style.overflow = 'visible';
-      
-      // 生成截图
-      const canvas = await html2canvas(container, {
-        backgroundColor: backgroundColor, // 使用实际的背景色
-        scale: window.devicePixelRatio <= 2 ? window.devicePixelRatio : 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true,
-        imageTimeout: 15000,
-        removeContainer: true,
-        foreignObjectRendering: false,
+      const htmlToImage = await import("html-to-image");
+
+      // 暂存原始内联样式，临时展开内容，确保完整渲染
+      const original = {
+        height: (node as HTMLElement).style.height,
+        overflow: (node as HTMLElement).style.overflow,
+      };
+      (node as HTMLElement).style.height = "auto";
+      (node as HTMLElement).style.overflow = "visible";
+
+      // 设备像素比上限 2，避免超大图片
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+      // toPng 返回 base64 URL，这里不手动传入 backgroundColor，
+      // 让库在 foreignObject 中复刻计算样式，避免 oklch 解析失败
+      const dataUrl = await htmlToImage.toPng(node as HTMLElement, {
+        cacheBust: true,
+        pixelRatio,
+        skipFonts: false,
+        // 只保留消息列表区域，避免截到浮层按钮
+        filter: (el) => {
+          // 过滤掉我们自己的浮动操作区域（例如含有 data-ignore-capture 标记的节点）
+          const anyEl = el as HTMLElement;
+          if (anyEl?.dataset?.ignoreCapture === "true") return false;
+          return true;
+        },
       });
-      
-      // 恢复原始样式
-      container.style.height = originalHeight;
-      container.style.overflow = originalOverflow;
-      
+
+      // 恢复样式
+      (node as HTMLElement).style.height = original.height;
+      (node as HTMLElement).style.overflow = original.overflow;
+
+      // 转换为 Canvas 以保持后续流程不变
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise((res, rej) => {
+        img.onload = res as any;
+        img.onerror = rej as any;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas 2D context not available");
+      ctx.drawImage(img, 0, 0);
       return canvas;
-      
     } catch (error) {
-      console.error('Failed to capture messages:', error);
+      console.error("Failed to capture messages:", error);
       throw error;
     }
   };
