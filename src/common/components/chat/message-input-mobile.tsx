@@ -1,5 +1,10 @@
 import { Button } from "@/common/components/ui/button";
 import { AutoResizeTextarea } from "@/common/components/ui/auto-resize-textarea";
+import { MentionSuggestions } from "./mention-suggestions";
+import { useMention } from "@/common/hooks/use-mention";
+import { useMentionPosition } from "@/common/hooks/use-mention-position";
+import { useAgents } from "@/core/hooks/useAgents";
+import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import { Send } from "lucide-react";
 import { forwardRef } from "react";
@@ -31,11 +36,63 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
       inputRef,
       canSubmit,
       handleSubmit,
-      handleKeyDown
+      handleKeyDown: baseHandleKeyDown
     } = useMessageInput({
       onSendMessage,
       forwardedRef: ref
     });
+
+    const { agents } = useAgents();
+    const { members } = useDiscussionMembers();
+
+    const mentionAgents = agents.filter((agent) => 
+      members.some((member) => member.agentId === agent.id)
+    );
+
+    const getAgentName = (agentId: string) => {
+      if (agentId === "user") return "我";
+      return agents.find((a) => a.id === agentId)?.name ?? "未知";
+    };
+
+    const getAgentAvatar = (agentId: string) => {
+      return agents.find((a) => a.id === agentId)?.avatar ?? "";
+    };
+
+    const {
+      mentionState,
+      filteredAgents,
+      selectedIndex,
+      selectMention,
+      handleKeyDown: mentionHandleKeyDown,
+      handleInputChange,
+    } = useMention({
+      value: input,
+      onChange: setInput,
+      agents: mentionAgents,
+      getAgentName,
+      inputRef,
+    });
+
+    const mentionPosition = useMentionPosition({
+      isActive: mentionState?.isActive ?? false,
+      startIndex: mentionState?.startIndex ?? 0,
+      value: input,
+      inputRef,
+    });
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (mentionState?.isActive) {
+        mentionHandleKeyDown(e);
+        if (e.defaultPrevented) {
+          return;
+        }
+      }
+      baseHandleKeyDown(e);
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      handleInputChange(e.target.value);
+    };
 
     return (
       <div className={cn("bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 sticky bottom-0 z-10", className)}>
@@ -44,9 +101,9 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
             <AutoResizeTextarea
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleChange}
               onKeyDown={handleKeyDown}
-              placeholder="在这里输入消息..."
+              placeholder="在这里输入消息... (输入 @ 可以提及成员)"
               className="flex-1 resize-none text-sm outline-none border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-none focus-visible:shadow-none shadow-none bg-transparent px-3 py-2 min-h-[20px] leading-tight text-gray-900 dark:text-gray-100"
               disabled={isLoading}
               minRows={1}
@@ -68,6 +125,14 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
             </Button>
           </div>
         </div>
+        <MentionSuggestions
+          agents={filteredAgents}
+          selectedIndex={selectedIndex}
+          onSelect={selectMention}
+          getAgentName={getAgentName}
+          getAgentAvatar={getAgentAvatar}
+          position={mentionPosition}
+        />
       </div>
     );
   }

@@ -2,6 +2,7 @@ import { PluginRouter } from "@/common/components/common/plugin-router";
 import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
 import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
+import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
@@ -25,7 +26,7 @@ export function DesktopAppInner() {
       // desktopIndexedDBExtension,
       // desktopFileManagerExtension,
       // desktopPortalDemoExtension,
-      // githubExtension,
+      githubExtension,
     ],
   });
   const { rootClassName } = useTheme();
