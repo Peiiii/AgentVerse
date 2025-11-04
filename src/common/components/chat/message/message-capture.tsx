@@ -72,6 +72,30 @@ export function MessageCapture({
       offscreen.style.overflow = "visible";
       // 克隆消息内容节点（包含所有消息），避免受滚动容器限制
       const cloned = node.cloneNode(true) as HTMLElement;
+      // 规避动画/过渡导致的透明或位移：去除隐藏类与内联样式中的 opacity/transform
+      const sanitizeClone = (rootEl: HTMLElement) => {
+        const HIDE_CLASS = new Set(["opacity-0", "hidden", "invisible", "sr-only"]);
+        const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_ELEMENT);
+        let current = walker.currentNode as HTMLElement | null;
+        while (current) {
+          // 去除 tailwind 隐藏类
+          if (current.classList) {
+            for (const c of Array.from(current.classList)) {
+              if (HIDE_CLASS.has(c)) current.classList.remove(c);
+            }
+          }
+          // 清除常见内联隐藏/位移动画样式
+          const style = (current as HTMLElement).style as CSSStyleDeclaration;
+          if (style) {
+            if (style.opacity === "0") style.opacity = "1";
+            if (style.transform && style.transform !== "none") style.transform = "none";
+            if (style.transition) style.transition = "";
+            if (style.visibility === "hidden") style.visibility = "visible";
+          }
+          current = walker.nextNode() as HTMLElement | null;
+        }
+      };
+      sanitizeClone(cloned);
       // 确保克隆节点在离屏容器中按块级布局占满宽度
       cloned.style.display = "block";
       cloned.style.width = "100%";
