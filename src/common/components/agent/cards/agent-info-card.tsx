@@ -1,21 +1,35 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Badge } from "@/common/components/ui/badge";
+import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { Bot, Brain, Edit3, Sparkles, Target, User } from "lucide-react";
+import { Bot, Brain, Edit3, Sparkles, Target, User, Wand2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/common/components/ui/dropdown-menu";
 
 interface AgentInfoCardProps {
   agent: AgentDef;
   className?: string;
   variant?: "default" | "compact" | "minimal";
   showPrompt?: boolean;
+  onEdit?: (agent: AgentDef) => void;
+  onEditWithAI?: (agent: AgentDef) => void;
+  showEditActions?: boolean;
 }
 
 export function AgentInfoCard({ 
   agent, 
   className, 
   variant = "default",
-  showPrompt = true 
+  showPrompt = true,
+  onEdit,
+  onEditWithAI,
+  showEditActions = false,
 }: AgentInfoCardProps) {
   const getRoleConfig = (role?: string) => {
     switch (role) {
@@ -89,6 +103,8 @@ export function AgentInfoCard({
   }
 
   if (variant === "compact") {
+    const hasEditActions = showEditActions && (onEdit || onEditWithAI);
+    
     return (
       <div className={cn("bg-card border border-border rounded-lg p-4 shadow-sm", className)}>
         <div className="flex items-start gap-3">
@@ -109,11 +125,11 @@ export function AgentInfoCard({
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-bold text-base text-foreground truncate">{agent.name}</h3>
+              <h3 className="font-bold text-base text-foreground truncate flex-1 min-w-0">{agent.name}</h3>
               <Badge
                 variant="outline"
                 className={cn(
-                  "text-xs px-2 py-0.5",
+                  "text-xs px-2 py-0.5 shrink-0",
                   roleConfig.borderColor,
                   roleConfig.bgColor,
                   roleConfig.color
@@ -121,6 +137,38 @@ export function AgentInfoCard({
               >
                 {roleConfig.label}
               </Badge>
+              {hasEditActions && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 shrink-0 hover:bg-accent"
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label="编辑智能体"
+                    >
+                      <Edit3 className="h-3.5 w-3.5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    {onEdit && (
+                      <DropdownMenuItem onClick={() => onEdit(agent)}>
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        表单编辑
+                      </DropdownMenuItem>
+                    )}
+                    {onEditWithAI && (
+                      <>
+                        {onEdit && <DropdownMenuSeparator />}
+                        <DropdownMenuItem onClick={() => onEditWithAI(agent)}>
+                          <Wand2 className="h-4 w-4 mr-2" />
+                          AI 助手编辑
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
             
             <div className="space-y-2 text-sm">

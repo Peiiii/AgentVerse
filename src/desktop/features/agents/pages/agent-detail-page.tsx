@@ -13,19 +13,21 @@ import { useAgents } from "@/core/hooks/useAgents";
 import { isEqual } from "lodash-es";
 import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
 import { useCallback, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { combineLatest, distinctUntilChanged, filter, map, take, tap } from "rxjs";
 import { useAgentChatPageHelper } from "@/core/hooks/use-agent-chat-page-helper";
 
 export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { agents, updateAgent } = useAgents();
 
   const { enterAgentChat } = useAgentChatPageHelper();
 
   const [agent, setAgent] = useState<AgentDef | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">("ai-create");
+  const initialTab = (searchParams.get("tab") as "configure" | "ai-create" | null) || "ai-create";
+  const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">(initialTab);
 
   // 所有回调函数必须在条件返回之前定义
   const handleAgentUpdate = useCallback((updatedAgentData: Omit<AgentDef, "id">) => {

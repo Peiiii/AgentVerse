@@ -2,13 +2,16 @@ import { Button } from "@/common/components/ui/button";
 import { ScrollableLayout } from "@/common/components/layouts/scrollable-layout";
 import { cn } from "@/common/lib/utils";
 import { AgentMessage } from "@/common/types/discussion";
+import { AgentDef } from "@/common/types/agent";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
-import { forwardRef, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 import { useAgents } from "@/core/hooks/useAgents";
+import { useEditAgentDialog } from "@/common/components/agent/dialogs/edit-agent-dialog";
 
 /**
  * 微信PC端消息列表设计：
@@ -43,6 +46,8 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     ref
   ) {
     const { agents } = useAgents();
+    const navigate = useNavigate();
+    const { openEditAgentDialog } = useEditAgentDialog();
     const {
       scrollableLayoutRef,
       messagesContainerRef,
@@ -60,6 +65,14 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     const agentMap = useMemo(() => {
       return new Map(agents.map(agent => [agent.id, agent]));
     }, [agents]);
+
+    const handleEditAgent = useCallback((agent: AgentDef) => {
+      openEditAgentDialog(agent);
+    }, [openEditAgentDialog]);
+
+    const handleEditAgentWithAI = useCallback((agent: AgentDef) => {
+      navigate(`/agents/${agent.id}?tab=ai-create`);
+    }, [navigate]);
 
     // 暴露方法给父组件
     useImperativeHandle(ref, () => ({
@@ -110,6 +123,8 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
                         agentInfo={agentInfo}
                         agent={agent}
                         previousMessageTimestamp={previousTimestamp}
+                        onEditAgent={handleEditAgent}
+                        onEditAgentWithAI={handleEditAgentWithAI}
                       />
                     );
                   })}
