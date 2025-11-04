@@ -1,7 +1,7 @@
 import { PluginRouter } from "@/common/components/common/plugin-router";
 import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/components/layout/activity-bar";
-import { githubExtension } from "@/common/features/github/extensions";
+import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
@@ -10,11 +10,7 @@ import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { desktopAgentsExtension } from "@/desktop/features/agents/extensions";
 import { desktopChatExtension } from "@/desktop/features/chat/extensions";
-import { desktopIndexedDBExtension } from "@/desktop/features/indexeddb/extensions";
 import { desktopMCPExtension } from "@/desktop/features/mcp/extensions";
-import { desktopFileManagerExtension } from "@/desktop/features/file-manager/extensions";
-import { desktopPortalDemoExtension } from "@/desktop/features/portal-demo";
-import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
 import { useEffect } from "react";
 import { HashRouter } from "react-router-dom";
 
@@ -26,10 +22,10 @@ export function DesktopAppInner() {
       desktopAgentsExtension,
       settingsExtension,
       desktopMCPExtension,
-      desktopIndexedDBExtension,
-      desktopFileManagerExtension,
-      desktopPortalDemoExtension,
-      githubExtension,
+      // desktopIndexedDBExtension,
+      // desktopFileManagerExtension,
+      // desktopPortalDemoExtension,
+      // githubExtension,
     ],
   });
   const { rootClassName } = useTheme();

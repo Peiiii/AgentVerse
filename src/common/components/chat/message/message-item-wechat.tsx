@@ -1,8 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+import { ClickableAgentAvatar } from "@/common/components/agent";
 import { useCopy } from "@/core/hooks/use-copy";
 import { useToast } from "@/core/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
 import { MessageWithResults } from "@/common/types/discussion";
+import { AgentDef } from "@/common/types/agent";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { MessageMarkdownContent } from "../agent-action-display";
@@ -13,6 +14,7 @@ interface MessageItemWechatProps {
     getName: (agentId: string) => string;
     getAvatar: (agentId: string) => string;
   };
+  agent?: AgentDef;
   previousMessageTimestamp?: number;
 }
 
@@ -22,6 +24,7 @@ const TIME_DISPLAY_THRESHOLD = 15 * 60 * 1000;
 export function MessageItemWechat({ 
   message, 
   agentInfo,
+  agent,
   previousMessageTimestamp 
 }: MessageItemWechatProps) {
   const [copied, setCopied] = useState(false);
@@ -67,16 +70,13 @@ export function MessageItemWechat({
         "flex items-start",
         isUserMessage ? "flex-row-reverse gap-1" : "gap-2"
       )}>
-        {/* 头像 */}
-        <Avatar className="w-9 h-9 shrink-0">
-          <AvatarImage src={getAvatar(message.agentId)} />
-          <AvatarFallback className={cn(
-            "text-white text-xs",
-            isUserMessage ? "bg-green-500" : "bg-blue-500"
-          )}>
-            {agentName[0]}
-          </AvatarFallback>
-        </Avatar>
+        <ClickableAgentAvatar
+          agent={agent}
+          avatar={getAvatar(message.agentId)}
+          name={agentName}
+          isUser={isUserMessage}
+          size="md"
+        />
         
         <div className={cn(
           "flex flex-col max-w-[calc(100%-48px)]", // 限制容器最大宽度

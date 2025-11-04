@@ -4,10 +4,11 @@ import { cn } from "@/common/lib/utils";
 import { AgentMessage } from "@/common/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
+import { useAgents } from "@/core/hooks/useAgents";
 
 /**
  * 微信PC端消息列表设计：
@@ -41,6 +42,7 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     },
     ref
   ) {
+    const { agents } = useAgents();
     const {
       scrollableLayoutRef,
       messagesContainerRef,
@@ -54,6 +56,10 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
       discussionId,
       scrollButtonThreshold
     });
+
+    const agentMap = useMemo(() => {
+      return new Map(agents.map(agent => [agent.id, agent]));
+    }, [agents]);
 
     // 暴露方法给父组件
     useImperativeHandle(ref, () => ({
@@ -93,12 +99,16 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
                     const previousTimestamp = previousMessage 
                       ? new Date(previousMessage.timestamp).getTime() 
                       : undefined;
+                    
+                    // 获取对应的 agent 信息
+                    const agent = agentMap.get(message.agentId);
                       
                     return (
                       <MessageItemWechat
                         key={message.id}
                         message={message}
                         agentInfo={agentInfo}
+                        agent={agent}
                         previousMessageTimestamp={previousTimestamp}
                       />
                     );
