@@ -29,7 +29,13 @@ export function MessageCapture({
   const captureImage = async () => {
     if (!containerRef.current || isCapturing) return null;
 
+    // 选择截图根节点：优先选择标记为 data-capture-root 的祖先，
+    // 以保证包含正确的背景与上下文；否则回退到传入容器本身
     const node = containerRef.current;
+    const captureRoot = (node as HTMLElement).closest(
+      "[data-capture-root]"
+    ) as HTMLElement | null;
+    const root = (captureRoot ?? (node as HTMLElement)) as HTMLElement;
     try {
       const htmlToImage = await import("html-to-image");
 
@@ -46,7 +52,7 @@ export function MessageCapture({
         }
         return window.getComputedStyle(document.body).backgroundColor || null;
       };
-      const backgroundColor = resolveBackgroundColor(node as HTMLElement) || undefined;
+      const backgroundColor = resolveBackgroundColor(root) || undefined;
 
       // 暂存原始内联样式，临时展开内容，确保完整渲染
       const original = {
@@ -61,7 +67,7 @@ export function MessageCapture({
 
       // toPng 返回 base64 URL，这里不手动传入 backgroundColor，
       // 让库在 foreignObject 中复刻计算样式，避免 oklch 解析失败
-      const dataUrl = await htmlToImage.toPng(node as HTMLElement, {
+      const dataUrl = await htmlToImage.toPng(root, {
         cacheBust: true,
         pixelRatio,
         skipFonts: false,

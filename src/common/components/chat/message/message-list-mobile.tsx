@@ -83,11 +83,11 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
     }));
 
     return (
-      <div ref={containerRef} className="h-full">
+      <div ref={containerRef} className="h-full bg-gray-50 dark:bg-gray-900" data-capture-root>
         <ScrollableLayout
           ref={scrollableLayoutRef}
           onScroll={handleScroll}
-          className={cn("relative bg-gray-50 dark:bg-gray-900 h-full", className)}
+          className={cn("relative h-full", className)}
           initialAlignment="bottom"
           unpinThreshold={1}
           pinThreshold={30}

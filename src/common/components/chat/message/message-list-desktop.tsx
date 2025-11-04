@@ -81,10 +81,10 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
 
     return (
       <div className="relative h-full">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-900" data-capture-root>
           <ScrollableLayout
             ref={scrollableLayoutRef}
-            className={cn("h-full overflow-x-hidden bg-gray-100 dark:bg-gray-900", className)}
+            className={cn("h-full overflow-x-hidden", className)}
             initialAlignment="bottom"
             unpinThreshold={1}
             pinThreshold={30}
