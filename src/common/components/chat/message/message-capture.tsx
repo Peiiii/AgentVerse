@@ -33,6 +33,21 @@ export function MessageCapture({
     try {
       const htmlToImage = await import("html-to-image");
 
+      // 找到最接近的有背景色的祖先，保证导出图片背景与页面一致
+      const resolveBackgroundColor = (el: HTMLElement | null): string | null => {
+        let cur: HTMLElement | null = el;
+        while (cur) {
+          const bg = window.getComputedStyle(cur).backgroundColor;
+          // 过滤透明背景
+          if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+            return bg;
+          }
+          cur = cur.parentElement;
+        }
+        return window.getComputedStyle(document.body).backgroundColor || null;
+      };
+      const backgroundColor = resolveBackgroundColor(node as HTMLElement) || undefined;
+
       // 暂存原始内联样式，临时展开内容，确保完整渲染
       const original = {
         height: (node as HTMLElement).style.height,
@@ -50,6 +65,7 @@ export function MessageCapture({
         cacheBust: true,
         pixelRatio,
         skipFonts: false,
+        backgroundColor,
         // 只保留消息列表区域，避免截到浮层按钮
         filter: (el) => {
           // 过滤掉我们自己的浮动操作区域（例如含有 data-ignore-capture 标记的节点）

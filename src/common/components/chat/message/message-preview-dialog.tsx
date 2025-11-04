@@ -64,12 +64,13 @@ export function MessagePreviewDialog({
                   </p>
                 </div>
               ) : imageUrl ? (
-                <div className="relative group">
-                  <div className="absolute -inset-4 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5" />
+                <div className="relative">
+                  {/* 预览样式常显（原先 hover 才显示），让预览与下载保持一致视觉 */}
+                  <div className="absolute -inset-4 rounded-xl opacity-100 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5" />
                   <img
                     src={imageUrl}
                     alt="Preview"
-                    className="relative max-w-full h-auto rounded-lg shadow-xl transition-transform group-hover:scale-[0.998]"
+                    className="relative max-w-full h-auto rounded-lg shadow-xl scale-[0.998]"
                     style={{
                       boxShadow: "0 8px 40px -12px rgba(0,0,0,0.2)",
                     }}
