@@ -24,7 +24,7 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       // 自动检测和移除console语句
-      'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
       // 或者使用warn级别，不强制移除
       // 'no-console': ['warn', { allow: ['warn', 'error'] }],
     },

@@ -8,7 +8,7 @@ import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { AgentMessage } from "@/common/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChatEmptyGuide } from "./chat-empty-guide";
 import { MessageList, MessageListRef } from "./message";
 import { MessageInput, MessageInputRef } from "./message-input";
@@ -44,6 +44,8 @@ export function ChatArea({
   const { currentDiscussion } = useDiscussions();
   const { members, addMembers } = useDiscussionMembers();
   const { agents } = useAgents();
+  // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
+  const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 
   useEffect(() => {
     discussionControlService.setMembers(members);
@@ -90,8 +92,11 @@ export function ChatArea({
     console.log("开始讨论:", topic);
 
     try {
+      // 标记开始流程，避免空引导闪烁
+      setIsStartingDiscussion(true);
       if (!currentDiscussion) {
         console.error("当前没有可用的讨论");
+        setIsStartingDiscussion(false);
         return;
       }
 
@@ -168,8 +173,16 @@ export function ChatArea({
       }
     } catch (error) {
       console.error("启动讨论失败:", error);
+      setIsStartingDiscussion(false);
     }
   };
+
+  // 当有消息产生后，关闭“开始中”状态
+  useEffect(() => {
+    if (isStartingDiscussion && messages.length > 0) {
+      setIsStartingDiscussion(false);
+    }
+  }, [isStartingDiscussion, messages.length]);
 
   const agentInfoGetter = {
     getName: getAgentName,
@@ -217,14 +230,20 @@ export function ChatArea({
               exit={{ opacity: 0 }}
               className="py-4 pr-4"
             >
-              <ChatEmptyGuide
-                scenarios={DEFAULT_SCENARIOS}
-                membersCount={members.length}
-                onSuggestionClick={(template) => {
-                  messageInputRef.current?.setValue(template);
-                  messageInputRef.current?.focus();
-                }}
-              />
+              {isStartingDiscussion ? (
+                <div className="h-32 flex items-center justify-center text-muted-foreground">
+                  正在创建讨论…
+                </div>
+              ) : (
+                <ChatEmptyGuide
+                  scenarios={DEFAULT_SCENARIOS}
+                  membersCount={members.length}
+                  onSuggestionClick={(template) => {
+                    messageInputRef.current?.setValue(template);
+                    messageInputRef.current?.focus();
+                  }}
+                />
+              )}
             </motion.div>
           ) : (
             <MessageList
