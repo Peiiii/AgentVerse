@@ -54,36 +54,39 @@ export function MessageCapture({
       };
       const backgroundColor = resolveBackgroundColor(root) || undefined;
 
-      // 暂存原始内联样式，临时展开内容，确保完整渲染
-      const original = {
-        height: (node as HTMLElement).style.height,
-        overflow: (node as HTMLElement).style.overflow,
-      };
-      (node as HTMLElement).style.height = "auto";
-      (node as HTMLElement).style.overflow = "visible";
-
       // 设备像素比上限 2，避免超大图片
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
-      // toPng 返回 base64 URL，这里不手动传入 backgroundColor，
-      // 让库在 foreignObject 中复刻计算样式，避免 oklch 解析失败
-      const dataUrl = await htmlToImage.toPng(root, {
+      // 为了捕获完整内容，不对真实 DOM 进行改动，改为构造一个离屏容器，
+      // 将消息内容节点克隆进去，按原宽度自然撑开到完整高度进行渲染
+      const offscreen = document.createElement("div");
+      const rootRect = root.getBoundingClientRect();
+      offscreen.style.position = "fixed";
+      offscreen.style.left = "-10000px";
+      offscreen.style.top = "0";
+      offscreen.style.width = `${Math.round(rootRect.width)}px`;
+      offscreen.style.background = backgroundColor || "transparent";
+      offscreen.style.boxSizing = "border-box";
+      offscreen.style.padding = "0";
+      offscreen.style.margin = "0";
+      offscreen.style.overflow = "visible";
+      // 克隆消息内容节点（包含所有消息），避免受滚动容器限制
+      const cloned = node.cloneNode(true) as HTMLElement;
+      // 确保克隆节点在离屏容器中按块级布局占满宽度
+      cloned.style.display = "block";
+      cloned.style.width = "100%";
+      offscreen.appendChild(cloned);
+      document.body.appendChild(offscreen);
+
+      const dataUrl = await htmlToImage.toPng(offscreen, {
         cacheBust: true,
         pixelRatio,
         skipFonts: false,
         backgroundColor,
-        // 只保留消息列表区域，避免截到浮层按钮
-        filter: (el) => {
-          // 过滤掉我们自己的浮动操作区域（例如含有 data-ignore-capture 标记的节点）
-          const anyEl = el as HTMLElement;
-          if (anyEl?.dataset?.ignoreCapture === "true") return false;
-          return true;
-        },
       });
 
-      // 恢复样式
-      (node as HTMLElement).style.height = original.height;
-      (node as HTMLElement).style.overflow = original.overflow;
+      // 清理离屏容器
+      document.body.removeChild(offscreen);
 
       // 转换为 Canvas 以保持后续流程不变
       const img = new Image();
