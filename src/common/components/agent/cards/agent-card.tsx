@@ -8,6 +8,7 @@ import { Card, CardHeader } from "@/common/components/ui/card";
 import { Label } from "@/common/components/ui/label";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
+import { RoleBadge } from "@/common/components/common/role-badge";
 
 // 定义卡片模式
 export type AgentCardMode = "preview" | "detail" | "management";
@@ -132,12 +133,10 @@ export const AgentCard: React.FC<AgentCardProps> = ({
             <div className="flex items-center gap-1.5">
               <span className={cn("font-medium", isMobile ? "text-sm" : "text-base")}>{safeName}</span>
               {agent.role && (
-                <Badge
-                  variant={agent.role === "moderator" ? "default" : "secondary"}
-                  className="text-xs px-1.5 py-0"
-                >
-                  {agent.role === "moderator" ? "主持人" : "参与者"}
-                </Badge>
+                <RoleBadge 
+                  role={agent.role} 
+                  size="sm"
+                />
               )}
             </div>
             <div className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">

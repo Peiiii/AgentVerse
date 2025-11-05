@@ -5,6 +5,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
+import { RoleBadge } from "@/common/components/common/role-badge";
 
 export interface AgentChatCardProps {
   // Agent数据
@@ -85,9 +86,11 @@ export const AgentChatCard: React.FC<AgentChatCardProps> = ({
             <div>
               <div className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>{agent.name || "未命名"}</div>
               {agent.role && (
-                <div className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-xs")}>
-                  {agent.role === "moderator" ? "主持人" : "参与者"}
-                </div>
+                <RoleBadge 
+                  role={agent.role} 
+                  size="sm"
+                  className="mt-0.5"
+                />
               )}
             </div>
           </div>

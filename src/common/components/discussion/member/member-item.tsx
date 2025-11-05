@@ -6,6 +6,7 @@ import { AgentDef } from "@/common/types/agent";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { ChevronRight, UserX, Settings, Briefcase, Lightbulb, Target } from "lucide-react";
 import { SmartAvatar } from "@/common/components/ui/smart-avatar";
+import { RoleBadge } from "@/common/components/common/role-badge";
 
 interface MemberItemProps {
   member: DiscussionMember;
@@ -209,9 +210,11 @@ export function MemberItem({
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-muted-foreground/80 truncate">
-                  {agent.role}
-                </span>
+                <RoleBadge 
+                  role={agent.role} 
+                  size="sm"
+                  className="shrink-0"
+                />
                 <div 
                   className="flex items-center gap-2 shrink-0" 
                   onClick={e => e.stopPropagation()}

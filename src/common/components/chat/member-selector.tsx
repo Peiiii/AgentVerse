@@ -8,6 +8,7 @@ import {
 import { Member } from "@/core/hooks/useMemberSelection";
 import { AgentDef } from "@/common/types/agent";
 import { MemberSelectItem } from "./member-select-item";
+import { RoleBadge } from "@/common/components/common/role-badge";
 
 interface MemberSelectorProps {
   selectedMemberId: string;
@@ -70,9 +71,10 @@ export function MemberSelector({
           我
         </Badge>
       ) : selectedAgent && (
-        <Badge variant="outline" className="h-5 text-xs font-normal">
-          {selectedAgent.role === "moderator" ? "主持人" : "参与者"}
-        </Badge>
+        <RoleBadge 
+          role={selectedAgent.role} 
+          size="sm"
+        />
       )}
     </div>
   );

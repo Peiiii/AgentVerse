@@ -5,10 +5,11 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { useAgents } from "@/core/hooks/useAgents";
-import { Brain, MessageCircle, Sparkles, Users } from "lucide-react";
+import { Sparkles, Users } from "lucide-react";
 import match from "pinyin-match";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { RoleBadge } from "@/common/components/common/role-badge";
 
 export function AgentsPage() {
   const navigate = useNavigate();
@@ -141,8 +142,10 @@ export function AgentsPage() {
               className="cursor-pointer hover:bg-primary/10 flex items-center gap-1"
               onClick={() => setSelectedRole(role)}
             >
-              {role === "moderator" ? <Brain className="w-3 h-3" /> : <MessageCircle className="w-3 h-3" />}
-              {role === "moderator" ? "主持人" : "参与者"}
+              <RoleBadge 
+                role={role} 
+                size="sm"
+              />
             </Badge>
           ))}
         </div>
@@ -209,11 +212,9 @@ export function AgentsPage() {
             <span>总计: {agents.length} 个智能体</span>
           </div>
           <div className="flex items-center gap-2">
-            <Brain className="w-4 h-4" />
             <span>主持人: {agents.filter(a => a.role === "moderator").length} 个</span>
           </div>
           <div className="flex items-center gap-2">
-            <MessageCircle className="w-4 h-4" />
             <span>参与者: {agents.filter(a => a.role === "participant").length} 个</span>
           </div>
         </div>

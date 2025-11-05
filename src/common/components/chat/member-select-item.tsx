@@ -3,6 +3,7 @@ import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { SelectItem } from "@/common/components/ui/select";
 import { AgentDef } from "@/common/types/agent";
 import { User } from "lucide-react";
+import { RoleBadge } from "@/common/components/common/role-badge";
 
 interface MemberSelectItemProps {
   agentId: string;
@@ -28,14 +29,19 @@ export function MemberSelectItem({ agentId, memberId, agents, isSelf }: MemberSe
   
   return (
     <SelectItem value={memberId} className="flex items-center">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
         <SmartAvatar
           src={agent.avatar}
           alt={agent.name}
-          className="w-5 h-5"
+          className="w-5 h-5 shrink-0"
           fallback={<span className="text-xs">{agent.name[0]}</span>}
         />
-        <span className="text-sm">{agent.name}</span>
+        <span className="text-sm truncate flex-1">{agent.name}</span>
+        <RoleBadge 
+          role={agent.role} 
+          size="sm"
+          className="shrink-0 ml-auto"
+        />
       </div>
     </SelectItem>
   );
