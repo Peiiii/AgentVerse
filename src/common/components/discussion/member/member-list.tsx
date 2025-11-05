@@ -49,14 +49,14 @@ export function MemberList({
   const renderHeader = () => (
     <header
       className={cn(
-        "flex-none flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur z-10 py-3 mb-2",
+        "flex-none flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-3.5 mb-3 border-b border-border/40",
         headerClassName
       )}
     >
       <div className="flex items-center gap-3">
-        <h2 className="text-lg font-medium">成员</h2>
-        <span className="text-sm text-muted-foreground">
-          {memberCount}{autoReplyCount > 0 && `/${autoReplyCount}自动回复`}
+        <h2 className="text-lg font-semibold text-foreground">成员</h2>
+        <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-md bg-muted/50">
+          {memberCount}{autoReplyCount > 0 && ` · ${autoReplyCount} 自动回复`}
         </span>
       </div>
       <Button
@@ -64,10 +64,10 @@ export function MemberList({
         variant="outline"
         size="sm"
         disabled={isLoading}
-        className="h-8 px-3"
+        className="h-8 px-3 gap-1.5 hover:bg-muted/60 transition-colors"
       >
-        <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
-        添加成员
+        <PlusCircle className="w-3.5 h-3.5" />
+        <span>添加</span>
       </Button>
     </header>
   );
@@ -81,10 +81,12 @@ export function MemberList({
 
     if (members.length === 0) {
       return (
-        <div className="space-y-4 py-8">
-          <div className="text-center text-muted-foreground">
-            <p>选择一个预设组合快速开始</p>
-            <p className="text-sm">或点击上方按钮手动添加成员</p>
+        <div className="space-y-6 py-8">
+          <div className="text-center space-y-2">
+            <p className="text-base font-medium text-foreground">还没有成员</p>
+            <p className="text-sm text-muted-foreground">
+              选择一个预设组合快速开始，或点击上方按钮手动添加成员
+            </p>
           </div>
           <QuickMemberSelector />
         </div>
@@ -120,8 +122,8 @@ export function MemberList({
     <>
       <div className={cn("flex flex-col h-full overflow-hidden", className)}>
         {renderHeader()}
-        <div className={cn("flex-1 min-h-0 overflow-y-auto px-0.5", listClassName)}>
-          <div className="space-y-2 pb-4">
+        <div className={cn("flex-1 min-h-0 overflow-y-auto px-1", listClassName)}>
+          <div className="space-y-2.5 pb-4">
             {renderContent()}
           </div>
         </div>
