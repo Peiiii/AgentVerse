@@ -132,6 +132,8 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
           getAgentName={getAgentName}
           getAgentAvatar={getAgentAvatar}
           position={mentionPosition}
+          // On mobile, show the suggestions above the caret to avoid being covered by the keyboard
+          placement="top"
         />
       </div>
     );
