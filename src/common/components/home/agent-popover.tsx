@@ -33,7 +33,7 @@ export const AgentPopover: React.FC<AgentPopoverProps> = ({
   
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger asChild>
         {children || (
           <button 
             className={cn(

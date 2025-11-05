@@ -1,6 +1,5 @@
 import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
-import { ClientBreakpointProvider } from "@/common/components/common/client-breakpoint-provider";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 
 function AppContent() {
@@ -9,9 +8,5 @@ function AppContent() {
 }
 
 export const App = () => {
-  return (
-    <ClientBreakpointProvider>
-      <AppContent />
-    </ClientBreakpointProvider>
-  );
+  return <AppContent />;
 };

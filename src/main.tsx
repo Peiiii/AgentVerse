@@ -14,6 +14,7 @@ import { App } from "./App.tsx";
 import { AppLoading } from "./common/components/app/app-loading.tsx";
 import { ThemeProvider } from "./common/components/common/theme/context.tsx";
 import { ModalProvider } from "./common/components/ui/modal/provider.tsx";
+import { ClientBreakpointProvider } from "@/common/components/common/client-breakpoint-provider";
 import "./core/styles/theme.css";
 import "./index.css";
 
@@ -29,9 +30,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Suspense fallback={<AppLoading />}>
       <TooltipProvider>
         <ThemeProvider>
-          <ModalProvider>
-            <App />
-          </ModalProvider>
+          <ClientBreakpointProvider>
+            <ModalProvider>
+              <App />
+            </ModalProvider>
+          </ClientBreakpointProvider>
         </ThemeProvider>
       </TooltipProvider>
     </Suspense>
