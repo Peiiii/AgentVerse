@@ -34,7 +34,10 @@ export function MessageCapture({
     const captureRoot = (node as HTMLElement).closest(
       "[data-capture-root]"
     ) as HTMLElement | null;
-    const root = (captureRoot ?? (node as HTMLElement)) as HTMLElement;
+    // 为了生成完整内容，优先截取消息内容容器本身（node），
+    // 仅将 captureRoot 用于解析背景与宽度参考，避免被滚动容器裁切
+    const root = node as HTMLElement;
+    const bgScope = (captureRoot ?? root) as HTMLElement;
 
     try {
       const htmlToImage = await import("html-to-image");
@@ -51,7 +54,8 @@ export function MessageCapture({
         }
         return window.getComputedStyle(document.body).backgroundColor || null;
       };
-      const backgroundColor = resolveBackgroundColor(root) || undefined;
+      const backgroundColor = resolveBackgroundColor(bgScope) || undefined;
+      const width = Math.round(bgScope.getBoundingClientRect().width);
 
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -65,6 +69,7 @@ export function MessageCapture({
           if (!(n instanceof Element)) return true;
           return !n.closest('[data-ignore-capture]');
         },
+        width,
       });
 
       // 将 dataURL 转回 Canvas，以复用下游处理流程
