@@ -76,7 +76,9 @@ export function MessagePreviewDialog({
                     }}
                   />
                 </div>
-              ) : null}
+              ) : (
+                <div className="text-sm text-muted-foreground">暂无可预览的内容</div>
+              )}
             </div>
           </div>
 
