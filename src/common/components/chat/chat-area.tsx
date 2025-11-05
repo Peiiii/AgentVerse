@@ -7,7 +7,6 @@ import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { cn } from "@/common/lib/utils";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { AgentMessage } from "@/common/types/discussion";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ChatEmptyGuide } from "./chat-empty-guide";
 import { MessageList, MessageListRef } from "./message";
@@ -221,41 +220,33 @@ export function ChatArea({
           messageListClassName
         )}
       >
-        <AnimatePresence mode="wait">
-          {messages.length === 0 ? (
-            <motion.div
-              key="empty-guide"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="py-4 pr-4"
-            >
-              {isStartingDiscussion ? (
-                <div className="h-32 flex items-center justify-center text-muted-foreground">
-                  正在创建讨论…
-                </div>
-              ) : (
-                <ChatEmptyGuide
-                  scenarios={DEFAULT_SCENARIOS}
-                  membersCount={members.length}
-                  onSuggestionClick={(template) => {
-                    messageInputRef.current?.setValue(template);
-                    messageInputRef.current?.focus();
-                  }}
-                />
-              )}
-            </motion.div>
-          ) : (
-            <MessageList
-              discussionId={currentDiscussion.id}
-              ref={messageListRef}
-              messages={messages}
-              agentInfo={agentInfoGetter}
-              data-testid="chat-message-list"
-              className="py-4 px-4"
-            />
-          )}
-        </AnimatePresence>
+        {messages.length === 0 ? (
+          <div className="py-4 pr-4">
+            {isStartingDiscussion ? (
+              <div className="h-32 flex items-center justify-center text-muted-foreground">
+                正在创建讨论…
+              </div>
+            ) : (
+              <ChatEmptyGuide
+                scenarios={DEFAULT_SCENARIOS}
+                membersCount={members.length}
+                onSuggestionClick={(template) => {
+                  messageInputRef.current?.setValue(template);
+                  messageInputRef.current?.focus();
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <MessageList
+            discussionId={currentDiscussion.id}
+            ref={messageListRef}
+            messages={messages}
+            agentInfo={agentInfoGetter}
+            data-testid="chat-message-list"
+            className="py-4 px-4"
+          />
+        )}
       </div>
 
       {/* 输入框区域 */}
