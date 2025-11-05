@@ -1,15 +1,10 @@
 import { Button } from "@/common/components/ui/button";
-import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { Loader2, Share2 } from "lucide-react";
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
+import { MessagePreviewDialog } from "./message-preview-dialog";
 
-// 懒加载预览对话框组件
-const MessagePreviewDialog = lazy(() =>
-  import("./message-preview-dialog").then((module) => ({
-    default: module.MessagePreviewDialog,
-  }))
-);
+// 直接引入预览对话框，避免 Suspense 过渡造成视觉突变
 
 interface MessageCaptureProps {
   containerRef: React.RefObject<HTMLElement>;
@@ -55,7 +50,8 @@ export function MessageCapture({
         return window.getComputedStyle(document.body).backgroundColor || null;
       };
       const backgroundColor = resolveBackgroundColor(bgScope) || undefined;
-      const width = Math.round(bgScope.getBoundingClientRect().width);
+      // 使用实际被捕获节点自身宽度，避免因参照外层宽度导致导出图片右侧留白更大
+      const width = Math.round(root.getBoundingClientRect().width);
 
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -157,28 +153,15 @@ export function MessageCapture({
       </Button>
 
       {showPreview && (
-        <Suspense
-          fallback={
-            <Dialog open={showPreview} onOpenChange={setShowPreview}>
-              <DialogContent className="max-w-md w-full p-6">
-                <div className="flex items-center gap-3">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm text-muted-foreground">正在打开预览...</span>
-                </div>
-              </DialogContent>
-            </Dialog>
-          }
-        >
-          <MessagePreviewDialog
-            open={showPreview}
-            onOpenChange={setShowPreview}
-            imageUrl={previewUrl}
-            onDownload={handleDownload}
-            isGenerating={isCapturing}
-            error={error}
-            isMobile={isMobile}
-          />
-        </Suspense>
+        <MessagePreviewDialog
+          open={showPreview}
+          onOpenChange={setShowPreview}
+          imageUrl={previewUrl}
+          onDownload={handleDownload}
+          isGenerating={isCapturing}
+          error={error}
+          isMobile={isMobile}
+        />
       )}
     </>
   );
