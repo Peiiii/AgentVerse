@@ -14,12 +14,19 @@ export interface ClickableAgentAvatarProps {
   className?: string;
   onEditWithAI?: (agent: AgentDef) => void;
   showEditActions?: boolean;
+  isResponding?: boolean;
 }
 
 const sizeClasses = {
   sm: "w-8 h-8",
   md: "w-9 h-9",
   lg: "w-10 h-10",
+};
+
+// 计算圆形轨迹的半径（基于头像大小）
+const getOrbitRadius = (size: "sm" | "md" | "lg") => {
+  const sizeMap = { sm: 14, md: 16, lg: 18 };
+  return sizeMap[size];
 };
 
 export function ClickableAgentAvatar({
@@ -31,6 +38,7 @@ export function ClickableAgentAvatar({
   className,
   onEditWithAI,
   showEditActions = false,
+  isResponding = false,
 }: ClickableAgentAvatarProps) {
   const sizeClass = sizeClasses[size];
 
@@ -54,15 +62,36 @@ export function ClickableAgentAvatar({
     <Popover>
       <PopoverTrigger asChild>
         <button 
-          className="cursor-pointer hover:opacity-80 transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 active:scale-95"
+          className="cursor-pointer hover:opacity-80 transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 active:scale-95 relative"
           aria-label={`查看 ${name} 的详细信息`}
         >
+          {/* 响应时的圆形轨迹动画 - 优雅的光点沿着边框移动 */}
+          {isResponding && (
+            <div className="absolute inset-0 rounded-full overflow-visible pointer-events-none z-0">
+              {/* 移动的光点 - 沿着圆形轨迹 */}
+              <div 
+                className="absolute w-2 h-2 rounded-full bg-primary animate-orbit"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-4px',
+                  marginLeft: '-4px',
+                  '--radius': `${getOrbitRadius(size)}px`,
+                  boxShadow: '0 0 6px 2px hsl(var(--primary) / 0.6), 0 0 12px 4px hsl(var(--primary) / 0.3)',
+                } as React.CSSProperties}
+              />
+            </div>
+          )}
           <SmartAvatar
             src={avatar}
             alt={name}
             className={cn(
               sizeClass,
-              "shrink-0 ring-2 ring-transparent hover:ring-primary/40 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md",
+              "shrink-0 relative z-10 transition-all duration-300",
+              "ring-2 ring-transparent hover:ring-primary/40",
+              isResponding 
+                ? "ring-primary/40 shadow-md" 
+                : "hover:scale-105 shadow-sm hover:shadow-md",
               className
             )}
             fallback={<span className="text-white text-xs">{name[0]}</span>}

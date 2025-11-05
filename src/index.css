@@ -2,6 +2,45 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* 自定义动画 - AI 响应时的头像动画 */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(var(--radius, 14px)) rotate(0deg);
+    opacity: 0.7;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) translateX(var(--radius, 14px)) rotate(-360deg);
+    opacity: 0.7;
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-orbit {
+  animation: orbit 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center;
+}
+
 
 @custom-variant dark (&:where(.dark, .dark *));
 

@@ -39,19 +39,19 @@ function MemberExpandedContent({
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
               <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>专业领域</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {agent.expertise.map((item, index) => (
-                <span 
-                  key={index}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 text-muted-foreground border border-primary/20 backdrop-blur-sm"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
+            <span>专业领域</span>
           </div>
+          <div className="flex flex-wrap gap-1.5">
+              {agent.expertise.map((item, index) => (
+              <span 
+                key={index}
+                  className="px-2.5 py-1 text-xs rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 text-muted-foreground border border-primary/20 backdrop-blur-sm"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
         )}
 
         {(agent.bias || agent.responseStyle) && (
@@ -60,24 +60,24 @@ function MemberExpandedContent({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                   <Target className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>偏好倾向</span>
-                </div>
+            <span>偏好倾向</span>
+          </div>
                 <p className="text-sm text-muted-foreground pl-5">
                   {agent.bias}
-                </p>
-              </div>
+          </p>
+        </div>
             )}
 
             {agent.responseStyle && (
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                   <Lightbulb className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>回复风格</span>
-                </div>
+            <span>回复风格</span>
+          </div>
                 <p className="text-sm text-muted-foreground pl-5">
                   {agent.responseStyle}
-                </p>
-              </div>
+          </p>
+        </div>
             )}
           </div>
         )}
@@ -182,11 +182,11 @@ export function MemberItem({
         <div className="flex gap-3.5">
           <div className="relative">
             <SmartAvatar
-              src={agent.avatar}
-              alt={agent.name}
+            src={agent.avatar}
+            alt={agent.name}
               className="w-12 h-12 rounded-xl shrink-0 ring-2 ring-border/30 group-hover:ring-primary/20 transition-all duration-300 group-hover:scale-105"
               fallback={<span className="text-white text-xs font-medium">{agent.name[0]}</span>}
-            />
+          />
             {/* 在线状态指示器 */}
             {member.isAutoReply && (
               <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary ring-2 ring-background border border-primary/20" />

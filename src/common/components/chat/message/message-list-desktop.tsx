@@ -5,12 +5,13 @@ import { AgentMessage } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
 // 去掉容器级动画，避免切换会话时的闪烁
 import { ArrowDown } from "lucide-react";
-import { forwardRef, useImperativeHandle, useMemo, useCallback } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 import { useAgents } from "@/core/hooks/useAgents";
+import { discussionControlService } from "@/core/services/discussion-control.service";
 
 /**
  * 微信PC端消息列表设计：
@@ -63,6 +64,15 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
       return new Map(agents.map(agent => [agent.id, agent]));
     }, [agents]);
 
+    // 获取当前正在响应的 agentId
+    const [respondingAgentId, setRespondingAgentId] = useState<string | null>(null);
+    useEffect(() => {
+      const sub = discussionControlService.env.speakScheduler.speakingStateBean.$.subscribe(
+        (state) => setRespondingAgentId(state.agentId)
+      );
+      return () => sub.unsubscribe();
+    }, []);
+
     const handleEditAgentWithAI = useCallback((agent: AgentDef) => {
       navigate(`/agents/${agent.id}?tab=ai-create`);
     }, [navigate]);
@@ -95,6 +105,11 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
                   
                   // 获取对应的 agent 信息
                   const agent = agentMap.get(message.agentId);
+                  
+                  // 只有正在生成的最新消息才显示响应动画
+                  // 检查：1. agentId 匹配正在响应的 agent 2. 是最后一条消息
+                  const isLastMessage = index === reorganizedMessages.length - 1;
+                  const isResponding = message.agentId === respondingAgentId && isLastMessage;
                     
                   return (
                     <MessageItemWechat
@@ -104,6 +119,7 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
                       agent={agent}
                       previousMessageTimestamp={previousTimestamp}
                       onEditAgentWithAI={handleEditAgentWithAI}
+                      isResponding={isResponding}
                     />
                   );
                 })}

@@ -129,18 +129,18 @@ export function AgentInfoCard({
                 {roleConfig.label}
               </Badge>
               {hasEditActions && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 shrink-0 hover:bg-accent"
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 shrink-0 hover:bg-accent"
                   onClick={(e) => {
                     e.stopPropagation();
                     onEditWithAI?.(agent);
                   }}
                   aria-label="AI 编辑智能体"
-                >
+                    >
                   <Wand2 className="h-3.5 w-3.5" />
-                </Button>
+                    </Button>
               )}
             </div>
             

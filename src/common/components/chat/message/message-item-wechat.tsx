@@ -17,6 +17,7 @@ interface MessageItemWechatProps {
   agent?: AgentDef;
   previousMessageTimestamp?: number;
   onEditAgentWithAI?: (agent: AgentDef) => void;
+  isResponding?: boolean;
 }
 
 // 时间间隔阈值，超过这个值才显示时间（15分钟）
@@ -28,6 +29,7 @@ export function MessageItemWechat({
   agent,
   previousMessageTimestamp,
   onEditAgentWithAI,
+  isResponding = false,
 }: MessageItemWechatProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -80,6 +82,7 @@ export function MessageItemWechat({
           size="md"
           onEditWithAI={onEditAgentWithAI}
           showEditActions={!isUserMessage && !!agent && !!onEditAgentWithAI}
+          isResponding={isResponding && !isUserMessage}
         />
         
         <div className={cn(
