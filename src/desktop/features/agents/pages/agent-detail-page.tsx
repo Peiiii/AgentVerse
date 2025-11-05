@@ -1,7 +1,8 @@
 import { AgentEmbeddedForm } from "@/common/features/agents/components/forms";
 import { AgentConfigurationAssistant } from "@/common/features/agents/components/configuration";
 import { AgentPreviewChat } from "@/common/features/agents/components/preview";
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+// Avatar primitives are not used directly here
+import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
@@ -124,12 +125,12 @@ export function AgentDetailPage() {
             </Button>
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div className="relative">
-                <Avatar className="w-12 h-12 ring-2 ring-primary/20 shadow-lg">
-                  <AvatarImage src={agent.avatar} alt={agent.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40">
-                    {agent.name?.[0] || "?"}
-                  </AvatarFallback>
-                </Avatar>
+                <SmartAvatar
+                  src={agent.avatar}
+                  alt={agent.name}
+                  className="w-12 h-12 ring-2 ring-primary/20 shadow-lg"
+                  fallback={<span className="bg-gradient-to-br from-primary/20 to-primary/40">{agent.name?.[0] || "?"}</span>}
+                />
                 <div className={cn(
                   "absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-lg border-2 border-background",
                   roleConfig.bgColor

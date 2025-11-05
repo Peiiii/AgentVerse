@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+// Avatar primitives are not used directly here
+import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
@@ -116,10 +117,12 @@ export function AgentEmbeddedForm({
                   className="flex-1"
                 />
                 {formData.avatar && (
-                  <Avatar className="w-10 h-10 ring-2 ring-border">
-                    <AvatarImage src={formData.avatar} alt="预览" />
-                    <AvatarFallback>预</AvatarFallback>
-                  </Avatar>
+                  <SmartAvatar
+                    src={formData.avatar}
+                    alt="预览"
+                    className="w-10 h-10 ring-2 ring-border"
+                    fallback={<span>预</span>}
+                  />
                 )}
               </div>
             </div>

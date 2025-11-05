@@ -31,7 +31,8 @@ export function useMessageList({
   const scrollableLayoutRef = useRef<ScrollableLayoutRef>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  // 不再做容器级的淡入/淡出过渡，避免切会话时闪烁
+  const [isTransitioning] = useState(false);
 
   const handleScroll = (scrollTop: number, maxScroll: number) => {
     const distanceToBottom = maxScroll - scrollTop;
@@ -44,20 +45,9 @@ export function useMessageList({
     scrollableLayoutRef.current?.scrollToBottom(instant);
   };
 
+  // 切换会话时仅执行即时滚动到底部，不再隐藏容器
   useEffect(() => {
-    // 开始过渡
-    setIsTransitioning(true);
-
-    // 等待下一帧，让过渡效果生效
-    requestAnimationFrame(() => {
-      // 执行即时滚动
-      scrollToBottom(true);
-
-      // 300ms 后结束过渡
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 300);
-    });
+    scrollToBottom(true);
   }, [discussionId]);
 
   const reorganizedMessages = reorganizeMessages(messages);

@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+// Avatar primitives are no longer used directly here
+import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
 import { AgentInfoCard } from "@/common/components/agent/cards/agent-info-card";
 import { AgentDef } from "@/common/types/agent";
@@ -37,15 +38,12 @@ export function ClickableAgentAvatar({
 
   if (isUser || !agent) {
     return (
-      <Avatar className={cn(sizeClass, "shrink-0", className)}>
-        <AvatarImage src={avatar} />
-        <AvatarFallback className={cn(
-          "text-white text-xs",
-          isUser ? "bg-green-500" : "bg-blue-500"
-        )}>
-          {name[0]}
-        </AvatarFallback>
-      </Avatar>
+      <SmartAvatar
+        src={avatar}
+        alt={name}
+        className={cn(sizeClass, "shrink-0", className)}
+        fallback={<span className="text-white text-xs">{name[0]}</span>}
+      />
     );
   }
 
@@ -56,16 +54,16 @@ export function ClickableAgentAvatar({
           className="cursor-pointer hover:opacity-80 transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 active:scale-95"
           aria-label={`查看 ${name} 的详细信息`}
         >
-          <Avatar className={cn(
-            sizeClass,
-            "shrink-0 ring-2 ring-transparent hover:ring-primary/40 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md",
-            className
-          )}>
-            <AvatarImage src={avatar} />
-            <AvatarFallback className="text-white text-xs bg-blue-500">
-              {name[0]}
-            </AvatarFallback>
-          </Avatar>
+          <SmartAvatar
+            src={avatar}
+            alt={name}
+            className={cn(
+              sizeClass,
+              "shrink-0 ring-2 ring-transparent hover:ring-primary/40 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md",
+              className
+            )}
+            fallback={<span className="text-white text-xs">{name[0]}</span>}
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent 
@@ -87,4 +85,3 @@ export function ClickableAgentAvatar({
     </Popover>
   );
 }
-

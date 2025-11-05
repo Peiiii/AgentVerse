@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+// Avatar primitives are not used directly here
+import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { AgentDef } from "@/common/types/agent";
 import { cn } from "@/common/lib/utils";
 import { useRef, useEffect } from "react";
@@ -81,12 +82,12 @@ export function MentionSuggestions({
               )}
               onClick={() => onSelect(agent)}
             >
-              <Avatar className="w-8 h-8 shrink-0">
-                <AvatarImage src={agentAvatar} />
-                <AvatarFallback className="text-xs bg-primary/20">
-                  {agentName[0]}
-                </AvatarFallback>
-              </Avatar>
+              <SmartAvatar
+                src={agentAvatar}
+                alt={agentName}
+                className="w-8 h-8 shrink-0"
+                fallback={<span className="text-xs">{agentName[0]}</span>}
+              />
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate">{agentName}</div>
                 {agent.personality && (

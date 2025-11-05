@@ -3,7 +3,7 @@ import { ScrollableLayout } from "@/common/components/layouts/scrollable-layout"
 import { cn } from "@/common/lib/utils";
 import { AgentMessage } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
-import { AnimatePresence, motion } from "framer-motion";
+// 去掉容器级动画，避免切换会话时的闪烁
 import { ArrowDown } from "lucide-react";
 import { forwardRef, useImperativeHandle, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +52,6 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
       scrollableLayoutRef,
       messagesContainerRef,
       showScrollButton,
-      isTransitioning,
       reorganizedMessages,
       handleScroll,
       scrollToBottom
@@ -90,47 +89,33 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
             pinThreshold={30}
             onScroll={handleScroll}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={discussionId}
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  transition: { duration: 0.2 },
-                }}
-                exit={{ opacity: 0 }}
-                className={cn(
-                  "py-4 transition-opacity duration-200",
-                  isTransitioning && "opacity-0"
-                )}
-                ref={messagesContainerRef}
-              >
-                <div className="space-y-1 px-4">
-                  {reorganizedMessages.map((message, index) => {
-                    // 获取前一条消息的时间戳
-                    const previousMessage = index > 0 ? reorganizedMessages[index - 1] : null;
-                    const previousTimestamp = previousMessage 
-                      ? new Date(previousMessage.timestamp).getTime() 
-                      : undefined;
+            <div className={cn("py-4")}
+                 ref={messagesContainerRef}>
+              <div className="space-y-1 px-4">
+                {reorganizedMessages.map((message, index) => {
+                  // 获取前一条消息的时间戳
+                  const previousMessage = index > 0 ? reorganizedMessages[index - 1] : null;
+                  const previousTimestamp = previousMessage 
+                    ? new Date(previousMessage.timestamp).getTime() 
+                    : undefined;
+                  
+                  // 获取对应的 agent 信息
+                  const agent = agentMap.get(message.agentId);
                     
-                    // 获取对应的 agent 信息
-                    const agent = agentMap.get(message.agentId);
-                      
-                    return (
-                      <MessageItemWechat
-                        key={message.id}
-                        message={message}
-                        agentInfo={agentInfo}
-                        agent={agent}
-                        previousMessageTimestamp={previousTimestamp}
-                        onEditAgent={handleEditAgent}
-                        onEditAgentWithAI={handleEditAgentWithAI}
-                      />
-                    );
-                  })}
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                  return (
+                    <MessageItemWechat
+                      key={message.id}
+                      message={message}
+                      agentInfo={agentInfo}
+                      agent={agent}
+                      previousMessageTimestamp={previousTimestamp}
+                      onEditAgent={handleEditAgent}
+                      onEditAgentWithAI={handleEditAgentWithAI}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           </ScrollableLayout>
         </div>
 

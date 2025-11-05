@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+// Avatar primitives are not used directly in this component
+import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { useCopy } from "@/core/hooks/use-copy";
 import { useToast } from "@/core/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
@@ -27,12 +28,12 @@ function MessageHeader({
 
   return (
     <div className="sm:hidden flex items-center gap-2 mb-2">
-      <Avatar className="w-5 h-5 shrink-0">
-        <AvatarImage src={getAvatar(message.agentId)} />
-        <AvatarFallback className="bg-gradient-to-br from-purple-400 to-blue-400 text-white text-[10px]">
-          {getName(message.agentId)[0]}
-        </AvatarFallback>
-      </Avatar>
+      <SmartAvatar
+        src={getAvatar(message.agentId)}
+        alt={getName(message.agentId)}
+        className="w-5 h-5 shrink-0"
+        fallback={<span>{getName(message.agentId)[0]}</span>}
+      />
       <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
         {getName(message.agentId)}
       </div>
@@ -55,12 +56,12 @@ function DesktopMessageHeader({
 
   return (
     <div className="hidden sm:flex items-start gap-3">
-      <Avatar className="w-8 h-8 shrink-0 ring-2 ring-transparent group-hover:ring-purple-500/30 transition-all duration-200">
-        <AvatarImage src={getAvatar(message.agentId)} />
-        <AvatarFallback className="bg-gradient-to-br from-purple-400 to-blue-400 text-white text-xs">
-          {getName(message.agentId)[0]}
-        </AvatarFallback>
-      </Avatar>
+        <SmartAvatar
+          src={getAvatar(message.agentId)}
+          alt={getName(message.agentId)}
+          className="w-8 h-8 shrink-0 ring-2 ring-transparent group-hover:ring-purple-500/30 transition-all duration-200"
+          fallback={<span>{getName(message.agentId)[0]}</span>}
+        />
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center gap-2">
           <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
