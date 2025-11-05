@@ -5,9 +5,10 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { useAgents } from "@/core/hooks/useAgents";
+import { AgentDef } from "@/common/types/agent";
 import { Sparkles, Users } from "lucide-react";
 import match from "pinyin-match";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RoleBadge } from "@/common/components/common/role-badge";
 
@@ -23,7 +24,6 @@ export function AgentsPage() {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
-    handleEditAgent,
     handleSubmit,
   } = useAgentForm(agents, updateAgent);
 
@@ -31,6 +31,11 @@ export function AgentsPage() {
   const handleViewAgent = (agentId: string) => {
     navigate(`/agents/${agentId}`);
   };
+
+  // 处理 AI 编辑智能体
+  const handleEditAgentWithAI = useCallback((agent: AgentDef) => {
+    navigate(`/agents/${agent.id}?tab=ai-create`);
+  }, [navigate]);
 
   // 获取所有角色和专长用于筛选
   const allRoles = useMemo(() => {
@@ -92,7 +97,7 @@ export function AgentsPage() {
             key={agent.id}
             agent={agent}
             variant="default"
-            onEdit={handleEditAgent}
+            onEditWithAI={handleEditAgentWithAI}
             onDelete={deleteAgent}
             onView={handleViewAgent}
             showActions={true}
@@ -111,7 +116,7 @@ export function AgentsPage() {
             key={agent.id}
             agent={agent}
             variant="compact"
-            onEdit={handleEditAgent}
+            onEditWithAI={handleEditAgentWithAI}
             onDelete={deleteAgent}
             onView={handleViewAgent}
             showActions={true}

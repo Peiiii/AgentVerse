@@ -12,7 +12,6 @@ export interface ClickableAgentAvatarProps {
   isUser?: boolean;
   size?: "sm" | "md" | "lg";
   className?: string;
-  onEdit?: (agent: AgentDef) => void;
   onEditWithAI?: (agent: AgentDef) => void;
   showEditActions?: boolean;
 }
@@ -30,7 +29,6 @@ export function ClickableAgentAvatar({
   isUser = false,
   size = "md",
   className,
-  onEdit,
   onEditWithAI,
   showEditActions = false,
 }: ClickableAgentAvatarProps) {
@@ -77,7 +75,6 @@ export function ClickableAgentAvatar({
           variant="compact"
           showPrompt={false}
           className="border-0 shadow-none"
-          onEdit={onEdit}
           onEditWithAI={onEditWithAI}
           showEditActions={showEditActions}
         />

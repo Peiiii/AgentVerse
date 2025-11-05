@@ -3,21 +3,13 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { Bot, Brain, Edit3, Sparkles, Target, User, Wand2 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/common/components/ui/dropdown-menu";
+import { Bot, Brain, Sparkles, Target, User, Wand2 } from "lucide-react";
 
 interface AgentInfoCardProps {
   agent: AgentDef;
   className?: string;
   variant?: "default" | "compact" | "minimal";
   showPrompt?: boolean;
-  onEdit?: (agent: AgentDef) => void;
   onEditWithAI?: (agent: AgentDef) => void;
   showEditActions?: boolean;
 }
@@ -27,7 +19,6 @@ export function AgentInfoCard({
   className, 
   variant = "default",
   showPrompt = true,
-  onEdit,
   onEditWithAI,
   showEditActions = false,
 }: AgentInfoCardProps) {
@@ -103,7 +94,7 @@ export function AgentInfoCard({
   }
 
   if (variant === "compact") {
-    const hasEditActions = showEditActions && (onEdit || onEditWithAI);
+    const hasEditActions = showEditActions && onEditWithAI;
     
     return (
       <div className={cn("bg-card border border-border rounded-lg p-4 shadow-sm", className)}>
@@ -138,36 +129,18 @@ export function AgentInfoCard({
                 {roleConfig.label}
               </Badge>
               {hasEditActions && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0 shrink-0 hover:bg-accent"
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label="编辑智能体"
-                    >
-                      <Edit3 className="h-3.5 w-3.5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    {onEdit && (
-                      <DropdownMenuItem onClick={() => onEdit(agent)}>
-                        <Edit3 className="h-4 w-4 mr-2" />
-                        表单编辑
-                      </DropdownMenuItem>
-                    )}
-                    {onEditWithAI && (
-                      <>
-                        {onEdit && <DropdownMenuSeparator />}
-                        <DropdownMenuItem onClick={() => onEditWithAI(agent)}>
-                          <Wand2 className="h-4 w-4 mr-2" />
-                          AI 助手编辑
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 shrink-0 hover:bg-accent"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditWithAI?.(agent);
+                  }}
+                  aria-label="AI 编辑智能体"
+                >
+                  <Wand2 className="h-3.5 w-3.5" />
+                </Button>
               )}
             </div>
             
@@ -275,7 +248,7 @@ export function AgentInfoCard({
             {/* 系统提示词预览 */}
             {showPrompt && agent.prompt && (
               <div className="flex items-start gap-2">
-                <Edit3 className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                <Sparkles className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <span className="font-medium text-foreground">系统提示：</span>
                   <p className="text-muted-foreground text-xs mt-1 break-all overflow-hidden max-h-12">

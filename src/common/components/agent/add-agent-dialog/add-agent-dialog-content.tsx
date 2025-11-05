@@ -7,15 +7,16 @@ import { useAgents } from "@/core/hooks/useAgents";
 import { Loader2, PlusCircle, Search } from "lucide-react";
 import match from "pinyin-match";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function AddAgentDialogContent() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   const { agents, isLoading, addAgent, updateAgent, deleteAgent } = useAgents();
   const {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
-    handleEditAgent,
     handleSubmit,
   } = useAgentForm(agents, updateAgent);
 
@@ -77,7 +78,9 @@ export function AddAgentDialogContent() {
           <AgentList
             agents={filteredAgents}
             loading={isLoading}
-            onEditAgent={handleEditAgent}
+            onEditAgentWithAI={(agent) => {
+              navigate(`/agents/${agent.id}?tab=ai-create`);
+            }}
             onDeleteAgent={deleteAgent}
           />
         </div>

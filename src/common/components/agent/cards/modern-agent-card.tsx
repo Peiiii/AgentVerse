@@ -6,7 +6,6 @@ import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
 import {
   Brain,
-  Edit,
   Eye,
   Heart,
   MessageCircle,
@@ -21,7 +20,7 @@ import React, { useState } from "react";
 export interface ModernAgentCardProps {
   agent: AgentDef;
   variant?: "default" | "compact";
-  onEdit?: (agent: AgentDef) => void;
+  onEditWithAI?: (agent: AgentDef) => void;
   onDelete?: (agentId: string) => void;
   onView?: (agentId: string) => void;
   showActions?: boolean;
@@ -78,7 +77,7 @@ const getRoleConfig = (role?: string) => {
 export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
   agent,
   variant = "default",
-  onEdit,
+  onEditWithAI,
   onDelete,
   onView,
   showActions = false,
@@ -171,11 +170,12 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEdit?.(agent);
+                    onEditWithAI?.(agent);
                   }}
                   className="h-8 w-8 p-0 hover:bg-white/20 text-white/80 hover:text-white"
+                  title="AI 编辑"
                 >
-                  <Edit className="w-4 h-4" />
+                  <Zap className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -349,11 +349,12 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEdit?.(agent);
+                    onEditWithAI?.(agent);
                   }}
                   className="h-7 w-7 p-0 hover:bg-primary/20 hover:text-primary"
+                  title="AI 编辑"
                 >
-                  <Edit className="w-3 h-3" />
+                  <Zap className="w-3 h-3" />
                 </Button>
                 <Button
                   variant="ghost"

@@ -10,16 +10,18 @@ import match from "pinyin-match";
 import { useCallback, useMemo, useState } from "react";
 import { AgentForm } from "@/common/features/agents/components/forms";
 import { AgentList } from "../lists/agent-list";
+import { useNavigate } from "react-router-dom";
 
 // 对话框内容组件
 export function AddAgentDialogContent() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const modal = useModal();
   const { agents, isLoading, addAgent, updateAgent, deleteAgent } = useAgents();
   const {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
-    handleEditAgent,
     handleSubmit,
   } = useAgentForm(agents, updateAgent);
   
@@ -98,7 +100,10 @@ export function AddAgentDialogContent() {
           <AgentList
             agents={filteredAgents}
             loading={isLoading}
-            onEditAgent={handleEditAgent}
+            onEditAgentWithAI={(agent) => {
+              modal.close();
+              navigate(`/agents/${agent.id}?tab=ai-create`);
+            }}
             onDeleteAgent={deleteAgent}
           />
         </div>

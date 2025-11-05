@@ -16,7 +16,6 @@ interface MessageItemWechatProps {
   };
   agent?: AgentDef;
   previousMessageTimestamp?: number;
-  onEditAgent?: (agent: AgentDef) => void;
   onEditAgentWithAI?: (agent: AgentDef) => void;
 }
 
@@ -28,7 +27,6 @@ export function MessageItemWechat({
   agentInfo,
   agent,
   previousMessageTimestamp,
-  onEditAgent,
   onEditAgentWithAI,
 }: MessageItemWechatProps) {
   const [copied, setCopied] = useState(false);
@@ -80,9 +78,8 @@ export function MessageItemWechat({
           name={agentName}
           isUser={isUserMessage}
           size="md"
-          onEdit={onEditAgent}
           onEditWithAI={onEditAgentWithAI}
-          showEditActions={!isUserMessage && !!agent && (!!onEditAgent || !!onEditAgentWithAI)}
+          showEditActions={!isUserMessage && !!agent && !!onEditAgentWithAI}
         />
         
         <div className={cn(

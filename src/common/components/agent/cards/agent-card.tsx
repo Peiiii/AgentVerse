@@ -31,7 +31,7 @@ export interface AgentCardProps {
   mode?: AgentCardMode;
   
   // 交互回调
-  onEdit?: (agent: AgentDef) => void;
+  onEditWithAI?: (agent: AgentDef) => void;
   onDelete?: (agentId: string) => void;
   
   // 样式
@@ -47,7 +47,7 @@ export interface AgentCardProps {
 export const AgentCard: React.FC<AgentCardProps> = ({
   agent,
   mode = "preview",
-  onEdit,
+  onEditWithAI,
   onDelete,
   className,
   description,
@@ -157,17 +157,17 @@ export const AgentCard: React.FC<AgentCardProps> = ({
         {mode === "management" && (
           <div className="flex items-center justify-between gap-2 mt-3">
             <div className="flex items-center gap-1">
-              {onEdit && (
+              {onEditWithAI && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onEdit(agent as AgentDef)}
+                  onClick={() => onEditWithAI(agent as AgentDef)}
                   className={cn(
-                    "hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-950 dark:hover:text-purple-400",
+                    "hover:bg-primary/10 hover:text-primary",
                     isMobile ? "h-7 px-1.5 text-xs" : "h-8 px-2"
                   )}
                 >
-                  编辑
+                  AI 编辑
                 </Button>
               )}
               {onDelete && 'id' in agent && (

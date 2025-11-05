@@ -6,7 +6,7 @@ import { AgentCard } from "../cards";
 export interface AgentListProps {
   agents: AgentDef[];
   loading?: boolean;
-  onEditAgent: (agent: AgentDef) => void;
+  onEditAgentWithAI: (agent: AgentDef) => void;
   onDeleteAgent: (id: string) => void;
   listClassName?: string;
   cardMode?: "detail" | "management";
@@ -15,7 +15,7 @@ export interface AgentListProps {
 export function AgentList({
   agents,
   loading,
-  onEditAgent,
+  onEditAgentWithAI,
   onDeleteAgent,
   listClassName,
   cardMode = "management"
@@ -27,7 +27,7 @@ export function AgentList({
           key={agent.id}
           agent={agent}
           mode={cardMode}
-          onEdit={onEditAgent}
+          onEditWithAI={onEditAgentWithAI}
           onDelete={onDeleteAgent}
         />
       ))}
