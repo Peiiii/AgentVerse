@@ -70,9 +70,11 @@ export function SmartAvatar({ src, alt, className, fallback }: SmartAvatarProps)
     };
     const onError = () => {
       if (!mountedRef.current) return;
-      // keep currentSrc; do not swap to broken image
+      // Image failed to load, clear src and show fallback
+      setCurrentSrc(undefined);
       setNextSrc(undefined);
       setNextReady(false);
+      setLoaded(false);
     };
     if (img.decode) {
       img.decode().then(onLoad).catch(onError);

@@ -54,16 +54,17 @@ export function useAgents({ onChange }: UseAgentsProps = {}) {
   });
 
   const getAgentAvatar = useMemoizedFn((id: string) => {
-    // Provide a stable avatar for the local user; allow override via localStorage
+    // For user, return empty string to use text avatar instead of generated image
     if (id === "user") {
       try {
         const stored = typeof window !== 'undefined' ? window.localStorage.getItem('userAvatar') : null;
-        return stored || "/avatars/default.png";
+        // Only use stored avatar if user explicitly set one
+        return stored || "";
       } catch {
-        return "/avatars/default.png";
+        return "";
       }
     }
-    return agents.find((agent) => agent.id === id)?.avatar || "/avatars/default.png";
+    return agents.find((agent) => agent.id === id)?.avatar || "";
   });
 
   return {

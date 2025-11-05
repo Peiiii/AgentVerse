@@ -35,12 +35,17 @@ export function ClickableAgentAvatar({
   const sizeClass = sizeClasses[size];
 
   if (isUser || !agent) {
+    // For user, always show text avatar (no image)
     return (
       <SmartAvatar
-        src={avatar}
+        src={avatar || undefined}
         alt={name}
-        className={cn(sizeClass, "shrink-0", className)}
-        fallback={<span className="text-white text-xs">{name[0]}</span>}
+        className={cn(
+          sizeClass, 
+          "shrink-0 bg-gradient-to-br from-primary/80 to-primary",
+          className
+        )}
+        fallback={<span className="text-white text-xs font-medium">{name[0] || "我"}</span>}
       />
     );
   }
