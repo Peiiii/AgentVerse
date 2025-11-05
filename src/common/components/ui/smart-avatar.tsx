@@ -21,7 +21,8 @@ export function SmartAvatar({ src, alt, className, fallback }: SmartAvatarProps)
   const [currentSrc, setCurrentSrc] = useState<string | undefined>(src);
   const [nextSrc, setNextSrc] = useState<string | undefined>(undefined);
   const [nextReady, setNextReady] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  // If the target is already cached, start in loaded state to avoid skeleton flash on mount
+  const [loaded, setLoaded] = useState<boolean>(() => (src ? loadedCache.has(src) : false));
   const target = src || "";
   const mountedRef = useRef(true);
 
@@ -34,7 +35,10 @@ export function SmartAvatar({ src, alt, className, fallback }: SmartAvatarProps)
 
   // When target changes, either swap immediately (if cached) or preload then crossfade
   useEffect(() => {
-    if (!target) return;
+    if (!target) {
+      setLoaded(false);
+      return;
+    }
 
     if (loadedCache.has(target)) {
       setCurrentSrc(target);
