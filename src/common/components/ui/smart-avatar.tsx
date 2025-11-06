@@ -53,7 +53,7 @@ export function SmartAvatar({ src, alt, className, fallback }: SmartAvatarProps)
     setNextReady(false);
 
     const img = new Image();
-    img.decoding = "async" as any;
+    img.decoding = "async";
     img.src = target;
     const onLoad = () => {
       loadedCache.add(target);

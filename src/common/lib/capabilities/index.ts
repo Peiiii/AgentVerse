@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Capability {
   name: string;
   description: string;
-  execute: (params: any) => Promise<any>;
+  execute: (params: unknown) => Promise<unknown>;
 }
 
 export class CapabilityRegistry {
@@ -34,11 +33,11 @@ export class CapabilityRegistry {
 
   async execute(
     name: string,
-    params: any,
+    params: unknown,
     options: {
       ignoreError?: boolean;
     } = {}
-  ): Promise<any> {
+  ): Promise<unknown> {
     console.log("[CapabilityRegistry] execute:", name, "params:", params);
     const capability = this.capabilities.get(name);
     if (!capability && !options.ignoreError) {
@@ -47,5 +46,4 @@ export class CapabilityRegistry {
     return capability?.execute(params);
   }
 }
-
 

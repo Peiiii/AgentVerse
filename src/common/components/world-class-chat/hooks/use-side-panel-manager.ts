@@ -3,11 +3,11 @@ import { useState, useMemo, useCallback } from "react";
 export interface SidePanelConfig {
   key: string;
   hideCloseButton?: boolean;
-  render: (panelProps: any, close: () => void) => React.ReactNode;
+  render: (panelProps: unknown, close: () => void) => React.ReactNode;
 }
 
 export function useSidePanelManager(initialConfigs: SidePanelConfig[]) {
-  const [activePanel, setActivePanel] = useState<{ key: string; props?: any } | null>(null);
+  const [activePanel, setActivePanel] = useState<{ key: string; props?: unknown } | null>(null);
   const [dynamicConfigs, setDynamicConfigs] = useState<SidePanelConfig[]>([]);
   
   // 合并初始配置和动态配置
@@ -16,7 +16,7 @@ export function useSidePanelManager(initialConfigs: SidePanelConfig[]) {
   const sidePanelActive = !!activePanel;
   const activePanelConfig = useMemo(() => allConfigs.find(cfg => cfg.key === activePanel?.key), [allConfigs, activePanel]);
   
-  const openPanel = useCallback((key: string, props?: any) => setActivePanel({ key, props }), []);
+  const openPanel = useCallback((key: string, props?: unknown) => setActivePanel({ key, props }), []);
   const closePanel = useCallback(() => setActivePanel(null), []);
   
   // 动态添加 panel 配置

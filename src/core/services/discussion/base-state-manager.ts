@@ -1,7 +1,7 @@
 import { RxEvent } from "@/common/lib/rx-event";
 import { WithState } from "@/common/lib/with-event";
 
-export interface BaseDiscussionState {
+export interface BaseDiscussionState extends Record<string, unknown> {
   isPaused: boolean;
   currentDiscussionId: string | null;
 }

@@ -3,7 +3,7 @@ import { ActionDef, ActionParser } from "@/common/lib/agent/action/action-parser
 import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { DiscussionKeys, SpeakRequest } from "@/common/lib/discussion/discussion-env";
 import { generateId } from "@/common/lib/utils";
-import { messagesResource } from "@/core/resources";
+import { getPresenter } from "@/core/presenter/presenter";
 import { messageService } from "@/core/services/message.service";
 import {
   ActionResultMessage,
@@ -103,7 +103,7 @@ export class ChatAgent extends MessageHandlingAgent {
           agentMessage.discussionId,
           resultMessage
         );
-        messagesResource.current.reload();
+        await getPresenter().messages.loadForDiscussion(agentMessage.discussionId);
         this.env.eventBus.emit(DiscussionKeys.Events.message, resultMessage);
       }
     }

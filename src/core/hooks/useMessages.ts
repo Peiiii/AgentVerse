@@ -1,70 +1,38 @@
-import { useResourceState } from "@/common/lib/resource";
-import { messagesResource } from "@/core/resources";
-import { discussionControlService } from "@/core/services/discussion-control.service";
-import { messageService } from "@/core/services/message.service";
-import { AgentMessage, NormalMessage } from "@/common/types/discussion";
-import { useMemoizedFn } from "ahooks";
-import { nanoid } from "nanoid";
-import { useProxyBeanState } from "packages/rx-nested-bean/src";
-import { useOptimisticUpdate } from "./useOptimisticUpdate";
+import { usePresenter } from "@/core/presenter";
+import { AgentMessage } from "@/common/types/discussion";
 
 export function useMessages() {
-  const resourceState = useResourceState(messagesResource.current);
-  const { data: currentDiscussionId } = useProxyBeanState(
-    discussionControlService.store,
-    "currentDiscussionId"
-  );
+  const presenter = usePresenter();
+  const messages = presenter.messages.store((s) => s.messages);
+  const isLoading = presenter.messages.store((s) => s.isLoading);
+  const error = presenter.messages.store((s) => s.error);
+  const currentDiscussionId = presenter.discussions.store((s) => s.currentId);
 
-  const withOptimisticUpdate = useOptimisticUpdate(resourceState);
-
-  const addMessage = useMemoizedFn(
-    async ({
+  const addMessage = async ({
+    content,
+    agentId,
+    type = "text" as AgentMessage["type"],
+    replyTo,
+  }: {
+    content: string;
+    agentId: string;
+    type?: AgentMessage["type"];
+    replyTo?: string;
+  }) => {
+    if (!currentDiscussionId) return;
+    return presenter.messages.add(currentDiscussionId, {
       content,
       agentId,
-      type = "text",
+      type,
       replyTo,
-    }: {
-      content: string;
-      agentId: string;
-      type?: AgentMessage["type"];
-      replyTo?: string;
-    }) => {
-      if (!currentDiscussionId) return;
-
-      const tempId = nanoid();
-      const timestamp = new Date();
-
-      return withOptimisticUpdate(
-        // 乐观更新
-        (messages) => [
-          ...messages,
-          {
-            id: tempId,
-            content,
-            agentId,
-            type,
-            replyTo,
-            timestamp,
-            discussionId: currentDiscussionId,
-          } as NormalMessage,
-        ],
-        // API 调用
-        () =>
-          messageService.addMessage(currentDiscussionId, {
-            content,
-            agentId,
-            type,
-            replyTo,
-            timestamp,
-          } as Omit<NormalMessage, "id" | "discussionId">)
-      );
-    }
-  );
+      timestamp: new Date(),
+    } as Omit<AgentMessage, "id" | "discussionId">);
+  };
 
   return {
-    messages: resourceState.data,
-    isLoading: resourceState.isLoading,
-    error: resourceState.error,
+    messages,
+    isLoading,
+    error,
     addMessage,
   };
 }

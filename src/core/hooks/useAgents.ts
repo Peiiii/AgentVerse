@@ -1,80 +1,25 @@
-import { useResourceState } from "@/common/lib/resource";
-import { agentsResource } from "@/core/resources";
-import { agentService } from "@/core/services/agent.service";
-import { AgentDef } from "@/common/types/agent";
-import { useMemoizedFn } from "ahooks";
-import { useOptimisticUpdate } from "./useOptimisticUpdate";
+import { usePresenter } from "@/core/presenter";
+import type { AgentDef } from "@/common/types/agent";
 
 interface UseAgentsProps {
   onChange?: (agents: AgentDef[]) => void;
 }
 
-export function useAgents({ onChange }: UseAgentsProps = {}) {
-  const resource = useResourceState(agentsResource.list);
-  const { data: agents } = resource;
-
-  const withOptimisticUpdate = useOptimisticUpdate(resource, { onChange });
-
-  const addAgent = useMemoizedFn(async () => {
-    const defaultAgent = agentService.createDefaultAgent();
-    const seed = `agent${Date.now().toString().slice(-4)}`;
-    defaultAgent.avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
-    
-    return withOptimisticUpdate(
-      // 乐观更新
-      (agents) => [...agents, { ...defaultAgent, id: `temp-${seed}` }],
-      // API 调用
-      () => agentService.createAgent(defaultAgent)
-    );
-  });
-
-  const updateAgent = useMemoizedFn(async (id: string, data: Partial<AgentDef>) => {
-    return withOptimisticUpdate(
-      // 乐观更新
-      (agents) => agents.map((a) => (a.id === id ? { ...a, ...data } : a)),
-      // API 调用
-      () => agentService.updateAgent(id, data)
-    );
-  });
-
-  const deleteAgent = useMemoizedFn(async (id: string) => {
-    return withOptimisticUpdate(
-      // 乐观更新
-      (agents) => agents.filter((a) => a.id !== id),
-      // API 调用
-      () => agentService.deleteAgent(id)
-    );
-  });
-
-  const getAgentName = useMemoizedFn((id: string) => {
-    if(id==="user"){
-      return "我";
-    }
-    return agents.find((agent) => agent.id === id)?.name ?? "未知";
-  });
-
-  const getAgentAvatar = useMemoizedFn((id: string) => {
-    // For user, return empty string to use text avatar instead of generated image
-    if (id === "user") {
-      try {
-        const stored = typeof window !== 'undefined' ? window.localStorage.getItem('userAvatar') : null;
-        // Only use stored avatar if user explicitly set one
-        return stored || "";
-      } catch {
-        return "";
-      }
-    }
-    return agents.find((agent) => agent.id === id)?.avatar || "";
-  });
+// Thin adapter to new AgentsManager + store. Kept for compatibility.
+export function useAgents(_opts: UseAgentsProps = {}) {
+  const presenter = usePresenter();
+  const agents = presenter.agents.store((s) => s.agents);
+  const isLoading = presenter.agents.store((s) => s.isLoading);
+  const error = presenter.agents.store((s) => s.error);
 
   return {
     agents,
-    isLoading: resource.isLoading,
-    error: resource.error,
-    addAgent,
-    updateAgent,
-    deleteAgent,
-    getAgentName,
-    getAgentAvatar
+    isLoading,
+    error,
+    addAgent: presenter.agents.addDefault,
+    updateAgent: presenter.agents.update,
+    deleteAgent: presenter.agents.remove,
+    getAgentName: presenter.agents.getName,
+    getAgentAvatar: presenter.agents.getAvatar,
   };
 }

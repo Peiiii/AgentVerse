@@ -1,20 +1,23 @@
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { Loader2, PlusCircle } from "lucide-react";
+import { usePresenter } from "@/core/presenter";
 
 interface DiscussionListHeaderProps {
   className?: string;
   isLoading?: boolean;
   disabled?: boolean;
-  onCreateDiscussion: () => void;
+  onCreateDiscussion?: () => void;
 }
 
 export function DiscussionListHeader({
   className,
   isLoading,
   disabled,
-  onCreateDiscussion
+  onCreateDiscussion,
 }: DiscussionListHeaderProps) {
+  const presenter = usePresenter();
+  const handleCreate = onCreateDiscussion ?? (() => presenter.discussions.create("新的讨论"));
   return (
     <header
       className={cn(
@@ -26,7 +29,7 @@ export function DiscussionListHeader({
     >
       <h2 className="text-sm font-medium text-foreground/90">会话列表</h2>
       <Button
-        onClick={onCreateDiscussion}
+        onClick={handleCreate}
         variant="outline"
         size="sm"
         disabled={isLoading || disabled}

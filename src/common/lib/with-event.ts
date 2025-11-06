@@ -1,8 +1,7 @@
 import { RxEvent } from "@/common/lib/rx-event";
 import { createNestedBean } from "packages/rx-nested-bean/src";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class WithState<T extends Record<string, any>> {
+export class WithState<T extends Record<string, unknown>> {
   store: ReturnType<typeof createNestedBean<T>>;
 
   onStateChange$ = new RxEvent<[T, T]>();

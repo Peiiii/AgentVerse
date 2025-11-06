@@ -61,7 +61,7 @@ async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlC
 }
 
 export function createHtmlPreviewFromFileTool(
-  openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => string | null,
+  openCustomPanel: (key: string, config: SidePanelConfig, props?: unknown) => string | null,
   getIframeManager?: () => ReturnType<typeof useIframeManager> | null
 ): AgentTool {
   let currentPreviewInfo: {
@@ -164,7 +164,7 @@ export function createHtmlPreviewFromFileTool(
         {
           key: panelKey,
           hideCloseButton: true,
-          render: (_panelProps: any, close: () => void) => (
+          render: (_panelProps: unknown, close: () => void) => (
             <WorldClassChatHtmlPreview
               html={htmlContent}
               onClose={close}

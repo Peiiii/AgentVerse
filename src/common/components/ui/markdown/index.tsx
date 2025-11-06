@@ -32,11 +32,11 @@ export function Markdown({
   codeBlockActions = [],
 }: MarkdownWithActionsProps) {
   const remarkPlugins = useMemo(() => [...(extraRemarkPlugins ?? []), remarkGfm as unknown as Plugin<[], Root>], [extraRemarkPlugins]);
-  const rehypePlugins = useMemo(() => [...(extraRehypePlugins ?? []), rehypeRaw as any], [extraRehypePlugins]);
+  const rehypePlugins = useMemo(() => [...(extraRehypePlugins ?? []), rehypeRaw as unknown as Plugin<[], Root>], [extraRehypePlugins]);
   // 组件配置，注入 codeBlockActions
   const defaultComponents: Partial<Components> = useMemo(() => ({
     ...(components as Partial<Components>),
-    code: (props: any) => <CodeBlock {...props} codeBlockActions={codeBlockActions} />, // 注入 actions
+    code: (props: React.ComponentPropsWithoutRef<'code'>) => <CodeBlock {...props} codeBlockActions={codeBlockActions} />, // 注入 actions
     pre: (props: React.HTMLAttributes<HTMLPreElement>) => {
       const children: React.ReactElement<{ children: string | string[]; className?: string }> | undefined = props.children as React.ReactElement<{ children: string | string[]; className?: string }>;
       let code = "";

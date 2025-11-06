@@ -6,8 +6,7 @@ export type CompareFn<T> = (a: T, b: T) => number;
 export interface SortField<T, K extends keyof T> {
   field: K;
   direction?: "asc" | "desc";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  comparator?: CompareFn<any>;
+  comparator?: CompareFn<T[K]>;
 }
 
 export interface LocalStorageOptions<T> {

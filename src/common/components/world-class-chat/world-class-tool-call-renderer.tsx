@@ -1,5 +1,5 @@
 import type { ToolInvocation } from '@ai-sdk/ui-utils';
-import type { ToolRenderer, ToolResult } from '@agent-labs/agent-chat';
+import type { ToolRenderer, ToolResult, ToolCall } from '@agent-labs/agent-chat';
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { AgentToolRendererManagerContext } from '@agent-labs/agent-chat';
 
@@ -91,19 +91,22 @@ export const WorldClassToolCallRenderer: React.FC<WorldClassToolCallRendererProp
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f7fafd', padding: 0 }}>
         {renderer && typeof renderer.render === 'function' ? (
           <div style={{ width: '100%' }}>
-            {renderer.render(
-              Object.assign({
+            {(() => {
+              const maybeResult = (toolInvocation as { result?: unknown }).result;
+              const toolCall: ToolCall & { result?: unknown } = {
                 id: toolInvocation.toolCallId,
                 type: 'function',
                 function: {
                   name: toolInvocation.toolName,
                   arguments: JSON.stringify(toolInvocation.args),
                 },
-              },
-                (toolInvocation as any).result !== undefined ? { result: (toolInvocation as any).result } : {}
-              ) as any,
-              onToolResult || (() => {})
-            )}
+                ...(maybeResult !== undefined ? { result: maybeResult } : {}),
+              };
+              return renderer.render(
+                toolCall,
+                onToolResult || (() => {})
+              );
+            })()}
           </div>
         ) : (
           <pre style={{

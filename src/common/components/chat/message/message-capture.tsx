@@ -71,9 +71,9 @@ export function MessageCapture({
       // 将 dataURL 转回 Canvas，以复用下游处理流程
       const img = new Image();
       img.src = dataUrl;
-      await new Promise((res, rej) => {
-        img.onload = res as any;
-        img.onerror = rej as any;
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Image load error'));
       });
       const canvas = document.createElement("canvas");
       canvas.width = img.naturalWidth;

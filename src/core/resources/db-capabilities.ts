@@ -71,9 +71,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params): Promise<DBStoresResponse> => {
+    execute: async (params: unknown): Promise<DBStoresResponse> => {
       try {
-        const { dbName } = params;
+        const { dbName } = params as { dbName: string };
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(dbName);
           
@@ -200,9 +200,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params: DBInitParams): Promise<DBResponse> => {
+    execute: async (params: unknown): Promise<DBResponse> => {
       try {
-        const { name, version, stores } = params;
+        const { name, version, stores } = params as DBInitParams;
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(name, version);
           
@@ -275,9 +275,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params): Promise<DBResponse> => {
+    execute: async (params: unknown): Promise<DBResponse> => {
       try {
-        const { dbName, storeName, data } = params;
+        const { dbName, storeName, data } = params as { dbName: string; storeName: string; data: unknown };
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(dbName);
           
@@ -355,9 +355,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params): Promise<DBResponse> => {
+    execute: async (params: unknown): Promise<DBResponse> => {
       try {
-        const { dbName, storeName, key } = params;
+        const { dbName, storeName, key } = params as { dbName: string; storeName: string; key: string | number };
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(dbName);
           
@@ -416,9 +416,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params): Promise<DBResponse> => {
+    execute: async (params: unknown): Promise<DBResponse> => {
       try {
-        const { dbName, storeName, data } = params;
+        const { dbName, storeName, data } = params as { dbName: string; storeName: string; data: unknown };
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(dbName);
           
@@ -474,9 +474,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params): Promise<DBResponse> => {
+    execute: async (params: unknown): Promise<DBResponse> => {
       try {
-        const { dbName, storeName, key } = params;
+        const { dbName, storeName, key } = params as { dbName: string; storeName: string; key: string | number };
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(dbName);
           
@@ -532,9 +532,9 @@ export const dbCapabilities: Capability[] = [
     </schema>
   </returns>
 </capability>`,
-    execute: async (params): Promise<DBResponse> => {
+    execute: async (params: unknown): Promise<DBResponse> => {
       try {
-        const { dbName, storeName } = params;
+        const { dbName, storeName } = params as { dbName: string; storeName: string };
         return new Promise((resolve, reject) => {
           const request = indexedDB.open(dbName);
           

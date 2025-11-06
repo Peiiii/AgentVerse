@@ -16,7 +16,7 @@ export interface SubscribeIframeMessagesToolResult {
   subscriptionId?: string;
   receivedMessages?: Array<{
     type: string;
-    data: any;
+    data: unknown;
     timestamp: number;
     source: string;
   }>;
@@ -28,12 +28,12 @@ class IframeMessageSubscriptionManager {
   private subscriptions = new Map<string, {
     iframeId: string;
     messageTypes: string[];
-    callback: (message: any) => void;
+    callback: (message: { type?: string; data?: unknown; timestamp?: number; source?: string }) => void;
     timeout?: number;
     startTime: number;
     receivedMessages: Array<{
       type: string;
-      data: any;
+      data: unknown;
       timestamp: number;
       source: string;
     }>;
@@ -47,7 +47,7 @@ class IframeMessageSubscriptionManager {
     iframeId: string,
     messageTypes: string[] = ['*'],
     timeout?: number,
-    callback?: (message: any) => void
+    callback?: (message: { type?: string; data?: unknown; timestamp?: number; source?: string }) => void
   ): string {
     const subscriptionId = `sub-${this.nextSubscriptionId++}`;
     
@@ -85,7 +85,7 @@ class IframeMessageSubscriptionManager {
   }
 
   // 处理接收到的消息
-  handleMessage(iframeId: string, message: any): void {
+  handleMessage(iframeId: string, message: { type?: string; data?: unknown }): void {
     const timestamp = Date.now();
     
     this.subscriptions.forEach((subscription) => {
@@ -240,8 +240,8 @@ export function createSubscribeIframeMessagesTool(
                 content: `收到来自 iframe ${iframeId} 的消息：
                 
 消息类型: ${message.type}
-消息内容: ${JSON.stringify(message.data, null, 2)}
-时间戳: ${new Date(message.timestamp).toLocaleString()}
+消息内容: ${JSON.stringify(message.data ?? null, null, 2)}
+时间戳: ${new Date(message.timestamp ?? Date.now()).toLocaleString()}
 来源: ${message.source}
 
 请根据这个消息内容进行相应的处理或回复。`,

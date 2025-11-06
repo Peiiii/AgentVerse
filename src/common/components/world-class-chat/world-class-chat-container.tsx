@@ -40,8 +40,8 @@ export interface WorldClassChatContainerProps {
 }
 
 export interface WorldClassChatContainerRef {
-  openPanel: (key: string, props?: any) => void;
-  openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => string | null;
+  openPanel: (key: string, props?: unknown) => void;
+  openCustomPanel: (key: string, config: SidePanelConfig, props?: unknown) => string | null;
   suggestionsManager: SuggestionsManager;
   iframeManager: ReturnType<typeof useIframeManager>;
   addMessages: (messages: Message[], options?: {
@@ -78,9 +78,10 @@ export const WorldClassChatContainer = forwardRef<
       {
         key: "preview",
         hideCloseButton: true,
-        render: (panelProps, close: () => void) => (
-          <WorldClassChatHtmlPreview {...panelProps} onClose={close} />
-        ),
+        render: (panelProps: unknown, close: () => void) => {
+          const props = (panelProps ?? {}) as Partial<Parameters<typeof WorldClassChatHtmlPreview>[0]>;
+          return <WorldClassChatHtmlPreview {...(props as Parameters<typeof WorldClassChatHtmlPreview>[0])} onClose={close} />;
+        },
       },
     ],
     []
@@ -98,7 +99,7 @@ export const WorldClassChatContainer = forwardRef<
   useImperativeHandle(ref, () => ({ 
     addMessages,
     openPanel,
-    openCustomPanel: (key: string, config: SidePanelConfig, props?: any) => {
+    openCustomPanel: (key: string, config: SidePanelConfig, props?: unknown) => {
       addPanel(config);
       openPanel(key, props);
       
@@ -252,7 +253,7 @@ export const WorldClassChatContainer = forwardRef<
           onClose={closePanel}
           hideCloseButton={activePanelConfig?.hideCloseButton}
         >
-          {activePanelConfig?.render(activePanel?.props, closePanel)}
+          {activePanelConfig?.render(activePanel?.props ?? {}, closePanel)}
         </SidePanel>
       </div>
     </AgentChatProviderWrapper>

@@ -4,11 +4,8 @@ import { ChatMessage, ChatRole } from "@/common/lib/ai-service";
 import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { DiscussionKeys } from "@/common/lib/discussion/discussion-env";
 import { SpeakReason, SpeakRequest } from "@/common/lib/discussion/speak-scheduler";
-import {
-  agentListResource,
-  discussionMembersResource,
-  messagesResource,
-} from "@/core/resources";
+import { agentListResource, discussionMembersResource } from "@/core/resources";
+import { getPresenter } from "@/core/presenter/presenter";
 import { aiService } from "@/core/services/ai.service";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { messageService } from "@/core/services/message.service";
@@ -321,7 +318,8 @@ export abstract class MessageHandlingAgent<
       ...extra,
     };
     const createdMessage = await messageService.createMessage(message);
-    messagesResource.current.reload();
+    const presenter = getPresenter();
+    await presenter.messages.loadForDiscussion(discussionId);
     return createdMessage as NormalMessage;
   }
 
@@ -330,7 +328,11 @@ export abstract class MessageHandlingAgent<
     updates: Partial<NormalMessage>
   ): Promise<void> {
     await messageService.updateMessage(messageId, updates);
-    messagesResource.current.reload();
+    const discussionId = discussionControlService.getCurrentDiscussionId();
+    if (discussionId) {
+      const presenter = getPresenter();
+      await presenter.messages.loadForDiscussion(discussionId);
+    }
   }
 
   protected shouldRespond(message: NormalMessage): boolean {

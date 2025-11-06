@@ -87,7 +87,8 @@ const capabilities: Capability[] = [
     <note>仅在需要查看完整定义时使用此能力</note>
   </notes>
 </capability>`,
-    execute: async ({ id }) => {
+    execute: async (rawParams: unknown) => {
+      const { id } = rawParams as { id: string };
       if (!id) {
         throw new Error("Agent ID is required");
       }
@@ -174,7 +175,18 @@ const capabilities: Capability[] = [
     </antiPatterns>
   </promptGuidelines>
 </capability>`,
-    execute: async (params) => {
+    execute: async (rawParams: unknown) => {
+      const params = rawParams as {
+        name: string;
+        role: 'moderator' | 'participant';
+        personality: string;
+        expertise: string[];
+        prompt: string;
+        avatar?: string;
+        bias?: string;
+        responseStyle?: string;
+        addToDiscussion?: boolean;
+      };
       // 验证必填字段
       const requiredFields = [
         "name",
@@ -183,8 +195,9 @@ const capabilities: Capability[] = [
         "expertise",
         "prompt",
       ];
+      const p = params as Record<string, unknown>;
       for (const field of requiredFields) {
-        if (!params[field]) {
+        if (!(field in p)) {
           throw new Error(`${field} is required`);
         }
       }
@@ -274,7 +287,7 @@ const capabilities: Capability[] = [
     <note>如需查看可添加的Agent列表，请使用listAgentLibrary能力</note>
   </notes>
 </capability>`,
-    execute: addMemberToDiscussion,
+    execute: async (rawParams: unknown) => addMemberToDiscussion(rawParams as { agentId: string }),
   },
   {
     name: "removeMemberFromDiscussion",
@@ -293,7 +306,8 @@ const capabilities: Capability[] = [
     <note>参数memberId是成员ID而非agentId，可以通过getCurrentDiscussionMembers获取</note>
   </notes>
 </capability>`,
-    execute: async ({ memberId }) => {
+    execute: async (rawParams: unknown) => {
+      const { memberId } = rawParams as { memberId: string };
       console.log("[Capabilities] memberId:", memberId);
       await discussionMemberService.delete(memberId);
       return discussionMembersResource.current.reload();
@@ -396,7 +410,18 @@ const capabilities: Capability[] = [
     <note>其他字段可选，仅更新提供的字段</note>
   </notes>
 </capability>`,
-    execute: async (params) => {
+    execute: async (rawParams: unknown) => {
+      const params = rawParams as {
+        id: string;
+        name?: string;
+        role?: 'moderator' | 'participant';
+        personality?: string;
+        expertise?: string[];
+        prompt?: string;
+        avatar?: string;
+        bias?: string;
+        responseStyle?: string;
+      };
       // 验证必填字段
       if (!params.id) {
         throw new Error("id is required");

@@ -1,7 +1,7 @@
 import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { cn } from "@/common/lib/utils";
-import { discussionsResource, messagesResource } from "@/core/resources";
+import { usePresenter } from "@/core/presenter";
 import { DEFAULT_DISCUSSION_TITLE } from "@/core/services/common.util";
 import { filterNormalMessages } from "@/core/services/message.util";
 import { Loader2 } from "lucide-react";
@@ -17,14 +17,13 @@ export function DiscussionList({
   onSelectDiscussion,
 }: DiscussionListProps) {
   const { agents } = useAgents();
+  const presenter = usePresenter();
   const {
     discussions,
     currentDiscussion,
     isLoading,
     createDiscussion,
     selectDiscussion,
-    updateDiscussion,
-    deleteDiscussion,
   } = useDiscussions();
 
   const handleCreateDiscussion = async () => {
@@ -35,31 +34,23 @@ export function DiscussionList({
     }
   };
 
+  const messages = presenter.messages.store((s) => s.messages);
   useEffect(() => {
-    // 监听消息变化并更新标题
-    return messagesResource.current.subscribe(async (state) => {
-      if (state.data && !state.isValidating && !state.isLoading) {
-        const messages = filterNormalMessages(state.data);
-        if (messages.length) {
-          const discussion = discussionsResource.current.getState().data;
-          if (discussion && discussion.title === DEFAULT_DISCUSSION_TITLE) {
-            try {
-              updateDiscussion(messages[0].discussionId, {
-                title: messages[0].content.slice(0, 50),
-              });
-            } catch (error) {
-              console.error("Failed to generate discussion title:", error);
-            }
-          }
-        }
-      }
-    });
-  }, [updateDiscussion]);
+    const normals = filterNormalMessages(messages);
+    if (!normals.length) return;
+    const cur = presenter.discussions.getCurrent();
+    if (cur && cur.title === DEFAULT_DISCUSSION_TITLE) {
+      const first = normals[0];
+      void presenter.discussions.update(first.discussionId, {
+        title: first.content.slice(0, 50),
+      });
+    }
+  }, [messages]);
 
-  const handleSelectDiscussion = (discussionId: string) => {
-    selectDiscussion(discussionId);
-    onSelectDiscussion?.(discussionId);
-  };
+  // 当当前会话变化时，通知外部（保持兼容）
+  useEffect(() => {
+    if (currentDiscussion?.id) onSelectDiscussion?.(currentDiscussion.id);
+  }, [currentDiscussion?.id]);
 
   return (
     <div
@@ -81,9 +72,6 @@ export function DiscussionList({
               key={discussion.id}
               discussion={discussion}
               isActive={discussion.id === currentDiscussion?.id}
-              onClick={() => handleSelectDiscussion(discussion.id)}
-              onRename={(title) => updateDiscussion(discussion.id, { title })}
-              onDelete={() => deleteDiscussion(discussion.id)}
             />
           ))}
         </div>

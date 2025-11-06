@@ -1,6 +1,4 @@
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
-import { useIconStore } from "@/core/stores/icon.store";
-import { useRouteTreeStore } from "@/core/stores/route-tree.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
@@ -19,10 +17,11 @@ export const desktopChatExtension = defineExtension({
         icon: "message",
     },
     activate: ({ subscriptions }) => {
-        subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
+        const presenter = getPresenter();
+        subscriptions.push(Disposable.from(presenter.icon.addIcons({
             "message": MessageSquare,
         })))
-        subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
+        subscriptions.push(Disposable.from(presenter.activityBar.addItem({
             id: "chat",
             label: "Chat",
             title: "Chat with the user",
@@ -31,7 +30,7 @@ export const desktopChatExtension = defineExtension({
             order: ModuleOrderEnum.CHAT,
         })))
 
-        subscriptions.push(Disposable.from(useRouteTreeStore.getState().addRoutes([{
+        subscriptions.push(Disposable.from(presenter.routeTree.addRoutes([{
             id: "chat",
             path: "/chat",
             order: 0,

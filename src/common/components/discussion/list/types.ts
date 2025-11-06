@@ -10,7 +10,4 @@ export interface DiscussionListProps {
 export interface DiscussionItemProps {
   discussion: Discussion;
   isActive: boolean;
-  onClick: () => void;
-  onRename: (title: string) => void;
-  onDelete: () => void;
-} 
+}

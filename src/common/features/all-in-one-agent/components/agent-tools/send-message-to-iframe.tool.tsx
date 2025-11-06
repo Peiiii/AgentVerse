@@ -4,7 +4,7 @@ import { useIframeManager } from "@/common/components/world-class-chat/hooks/use
 
 export interface SendMessageToIframeToolParams {
   iframeId: string;
-  message: any;
+  message: unknown;
   targetOrigin?: string;
 }
 
@@ -13,7 +13,7 @@ export interface SendMessageToIframeToolResult {
   message: string;
   sentMessage?: {
     type: string;
-    data: any;
+    data: unknown;
     targetOrigin: string;
   };
   error?: string;

@@ -86,8 +86,8 @@ export class DiscussionStateManager extends BaseStateManager<DiscussionState> {
         return this.getState().currentDiscussionId;
     }
 
-    getCurrentDiscussionId$(): Observable<string | null> {
-        return this.store.namespaces.currentDiscussionId.$;
+  getCurrentDiscussionId$(): Observable<string | null> {
+        return this.store.namespaces.currentDiscussionId.$ as unknown as Observable<string | null>;
     }
 
     resetDiscussionState() {

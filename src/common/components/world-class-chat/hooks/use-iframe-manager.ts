@@ -82,7 +82,7 @@ export class IframeManager {
   }
 
   // 向 iframe 发送消息
-  postMessage(id: string, message: any, targetOrigin: string = '*'): boolean {
+  postMessage(id: string, message: unknown, targetOrigin: string = '*'): boolean {
     const iframeInfo = this.iframes.get(id);
     if (iframeInfo?.element?.contentWindow) {
       iframeInfo.element.contentWindow.postMessage(message, targetOrigin);

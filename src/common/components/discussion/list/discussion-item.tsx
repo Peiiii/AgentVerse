@@ -13,16 +13,15 @@ import { cn, formatTime } from "@/common/lib/utils";
 import { Download, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { DiscussionItemProps } from "./types";
+import { usePresenter } from "@/core/presenter";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { DiscussionAvatar } from "./discussion-avatar";
 
 export function DiscussionItem({
   discussion,
   isActive,
-  onClick,
-  onRename,
-  onDelete,
 }: DiscussionItemProps) {
+  const presenter = usePresenter();
   const { getMembersForDiscussion } = useDiscussionMembers();
   const [members, setMembers] = useState<DiscussionMember[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -51,10 +50,10 @@ export function DiscussionItem({
     setIsEditing(true);
   };
 
-  const handleConfirmEdit = (e: React.MouseEvent) => {
+  const handleConfirmEdit = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (editValue.trim()) {
-      onRename(editValue.trim());
+      await presenter.discussions.update(discussion.id, { title: editValue.trim() });
     }
     setIsEditing(false);
   };
@@ -71,7 +70,7 @@ export function DiscussionItem({
       description: "确定要删除这个讨论吗？此操作不可撤销。",
       okText: "确认删除",
       cancelText: "取消",
-      onOk: onDelete
+      onOk: () => presenter.discussions.remove(discussion.id)
     });
   };
 
@@ -96,7 +95,7 @@ export function DiscussionItem({
         if ((e.target as HTMLElement).closest('.discussion-actions, .editing-actions')) {
           return;
         }
-        onClick();
+        presenter.discussions.select(discussion.id);
       }}
     >
       {/* 群组头像 */}

@@ -100,8 +100,7 @@ export class StreamProcessor implements IStreamProcessor {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getChunkType(chunk: any): string {
+  private getChunkType(chunk: OpenAI.Chat.Completions.ChatCompletionChunk): string {
     if (chunk.choices[0].delta.tool_calls) return "tool";
     if (chunk.choices[0].delta.content) return "text";
     return "unknown";

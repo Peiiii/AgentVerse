@@ -4,7 +4,7 @@ import {
   DiscussionKeys,
 } from "@/common/lib/discussion/discussion-env";
 import { RxEvent } from "@/common/lib/rx-event";
-import { messagesResource } from "@/core/resources";
+import { getPresenter } from "@/core/presenter/presenter";
 import { discussionCapabilitiesResource } from "@/core/resources/discussion-capabilities.resource";
 import { AgentManager } from "@/core/services/agent/agent-manager";
 import { messageService } from "@/core/services/message.service";
@@ -144,7 +144,10 @@ export class DiscussionControlService extends DiscussionStateManager {
         this.getCurrentDiscussionId()!,
         warningMessage
       );
-      messagesResource.current.reload();
+      const id = this.getCurrentDiscussionId();
+      if (id) {
+        void getPresenter().messages.loadForDiscussion(id);
+      }
       // 暂停讨论
       this.pause();
     });

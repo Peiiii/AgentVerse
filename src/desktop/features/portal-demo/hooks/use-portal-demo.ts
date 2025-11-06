@@ -51,7 +51,7 @@ export function usePortalDemo() {
       return data.map(item => item.toUpperCase()).filter(item => item.length > 0);
     },
 
-    'ui.render': async (component: string, props: any) => {
+    'ui.render': async (component: string, props: Record<string, unknown>) => {
       switch (component) {
         case 'button':
           return `<button onclick="alert('${props.text} clicked!')" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">${props.text}</button>`;
@@ -89,7 +89,7 @@ export function usePortalDemo() {
       return value ? JSON.parse(value) : null;
     },
     
-    'storage.set': async (key: string, value: any) => {
+    'storage.set': async (key: string, value: unknown) => {
       localStorage.setItem(key, JSON.stringify(value));
       return 'stored';
     }
@@ -103,13 +103,16 @@ export function usePortalDemo() {
       if (!service) {
         throw new Error(`Service not found: ${key}`);
       }
-      const result = await (service as any)(...args);
+      if (typeof service !== 'function') {
+        throw new Error(`Service is not callable: ${key}`);
+      }
+      const result = await (service as (...x: unknown[]) => unknown)(...args);
       console.log('[Main thread][serviceBus.invoke]: result', result);
       return result;
     }
   };
 
-  const runExample = async (exampleName: string, exampleFn: () => Promise<any>) => {
+  const runExample = async (exampleName: string, exampleFn: () => Promise<unknown>) => {
     setIsRunning(true);
     setStatus(`Running ${exampleName}...`);
     setLogs([]);
