@@ -19,6 +19,7 @@ import { Discussion } from "@/common/types/discussion";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
+import { usePresenter } from "@/core/presenter";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
@@ -43,7 +44,8 @@ export function MobileAppInner() {
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();
   // agents/messages 由业务组件直连 presenter/store
-  const { currentDiscussion, clearMessages } = useDiscussions();
+  const presenter = usePresenter();
+  const { currentDiscussion } = useDiscussions();
   const [currentScene, setCurrentScene] = useState<Scene>("chat");
   const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
     false,
@@ -108,7 +110,7 @@ export function MobileAppInner() {
             onOpenSettings={() => openSettingsDialog()}
             onClearMessages={() => {
               if (currentDiscussion) {
-                clearMessages(currentDiscussion.id);
+                presenter.discussions.clearMessages(currentDiscussion.id);
               }
             }}
           />

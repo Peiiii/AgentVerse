@@ -13,6 +13,7 @@ import { Switch } from "@/common/components/ui/switch";
 import { cn } from "@/common/lib/utils";
 import { Discussion } from "@/common/types/discussion";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
+import { usePresenter } from "@/core/presenter";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { useEffect, useState } from "react";
@@ -25,7 +26,8 @@ export function ChatPage() {
     const { isMobile } = useBreakpointContext();
     const { rootClassName } = useTheme();
     // agents/messages 由业务组件直连 presenter/store
-    const { currentDiscussion, clearMessages } = useDiscussions();
+    const presenter = usePresenter();
+    const { currentDiscussion } = useDiscussions();
     const [currentScene, setCurrentScene] = useState<Scene>("chat");
     const { data: currentDiscussionId } = useProxyBeanState(
         discussionControlService.store,
@@ -72,7 +74,7 @@ export function ChatPage() {
                         onOpenSettings={() => openSettingsDialog()}
                         onClearMessages={() => {
                             if (currentDiscussion) {
-                                clearMessages(currentDiscussion.id);
+                                presenter.discussions.clearMessages(currentDiscussion.id);
                             }
                         }}
                     />

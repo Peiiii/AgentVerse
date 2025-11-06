@@ -2,7 +2,6 @@ import { discussionControlService } from "@/core/services/discussion-control.ser
 import { AgentMessage } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
-import { ITypingIndicator, typingIndicatorService } from "@/core/services/typing-indicator.service";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 
 interface UseDiscussionControlProps {
@@ -21,9 +20,6 @@ export function useDiscussionControl({ status }: UseDiscussionControlProps) {
     discussionControlService.store,
     "settings"
   );
-  const [indicators, setIndicators] = useState<Map<string, ITypingIndicator>>(
-    typingIndicatorService.getIndicators()
-  );
   const [messageCount, setMessageCount] = useState(0);
   const { members } = useDiscussionMembers();
 
@@ -33,10 +29,7 @@ export function useDiscussionControl({ status }: UseDiscussionControlProps) {
 
   useEffect(() => {
     if (status === "active") {
-      const activeMembers = members.filter((m) => m.isAutoReply);
-      if (activeMembers.length > 0) {
-        discussionControlService.run();
-      }
+      void discussionControlService.startIfEligible();
     } else {
       discussionControlService.pause();
     }
@@ -48,26 +41,14 @@ export function useDiscussionControl({ status }: UseDiscussionControlProps) {
     };
   }, []);
 
+  // 简化后不再有内部调度器计数，这里保留占位。
   useEffect(() => {
-    return typingIndicatorService.onIndicatorsChange$.listen(setIndicators);
-  }, []);
-
-  useEffect(() => {
-    const sub =
-      discussionControlService.env.speakScheduler.messageCounterBean.$.subscribe(
-        (count) => setMessageCount(count)
-      );
-    return () => {
-      sub.unsubscribe();
-    };
+    setMessageCount(0);
   }, []);
 
   const handleStatusChange = (isActive: boolean) => {
-    if (!isActive) {
-      discussionControlService.pause();
-    } else {
-      discussionControlService.run();
-    }
+    if (!isActive) discussionControlService.pause();
+    else void discussionControlService.startIfEligible();
   };
 
   return {
@@ -75,8 +56,7 @@ export function useDiscussionControl({ status }: UseDiscussionControlProps) {
     setShowSettings,
     settings,
     setSettings,
-    indicators,
     messageCount,
     handleStatusChange,
   };
-} 
+}

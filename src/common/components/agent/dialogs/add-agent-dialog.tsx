@@ -4,6 +4,7 @@ import { useModal } from "@/common/components/ui/modal";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { Loader2, PlusCircle, Search } from "lucide-react";
 import match from "pinyin-match";
@@ -17,13 +18,14 @@ export function AddAgentDialogContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const modal = useModal();
-  const { agents, isLoading, addAgent, updateAgent, deleteAgent } = useAgents();
+  const presenter = usePresenter();
+  const { agents, isLoading } = useAgents();
   const {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
     handleSubmit,
-  } = useAgentForm(agents, updateAgent);
+  } = useAgentForm(agents, presenter.agents.update);
   
   const { isMobile } = useBreakpointContext();
 
@@ -69,7 +71,7 @@ export function AddAgentDialogContent() {
             />
           </div>
           <Button
-            onClick={addAgent}
+            onClick={presenter.agents.addDefault}
             variant="default"
             size={isMobile ? "sm" : "default"}
             disabled={isLoading}
@@ -104,7 +106,7 @@ export function AddAgentDialogContent() {
               modal.close();
               navigate(`/agents/${agent.id}?tab=ai-create`);
             }}
-            onDeleteAgent={deleteAgent}
+            onDeleteAgent={presenter.agents.remove}
           />
         </div>
       </div>

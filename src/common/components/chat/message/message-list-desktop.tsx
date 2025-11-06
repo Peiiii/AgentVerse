@@ -4,7 +4,7 @@ import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
 // 去掉容器级动画，避免切换会话时的闪烁
 import { ArrowDown } from "lucide-react";
-import { forwardRef, useImperativeHandle, useMemo, useCallback, useEffect, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
@@ -35,7 +35,7 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     },
     ref
   ) {
-    const { agents, getAgentName, getAgentAvatar } = useAgents();
+    const { agents } = useAgents();
     const presenter = usePresenter();
     const navigate = useNavigate();
     const {
@@ -55,14 +55,11 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
       return new Map(agents.map(agent => [agent.id, agent]));
     }, [agents]);
 
-    // 获取当前正在响应的 agentId
-    const [respondingAgentId, setRespondingAgentId] = useState<string | null>(null);
-    useEffect(() => {
-      const sub = presenter.discussionControl.getSpeakingState$().subscribe(
-        (state) => setRespondingAgentId(state.agentId)
-      );
-      return () => sub.unsubscribe();
-    }, [presenter]);
+    // 获取当前正在响应的 agentId（基于最后一条 streaming 状态消息）
+    const respondingAgentId = useMemo(() => {
+      const last = reorganizedMessages[reorganizedMessages.length - 1];
+      return last && last.status === 'streaming' ? last.agentId : null;
+    }, [reorganizedMessages]);
 
     const handleEditAgentWithAI = useCallback((agent: AgentDef) => {
       navigate(`/agents/${agent.id}?tab=ai-create`);
@@ -85,28 +82,28 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
             onScroll={handleScroll}
           >
             <div className={cn("py-4")}
-                 ref={messagesContainerRef}>
+              ref={messagesContainerRef}>
               <div className="space-y-1 px-4">
                 {reorganizedMessages.map((message, index) => {
                   // 获取前一条消息的时间戳
                   const previousMessage = index > 0 ? reorganizedMessages[index - 1] : null;
-                  const previousTimestamp = previousMessage 
-                    ? new Date(previousMessage.timestamp).getTime() 
+                  const previousTimestamp = previousMessage
+                    ? new Date(previousMessage.timestamp).getTime()
                     : undefined;
-                  
+
                   // 获取对应的 agent 信息
                   const agent = agentMap.get(message.agentId);
-                  
+
                   // 只有正在生成的最新消息才显示响应动画
                   // 检查：1. agentId 匹配正在响应的 agent 2. 是最后一条消息
                   const isLastMessage = index === reorganizedMessages.length - 1;
                   const isResponding = message.agentId === respondingAgentId && isLastMessage;
-                    
+
                   return (
                     <MessageItemWechat
                       key={message.id}
                       message={message}
-                      agentInfo={{ getName: getAgentName, getAvatar: getAgentAvatar }}
+                      agentInfo={{ getName: presenter.agents.getAgentName, getAvatar: presenter.agents.getAgentAvatar }}
                       agent={agent}
                       previousMessageTimestamp={previousTimestamp}
                       onEditAgentWithAI={handleEditAgentWithAI}

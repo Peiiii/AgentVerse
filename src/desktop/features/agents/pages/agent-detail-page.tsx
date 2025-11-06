@@ -11,6 +11,7 @@ import { useEffectFromObservable, useObservableFromState } from "@/common/lib/rx
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { isEqual } from "lodash-es";
 import { ArrowLeft, Bot, Edit3, Settings, Sparkles, Wand2 } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -22,7 +23,8 @@ export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { agents, updateAgent } = useAgents();
+  const presenter = usePresenter();
+  const { agents } = useAgents();
 
   const { enterAgentChat } = useAgentChatPageHelper();
 
@@ -36,8 +38,8 @@ export function AgentDetailPage() {
 
     const updatedAgent = { ...updatedAgentData, id: agent.id };
     setAgent(updatedAgent);
-    updateAgent(agent.id, updatedAgentData);
-  }, [agent, updateAgent]);
+    presenter.agents.update(agent.id, updatedAgentData);
+  }, [agent, presenter]);
 
   // 查找当前agent
   const agentId$ = useObservableFromState(agentId);

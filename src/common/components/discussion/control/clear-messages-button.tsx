@@ -1,6 +1,7 @@
 import { Button } from "@/common/components/ui/button";
 import { useModal } from "@/common/components/ui/modal";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
+import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { Eraser } from "lucide-react";
 
@@ -17,7 +18,8 @@ export function ClearMessagesButton({
   size = "sm",
   mode = "current"
 }: ClearMessagesButtonProps) {
-  const { currentDiscussion, clearMessages, clearAllMessages } = useDiscussions();
+  const presenter = usePresenter();
+  const { currentDiscussion } = useDiscussions();
   const modal = useModal();
 
   // 如果是清空当前会话且没有当前会话，则不显示
@@ -33,9 +35,9 @@ export function ClearMessagesButton({
       cancelText: "取消",
       onOk: () => {
         if (mode === "current" && currentDiscussion) {
-          clearMessages(currentDiscussion.id);
+          presenter.discussions.clearMessages(currentDiscussion.id);
         } else if (mode === "all") {
-          clearAllMessages();
+          presenter.discussions.clearAllMessages();
         }
       }
     });

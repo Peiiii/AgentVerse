@@ -22,15 +22,17 @@ import { discussionControlService } from "@/core/services/discussion-control.ser
 import { Discussion } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
+import { usePresenter } from "@/core/presenter";
 
 // 场景类型
 type Scene = "discussions" | "chat" | "agents" | "settings";
 
 export function ChatPage() {
+    const presenter = usePresenter();
     const { isDesktop, isMobile } = useBreakpointContext();
     const { rootClassName } = useTheme();
     // agents/messages 由内部业务组件直连 presenter/store，无需在此处传递
-    const { currentDiscussion, clearMessages } = useDiscussions();
+    const { currentDiscussion } = useDiscussions();
     const [currentScene, setCurrentScene] = useState<Scene>("chat");
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
     const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
@@ -98,7 +100,7 @@ export function ChatPage() {
                         onOpenSettings={() => openSettingsDialog()}
                         onClearMessages={() => {
                             if (currentDiscussion) {
-                                clearMessages(currentDiscussion.id);
+                                presenter.messages.clearForDiscussion(currentDiscussion.id);
                             }
                         }}
                     />

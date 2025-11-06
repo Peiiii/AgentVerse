@@ -3,11 +3,8 @@ import { UI_PERSIST_KEYS, createUIPersistOptions } from "@/core/config/ui-persis
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { cn } from "@/common/lib/utils";
-import { agentListResource } from "@/core/resources";
-import { ITypingIndicator } from "@/core/services/typing-indicator.service";
 import { PauseCircle, PlayCircle } from "lucide-react";
-import { useCallback, useMemo } from "react";
-import { TypingIndicator } from "../../chat/typing-indicator";
+import { useCallback } from "react";
 import { MemberToggleButton } from "../member/member-toggle-button";
 import { DiscussionSettingsButton } from "../settings/discussion-settings-button";
 import { DiscussionSettingsPanel } from "../settings/discussion-settings-panel";
@@ -45,13 +42,9 @@ function ControlButton({ isActive, onClick }: { isActive: boolean; onClick: () =
 function StatusIndicator({ 
   isActive, 
   messageCount, 
-  indicators,
-  getAgentInfo 
 }: { 
   isActive: boolean;
   messageCount: number;
-  indicators: Map<string, ITypingIndicator>;
-  getAgentInfo: { getName: (id: string) => string; getAvatar: (id: string) => string };
 }) {
   return (
     <div className="hidden md:flex items-center gap-3">
@@ -77,13 +70,7 @@ function StatusIndicator({
           本轮消息: {messageCount}
         </span>
       )}
-      <div className="ml-1">
-        <TypingIndicator
-          indicators={indicators}
-          getMemberName={getAgentInfo.getName}
-          getMemberAvatar={getAgentInfo.getAvatar}
-        />
-      </div>
+      {/* typing 指示器删除，保持精简 */}
     </div>
   );
 }
@@ -151,7 +138,6 @@ export function DiscussionController({
   const {
     settings,
     setSettings,
-    indicators,
     messageCount,
     handleStatusChange,
   } = useDiscussionControl({ status });
@@ -165,15 +151,7 @@ export function DiscussionController({
   const { members } = useDiscussionMembers();
   const isActive = status === "active";
 
-  const getAgentInfo = useMemo(() => {
-    const agents = agentListResource.read().data;
-    return {
-      getName: (agentId: string) =>
-        agents.find((agent) => agent.id === agentId)?.name || agentId,
-      getAvatar: (agentId: string) =>
-        agents.find((agent) => agent.id === agentId)?.avatar || "",
-    };
-  }, []);
+  // typing 相关已移除
 
   const handleToggleSettings = useCallback(() => {
     setShowSettings(!showSettings);
@@ -194,8 +172,6 @@ export function DiscussionController({
             <StatusIndicator 
               isActive={isActive}
               messageCount={messageCount}
-              indicators={indicators}
-              getAgentInfo={getAgentInfo}
             />
           </div>
 

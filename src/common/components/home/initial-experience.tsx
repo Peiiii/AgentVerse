@@ -1,6 +1,7 @@
 import { CustomTeamDialog } from "@/common/components/agent/dialogs/custom-team-dialog";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -32,7 +33,8 @@ export function InitialExperience({
   const [topic, setTopic] = useState("");
   const [selectedCombinationKey, setSelectedCombinationKey] =
     useState<AgentCombinationType>("thinkingTeam");
-  const { agents, getAgentName, getAgentAvatar } = useAgents();
+  const presenter = usePresenter();
+  const { agents } = useAgents();
 
   const handleInputSubmit = (inputTopic: string) => {
     setTopic(inputTopic);
@@ -311,8 +313,8 @@ export function InitialExperience({
                           return agent ? (
                             <AgentPopover
                               key={idx}
-                              name={getAgentName(agent.id)}
-                              avatar={getAgentAvatar(agent.id)}
+                              name={presenter.agents.getAgentName(agent.id)}
+                              avatar={presenter.agents.getAgentAvatar(agent.id)}
                               role={agent.role}
                               expertise={agent.expertise}
                               description={agent.personality}
@@ -411,7 +413,7 @@ export function InitialExperience({
                     const agent = agents.find((a) => a.id === member.agentId);
                     return {
                       id: member.agentId,
-                      role: agent ? getAgentName(agent.id) : "未知专家",
+                      role: agent ? presenter.agents.getAgentName(agent.id) : "未知专家",
                       expertise: agent?.expertise || [],
                     };
                   })

@@ -4,6 +4,7 @@ import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { Loader2, PlusCircle, Search } from "lucide-react";
 import match from "pinyin-match";
 import { useMemo, useState } from "react";
@@ -12,13 +13,14 @@ import { useNavigate } from "react-router-dom";
 export function AddAgentDialogContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const { agents, isLoading, addAgent, updateAgent, deleteAgent } = useAgents();
+  const presenter = usePresenter();
+  const { agents, isLoading } = useAgents();
   const {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
     handleSubmit,
-  } = useAgentForm(agents, updateAgent);
+  } = useAgentForm(agents, presenter.agents.update);
 
   // 使用 useMemo 优化搜索过滤逻辑
   const filteredAgents = useMemo(() => {
@@ -56,7 +58,7 @@ export function AddAgentDialogContent() {
             />
           </div>
           <Button
-            onClick={addAgent}
+            onClick={presenter.agents.addDefault}
             variant="default"
             size="sm"
             disabled={isLoading}
@@ -81,7 +83,7 @@ export function AddAgentDialogContent() {
             onEditAgentWithAI={(agent) => {
               navigate(`/agents/${agent.id}?tab=ai-create`);
             }}
-            onDeleteAgent={deleteAgent}
+            onDeleteAgent={presenter.agents.remove}
           />
         </div>
       </div>

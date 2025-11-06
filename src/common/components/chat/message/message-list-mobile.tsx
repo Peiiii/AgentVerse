@@ -1,14 +1,13 @@
-import { Button } from "@/common/components/ui/button";
 import { ScrollableLayout } from "@/common/components/layouts/scrollable-layout";
+import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
+import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
+import { usePresenter } from "@/core/presenter";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
-import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, useRef } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { MessageCapture } from "./message-capture";
 import { MessageItem } from "./message-item";
-import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
-import { useAgents } from "@/core/hooks/useAgents";
-import { usePresenter } from "@/core/presenter";
 
 /**
  * 移动端消息列表设计：
@@ -32,7 +31,7 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
     },
     ref
   ) {
-    const { getAgentName, getAgentAvatar } = useAgents();
+    const presenter = usePresenter();
     // 使用本地状态管理滚动按钮的显示
     const [showScrollButton, setShowScrollButton] = useState(false);
     // 保存容器DOM引用
@@ -101,7 +100,7 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
                 >
                   <MessageItem
                     message={message}
-                    agentInfo={{ getName: getAgentName, getAvatar: getAgentAvatar }}
+                    agentInfo={{ getName: presenter.agents.getAgentName, getAvatar: presenter.agents.getAgentAvatar }}
                   />
                 </motion.div>
               ))}

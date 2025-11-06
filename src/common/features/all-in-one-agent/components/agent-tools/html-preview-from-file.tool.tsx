@@ -132,29 +132,22 @@ export function createHtmlPreviewFromFileTool(
       // 刷新回调函数
       const handleRefresh = async () => {
         if (!currentPreviewInfo) return;
-        
-        try {
-          const refreshResult = await readHtmlFile(currentPreviewInfo.filePath);
-          if (refreshResult.success && refreshResult.htmlContent) {
-            // 更新存储的内容
-            currentPreviewInfo.htmlContent = refreshResult.htmlContent;
-            
-            // 直接更新 iframe 内容，而不是重新创建面板
-            if (iframeManager && currentPreviewInfo.iframeId) {
-              const iframeElement = iframeManager.getElement(currentPreviewInfo.iframeId);
-              if (iframeElement && iframeElement.contentDocument) {
-                iframeElement.contentDocument.open();
-                iframeElement.contentDocument.write(refreshResult.htmlContent);
-                iframeElement.contentDocument.close();
-              }
+        const refreshResult = await readHtmlFile(currentPreviewInfo.filePath);
+        if (refreshResult.success && refreshResult.htmlContent) {
+          // 更新存储的内容
+          currentPreviewInfo.htmlContent = refreshResult.htmlContent;
+          // 直接更新 iframe 内容，而不是重新创建面板
+          if (iframeManager && currentPreviewInfo.iframeId) {
+            const iframeElement = iframeManager.getElement(currentPreviewInfo.iframeId);
+            if (iframeElement && iframeElement.contentDocument) {
+              iframeElement.contentDocument.open();
+              iframeElement.contentDocument.write(refreshResult.htmlContent);
+              iframeElement.contentDocument.close();
             }
-          } else {
-            // 如果刷新失败，抛出错误
-            throw new Error(refreshResult.error || "刷新失败");
           }
-        } catch (error) {
-          // 重新抛出错误，让组件处理
-          throw error;
+        } else {
+          // 如果刷新失败，抛出错误
+          throw new Error(refreshResult.error || "刷新失败");
         }
       };
 

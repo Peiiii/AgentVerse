@@ -7,6 +7,7 @@ import {
 } from "@/common/components/ui/dialog";
 import { Input } from "@/common/components/ui/input";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
@@ -20,8 +21,9 @@ interface AddMemberDialogProps {
 }
 
 export function AddMemberDialog({ open, onOpenChange }: AddMemberDialogProps) {
-  const { agents, getAgentName, getAgentAvatar } = useAgents();
-  const { members, addMember } = useDiscussionMembers();
+  const presenter = usePresenter();
+  const { agents } = useAgents();
+  const { members } = useDiscussionMembers();
   const [selectedAgents, setSelectedAgents] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -36,14 +38,14 @@ export function AddMemberDialog({ open, onOpenChange }: AddMemberDialogProps) {
     }
 
     return filtered.filter((agent) => {
-      const name = getAgentName(agent.id);
+      const name = presenter.agents.getAgentName(agent.id);
       // 支持直接匹配和拼音匹配
       return (
         name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         match.match(name, searchQuery)
       );
     });
-  }, [agents, members, searchQuery, getAgentName]);
+  }, [agents, members, searchQuery, presenter]);
 
   const handleAgentClick = (agent: AgentDef) => {
     const newSelected = new Set(selectedAgents);
@@ -58,7 +60,7 @@ export function AddMemberDialog({ open, onOpenChange }: AddMemberDialogProps) {
   const handleConfirm = async () => {
     await Promise.all(
       Array.from(selectedAgents).map((agentId) =>
-        addMember(agentId, true)
+        presenter.discussionMembers.add(agentId, true)
       )
     );
     onOpenChange(false);
@@ -103,14 +105,14 @@ export function AddMemberDialog({ open, onOpenChange }: AddMemberDialogProps) {
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={getAgentAvatar(agent.id)}
-                    alt={getAgentName(agent.id)}
+                    src={presenter.agents.getAgentAvatar(agent.id)}
+                    alt={presenter.agents.getAgentName(agent.id)}
                     className="w-10 h-10 rounded-full"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium truncate">
-                        {getAgentName(agent.id)}
+                        {presenter.agents.getAgentName(agent.id)}
                       </h3>
                       <span className="text-xs text-muted-foreground capitalize">
                         {agent.role}

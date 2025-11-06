@@ -48,7 +48,7 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
           type: "text",
           timestamp: new Date(),
         });
-        if (agentMessage) presenter.discussionControl.onMessage(agentMessage);
+        if (agentMessage) await presenter.discussionControl.process(agentMessage);
       },
       forwardedRef: ref
     });

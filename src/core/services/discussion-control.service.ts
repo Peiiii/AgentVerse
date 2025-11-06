@@ -1,342 +1,203 @@
 import { CapabilityRegistry } from "@/common/lib/capabilities";
-import {
-  DiscussionEnvBus,
-  DiscussionKeys,
-} from "@/common/lib/discussion/discussion-env";
 import { RxEvent } from "@/common/lib/rx-event";
 import { getPresenter } from "@/core/presenter/presenter";
 import { discussionCapabilitiesResource } from "@/core/resources/discussion-capabilities.resource";
-import { AgentManager } from "@/core/services/agent/agent-manager";
+import { AgentMessage, DiscussionSettings, NormalMessage } from "@/common/types/discussion";
+import { DiscussionError, DiscussionErrorType, handleDiscussionError } from "./discussion-error.util";
+import { DEFAULT_SETTINGS } from "@/core/config/settings";
+import { createNestedBean } from "packages/rx-nested-bean/src";
+import { BehaviorSubject } from "rxjs";
+import { agentListResource } from "@/core/resources";
+import { PromptBuilder } from "@/common/lib/agent/prompt/prompt-builder";
+import { AgentDef } from "@/common/types/agent";
+import type { IAgentConfig } from "@/common/types/agent-config";
+import { aiService } from "@/core/services/ai.service";
 import { messageService } from "@/core/services/message.service";
-import { typingIndicatorService } from "@/core/services/typing-indicator.service";
-import {
-  AgentMessage,
-  NormalMessage
-} from "@/common/types/discussion";
-import {
-  DiscussionError,
-  DiscussionErrorType,
-  handleDiscussionError,
-} from "./discussion-error.util";
-import { DiscussionStateManager } from "./discussion/discussion-state-manager";
+import { CapabilityRegistry as Caps } from "@/common/lib/capabilities";
+import { ActionDef, ActionParser } from "@/common/lib/agent/action/action-parser";
+import { DefaultActionExecutor } from "@/common/lib/agent/action";
 
-class TimeoutManager {
-  private timeouts = new Set<NodeJS.Timeout>();
+// --- Minimal Rx Store State ---
+type Member = { agentId: string; isAutoReply: boolean };
+type State = {
+  isPaused: boolean;
+  currentDiscussionId: string | null;
+  settings: DiscussionSettings;
+  members: Member[];
+  messages: AgentMessage[];
+  topic: string;
+};
 
-  schedule(fn: () => void, delay: number) {
-    const timeout = setTimeout(() => {
-      fn();
-      this.timeouts.delete(timeout);
-    }, delay);
-    this.timeouts.add(timeout);
-    return timeout;
-  }
+export type Snapshot = {
+  isRunning: boolean;
+  currentSpeakerId: string | null;
+  processed: number;
+  roundLimit: number;
+};
 
-  clearAll() {
-    this.timeouts.forEach(clearTimeout);
-    this.timeouts.clear();
-  }
-}
+// (removed standalone factory; merged into service below)
 
-export class DiscussionControlService extends DiscussionStateManager {
+// --- Single-file Service ---
+export class DiscussionControlService {
   onError$ = new RxEvent<Error>();
+  onCurrentDiscussionIdChange$ = new RxEvent<string | null>();
 
-  private timeoutManager = new TimeoutManager();
-  private agentManager: AgentManager;
-  env: DiscussionEnvBus;
+  // rx-nested-bean store kept for UI hooks compatibility
+  store = createNestedBean<State>({
+    isPaused: true,
+    currentDiscussionId: null,
+    settings: DEFAULT_SETTINGS,
+    members: [],
+    messages: [],
+    topic: "",
+  });
 
-  // 生命周期管理
-  private serviceCleanupHandlers: Array<() => void> = []; // 服务级清理
-  private discussionCleanupHandlers: Array<() => void> = []; // 讨论级清理
-  private runtimeCleanupHandlers: Array<() => void> = []; // 运行时清理
+  // controller state (merged)
+  private ctrl = {
+    discussionId: null as string | null,
+    members: [] as Member[],
+    isRunning: false,
+    processed: 0,
+    roundLimit: 5,
+    currentSpeakerId: null as string | null,
+    currentAbort: undefined as AbortController | undefined,
+    snapshot$: new BehaviorSubject<Snapshot>({ isRunning: false, currentSpeakerId: null, processed: 0, roundLimit: 5 }),
+  };
 
   constructor() {
-    super();
-    this.env = new DiscussionEnvBus();
-    this.agentManager = new AgentManager(this.env);
-    this.initializeService();
-  }
-
-  // 服务级初始化
-  private initializeService() {
-    // 1. 注册能力
+    // register capabilities once
     discussionCapabilitiesResource.whenReady().then((data) => {
       CapabilityRegistry.getInstance().registerAll(data);
     });
-
-    // 2. 监听成员变化
-    const membersSub = this.onStateChange$.listen(([prev, current]) => {
-      if (prev.members !== current.members) {
-        this.agentManager.syncAgents(current.members);
-      }
-    });
-    this.serviceCleanupHandlers.push(() => membersSub());
   }
 
+  // helpers
+  private getState() { return this.store.get(); }
+  private setState(update: Partial<State>) { this.store.set((prev) => ({ ...prev, ...update })); }
+  private publishCtrl() { const { isRunning, currentSpeakerId, processed, roundLimit } = this.ctrl; this.ctrl.snapshot$.next({ isRunning, currentSpeakerId, processed, roundLimit }); }
+  getSnapshot(): Snapshot { return this.ctrl.snapshot$.getValue(); }
+
+  // state accessors
+  getCurrentDiscussionId(): string | null { return this.getState().currentDiscussionId; }
+  getCurrentDiscussionId$() { return this.store.namespaces.currentDiscussionId.$ as unknown as import('rxjs').Observable<string | null>; }
+  isPaused(): boolean { return this.getState().isPaused; }
+  private setPaused(paused: boolean) { this.setState({ isPaused: paused }); }
+
+  // mutations
   setCurrentDiscussionId(id: string | null) {
-    const oldId = this.getCurrentDiscussionId();
-    if (oldId !== id) {
-      // 1. 先清理当前讨论的所有状态
-      this.cleanupCurrentDiscussion();
-
-      // 2. 再设置新的讨论 ID
-      super.setCurrentDiscussionId(id);
-    }
+    if (this.getState().currentDiscussionId === id) return;
+    this.setState({ currentDiscussionId: id });
+    this.onCurrentDiscussionIdChange$.next(id);
+    this.ctrl.discussionId = id;
+    this.ctrl.roundLimit = Math.max(1, (this.getState().settings.maxRounds | 0) || 1);
+    this.publishCtrl();
   }
 
-  private cleanupCurrentDiscussion() {
-    // 1. 暂停当前讨论
-    this.pause();
-
-    // 2. 清理所有指示器
-    typingIndicatorService.clearAll();
-
-    // 3. 重置环境状态
-    this.env.reset();
-    this.env.speakScheduler.resetCounter();
-
-    // 4. 清理所有代理状态
-    this.agentManager.pauseAll();
-
-    // 5. 重置讨论相关状态
-    this.resetDiscussionState();
-
-    // 6. 执行讨论级清理
-    this.discussionCleanupHandlers.forEach((cleanup) => cleanup());
-    this.discussionCleanupHandlers = [];
-
-    // 7. 清理运行时资源
-    this.cleanupRuntime();
+  setMembers(members: Member[]) {
+    this.setState({ members });
+    this.ctrl.members = members;
+    this.publishCtrl();
   }
 
-  onMessage(message: AgentMessage) {
-    this.env.eventBus.emit(DiscussionKeys.Events.message, message);
+  setMessages(messages: AgentMessage[]) { this.setState({ messages }); }
+
+  setSettings(settings: Partial<DiscussionSettings>) {
+    const merged = { ...this.getState().settings, ...settings } as DiscussionSettings;
+    this.setState({ settings: merged });
+    this.ctrl.roundLimit = Math.max(1, (merged.maxRounds | 0) || 1);
+    this.publishCtrl();
   }
 
-  // 讨论级初始化
-  private initializeDiscussion() {
-    // 添加讨论级事件监听
-    const thinkingOff = this.env.eventBus.on(
-      DiscussionKeys.Events.thinking,
-      (state) => {
-        const { agentId, isThinking } = state;
-        typingIndicatorService.updateStatus(
-          agentId,
-          isThinking ? "thinking" : null
-        );
-      }
-    );
-    this.discussionCleanupHandlers.push(thinkingOff);
+  // runtime
+  pause() { this.setPaused(true); this.ctrl.isRunning = false; if (this.ctrl.currentAbort) { this.ctrl.currentAbort.abort(); this.ctrl.currentAbort = undefined; } this.ctrl.currentSpeakerId = null; this.publishCtrl(); }
+  resume() { this.setPaused(false); this.ctrl.isRunning = true; this.ctrl.processed = 0; this.publishCtrl(); }
 
-    // 添加消息限制监听
-    const scheduler = this.env.speakScheduler;
-    const limitReachedOff = scheduler.onLimitReached$.listen(() => {
-      // 添加系统消息
-      const warningMessage: NormalMessage = {
-        agentId: "system",
-        content: `由于本轮消息数量达到限制（${scheduler.getRoundLimit()}条），讨论已自动暂停。这是为了避免自动对话消耗过多资源，您可手动重启对话。此为临时解决方案，后续会努力提供更合理的自动终止策略。`,
-        type: "text",
-        id: `system-${Date.now()}`,
-        discussionId: this.getCurrentDiscussionId()!,
-        timestamp: new Date(),
-      };
-      messageService.addMessage(
-        this.getCurrentDiscussionId()!,
-        warningMessage
-      );
-      const id = this.getCurrentDiscussionId();
-      if (id) {
-        void getPresenter().messages.loadForDiscussion(id);
-      }
-      // 暂停讨论
-      this.pause();
-    });
-
-    this.discussionCleanupHandlers.push(limitReachedOff);
+  async startIfEligible(): Promise<boolean> {
+    if (!this.isPaused()) return true;
+    const { members } = this.getState(); if (members.length <= 0) return false;
+    this.setPaused(false); this.ctrl.isRunning = true; this.ctrl.processed = 0; this.publishCtrl(); return true;
   }
 
-  // 运行时控制
-  pause() {
-    // 1. 设置暂停状态
-    this.setPaused(true);
+  async run(): Promise<void> { await this.startIfEligible(); }
 
-    // 2. 暂停所有 agents
-    this.agentManager.pauseAll();
-
-    // 3. 暂停调度器
-    this.env.speakScheduler.setPaused(true);
-
-    // 4. 发送讨论暂停事件
-    this.env.eventBus.emit(DiscussionKeys.Events.discussionPause, null);
-
-    // 5. 清理运行时资源
-    this.cleanupRuntime();
-
-    // 6. 重置计数器
-    this.env.speakScheduler.resetCounter();
-  }
-
-  resume() {
-    // 1. 设置恢复状态
-    this.setPaused(false);
-
-    // 2. 恢复调度器
-    this.env.speakScheduler.setPaused(false);
-    this.env.speakScheduler.resetCounter();
-
-    // 3. 恢复所有 agents
-    this.agentManager.resumeAll();
-
-    // 4. 发送讨论恢复事件
-    this.env.eventBus.emit(DiscussionKeys.Events.discussionResume, null);
-  }
-
-  // 清理方法分层
-  private cleanupRuntime() {
-    // 清理运行时资源（定时器等）
-    this.timeoutManager.clearAll();
-    this.runtimeCleanupHandlers.forEach((cleanup) => cleanup());
-    this.runtimeCleanupHandlers = [];
-  }
-
-  private cleanupDiscussion() {
-    // 清理讨论级资源
-    this.discussionCleanupHandlers.forEach((cleanup) => cleanup());
-    this.discussionCleanupHandlers = [];
-    this.cleanupRuntime(); // 同时清理运行时资源
-  }
-
-  private cleanupService() {
-    // 清理服务级资源
-    this.serviceCleanupHandlers.forEach((cleanup) => cleanup());
-    this.serviceCleanupHandlers = [];
-    this.cleanupDiscussion(); // 同时清理讨论级资源
-  }
-
-  // 完全销毁服务
-  destroy() {
-    // 1. 清理所有代理
-    this.agentManager.cleanup();
-
-    // 2. 清理环境
-    this.env.destroy();
-
-    // 3. 清理所有级别的资源
-    this.cleanupService();
-
-    // 4. 重置所有状态
-    this.resetAllState();
-  }
-
-  private handleError(
-    error: unknown,
-    message: string,
-    context?: Record<string, unknown>
-  ) {
-    const discussionError =
-      error instanceof DiscussionError
-        ? error
-        : new DiscussionError(
-            DiscussionErrorType.GENERATE_RESPONSE,
-            message,
-            error,
-            context
-          );
-
-    const { shouldPause } = handleDiscussionError(discussionError);
-    if (shouldPause) {
-      this.setPaused(true);
-    }
-    this.onError$.next(discussionError);
-  }
-
-  getAgent(agentId: string) {
-    return this.agentManager.getAgent(agentId);
-  }
-
-  // 恢复已有讨论
-  private async resumeExistingDiscussion(): Promise<void> {
-    const state = this.getState();
-    const lastMessage = state.messages[state.messages.length - 1];
-
-    if (lastMessage) {
-      // 1. 初始化讨论级资源
-      await this.initializeDiscussion();
-
-      // 2. 恢复运行时状态
-      await this.resumeAndWaitReady();
-
-      // 3. 重放最后一条消息以触发响应
-      if (lastMessage.type === "text") {
-        // 延迟一小段时间确保所有状态都已经准备就绪
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        // 重放消息
-        this.onMessage(lastMessage);
-      }
-    }
-  }
-
-  // 等待所有组件就绪
-  private async resumeAndWaitReady(): Promise<void> {
-    // 创建所有 agent 就绪的 Promise 数组
-    const agentReadyPromises = this.agentManager.getAllAgents().map(
-      (agent) =>
-        new Promise<void>((resolve) => {
-          // 监听 agent 的状态变化
-          const off = agent.onStateChange$.listen((state) => {
-            if (!state.isPaused && !state.isThinking) {
-              off();
-              resolve();
-            }
-          });
-        })
-    );
-
-    // 创建一个 Promise 来等待调度器就绪
-    const schedulerReadyPromise = new Promise<void>((resolve) => {
-      const off = this.env.speakScheduler.isPausedBean.$.subscribe(
-        (isPaused) => {
-          if (!isPaused) {
-            off.unsubscribe();
-            resolve();
-          }
-        }
-      );
-    });
-
-    // 先恢复状态
-    this.resume();
-
-    // 等待所有组件就绪
-    await Promise.all([...agentReadyPromises, schedulerReadyPromise]);
-  }
-
-  // 主入口方法
-  async run(): Promise<void> {
+  async process(message: AgentMessage): Promise<void> {
     try {
-      // 1. 检查是否已经在运行
-      if (!this.isPaused()) {
-        console.log("[DiscussionControl] Discussion is already running");
-        return;
-      }
+      const id = this.getCurrentDiscussionId(); if (!id) throw new Error('No discussion selected');
+      if (this.isPaused()) { const started = await this.startIfEligible(); if (!started) return; }
+      await this.processInternal(message); await getPresenter().messages.loadForDiscussion(id);
+    } catch (error) { this.handleError(error, '处理消息失败'); this.pause(); }
+  }
 
-      // 2. 检查是否有历史消息和成员
-      const state = this.getState();
-      if (state.messages.length > 0 && state.members.length > 0) {
-        console.log("[DiscussionControl] Resuming existing discussion");
-        await this.resumeExistingDiscussion();
-        return;
-      }
+  // --- merged controller methods ---
+  private extractMention(content: string): string | null {
+    const re = /@(?:"([^"]+)"|'([^']+)'|([^\s@]+))/i; const m = content.match(re); return (m?.[1] || m?.[2] || m?.[3]) ?? null;
+  }
 
-      throw new DiscussionError(
-        DiscussionErrorType.NO_MESSAGES,
-        "没有历史消息"
-      );
-    } catch (error) {
-      console.error("[DiscussionControl] Failed to run discussion:", error);
-      this.handleError(error, "讨论运行失败");
-      this.pause();
+  private async selectNextAgentId(trigger: AgentMessage, lastResponder: string | null): Promise<string | null> {
+    const members = this.ctrl.members; if (members.length === 0) return null;
+    if (trigger.type === 'action_result' && lastResponder) { if (members.find(m => m.agentId === lastResponder)) return lastResponder; }
+    const mention = trigger.type === 'text' ? this.extractMention(trigger.content) : null;
+    if (mention) {
+      const defs = agentListResource.read().data; const agent = defs.find(a => a.name.toLowerCase() === mention.toLowerCase());
+      if (agent && members.find(m => m.agentId === agent.id)) return agent.id;
     }
+    const autos = members.filter(m => m.isAutoReply);
+    if (trigger.agentId === 'user') {
+      if (autos.length) return autos[0].agentId;
+      const defs = agentListResource.read().data; const mod = members.find(m => defs.find(a => a.id === m.agentId)?.role === 'moderator');
+      return mod ? mod.agentId : members[0]?.agentId ?? null;
+    }
+    const next = autos.find(m => m.agentId !== trigger.agentId); return next ? next.agentId : null;
+  }
+
+  private async tryRunActions(agentMessage: NormalMessage) {
+    const parser = new ActionParser(); const exec = new DefaultActionExecutor(); const reg = Caps.getInstance();
+    const parsed = parser.parse(agentMessage.content); if (!parsed.length) return;
+    const results = await exec.execute(parsed, reg);
+    const resultMessage: Omit<import("@/common/types/discussion").ActionResultMessage, 'id' | 'discussionId'> = {
+      type: 'action_result', agentId: 'system', timestamp: new Date(), originMessageId: agentMessage.id,
+      results: results.map((r, i) => { const def = parsed[i].parsed as ActionDef | undefined; return ({ operationId: def?.operationId ?? `op-${i}`, capability: r.capability, params: r.params || {}, status: r.error ? 'error' : 'success', result: r.result, description: def?.description ?? '', error: r.error, startTime: r.startTime, endTime: r.endTime }); })
+    };
+    await messageService.addMessage(agentMessage.discussionId, resultMessage);
+  }
+
+  private async addSystemMessage(content: string) { const id = this.ctrl.discussionId; if (!id) return; const msg: Omit<NormalMessage, 'id'> = { type: 'text', content, agentId: 'system', timestamp: new Date(), discussionId: id }; await messageService.createMessage(msg); }
+
+  private async generateStreamingResponse(agentId: string, trigger: AgentMessage): Promise<AgentMessage | null> {
+    const id = this.ctrl.discussionId; if (!id) return null; const defs = agentListResource.read().data; const current = defs.find(a => a.id === agentId); if (!current) return null;
+    const memberDefs: AgentDef[] = this.ctrl.members.map(m => defs.find(a => a.id === m.agentId)!).filter(Boolean);
+    const msgs = await messageService.listMessages(id);
+    const cfg: IAgentConfig = { ...current, agentId };
+    const prepared = new PromptBuilder().buildPrompt({ currentAgent: current, currentAgentConfig: cfg, agents: memberDefs, messages: msgs, triggerMessage: trigger.type === 'text' ? (trigger as NormalMessage) : undefined, capabilities: CapabilityRegistry.getInstance().getCapabilities() });
+    const initial: Omit<NormalMessage, 'id'> = { type: 'text', content: '', agentId, timestamp: new Date(), discussionId: id, status: 'streaming', lastUpdateTime: new Date() };
+    const created = await messageService.createMessage(initial) as NormalMessage;
+    this.ctrl.currentSpeakerId = agentId; this.publishCtrl(); this.ctrl.currentAbort = new AbortController();
+    try {
+      const stream = aiService.streamChatCompletion(prepared); let content = '';
+      await new Promise<void>((resolve, reject) => {
+        const sub = stream.subscribe({ next: async (chunk: string) => { if (this.ctrl.currentAbort?.signal.aborted) { sub.unsubscribe(); resolve(); return; } content += chunk; await messageService.updateMessage(created.id, { content, lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id); }, error: (e) => { sub.unsubscribe(); reject(e); }, complete: () => { sub.unsubscribe(); resolve(); } });
+        this.ctrl.currentAbort?.signal.addEventListener('abort', () => { sub.unsubscribe(); resolve(); });
+      });
+      await messageService.updateMessage(created.id, { status: 'completed', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id);
+      if (current.role === 'moderator') await this.tryRunActions(created);
+    } catch (e) {
+      await messageService.updateMessage(created.id, { status: 'error', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id); throw e;
+    } finally { this.ctrl.currentSpeakerId = null; this.ctrl.currentAbort = undefined; this.publishCtrl(); }
+    return await messageService.getMessage(created.id) as AgentMessage;
+  }
+
+  private async processInternal(trigger: AgentMessage): Promise<void> {
+    const id = this.ctrl.discussionId; if (!id) return; if (!this.ctrl.isRunning) this.resume(); let last: AgentMessage | null = trigger; let lastResponder: string | null = null; this.ctrl.processed = 0; this.publishCtrl();
+    while (this.ctrl.isRunning && this.ctrl.processed < this.ctrl.roundLimit && last) {
+      const next = await this.selectNextAgentId(last, lastResponder); if (!next) break; const resp = await this.generateStreamingResponse(next, last); if (!resp) break; lastResponder = next; last = resp; this.ctrl.processed++; this.publishCtrl();
+    }
+    if (this.ctrl.processed >= this.ctrl.roundLimit) { await this.addSystemMessage(`已达到消息上限（${this.ctrl.roundLimit}），对话已暂停。`); this.pause(); }
+  }
+
+  private handleError(error: unknown, message: string, context?: Record<string, unknown>) {
+    const discussionError = error instanceof DiscussionError ? error : new DiscussionError(DiscussionErrorType.GENERATE_RESPONSE, message, error, context);
+    const { shouldPause } = handleDiscussionError(discussionError); if (shouldPause) { this.setPaused(true); }
+    this.onError$.next(discussionError);
   }
 }
 

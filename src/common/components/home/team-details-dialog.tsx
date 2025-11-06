@@ -7,6 +7,7 @@ import {
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { AGENT_COMBINATIONS } from "@/core/config/agents";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 
 // 定义TeamMember和TeamConfig接口
 interface TeamMember {
@@ -32,20 +33,21 @@ export function TeamDetailsDialog({
   open,
   onOpenChange,
 }: TeamDetailsDialogProps) {
-  const { getAgentAvatar, agents } = useAgents();
+  const presenter = usePresenter();
+  const { agents } = useAgents();
   
   // 查找代理的头像
   const getAvatar = (memberId: string, memberRole: string) => {
     // 先尝试通过ID查找
     const agent = agents.find(a => a.id === memberId);
     if (agent) {
-      return getAgentAvatar(agent.id);
+      return presenter.agents.getAgentAvatar(agent.id);
     }
     
     // 如果找不到，尝试通过名称查找
     const agentByName = agents.find(a => a.name === memberRole);
     if (agentByName) {
-      return getAgentAvatar(agentByName.id);
+      return presenter.agents.getAgentAvatar(agentByName.id);
     }
     
     // 在预设组合中查找

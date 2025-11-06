@@ -7,22 +7,21 @@ import {
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
 import { Input } from "@/common/components/ui/input";
-import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+// removed useDiscussionMembers for actions; using presenter directly
 import { useModal } from "@/common/components/ui/modal";
 import { cn, formatTime } from "@/common/lib/utils";
 import { Download, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { DiscussionItemProps } from "./types";
-import { usePresenter } from "@/core/presenter";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { DiscussionAvatar } from "./discussion-avatar";
+import { usePresenter } from "@/core/presenter";
 
 export function DiscussionItem({
   discussion,
   isActive,
 }: DiscussionItemProps) {
   const presenter = usePresenter();
-  const { getMembersForDiscussion } = useDiscussionMembers();
   const [members, setMembers] = useState<DiscussionMember[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(discussion.title);
@@ -30,8 +29,8 @@ export function DiscussionItem({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    getMembersForDiscussion(discussion.id).then(setMembers);
-  }, [discussion.id, getMembersForDiscussion]);
+    presenter.discussionMembers.getMembersForDiscussion(discussion.id).then(setMembers);
+  }, [discussion.id, presenter]);
 
   useEffect(() => {
     let timer: number;

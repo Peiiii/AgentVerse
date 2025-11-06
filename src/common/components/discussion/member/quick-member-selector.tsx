@@ -1,7 +1,7 @@
 import { Button } from "@/common/components/ui/button";
 import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
 import { useAgents } from "@/core/hooks/useAgents";
-import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -16,8 +16,8 @@ export function QuickMemberSelector({
   onSelect,
   onMembersChange
 }: QuickMemberSelectorProps) {
+  const presenter = usePresenter();
   const { agents } = useAgents();
-  const { addMembers } = useDiscussionMembers();
   const { toast } = useToast();
   const [loading, setLoading] = useState<AgentCombinationType | null>(null);
 
@@ -62,7 +62,7 @@ export function QuickMemberSelector({
         onMembersChange(newMemberIds);
       } else {
         // 否则使用原有的添加成员逻辑
-        await addMembers(membersToAdd);
+        await presenter.discussionMembers.addMany(membersToAdd);
       }
       
       onSelect?.();

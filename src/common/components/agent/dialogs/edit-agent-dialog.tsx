@@ -1,6 +1,7 @@
 import { useModal } from "@/common/components/ui/modal";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
 import { useCallback } from "react";
@@ -35,7 +36,8 @@ export function EditAgentDialogContent({
 // 钩子函数，用于打开对话框
 export function useEditAgentDialog() {
   const modal = useModal();
-  const { updateAgent } = useAgents();
+  const presenter = usePresenter();
+  const {} = useAgents();
   const { isMobile } = useBreakpointContext();
 
   const openEditAgentDialog = useCallback((agent: AgentDef) => {
@@ -45,7 +47,7 @@ export function useEditAgentDialog() {
         <EditAgentDialogContent 
           agent={agent} 
           onSubmit={(data) => {
-            updateAgent(agent.id, { ...agent, ...data });
+            presenter.agents.update(agent.id, { ...agent, ...data });
             modal.close();
           }}
           onClose={() => modal.close()}
@@ -61,7 +63,7 @@ export function useEditAgentDialog() {
       // 不需要底部按钮
       showFooter: false
     });
-  }, [modal, updateAgent, isMobile]);
+  }, [modal, presenter, isMobile]);
 
   return {
     openEditAgentDialog

@@ -6,4 +6,3 @@ export * from "./discussions.manager";
 export * from "./agents.manager";
 export * from "./messages.manager";
 export * from "./discussion-members.manager";
-export * from "./discussion-control.manager";

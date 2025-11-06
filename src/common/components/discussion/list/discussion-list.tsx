@@ -22,15 +22,13 @@ export function DiscussionList({
     discussions,
     currentDiscussion,
     isLoading,
-    createDiscussion,
-    selectDiscussion,
   } = useDiscussions();
 
   const handleCreateDiscussion = async () => {
     if (agents.length === 0) return;
-    const discussion = await createDiscussion("新的讨论");
+    const discussion = await presenter.discussions.create("新的讨论");
     if (discussion) {
-      selectDiscussion(discussion.id);
+      presenter.discussions.select(discussion.id);
     }
   };
 

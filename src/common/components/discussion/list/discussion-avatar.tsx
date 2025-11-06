@@ -1,4 +1,5 @@
-import { useAgents } from "@/core/hooks/useAgents";
+
+import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { Users } from "lucide-react";
@@ -12,7 +13,7 @@ export function DiscussionAvatar({
   members, 
   size = "sm"
 }: DiscussionAvatarProps) {
-  const { getAgentName, getAgentAvatar } = useAgents();
+  const presenter = usePresenter();
 
   // 尺寸配置
   const sizeConfig = {
@@ -58,8 +59,8 @@ export function DiscussionAvatar({
       "flex items-center justify-center"
     )}>
       <img
-        src={getAgentAvatar(member.agentId)}
-        alt={getAgentName(member.agentId)}
+        src={presenter.agents.getAgentAvatar(member.agentId)}
+        alt={presenter.agents.getAgentName(member.agentId)}
         className={cn(config.avatar, "rounded-[2px] object-cover")}
       />
     </div>
@@ -77,8 +78,8 @@ export function DiscussionAvatar({
       {members.slice(0, 4).map((member) => (
         <div key={member.id} className="relative aspect-square">
           <img
-            src={getAgentAvatar(member.agentId)}
-            alt={getAgentName(member.agentId)}
+            src={presenter.agents.getAgentAvatar(member.agentId)}
+            alt={presenter.agents.getAgentName(member.agentId)}
             className="w-full h-full rounded-[1px] object-cover"
           />
         </div>

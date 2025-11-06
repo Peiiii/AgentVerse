@@ -1,4 +1,4 @@
-import { IAgentConfig } from "@/common/lib/agent";
+import { IAgentConfig } from "@/common/types/agent-config";
 import { ChatMessage } from "@/common/lib/ai-service";
 import { Capability } from "@/common/lib/capabilities";
 import { AgentDef } from "@/common/types/agent";

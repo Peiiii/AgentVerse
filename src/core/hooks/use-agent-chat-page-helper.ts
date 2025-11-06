@@ -1,8 +1,8 @@
+import { AgentDef } from "@/common/types/agent";
+import { usePresenter } from "@/core/presenter";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDiscussions } from "./useDiscussions";
-import { useDiscussionMembers } from "./useDiscussionMembers";
-import { AgentDef } from "@/common/types/agent";
 
 /**
  * 一键进入AI对话空间的hook
@@ -10,8 +10,8 @@ import { AgentDef } from "@/common/types/agent";
  */
 export function useAgentChatPageHelper() {
   const navigate = useNavigate();
-  const { discussions, createDiscussion, selectDiscussion } = useDiscussions();
-  const { getMembersForDiscussion, addMembers } = useDiscussionMembers();
+  const presenter = usePresenter();
+  const { discussions } = useDiscussions();
 
   /**
    * 进入与指定AI的对话空间
@@ -38,10 +38,10 @@ export function useAgentChatPageHelper() {
     // 1. 如果不强制新建，先查找现有空间
     if (!forceNew) {
       for (const d of discussions || []) {
-        const members = await getMembersForDiscussion(d.id);
+        const members = await presenter.discussionMembers.getMembersForDiscussion(d.id);
         // 匹配条件：只有1个成员且是该AI
         if (members.length === 1 && members[0].agentId === agent.id) {
-          selectDiscussion(d.id);
+          presenter.discussions.select(d.id);
           navigate("/chat");
           return d;
         }
@@ -50,17 +50,17 @@ export function useAgentChatPageHelper() {
 
     // 2. 没有找到或强制新建，则创建新空间
     const title = customTitle || `与${agent.name}的对话`;
-    const newDiscussion = await createDiscussion(title);
+    const newDiscussion = await presenter.discussions.create(title);
     
     // 只添加AI为成员，user不需要添加
-    await addMembers([
+    await presenter.discussionMembers.addMany([
       { agentId: agent.id, isAutoReply: autoReply },
     ]);
     
-    selectDiscussion(newDiscussion.id);
+    presenter.discussions.select(newDiscussion.id);
     navigate("/chat");
     return newDiscussion;
-  }, [discussions, getMembersForDiscussion, createDiscussion, addMembers, selectDiscussion, navigate]);
+  }, [discussions, presenter, navigate]);
 
   return {
     enterAgentChat

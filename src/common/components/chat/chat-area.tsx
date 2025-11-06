@@ -33,7 +33,7 @@ export function ChatArea({
   const messageInputRef = useRef<MessageInputRef>(null);
   const isFirstMessage = messages.length === 0;
   const { currentDiscussion } = useDiscussions();
-  const { members, addMembers } = useDiscussionMembers();
+  const { members } = useDiscussionMembers();
   const agents = presenter.agents.store((s) => s.agents);
   // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
@@ -41,6 +41,11 @@ export function ChatArea({
   useEffect(() => {
     presenter.discussionControl.setMessages(messages);
   }, [messages]);
+
+  // 同步成员到讨论控制服务，以便 run() 能生效（需要 members + messages 条件）
+  useEffect(() => {
+    presenter.discussionControl.setMembers(members);
+  }, [members]);
 
   useEffect(() => {
     const isInitialState = members.length === 0 && messages.length === 0;
@@ -54,6 +59,7 @@ export function ChatArea({
       } (来自: ${agentId})`
     );
 
+    console.log("[chat-area] handleSendMessage before add message", messages);
     try {
       // 发送消息
       if (!currentDiscussion) return;
@@ -63,21 +69,15 @@ export function ChatArea({
         type: "text",
         timestamp: new Date(),
       });
-      if (agentMessage) presenter.discussionControl.onMessage(agentMessage);
-      console.log("消息发送成功");
-
-      // 如果有成员，则尝试运行讨论控制服务
-      if (members.length > 0) {
-        console.log(`检测到 ${members.length} 个成员，启动讨论控制服务...`);
-        try {
-          await presenter.discussionControl.run();
-          console.log("讨论控制服务运行成功");
-        } catch (error) {
-          console.error("讨论控制服务运行失败:", error);
-        }
-      } else {
-        console.log("没有成员，跳过讨论控制服务");
+      if (agentMessage) {
+        console.log("[chat-area] handleSendMessage after add message", members);
+        presenter.discussionControl.setMembers(members);
+        presenter.discussionControl.setMessages([...messages, agentMessage]);
+        // 直接走简化控制器：先启动/恢复，再处理本条消息（无事件总线）
+        await presenter.discussionControl.startIfEligible();
+        await presenter.discussionControl.process(agentMessage);
       }
+      console.log("消息发送成功");
     } catch (error) {
       console.error("发送消息失败:", error);
     } finally {
@@ -103,13 +103,8 @@ export function ChatArea({
       // 如果提供了自定义成员，直接使用它们
       if (customMembers && customMembers.length > 0) {
         console.log(`使用自定义成员: ${customMembers.length} 个成员`);
-        await addMembers(customMembers);
+        await presenter.discussionMembers.addMany(customMembers);
         await handleSendMessage(topic, "user");
-        try {
-          await presenter.discussionControl.run();
-        } catch (error) {
-          console.error("运行讨论控制服务失败:", error);
-        }
         return;
       }
 
@@ -159,13 +154,8 @@ export function ChatArea({
       // 批量添加所有成员
       if (membersToAdd.length > 0) {
         console.log(`批量添加 ${membersToAdd.length} 个成员...`);
-        await addMembers(membersToAdd);
+        await presenter.discussionMembers.addMany(membersToAdd);
         await handleSendMessage(topic, "user");
-        try {
-          await presenter.discussionControl.run();
-        } catch (error) {
-          console.error("运行讨论控制服务失败:", error);
-        }
       } else {
         console.error("没有成功添加任何成员，无法启动讨论");
       }

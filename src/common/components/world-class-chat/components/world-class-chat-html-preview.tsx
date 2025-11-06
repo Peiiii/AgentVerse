@@ -53,7 +53,7 @@ export function WorldClassChatHtmlPreview({
       // 刷新完成后，重置加载状态
       setLoading(false);
       setError(null);
-    } catch (error) {
+    } catch {
       setError("刷新失败");
       setLoading(false);
     } finally {

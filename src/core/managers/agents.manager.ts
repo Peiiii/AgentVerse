@@ -58,12 +58,12 @@ export class AgentsManager {
     setAgents(agents.filter((a) => a.id !== id));
   };
 
-  getName = (id: string) => {
+  getAgentName = (id: string) => {
     if (id === "user") return "我";
     return this.store.getState().agents.find((a) => a.id === id)?.name ?? "未知";
   };
 
-  getAvatar = (id: string) => {
+  getAgentAvatar = (id: string) => {
     if (id === "user") {
       try {
         const stored = typeof window !== "undefined" ? window.localStorage.getItem("userAvatar") : null;

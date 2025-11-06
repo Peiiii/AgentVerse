@@ -1,5 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+import { usePresenter } from "@/core/presenter";
 import { useAgents } from "@/core/hooks/useAgents";
 import { cn } from "@/common/lib/utils";
 import { PlusCircle } from "lucide-react";
@@ -24,15 +25,16 @@ export function MemberList({
   headerClassName,
   listClassName
 }: MemberListProps) {
-  const { members, isLoading, removeMember, toggleAutoReply } = useDiscussionMembers();
-  const { agents, updateAgent } = useAgents();
+  const presenter = usePresenter();
+  const { members, isLoading } = useDiscussionMembers();
+  const { agents } = useAgents();
   const {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
     handleEditAgent,
     handleSubmit,
-  } = useAgentForm(agents, updateAgent);
+  } = useAgentForm(agents, presenter.agents.update);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -106,10 +108,10 @@ export function MemberList({
           agent={agent}
           isExpanded={expandedId === member.id}
           onExpand={() => setExpandedId(expandedId === member.id ? null : member.id)}
-          onToggleAutoReply={() => toggleAutoReply(member.id)}
+          onToggleAutoReply={() => presenter.discussionMembers.toggleAutoReply(member.id)}
           onRemove={(e) => {
             e.stopPropagation();
-            removeMember(member.id);
+            presenter.discussionMembers.remove(member.id);
           }}
           onEditAgent={() => handleEditAgent(agent)}
           {...getItemProps(index)}

@@ -5,6 +5,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { AgentDef } from "@/common/types/agent";
 import { Sparkles, Users } from "lucide-react";
 import match from "pinyin-match";
@@ -19,13 +20,14 @@ export function AgentsPage() {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [selectedExpertise, setSelectedExpertise] = useState<string>("");
   
-  const { agents, isLoading, addAgent, updateAgent, deleteAgent } = useAgents();
+  const presenter = usePresenter();
+  const { agents, isLoading } = useAgents();
   const {
     isFormOpen,
     setIsFormOpen,
     editingAgent,
     handleSubmit,
-  } = useAgentForm(agents, updateAgent);
+  } = useAgentForm(agents, presenter.agents.update);
 
   // 处理查看智能体详情
   const handleViewAgent = (agentId: string) => {
@@ -98,7 +100,7 @@ export function AgentsPage() {
             agent={agent}
             variant="default"
             onEditWithAI={handleEditAgentWithAI}
-            onDelete={deleteAgent}
+            onDelete={presenter.agents.remove}
             onView={handleViewAgent}
             showActions={true}
           />
@@ -117,7 +119,7 @@ export function AgentsPage() {
             agent={agent}
             variant="compact"
             onEditWithAI={handleEditAgentWithAI}
-            onDelete={deleteAgent}
+            onDelete={presenter.agents.remove}
             onView={handleViewAgent}
             showActions={true}
           />
@@ -199,7 +201,7 @@ export function AgentsPage() {
       primaryAction={{
         label: "创建智能体",
         icon: <Sparkles className="w-4 h-4" />,
-        onClick: addAgent,
+        onClick: () => presenter.agents.addDefault(),
         disabled: isLoading
       }}
       viewMode={viewMode}
@@ -247,7 +249,7 @@ export function AgentsPage() {
               }
             </p>
             {!searchQuery && !selectedRole && !selectedExpertise && (
-              <Button onClick={addAgent} className="gap-2">
+              <Button onClick={() => presenter.agents.addDefault()} className="gap-2">
                 <Sparkles className="w-4 h-4" />
                 创建智能体
               </Button>
