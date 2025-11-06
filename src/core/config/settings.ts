@@ -1,7 +1,7 @@
 import { DiscussionSettings } from "@/common/types/discussion";
 
 export const DEFAULT_SETTINGS: DiscussionSettings = {
-  maxRounds: 5,
+  maxRounds: 20,
   temperature: 0.7,
   interval: 3000,
   moderationStyle: "relaxed",

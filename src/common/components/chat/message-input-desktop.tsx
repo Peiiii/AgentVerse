@@ -32,10 +32,11 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
   function MessageInputDesktop({ className }, ref) {
     const presenter = usePresenter();
     const currentDiscussionId = presenter.discussions.store((s) => s.currentId);
+    const isAgentResponding = presenter.discussionControl.getSnapshot().currentSpeakerId !== null;
+
     const {
       input,
       setInput,
-      isLoading,
       inputRef,
       handleKeyDown: baseHandleKeyDown
     } = useMessageInput({
@@ -47,7 +48,6 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
           type: "text",
           timestamp: new Date(),
         });
-        console.log("[message-input-desktop] handleSendMessage after add message", agentMessage);
         if (agentMessage) await presenter.discussionControl.process(agentMessage);
       },
       forwardedRef: ref
@@ -101,6 +101,10 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
           return;
         }
       }
+      if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && isAgentResponding) {
+        e.preventDefault();
+        return;
+      }
       baseHandleKeyDown(e);
     };
 
@@ -118,7 +122,7 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
             onKeyDown={handleKeyDown}
             placeholder="在这里输入消息... (输入 @ 可以提及成员)"
             className="w-full resize-none text-sm outline-none border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-none focus-visible:shadow-none shadow-none bg-transparent text-gray-900 dark:text-gray-100"
-            disabled={isLoading}
+            disabled={false}
             minRows={2}
             maxRows={6}
           />

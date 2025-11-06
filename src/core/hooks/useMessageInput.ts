@@ -31,24 +31,31 @@ export function useMessageInput({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!canSubmit) return;
+    const messageContent = input.trim();
+    if (!messageContent || isLoading) return;
 
+    // Clear input immediately for better UX. If sending fails, restore.
+    setIsLoading(true);
+    setInput("");
     try {
-      setIsLoading(true);
-      await onSendMessage(input.trim(), "user");
-      setInput("");
-      inputRef.current?.focus();
+      await onSendMessage(messageContent, "user");
+    } catch (err: unknown) {
+      console.error("Failed to send message:", err);
+      // Restore previous content on failure so the user doesn't lose text
+      setInput(messageContent);
+      // Swallow error here to avoid crashing event handlers; upstream can handle internally
     } finally {
       setIsLoading(false);
+      inputRef.current?.focus();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
+      // IME 输入法合成中，忽略 Enter，避免误触发送
+      if (e.nativeEvent.isComposing) return;
       // 如果按下了任何修饰键，允许换行
-      if (e.shiftKey || e.metaKey || e.ctrlKey) {
-        return;
-      }
+      if (e.shiftKey || e.metaKey || e.ctrlKey) return;
       // 单纯的 Enter 键，发送消息
       e.preventDefault();
       handleSubmit();

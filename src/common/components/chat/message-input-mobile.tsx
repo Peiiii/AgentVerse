@@ -31,6 +31,8 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
   function MessageInputMobile({ className }, ref) {
     const presenter = usePresenter();
     const currentDiscussionId = presenter.discussions.store((s) => s.currentId);
+    const isAgentResponding = presenter.discussionControl.getSnapshot().currentSpeakerId !== null;
+
     const {
       input,
       setInput,
@@ -98,6 +100,10 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
           return;
         }
       }
+      if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey && isAgentResponding) {
+        e.preventDefault();
+        return;
+      }
       baseHandleKeyDown(e);
     };
 
@@ -116,14 +122,14 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
               onKeyDown={handleKeyDown}
               placeholder="在这里输入消息... (输入 @ 可以提及成员)"
               className="flex-1 resize-none text-sm outline-none border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-none focus-visible:shadow-none shadow-none bg-transparent px-3 py-2 min-h-[20px] leading-tight text-gray-900 dark:text-gray-100"
-              disabled={isLoading}
+              disabled={false}
               minRows={1}
               maxRows={4}
             />
             <Button
               type="button"
               onClick={(e) => handleSubmit(e as React.FormEvent)}
-              disabled={!canSubmit || isLoading}
+              disabled={!canSubmit || isLoading || isAgentResponding}
               size="icon"
               className={cn(
                 "h-7 w-7 rounded-md mr-2 flex-shrink-0",

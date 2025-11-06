@@ -20,7 +20,7 @@ export class DiscussionService {
       topic: "",
       status: "paused",
       settings: {
-        maxRounds: 10,
+        maxRounds: 20,
         temperature: 0.7,
         interval: 3000,
         moderationStyle: "relaxed",

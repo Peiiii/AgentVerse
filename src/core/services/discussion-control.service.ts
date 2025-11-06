@@ -58,10 +58,10 @@ export class DiscussionControlService {
     members: [] as Member[],
     isRunning: false,
     processed: 0,
-    roundLimit: 5,
+    roundLimit: 20,
     currentSpeakerId: null as string | null,
     currentAbort: undefined as AbortController | undefined,
-    snapshot$: new BehaviorSubject<Snapshot>({ isRunning: false, currentSpeakerId: null, processed: 0, roundLimit: 5 }),
+    snapshot$: new BehaviorSubject<Snapshot>({ isRunning: false, currentSpeakerId: null, processed: 0, roundLimit: 20 }),
   };
 
   constructor() {
@@ -76,6 +76,7 @@ export class DiscussionControlService {
   private setState(update: Partial<State>) { this.store.set((prev) => ({ ...prev, ...update })); }
   private publishCtrl() { const { isRunning, currentSpeakerId, processed, roundLimit } = this.ctrl; this.ctrl.snapshot$.next({ isRunning, currentSpeakerId, processed, roundLimit }); }
   getSnapshot(): Snapshot { return this.ctrl.snapshot$.getValue(); }
+  getSnapshot$() { return this.ctrl.snapshot$.asObservable(); }
 
   // state accessors
   getCurrentDiscussionId(): string | null { return this.getState().currentDiscussionId; }
