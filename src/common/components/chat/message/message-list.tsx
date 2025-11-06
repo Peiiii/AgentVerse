@@ -1,4 +1,3 @@
-import { AgentMessage } from "@/common/types/discussion";
 import { forwardRef } from "react";
 import { MessageListDesktop } from "./message-list-desktop";
 import { MessageListMobile } from "./message-list-mobile";
@@ -6,12 +5,6 @@ import { useBreakpointContext } from "@/common/components/common/breakpoint-prov
 import { MessageListRef } from "@/core/hooks/useMessageList";
 
 interface MessageListProps {
-  discussionId?: string;
-  messages: AgentMessage[];
-  agentInfo: {
-    getName: (agentId: string) => string;
-    getAvatar: (agentId: string) => string;
-  };
   className?: string;
   scrollButtonThreshold?: number; // 显示滚动按钮的阈值
 }

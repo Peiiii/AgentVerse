@@ -3,6 +3,7 @@ import { MentionSuggestions } from "./mention-suggestions";
 import { useMention } from "@/common/hooks/use-mention";
 import { useMentionPosition } from "@/common/hooks/use-mention-position";
 import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import { forwardRef, useMemo } from "react";
@@ -24,12 +25,13 @@ import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageIn
  */
 
 interface MessageInputProps {
-  onSendMessage: (content: string, agentId: string) => Promise<void>;
   className?: string;
 }
 
 export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps>(
-  function MessageInputDesktop({ onSendMessage, className }, ref) {
+  function MessageInputDesktop({ className }, ref) {
+    const presenter = usePresenter();
+    const currentDiscussionId = presenter.discussions.store((s) => s.currentId);
     const {
       input,
       setInput,
@@ -37,7 +39,16 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
       inputRef,
       handleKeyDown: baseHandleKeyDown
     } = useMessageInput({
-      onSendMessage,
+      onSendMessage: async (content: string, agentId: string) => {
+        if (!currentDiscussionId) return;
+        const agentMessage = await presenter.messages.add(currentDiscussionId, {
+          content,
+          agentId,
+          type: "text",
+          timestamp: new Date(),
+        });
+        if (agentMessage) presenter.discussionControl.onMessage(agentMessage);
+      },
       forwardedRef: ref
     });
 

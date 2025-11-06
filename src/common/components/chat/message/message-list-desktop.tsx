@@ -1,7 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { ScrollableLayout } from "@/common/components/layouts/scrollable-layout";
 import { cn } from "@/common/lib/utils";
-import { AgentMessage } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
 // 去掉容器级动画，避免切换会话时的闪烁
 import { ArrowDown } from "lucide-react";
@@ -11,7 +10,7 @@ import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 import { useAgents } from "@/core/hooks/useAgents";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { usePresenter } from "@/core/presenter";
 
 /**
  * 微信PC端消息列表设计：
@@ -24,12 +23,6 @@ import { discussionControlService } from "@/core/services/discussion-control.ser
  */
 
 interface MessageListDesktopProps {
-  discussionId?: string;
-  messages: AgentMessage[];
-  agentInfo: {
-    getName: (agentId: string) => string;
-    getAvatar: (agentId: string) => string;
-  };
   className?: string;
   scrollButtonThreshold?: number;
 }
@@ -37,15 +30,13 @@ interface MessageListDesktopProps {
 export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopProps>(
   function MessageListDesktop(
     {
-      messages,
-      agentInfo,
       className,
       scrollButtonThreshold = 200,
-      discussionId,
     },
     ref
   ) {
-    const { agents } = useAgents();
+    const { agents, getAgentName, getAgentAvatar } = useAgents();
+    const presenter = usePresenter();
     const navigate = useNavigate();
     const {
       scrollableLayoutRef,
@@ -55,8 +46,8 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
       handleScroll,
       scrollToBottom
     } = useMessageList({
-      messages,
-      discussionId,
+      messages: presenter.messages.store((s) => s.messages),
+      discussionId: presenter.discussions.store((s) => s.currentId) ?? undefined,
       scrollButtonThreshold
     });
 
@@ -67,11 +58,11 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     // 获取当前正在响应的 agentId
     const [respondingAgentId, setRespondingAgentId] = useState<string | null>(null);
     useEffect(() => {
-      const sub = discussionControlService.env.speakScheduler.speakingStateBean.$.subscribe(
+      const sub = presenter.discussionControl.getSpeakingState$().subscribe(
         (state) => setRespondingAgentId(state.agentId)
       );
       return () => sub.unsubscribe();
-    }, []);
+    }, [presenter]);
 
     const handleEditAgentWithAI = useCallback((agent: AgentDef) => {
       navigate(`/agents/${agent.id}?tab=ai-create`);
@@ -115,7 +106,7 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
                     <MessageItemWechat
                       key={message.id}
                       message={message}
-                      agentInfo={agentInfo}
+                      agentInfo={{ getName: getAgentName, getAvatar: getAgentAvatar }}
                       agent={agent}
                       previousMessageTimestamp={previousTimestamp}
                       onEditAgentWithAI={handleEditAgentWithAI}

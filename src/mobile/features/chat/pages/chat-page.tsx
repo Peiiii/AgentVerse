@@ -12,9 +12,7 @@ import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
 import { cn } from "@/common/lib/utils";
 import { Discussion } from "@/common/types/discussion";
-import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
-import { useMessages } from "@/core/hooks/useMessages";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { useEffect, useState } from "react";
@@ -26,8 +24,7 @@ type Scene = "discussions" | "chat" | "agents" | "settings";
 export function ChatPage() {
     const { isMobile } = useBreakpointContext();
     const { rootClassName } = useTheme();
-    const { getAgentName, getAgentAvatar } = useAgents();
-    const { messages, addMessage } = useMessages();
+    // agents/messages 由业务组件直连 presenter/store
     const { currentDiscussion, clearMessages } = useDiscussions();
     const [currentScene, setCurrentScene] = useState<Scene>("chat");
     const { data: currentDiscussionId } = useProxyBeanState(
@@ -57,18 +54,7 @@ export function ChatPage() {
         setIsPaused(status === "paused");
     };
 
-    const handleMessage = async (content: string, agentId: string) => {
-        const agentMessage = await addMessage({
-            content,
-            agentId,
-            type: "text",
-        });
-        if (agentMessage) discussionControlService.onMessage(agentMessage);
-    };
-
-    useEffect(() => {
-        discussionControlService.setMessages(messages);
-    }, [messages]);
+    // 业务消息在 ChatArea 内部处理
 
 
     // 渲染当前场景内容
@@ -93,10 +79,6 @@ export function ChatPage() {
                     <div className="flex-1 min-h-0">
                         <ChatArea
                             key={currentDiscussionId}
-                            messages={messages}
-                            onSendMessage={handleMessage}
-                            getAgentName={getAgentName}
-                            getAgentAvatar={getAgentAvatar}
                             onStartDiscussion={() => {
                                 if (status === "paused") {
                                     handleStatusChange("active");

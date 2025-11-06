@@ -1,5 +1,7 @@
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import type { AgentMessage } from "@/common/types/discussion";
+import type { SpeakingState } from "@/common/lib/discussion/speak-scheduler";
+import type { Observable } from "rxjs";
 
 // Manager wrapper for DiscussionControlService to expose actions via Presenter
 export class DiscussionControlManager {
@@ -21,5 +23,8 @@ export class DiscussionControlManager {
   // events
   onCurrentDiscussionIdChange$ = discussionControlService.onCurrentDiscussionIdChange$;
   onError$ = discussionControlService.onError$;
-}
 
+  // readonly speaking state (for UI hints)
+  getSpeakingState$ = (): Observable<SpeakingState> =>
+    discussionControlService.env.speakScheduler.speakingStateBean.$ as unknown as Observable<SpeakingState>;
+}

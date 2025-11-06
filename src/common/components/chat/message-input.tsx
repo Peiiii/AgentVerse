@@ -9,7 +9,6 @@ export interface MessageInputRef {
 }
 
 interface MessageInputProps {
-  onSendMessage: (content: string, agentId: string) => Promise<void>;
   className?: string;
   isFirstMessage?: boolean;
 }

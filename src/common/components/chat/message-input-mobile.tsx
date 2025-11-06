@@ -9,6 +9,7 @@ import { cn } from "@/common/lib/utils";
 import { Send } from "lucide-react";
 import { forwardRef } from "react";
 import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageInput";
+import { usePresenter } from "@/core/presenter";
 
 /**
  * 微信移动端消息输入框设计（简化版）：
@@ -22,13 +23,14 @@ import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageIn
  */
 
 interface MessageInputProps {
-  onSendMessage: (content: string, agentId: string) => Promise<void>;
   className?: string;
   isFirstMessage?: boolean;
 }
 
 export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>(
-  function MessageInputMobile({ onSendMessage, className }, ref) {
+  function MessageInputMobile({ className }, ref) {
+    const presenter = usePresenter();
+    const currentDiscussionId = presenter.discussions.store((s) => s.currentId);
     const {
       input,
       setInput,
@@ -38,7 +40,16 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
       handleSubmit,
       handleKeyDown: baseHandleKeyDown
     } = useMessageInput({
-      onSendMessage,
+      onSendMessage: async (content: string, agentId: string) => {
+        if (!currentDiscussionId) return;
+        const agentMessage = await presenter.messages.add(currentDiscussionId, {
+          content,
+          agentId,
+          type: "text",
+          timestamp: new Date(),
+        });
+        if (agentMessage) presenter.discussionControl.onMessage(agentMessage);
+      },
       forwardedRef: ref
     });
 

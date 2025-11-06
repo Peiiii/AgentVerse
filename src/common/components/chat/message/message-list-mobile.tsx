@@ -1,13 +1,14 @@
 import { Button } from "@/common/components/ui/button";
 import { ScrollableLayout } from "@/common/components/layouts/scrollable-layout";
 import { cn } from "@/common/lib/utils";
-import { AgentMessage } from "@/common/types/discussion";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, useRef } from "react";
 import { MessageCapture } from "./message-capture";
 import { MessageItem } from "./message-item";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
+import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 
 /**
  * 移动端消息列表设计：
@@ -19,12 +20,6 @@ import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList
  */
 
 interface MessageListMobileProps {
-  discussionId?: string;
-  messages: AgentMessage[];
-  agentInfo: {
-    getName: (agentId: string) => string;
-    getAvatar: (agentId: string) => string;
-  };
   className?: string;
   scrollButtonThreshold?: number;
 }
@@ -32,14 +27,12 @@ interface MessageListMobileProps {
 export const MessageListMobile = forwardRef<MessageListRef, MessageListMobileProps>(
   function MessageListMobile(
     {
-      messages,
-      agentInfo,
       className,
       scrollButtonThreshold = 200,
-      discussionId,
     },
     ref
   ) {
+    const { getAgentName, getAgentAvatar } = useAgents();
     // 使用本地状态管理滚动按钮的显示
     const [showScrollButton, setShowScrollButton] = useState(false);
     // 保存容器DOM引用
@@ -51,8 +44,8 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
       reorganizedMessages,
       scrollToBottom
     } = useMessageList({
-      messages,
-      discussionId,
+      messages: usePresenter().messages.store((s) => s.messages),
+      discussionId: usePresenter().discussions.store((s) => s.currentId) ?? undefined,
       scrollButtonThreshold,
     });
 
@@ -75,7 +68,7 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
           setShowScrollButton(true);
         }
       }
-    }, [messages.length, scrollButtonThreshold]);
+    }, [reorganizedMessages.length, scrollButtonThreshold]);
 
     // 将ref暴露给父组件
     useImperativeHandle(ref, () => ({
@@ -108,7 +101,7 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
                 >
                   <MessageItem
                     message={message}
-                    agentInfo={agentInfo}
+                    agentInfo={{ getName: getAgentName, getAvatar: getAgentAvatar }}
                   />
                 </motion.div>
               ))}

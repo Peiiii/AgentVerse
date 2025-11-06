@@ -1,6 +1,6 @@
 import { useMessagesStore } from "@/core/stores/messages.store";
 import { messageService } from "@/core/services/message.service";
-import type { AgentMessage } from "@/common/types/discussion";
+import type { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
 export class MessagesManager {
   store = useMessagesStore;
@@ -19,7 +19,7 @@ export class MessagesManager {
     }
   };
 
-  add = async (discussionId: string, message: Omit<AgentMessage, "id" | "discussionId">) => {
+  add = async (discussionId: string, message: Omit<NormalMessage, "id" | "discussionId">) => {
     const created = await messageService.addMessage(discussionId, message);
     const { messages, setMessages } = this.store.getState();
     setMessages([...messages, created]);

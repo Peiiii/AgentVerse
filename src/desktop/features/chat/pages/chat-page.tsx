@@ -6,18 +6,15 @@ import { DiscussionList } from "@/common/components/discussion/list/discussion-l
 import { MemberList } from "@/common/components/discussion/member/member-list";
 import { ResponsiveContainer } from "@/common/components/layout/responsive-container";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
-import { useAgents } from "@/core/hooks/useAgents";
-import { useMessages } from "@/core/hooks/useMessages";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { discussionControlService } from "@/core/services/discussion-control.service";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useProxyBeanState } from "rx-nested-bean";
 
 
 export function ChatPage() {
     const { isDesktop } = useBreakpointContext();
-    const { getAgentName, getAgentAvatar } = useAgents();
-    const { messages, addMessage } = useMessages();
+    // agents/messages 由内部业务组件直连 presenter/store，无需在此处传递
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
     const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
         false,
@@ -43,18 +40,7 @@ export function ChatPage() {
         setShowMembersForDesktop(!showMembersForDesktop);
     };
 
-    const handleMessage = async (content: string, agentId: string) => {
-        const agentMessage = await addMessage({
-            content,
-            agentId,
-            type: "text",
-        });
-        if (agentMessage) discussionControlService.onMessage(agentMessage);
-    };
-
-    useEffect(() => {
-        discussionControlService.setMessages(messages);
-    }, [messages]);
+    // 业务消息在 ChatArea 内部处理
 
     // 桌面端布局
     return (
@@ -80,10 +66,6 @@ export function ChatPage() {
                                 <div className="flex-1 min-h-0">
                                     <ChatArea
                                         key={currentDiscussionId}
-                                        messages={messages}
-                                        onSendMessage={handleMessage}
-                                        getAgentName={getAgentName}
-                                        getAgentAvatar={getAgentAvatar}
                                         onInitialStateChange={setIsInitialState}
                                     />
                                 </div>

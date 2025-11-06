@@ -5,19 +5,13 @@ import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { cn } from "@/common/lib/utils";
-import { discussionControlService } from "@/core/services/discussion-control.service";
-import { AgentMessage } from "@/common/types/discussion";
 import { useEffect, useRef, useState } from "react";
 import { ChatEmptyGuide } from "./chat-empty-guide";
 import { MessageList, MessageListRef } from "./message";
 import { MessageInput, MessageInputRef } from "./message-input";
-import { useAgents } from "@/core/hooks/useAgents";
+import { usePresenter } from "@/core/presenter";
 
 interface ChatAreaProps {
-  messages: AgentMessage[];
-  onSendMessage: (content: string, agentId: string) => Promise<void>;
-  getAgentName: (agentId: string) => string;
-  getAgentAvatar: (agentId: string) => string;
   className?: string;
   messageListClassName?: string;
   inputAreaClassName?: string;
@@ -27,28 +21,26 @@ interface ChatAreaProps {
 }
 
 export function ChatArea({
-  messages,
-  onSendMessage,
-  getAgentName,
-  getAgentAvatar,
   className,
   messageListClassName,
   inputAreaClassName,
   onInitialStateChange,
 }: ChatAreaProps) {
+  const presenter = usePresenter();
+  const messages = presenter.messages.store((s) => s.messages);
   const { isKeyboardVisible } = useViewportHeight();
   const messageListRef = useRef<MessageListRef>(null);
   const messageInputRef = useRef<MessageInputRef>(null);
   const isFirstMessage = messages.length === 0;
   const { currentDiscussion } = useDiscussions();
   const { members, addMembers } = useDiscussionMembers();
-  const { agents } = useAgents();
+  const agents = presenter.agents.store((s) => s.agents);
   // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 
   useEffect(() => {
-    discussionControlService.setMembers(members);
-  }, [members]);
+    presenter.discussionControl.setMessages(messages);
+  }, [messages]);
 
   useEffect(() => {
     const isInitialState = members.length === 0 && messages.length === 0;
@@ -64,14 +56,21 @@ export function ChatArea({
 
     try {
       // 发送消息
-      await onSendMessage(content, agentId);
+      if (!currentDiscussion) return;
+      const agentMessage = await presenter.messages.add(currentDiscussion.id, {
+        content,
+        agentId,
+        type: "text",
+        timestamp: new Date(),
+      });
+      if (agentMessage) presenter.discussionControl.onMessage(agentMessage);
       console.log("消息发送成功");
 
       // 如果有成员，则尝试运行讨论控制服务
       if (members.length > 0) {
         console.log(`检测到 ${members.length} 个成员，启动讨论控制服务...`);
         try {
-          await discussionControlService.run();
+          await presenter.discussionControl.run();
           console.log("讨论控制服务运行成功");
         } catch (error) {
           console.error("讨论控制服务运行失败:", error);
@@ -105,9 +104,9 @@ export function ChatArea({
       if (customMembers && customMembers.length > 0) {
         console.log(`使用自定义成员: ${customMembers.length} 个成员`);
         await addMembers(customMembers);
-        await onSendMessage(topic, "user");
+        await handleSendMessage(topic, "user");
         try {
-          await discussionControlService.run();
+          await presenter.discussionControl.run();
         } catch (error) {
           console.error("运行讨论控制服务失败:", error);
         }
@@ -161,9 +160,9 @@ export function ChatArea({
       if (membersToAdd.length > 0) {
         console.log(`批量添加 ${membersToAdd.length} 个成员...`);
         await addMembers(membersToAdd);
-        await onSendMessage(topic, "user");
+        await handleSendMessage(topic, "user");
         try {
-          await discussionControlService.run();
+          await presenter.discussionControl.run();
         } catch (error) {
           console.error("运行讨论控制服务失败:", error);
         }
@@ -182,11 +181,6 @@ export function ChatArea({
       setIsStartingDiscussion(false);
     }
   }, [isStartingDiscussion, messages.length]);
-
-  const agentInfoGetter = {
-    getName: getAgentName,
-    getAvatar: getAgentAvatar,
-  };
 
   if (!currentDiscussion) {
     return (
@@ -239,10 +233,7 @@ export function ChatArea({
           </div>
         ) : (
           <MessageList
-            discussionId={currentDiscussion.id}
             ref={messageListRef}
-            messages={messages}
-            agentInfo={agentInfoGetter}
             data-testid="chat-message-list"
             className="py-4 px-4"
           />
@@ -261,7 +252,6 @@ export function ChatArea({
         <MessageInput
           ref={messageInputRef}
           isFirstMessage={isFirstMessage}
-          onSendMessage={handleSendMessage}
           data-testid="chat-message-input"
         />
       </div>

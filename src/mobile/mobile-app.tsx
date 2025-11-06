@@ -18,9 +18,7 @@ import { cn } from "@/common/lib/utils";
 import { Discussion } from "@/common/types/discussion";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
-import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
-import { useMessages } from "@/core/hooks/useMessages";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
@@ -44,8 +42,7 @@ export function MobileAppInner() {
   });
   const { isDesktop, isMobile } = useBreakpointContext();
   const { rootClassName } = useTheme();
-  const { getAgentName, getAgentAvatar } = useAgents();
-  const { messages, addMessage } = useMessages();
+  // agents/messages 由业务组件直连 presenter/store
   const { currentDiscussion, clearMessages } = useDiscussions();
   const [currentScene, setCurrentScene] = useState<Scene>("chat");
   const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
@@ -87,18 +84,7 @@ export function MobileAppInner() {
     }
   };
 
-  const handleMessage = async (content: string, agentId: string) => {
-    const agentMessage = await addMessage({
-      content,
-      agentId,
-      type: "text",
-    });
-    if (agentMessage) discussionControlService.onMessage(agentMessage);
-  };
-
-  useEffect(() => {
-    discussionControlService.setMessages(messages);
-  }, [messages]);
+  // 业务消息在 ChatArea 内部处理
 
   const handleSelectDiscussion = () => {
     if (!isDesktop) {
@@ -129,10 +115,6 @@ export function MobileAppInner() {
           <div className="flex-1 min-h-0">
             <ChatArea
               key={currentDiscussionId}
-              messages={messages}
-              onSendMessage={handleMessage}
-              getAgentName={getAgentName}
-              getAgentAvatar={getAgentAvatar}
               onStartDiscussion={() => {
                 if (status === "paused") {
                   handleStatusChange("active");

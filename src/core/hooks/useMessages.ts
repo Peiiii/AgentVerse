@@ -1,5 +1,5 @@
 import { usePresenter } from "@/core/presenter";
-import { AgentMessage } from "@/common/types/discussion";
+import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
 export function useMessages() {
   const presenter = usePresenter();
@@ -26,7 +26,7 @@ export function useMessages() {
       type,
       replyTo,
       timestamp: new Date(),
-    } as Omit<AgentMessage, "id" | "discussionId">);
+    } as Omit<NormalMessage, "id" | "discussionId">);
   };
 
   return {
