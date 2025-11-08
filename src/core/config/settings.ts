@@ -7,6 +7,10 @@ export const DEFAULT_SETTINGS: DiscussionSettings = {
   moderationStyle: "relaxed",
   focusTopics: [],
   allowConflict: true,
+  toolPermissions: {
+    moderator: true,
+    participant: false,
+  },
 } as const;
 
 export const SETTING_KYES = {

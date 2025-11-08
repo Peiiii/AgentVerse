@@ -111,6 +111,16 @@ export class DiscussionControlService {
     this.publishCtrl();
   }
 
+  private agentCanUseActions(agent: AgentDef | undefined): boolean {
+    if (!agent) return false;
+    const permissions = this.getState().settings.toolPermissions;
+    const allowed = permissions?.[agent.role];
+    if (typeof allowed === "boolean") {
+      return allowed;
+    }
+    return agent.role === "moderator";
+  }
+
   // runtime
   pause() { this.setPaused(true); this.ctrl.isRunning = false; if (this.ctrl.currentAbort) { this.ctrl.currentAbort.abort(); this.ctrl.currentAbort = undefined; } this.ctrl.currentSpeakerId = null; this.publishCtrl(); }
   resume() { this.setPaused(false); this.ctrl.isRunning = true; this.ctrl.processed = 0; this.publishCtrl(); }
@@ -223,6 +233,11 @@ export class DiscussionControlService {
   }
 
   private async tryRunActions(agentMessage: NormalMessage): Promise<ActionResultMessage | null> {
+    const defs = agentListResource.read().data;
+    const author = defs.find((a) => a.id === agentMessage.agentId);
+    if (!author || !this.agentCanUseActions(author)) {
+      return null;
+    }
     const parser = new ActionParser(); const exec = new DefaultActionExecutor(); const reg = Caps.getInstance();
     const parsed = parser.parse(agentMessage.content); if (!parsed.length) return null;
     const results = await exec.execute(parsed, reg);
@@ -243,7 +258,8 @@ export class DiscussionControlService {
     const id = this.ctrl.discussionId; if (!id) return null; const defs = agentListResource.read().data; const current = defs.find(a => a.id === agentId); if (!current) return null;
     const memberDefs: AgentDef[] = this.ctrl.members.map(m => defs.find(a => a.id === m.agentId)!).filter(Boolean);
     const msgs = await messageService.listMessages(id);
-    const cfg: IAgentConfig = { ...current, agentId };
+    const canUseActions = this.agentCanUseActions(current);
+    const cfg: IAgentConfig = { ...current, agentId, canUseActions };
     const prepared = new PromptBuilder().buildPrompt({ currentAgent: current, currentAgentConfig: cfg, agents: memberDefs, messages: msgs, triggerMessage: trigger.type === 'text' ? (trigger as NormalMessage) : undefined, capabilities: CapabilityRegistry.getInstance().getCapabilities() });
     const initial: Omit<NormalMessage, 'id'> = { type: 'text', content: '', agentId, timestamp: new Date(), discussionId: id, status: 'streaming', lastUpdateTime: new Date() };
     const created = await messageService.createMessage(initial) as NormalMessage;
@@ -257,7 +273,7 @@ export class DiscussionControlService {
       });
       await messageService.updateMessage(created.id, { status: 'completed', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id);
       finalMessage = await messageService.getMessage(created.id);
-      if (current.role === 'moderator') {
+      if (canUseActions) {
         const actionResultMessage = await this.tryRunActions(finalMessage as NormalMessage);
         if (actionResultMessage) {
           finalMessage = actionResultMessage;

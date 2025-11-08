@@ -1,137 +1,66 @@
-1. **AI 接口层**（与 AI 交互的格式）：
-```markdown
-// 单个 action
-<action await>
+## AI 接口层（实际可用的能力调用格式）
+
+````markdown
+模型在需要调用工具时，必须输出一个 `:::action … :::` 区块：
+
+:::action
 {
-    "capability": "checkSystem",
-    "params": {}
+  "operationId": "searchFiles_482910_0",
+  "capability": "searchFiles",
+  "description": "让我搜索一下相关文件",
+  "params": {
+    "query": "*.ts"
+  }
 }
-</action>
+:::
+````
 
-// action group（并发执行）
-<action-group await>
-  <action>
-    { "capability": "checkDisk" }
-  </action>
-  <action>
-    { "capability": "checkMemory" }
-  </action>
-</action-group>
+字段含义：
 
-// flow（顺序执行）
-<flow await>
-  <action await>
-    { "capability": "step1" }
-  </action>
-  <action-group await>
-    <action>{ "capability": "step2a" }</action>
-    <action>{ "capability": "step2b" }</action>
-  </action-group>
-</flow>
-```
+- `operationId`：唯一 ID，通常按照 `{capability}_{timestamp}_{sequence}` 生成。
+- `capability`：要调用的系统能力名称，必须存在于 `CapabilityRegistry`。
+- `description`：自然语言描述本次操作的目的，便于人类理解。
+- `params`：传入能力的参数对象，可为空对象。
 
-2. **内部实现**：
-```typescript
-// 基础接口
-interface Action {
+> ⚠️ 当前实现**仅支持**上述线性语法。`<flow>`、`<action-group>`、`await` 等扩展语法尚未实现，也不会被解析。
+
+## 内部实现
+
+```ts
+interface ActionDef {
+  operationId: string;
+  type: "action";
   capability: string;
+  description: string;
   params: Record<string, unknown>;
-  await?: boolean;
+  await?: boolean; // 预留字段，当前执行器不会使用
 }
 
-interface ActionGroup {
-  actions: Action[];
-  await?: boolean;
-}
-
-interface Flow {
-  operations: (Action | ActionGroup)[];
-  await?: boolean;
-}
-
-// 解析器
 class ActionParser {
-  parse(content: string): (Action | ActionGroup | Flow)[] {
-    const operations = [];
-    
-    // 解析 flow
-    const flowMatches = content.matchAll(/<flow(?:\s+await)?>([\s\S]*?)<\/flow>/g);
-    for (const match of flowMatches) {
-      const isAwait = match[0].includes('await');
-      operations.push({
-        type: 'flow',
-        await: isAwait,
-        operations: this.parseFlowContent(match[1])
-      });
-    }
-    
-    // 解析 action-group
-    const groupMatches = content.matchAll(/<action-group(?:\s+await)?>([\s\S]*?)<\/action-group>/g);
-    for (const match of groupMatches) {
-      const isAwait = match[0].includes('await');
-      operations.push({
-        type: 'group',
-        await: isAwait,
-        actions: this.parseGroupContent(match[1])
-      });
-    }
-    
-    // 解析单个 action
-    const actionMatches = content.matchAll(/<action(?:\s+await)?>([\s\S]*?)<\/action>/g);
-    for (const match of actionMatches) {
-      const isAwait = match[0].includes('await');
-      const action = JSON.parse(match[1]);
-      operations.push({
-        ...action,
-        await: isAwait
-      });
-    }
-    
-    return operations;
+  parse(content: string): ActionParseResult<ActionDef>[] {
+    const actionRegex = /:::action(?:\s+|\s*\n)([\s\S]*?)(?:\s*\n|)\s*:::\s*/g;
+    // 每个 :::action 块被单独解析为 ActionDef
   }
 }
 
-// 执行器
-class ActionExecutor {
-  async execute(operation: Action | ActionGroup | Flow): Promise<void> {
-    if (this.isFlow(operation)) {
-      // 顺序执行
-      for (const op of operation.operations) {
-        if (operation.await) {
-          await this.execute(op);
-        } else {
-          this.execute(op).catch(console.error);
-        }
-      }
-    } else if (this.isGroup(operation)) {
-      // 并发执行
-      const promises = operation.actions.map(action => 
-        this.executeAction(action)
-      );
-      
-      if (operation.await) {
-        await Promise.all(promises);
-      }
-    } else {
-      // 单个 action
-      const promise = this.executeAction(operation);
-      if (operation.await) {
-        await promise;
-      }
-    }
+class DefaultActionExecutor {
+  async execute(actions: ActionParseResult[], registry: CapabilityRegistry) {
+    // 顺序执行解析到的每个 ActionDef
+    // 成功/失败结果会被包装为 action_result 消息写回消息流
   }
 }
 ```
 
-这个方案的特点：
-1. 保持了三层结构：
-   - `action`: 原子操作
-   - `action-group`: 并发执行组
-   - `flow`: 顺序执行流
+执行流程：
 
-2. 每层都支持 await 控制
+1. `ActionParser` 顺序扫描消息内容中的每个 `:::action` 块。
+2. 解析得到的 `ActionDef` 会被 `DefaultActionExecutor` 依次执行。
+3. 每条 action 的 `result`/`error`、`status` 等会写入一条新的 `action_result` 系统消息。
+4. 目前没有并发、流程控制、嵌套等高级语义，模型不应该输出这些标记。
 
-3. XML 风格的标记语言对 AI 友好
+## 行为约束
 
-4. 内部实现清晰且类型安全
-
+- 能力调用前后需要用自然语言解释目的及后续计划。
+- 一次消息可以包含多个 `:::action` 区块，但它们会按出现顺序依次执行。
+- 在 `action_result` 返回前不要继续下一步推理或重复调用相同能力。
+- 如果系统提示权限不足或出现解析错误，应改为自然语言沟通并等待进一步指示。

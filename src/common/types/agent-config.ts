@@ -8,5 +8,5 @@ export interface IAgentConfig extends AgentDef {
     minResponseDelay?: number;
     contextMessages?: number;
   };
+  canUseActions?: boolean;
 }
-

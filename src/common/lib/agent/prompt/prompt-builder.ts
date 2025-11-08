@@ -30,10 +30,11 @@ export class PromptBuilder {
       messages,
       capabilities,
     } = context;
+    const canUseActions = Boolean(currentAgentConfig.canUseActions);
     const systemPromptList = [
       createRolePrompt(currentAgent, agents),
-      currentAgent.role === "moderator"
-        ? generateCapabilityPrompt(capabilities)
+      canUseActions
+        ? generateCapabilityPrompt(capabilities, { role: currentAgent.role })
         : "",
     ].filter(Boolean);
 

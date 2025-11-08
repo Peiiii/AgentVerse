@@ -26,6 +26,10 @@ export class DiscussionService {
         moderationStyle: "relaxed",
         focusTopics: [],
         allowConflict: true,
+        toolPermissions: {
+          moderator: true,
+          participant: false,
+        },
       },
       createdAt: new Date(),
       updatedAt: new Date(),

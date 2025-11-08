@@ -71,8 +71,39 @@ export const MentionRules = {
   },
 };
 
-export function generateCapabilityPrompt(capabilities: Capability[]): string {
+export function generateCapabilityPrompt(
+  capabilities: Capability[],
+  options?: { role?: AgentDef["role"] }
+): string {
   const timestamp = Date.now().toString().slice(-6);
+  const role = options?.role ?? "moderator";
+  const permissionNotice =
+    role === "moderator"
+      ? `<permission-notice>
+  <rule>你是主持人，拥有完整的工具权限</rule>
+  <rule>你负责判断何时通过能力推进讨论</rule>
+  <rule>若系统提示暂停或撤回权限，必须立即停止 action</rule>
+</permission-notice>`
+      : `<permission-notice>
+  <rule>你是受邀成员，系统暂时授予工具权限</rule>
+  <rule>仅在主持人、系统或用户明确要求你执行操作时才调用 action</rule>
+  <rule>如果收到“无权限”“请停止”之类的提示，立即停止 action 并说明原因</rule>
+</permission-notice>`;
+
+  const roleUsageBlock =
+    role === "moderator"
+      ? `<capability-usage>
+  <rule>不要同时使用 @ 和 action 能力</rule>
+  <rule>当需要调用 action 时，等待上一个对话回合结束</rule>
+  <rule>优先通过语言引导而非直接调用能力</rule>
+  <rule>在总结或需要查证时才使用 action</rule>
+</capability-usage>`
+      : `<capability-usage>
+  <rule>一次只发送一个 :::action 块，保持流程清晰</rule>
+  <rule>在调用前后说明目的，提醒主持人你正在执行能力</rule>
+  <rule>若未获明确授权，优先通过文字讨论而非调用能力</rule>
+  <rule>等待 action-result 返回后再继续你的发言</rule>
+</capability-usage>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <capability-system>
@@ -86,6 +117,8 @@ export function generateCapabilityPrompt(capabilities: Capability[]): string {
       )
       .join("\n    ")}
   </capabilities>
+
+  ${permissionNotice}
 
   <action-syntax>
     <rule>使用 :::action 容器语法调用能力</rule>
@@ -126,6 +159,8 @@ export function generateCapabilityPrompt(capabilities: Capability[]): string {
 :::
     ]]></content>
   </example>
+
+  ${roleUsageBlock}
 
   <description-rules>
     <rule>使用第一人称，像对话一样自然</rule>

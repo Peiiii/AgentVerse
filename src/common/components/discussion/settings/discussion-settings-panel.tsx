@@ -13,6 +13,11 @@ const MODERATION_STYLE_OPTIONS: Array<{
   { value: "relaxed", label: "宽松" },
 ];
 
+const DEFAULT_TOOL_PERMISSIONS: DiscussionSettings["toolPermissions"] = {
+  moderator: true,
+  participant: true,
+};
+
 export interface DiscussionSettingsPanelProps {
   settings: DiscussionSettings;
   onSettingsChange: (settings: DiscussionSettings) => void;
@@ -25,6 +30,17 @@ export function DiscussionSettingsPanel({ settings, onSettingsChange }: Discussi
   ) => {
     onSettingsChange({ ...settings, [key]: value });
   };
+  const updateToolPermission = (role: "moderator" | "participant", value: boolean) => {
+    const currentPermissions = settings.toolPermissions ?? DEFAULT_TOOL_PERMISSIONS;
+    onSettingsChange({
+      ...settings,
+      toolPermissions: {
+        ...currentPermissions,
+        [role]: value,
+      },
+    });
+  };
+  const resolvedToolPermissions = settings.toolPermissions ?? DEFAULT_TOOL_PERMISSIONS;
 
   return (
     <div className="space-y-4 rounded-lg border bg-card/50 p-4">
@@ -67,6 +83,29 @@ export function DiscussionSettingsPanel({ settings, onSettingsChange }: Discussi
           checked={settings.allowConflict}
           onCheckedChange={(checked) => updateSetting("allowConflict", checked)}
         />
+      </div>
+
+      <div className="space-y-3 rounded-md border border-dashed border-border/50 bg-background/50 p-3">
+        <div>
+          <div className="text-sm font-semibold">工具权限</div>
+          <p className="text-xs text-muted-foreground">
+            控制哪些角色可以调用系统能力（如搜索、创建 Agent 等）
+          </p>
+        </div>
+        <div className="grid gap-3">
+          <SettingSwitch
+            label="主持人可调用"
+            description="主持人可以直接使用 action 能力辅助协作"
+            checked={resolvedToolPermissions.moderator}
+            onCheckedChange={(checked) => updateToolPermission("moderator", checked)}
+          />
+          <SettingSwitch
+            label="参与者可调用"
+            description="普通成员可在获得授权后使用 action 能力"
+            checked={resolvedToolPermissions.participant}
+            onCheckedChange={(checked) => updateToolPermission("participant", checked)}
+          />
+        </div>
       </div>
     </div>
   );

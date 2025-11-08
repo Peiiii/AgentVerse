@@ -62,4 +62,5 @@ export interface DiscussionSettings {
   moderationStyle: "strict" | "relaxed";
   focusTopics: string[];
   allowConflict: boolean;
+  toolPermissions: Record<"moderator" | "participant", boolean>;
 }
