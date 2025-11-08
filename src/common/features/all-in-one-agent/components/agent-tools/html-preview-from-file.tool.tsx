@@ -1,8 +1,8 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
-import { SidePanelConfig } from "@/common/components/world-class-chat/hooks/use-side-panel-manager";
-import { WorldClassChatHtmlPreview } from "@/common/components/world-class-chat/components/world-class-chat-html-preview";
-import { useIframeManager } from "@/common/components/world-class-chat/hooks/use-iframe-manager";
+import { SidePanelConfig } from "@/common/features/world-class-chat/hooks/use-side-panel-manager";
+import { WorldClassChatHtmlPreview } from "@/common/features/world-class-chat/components/world-class-chat-html-preview";
+import { useIframeManager } from "@/common/features/world-class-chat/hooks/use-iframe-manager";
 import { defaultFileManager } from "@/common/lib/file-manager.service";
 
 export interface HtmlPreviewFromFileToolParams {
@@ -164,7 +164,7 @@ export function createHtmlPreviewFromFileTool(
               onRefresh={handleRefresh}
               showRefreshButton={true}
               iframeId={returnedIframeId || undefined}
-              onIframeReady={(element) => {
+              onIframeReady={(element: HTMLIFrameElement) => {
                 if (iframeManager && returnedIframeId) {
                   iframeManager.registerElement(returnedIframeId, element);
                 }

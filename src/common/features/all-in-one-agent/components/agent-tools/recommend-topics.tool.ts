@@ -1,6 +1,6 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
-import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
 
 export interface RecommendTopicsParams {
   context?: "greeting" | "general" | "learning" | "health" | "work" | "shopping" | "travel";

@@ -1,6 +1,6 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
-import { useIframeManager } from "@/common/components/world-class-chat/hooks/use-iframe-manager";
+import { useIframeManager } from "@/common/features/world-class-chat/hooks/use-iframe-manager";
 
 export interface SendMessageToIframeToolParams {
   iframeId: string;

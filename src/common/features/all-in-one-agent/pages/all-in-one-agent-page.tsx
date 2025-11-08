@@ -1,8 +1,8 @@
 import {
   WorldClassChatContainer,
   WorldClassChatContainerRef,
-} from "@/common/components/world-class-chat";
-import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+} from "@/common/features/world-class-chat";
+import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";

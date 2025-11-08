@@ -1,6 +1,6 @@
-import { AgentChatInput, AgentChatMessages } from "@/common/components/chat/agent-chat";
-import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
-import { ChatWelcomeHeader } from "@/common/components/chat/chat-welcome-header";
+import { AgentChatInput, AgentChatMessages } from "@/common/features/chat/components/agent-chat";
+import { AgentChatProviderWrapper } from "@/common/features/chat/components/agent-chat/agent-chat-provider-wrapper";
+import { ChatWelcomeHeader } from "@/common/features/chat/components/chat-welcome-header";
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";

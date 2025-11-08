@@ -1,4 +1,4 @@
-import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
 import type { AgentTool } from "../preview";
 
 /**

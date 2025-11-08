@@ -1,9 +1,9 @@
-import { AgentChatContainer } from "@/common/components/chat/agent-chat";
+import { AgentChatContainer } from "@/common/features/chat/components/agent-chat";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
-import { MCPServerManager, MCPToolsDisplay, MCPServerForm, MCPImportForm } from "@/common/components/mcp";
+import { MCPServerManager, MCPToolsDisplay, MCPServerForm, MCPImportForm } from "@/common/features/mcp/components";
 import { useAllTools } from "@/common/hooks/use-all-tools";
 import { useMCPServers } from "@/common/hooks/use-mcp-servers";
 import { AgentDef } from "@/common/types/agent";

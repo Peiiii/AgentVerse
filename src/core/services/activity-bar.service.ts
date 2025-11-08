@@ -1,4 +1,4 @@
-import { useSettingsDialog } from "@/common/components/settings/settings-dialog";
+import { useSettingsDialog } from "@/common/features/settings/components/settings-dialog";
 import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useCallback, useMemo } from "react";
 

@@ -1,7 +1,7 @@
-import { AgentChatContainer, AgentChatContainerRef } from "@/common/components/chat/agent-chat";
-import { AgentChatProviderWrapper } from "@/common/components/chat/agent-chat/agent-chat-provider-wrapper";
-import { SuggestionsProvider } from "@/common/components/chat/suggestions";
-import type { Suggestion } from "@/common/components/chat/suggestions/suggestion.types";
+import { AgentChatContainer, AgentChatContainerRef } from "@/common/features/chat/components/agent-chat";
+import { AgentChatProviderWrapper } from "@/common/features/chat/components/agent-chat/agent-chat-provider-wrapper";
+import { SuggestionsProvider } from "@/common/features/chat/components/suggestions";
+import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
 import { AgentTool, useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";

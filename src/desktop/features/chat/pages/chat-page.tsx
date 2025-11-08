@@ -1,9 +1,9 @@
 
-import { ChatArea } from "@/common/components/chat/chat-area";
+import { ChatArea } from "@/common/features/chat/components/chat-area";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
-import { DiscussionController } from "@/common/components/discussion/control/discussion-controller";
-import { DiscussionList } from "@/common/components/discussion/list/discussion-list";
-import { MemberList } from "@/common/components/discussion/member/member-list";
+import { DiscussionController } from "@/common/features/discussion/components/control/discussion-controller";
+import { DiscussionList } from "@/common/features/discussion/components/list/discussion-list";
+import { MemberList } from "@/common/features/discussion/components/member/member-list";
 import { ResponsiveContainer } from "@/common/components/layout/responsive-container";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
