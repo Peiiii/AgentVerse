@@ -1,4 +1,5 @@
 import { useDiscussionsStore } from "@/core/stores/discussions.store";
+import { useMessagesStore } from "@/core/stores/messages.store";
 import { discussionService } from "@/core/services/discussion.service";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import type { Discussion } from "@/common/types/discussion";
@@ -65,11 +66,15 @@ export class DiscussionsManager {
 
   clearMessages = async (discussionId: string) => {
     await messageService.clearMessages(discussionId);
-    // leave messages store to reload by subscriber
+    const { setMessages } = useMessagesStore.getState();
+    if (discussionControlService.getCurrentDiscussionId() === discussionId) {
+      setMessages([]);
+    }
   };
 
   clearAllMessages = async () => {
     const list = this.getAll();
     await Promise.all(list.map((d) => messageService.clearMessages(d.id)));
+    useMessagesStore.getState().setMessages([]);
   };
 }

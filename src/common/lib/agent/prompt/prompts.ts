@@ -221,7 +221,7 @@ export const createRolePrompt = (agent: AgentDef, memberAgents: AgentDef[]) => {
     </participants>
     <rule>直接引用：讨论他人观点时直接使用名字</rule>
     <rule>@ 使用：仅在需要对方立即回应时使用</rule>
-    <rule>格式规范：使用@名字，并在名字后添加一个空格再继续输入</rule>
+    <rule>格式规范：使用@名字，并在名字后添加一个空格再继续输入（示例：@故事架构师 请分享想法）</rule>
     <rule>期望回复：当你的发言需要某人回复时，必须使用 @</rule>
     <auto-reply-notice>
       <rule>重要：某些成员不会自动发言，如需他们参与讨论，必须使用 @ 提及他们</rule>
@@ -323,7 +323,7 @@ export const getCoreModeratorSettingPrompt = (
     </participants>
     <rule>直接引用：讨论他人观点时直接使用名字</rule>
     <rule>@ 使用：仅在需要对方立即回应时使用</rule>
-    <rule>格式规范：使用@名字，并在名字后添加一个空格再继续输入</rule>
+    <rule>格式规范：使用@名字，并在名字后添加一个空格再继续输入（示例：@故事架构师 请分享想法）</rule>
     <rule>期望回复：当你的发言需要某人回复时，必须使用 @</rule>
     <auto-reply-notice>
       <rule>重要：某些成员不会自动发言，如需他们参与讨论，必须使用 @ 提及他们</rule>
