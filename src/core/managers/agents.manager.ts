@@ -26,7 +26,7 @@ export class AgentsManager {
   add = async (agent: Omit<AgentDef, "id">) => {
     const created = await agentService.createAgent(agent);
     const { agents, setAgents } = this.store.getState();
-    setAgents([...agents, created]);
+    setAgents([created, ...agents]);
     return created;
   };
 
@@ -75,4 +75,3 @@ export class AgentsManager {
     return this.store.getState().agents.find((a) => a.id === id)?.avatar || "";
   };
 }
-
