@@ -62,6 +62,8 @@ export class DiscussionControlService {
     currentSpeakerId: null as string | null,
     currentAbort: undefined as AbortController | undefined,
     snapshot$: new BehaviorSubject<Snapshot>({ isRunning: false, currentSpeakerId: null, processed: 0, roundLimit: 20 }),
+    pendingMentions: [] as string[],
+    pendingMentionSourceId: null as string | null,
   };
 
   constructor() {
@@ -130,12 +132,19 @@ export class DiscussionControlService {
   }
 
   // --- merged controller methods ---
-  private extractMention(content: string): string | null {
-    const re = /@(?:"([^"]+)"|'([^']+)'|“([^”]+)”|‘([^’]+)’|「([^」]+)」|『([^』]+)』|（([^）]+)）|【([^】]+)】|([^\s@]+))/i;
-    const match = content.match(re);
-    if (!match) return null;
-    const [, ...groups] = match;
-    return groups.find(Boolean) ?? null;
+  private extractMentions(content: string): string[] {
+    const re =
+      /@(?:"([^"]+)"|'([^']+)'|“([^”]+)”|‘([^’]+)’|「([^」]+)」|『([^』]+)』|（([^）]+)）|【([^】]+)】|《([^》]+)》|〈([^〉]+)〉|([^\s@，。,！？!?:：；;]+(?:\s+[^\s@，。,！？!?:：；;]+)*))/giu;
+    const results: string[] = [];
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(content)) !== null) {
+      const [, ...groups] = match;
+      const candidate = groups.find(Boolean);
+      if (candidate) {
+        results.push(candidate);
+      }
+    }
+    return results;
   }
 
   private normalizeMentionTarget(target: string | null): string | null {
@@ -143,20 +152,53 @@ export class DiscussionControlService {
     const cleaned = target
       .trim()
       .replace(/^["'“”‘’「」『』【】《》〈〉（）()]+/, "")
-      .replace(/["'“”‘’「」『』【】《》〈〉（）()\s，。,。！？!?:：；;、、]+$/u, "")
+      .replace(/["'“”‘’「」『』【】《》〈〉（）()\s，。,。！？!?:：；;、]+$/u, "")
+      .replace(/\s{2,}/g, " ")
       .trim();
     return cleaned.length ? cleaned : null;
+  }
+
+  private prepareMentionQueue(trigger: AgentMessage) {
+    if (trigger.type !== "text") return;
+    if (this.ctrl.pendingMentionSourceId === trigger.id && this.ctrl.pendingMentions.length > 0) {
+      return;
+    }
+    const mentions = this.extractMentions(trigger.content)
+      .map((m) => this.normalizeMentionTarget(m))
+      .filter((m): m is string => Boolean(m));
+    if (mentions.length > 0) {
+      this.ctrl.pendingMentions = mentions;
+      this.ctrl.pendingMentionSourceId = trigger.id;
+    } else if (this.ctrl.pendingMentionSourceId === trigger.id) {
+      this.ctrl.pendingMentions = [];
+      this.ctrl.pendingMentionSourceId = null;
+    }
+  }
+
+  private takeNextMention(members: Member[]): string | null {
+    if (!this.ctrl.pendingMentions.length) return null;
+    const defs = agentListResource.read().data;
+    while (this.ctrl.pendingMentions.length) {
+      const target = this.ctrl.pendingMentions.shift()!;
+      const agent = defs.find((a) => a.name.toLowerCase() === target.toLowerCase());
+      if (agent && members.find((m) => m.agentId === agent.id)) {
+        if (!this.ctrl.pendingMentions.length) {
+          this.ctrl.pendingMentionSourceId = null;
+        }
+        return agent.id;
+      }
+    }
+    this.ctrl.pendingMentionSourceId = null;
+    return null;
   }
 
   private async selectNextAgentId(trigger: AgentMessage, lastResponder: string | null): Promise<string | null> {
     const members = this.ctrl.members; if (members.length === 0) return null;
     if (trigger.type === 'action_result' && lastResponder) { if (members.find(m => m.agentId === lastResponder)) return lastResponder; }
-    const mention = trigger.type === 'text'
-      ? this.normalizeMentionTarget(this.extractMention(trigger.content))
-      : null;
-    if (mention) {
-      const defs = agentListResource.read().data; const agent = defs.find(a => a.name.toLowerCase() === mention.toLowerCase());
-      if (agent && members.find(m => m.agentId === agent.id)) return agent.id;
+    if (trigger.type === "text") {
+      this.prepareMentionQueue(trigger);
+      const mentionTarget = this.takeNextMention(members);
+      if (mentionTarget) return mentionTarget;
     }
     const autos = members.filter(m => m.isAutoReply);
     if (trigger.agentId === 'user') {
