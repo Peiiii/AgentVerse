@@ -175,12 +175,25 @@ export class DiscussionControlService {
     }
   }
 
+  private isBoundaryChar(char: string | undefined) {
+    if (!char) return true;
+    return /\s|[，。,。！？!?:：；;、]/u.test(char);
+  }
+
   private takeNextMention(members: Member[]): string | null {
     if (!this.ctrl.pendingMentions.length) return null;
     const defs = agentListResource.read().data;
     while (this.ctrl.pendingMentions.length) {
       const target = this.ctrl.pendingMentions.shift()!;
-      const agent = defs.find((a) => a.name.toLowerCase() === target.toLowerCase());
+      const targetLower = target.toLowerCase();
+      const agent = defs.find((a) => {
+        const nameLower = a.name.toLowerCase();
+        if (!targetLower.startsWith(nameLower)) {
+          return false;
+        }
+        const nextChar = targetLower.charAt(nameLower.length);
+        return this.isBoundaryChar(nextChar);
+      });
       if (agent && members.find((m) => m.agentId === agent.id)) {
         if (!this.ctrl.pendingMentions.length) {
           this.ctrl.pendingMentionSourceId = null;
