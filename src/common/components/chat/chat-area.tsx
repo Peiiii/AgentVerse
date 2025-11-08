@@ -38,6 +38,12 @@ export function ChatArea({
   // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 
+  const syncDiscussionMembers = () => {
+    const latestMembers =
+      presenter.discussionMembers.store.getState().members;
+    presenter.discussionControl.setMembers(latestMembers);
+  };
+
   useEffect(() => {
     presenter.discussionControl.setMessages(messages);
   }, [messages]);
@@ -71,8 +77,11 @@ export function ChatArea({
       });
       if (agentMessage) {
         console.log("[chat-area] handleSendMessage after add message", members);
-        presenter.discussionControl.setMembers(members);
-        presenter.discussionControl.setMessages([...messages, agentMessage]);
+        syncDiscussionMembers();
+        presenter.discussionControl.setMessages([
+          ...messages,
+          agentMessage,
+        ]);
         // 直接走简化控制器：先启动/恢复，再处理本条消息（无事件总线）
         await presenter.discussionControl.startIfEligible();
         await presenter.discussionControl.process(agentMessage);
@@ -104,6 +113,7 @@ export function ChatArea({
       if (customMembers && customMembers.length > 0) {
         console.log(`使用自定义成员: ${customMembers.length} 个成员`);
         await presenter.discussionMembers.addMany(customMembers);
+        syncDiscussionMembers();
         await handleSendMessage(topic, "user");
         return;
       }
@@ -155,6 +165,7 @@ export function ChatArea({
       if (membersToAdd.length > 0) {
         console.log(`批量添加 ${membersToAdd.length} 个成员...`);
         await presenter.discussionMembers.addMany(membersToAdd);
+        syncDiscussionMembers();
         await handleSendMessage(topic, "user");
       } else {
         console.error("没有成功添加任何成员，无法启动讨论");
