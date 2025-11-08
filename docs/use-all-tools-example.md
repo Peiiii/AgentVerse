@@ -7,7 +7,7 @@
 ```tsx
 import { useAllTools } from '@/common/hooks/use-all-tools';
 import { useProvideAgentToolDefs, useProvideAgentToolExecutors } from '@agent-labs/agent-chat';
-import { AgentChatContainer } from '@/common/components/chat/agent-chat';
+import { AgentChatContainer } from '@/common/features/chat/components/agent-chat';
 
 function MCPChatComponent() {
   // 使用 useAllTools hook 获取转换后的工具

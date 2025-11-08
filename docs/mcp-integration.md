@@ -89,7 +89,7 @@ src/desktop/features/mcp/
 ### 基本使用
 
 ```tsx
-import { MCPProvider } from "@/common/components/mcp/mcp-provider";
+import { MCPProvider } from "@/common/features/mcp/components/mcp-provider";
 import { useMCPTools } from "@/common/hooks/use-mcp-tools";
 
 function App() {
