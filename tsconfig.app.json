@@ -25,7 +25,8 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@cardos/service-bus-portal": ["./packages/service-bus-portal/src/index.ts"]
     }
   },
   "include": ["src"]

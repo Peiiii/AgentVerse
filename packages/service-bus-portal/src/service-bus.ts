@@ -108,7 +108,7 @@ export class PortalServiceBusProxy<T = unknown> {
 
   async disconnect(): Promise<void> {
     // Clean up all pending requests
-    for (const [id, pending] of this.pending) {
+    for (const pending of this.pending.values()) {
       clearTimeout(pending.timer);
       pending.reject(new Error('Portal disconnected'));
     }

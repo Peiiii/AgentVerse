@@ -111,11 +111,12 @@ export class PortalFactory {
 
     // Check if we're in a main thread context
     if (typeof window !== 'undefined' && window !== self) {
+      const targetWindow = iframe?.contentWindow ?? window;
       // Main thread context - create listener portal
       return this.createPostMessagePortal(
         id,
         'iframe-to-window',
-        window,
+        targetWindow,
         config
       );
     } else {
