@@ -186,8 +186,8 @@ export const createRolePrompt = (agent: AgentDef, memberAgents: AgentDef[]) => {
   </role-profile>
 
   <world-rules>
-    <rule>每个发言者都有独立ID前缀</rule>
-    <rule>你只能控制以【${agent.id}】开头的消息</rule>
+    <rule>每个发言者都有独立ID前缀（系统内部标记）</rule>
+    <rule>系统会自动处理ID，你的输出中不要添加任何ID或编号前缀</rule>
     <rule>其他Agent的行为由系统管理</rule>
   </world-rules>
 
@@ -297,8 +297,8 @@ export const getCoreModeratorSettingPrompt = (
   </role-profile>
 
   <world-rules>
-    <rule>每个发言者都有独立ID前缀</rule>
-    <rule>你只能控制以【${agent.id}】开头的消息</rule>
+    <rule>每个发言者都有独立ID前缀（系统内部标记）</rule>
+    <rule>系统会自动处理ID，你的输出中不要添加任何ID或编号前缀</rule>
     <rule>其他Agent的行为由系统管理</rule>
   </world-rules>
 

@@ -13,6 +13,8 @@ import { PATTERN_LINGUIST } from "./top-agents/pattern-linguist";
 import { PSYCHE_TIME_TRAVELER } from "./top-agents/psyche-time-traveler";
 import { QUANTUM_ADVISOR } from "./top-agents/quantum-advisor";
 import { ESSENCE_PERSPECTIVIST } from "./top-agents/essence-perspectivist";
+import { MEANING_SEEKER } from "./top-agents/meaning-seeker";
+import { STRUCTURE_ARCHITECT } from "./top-agents/structure-architect";
 // 导入新的实用角色
 import { IMPLEMENTATION_ARCHITECT } from "./practical-agents/implementation-architect";
 import { STARTUP_NAVIGATOR } from "./practical-agents/startup-navigator";
@@ -69,6 +71,8 @@ export const PARTICIPANT_IDS = {
   STARTUP_NAVIGATOR: "startup-navigator",
   STRUCTURED_THINKER: "structured-thinker",
   ESSENCE_PERSPECTIVIST: "essence-perspectivist",
+  MEANING_SEEKER: "meaning-seeker",
+  STRUCTURE_ARCHITECT: "structure-architect",
 } as const;
 
 // 定义主持人 ID
@@ -397,6 +401,8 @@ export const PARTICIPANTS_MAP: Record<string, Omit<AgentDef, "id">> = {
   [PARTICIPANT_IDS.IMPLEMENTATION_ARCHITECT]: IMPLEMENTATION_ARCHITECT,
   [PARTICIPANT_IDS.STARTUP_NAVIGATOR]: STARTUP_NAVIGATOR,
   [PARTICIPANT_IDS.ESSENCE_PERSPECTIVIST]: ESSENCE_PERSPECTIVIST,
+  [PARTICIPANT_IDS.MEANING_SEEKER]: MEANING_SEEKER,
+  [PARTICIPANT_IDS.STRUCTURE_ARCHITECT]: STRUCTURE_ARCHITECT,
 };
 
 // 主持人映射
@@ -636,6 +642,8 @@ export const AGENT_COMBINATIONS = {
       PARTICIPANTS_MAP[PARTICIPANT_IDS.DEVIL_ADVOCATE],
       PARTICIPANTS_MAP[PARTICIPANT_IDS.QUALITY_REVIEWER],
       PARTICIPANTS_MAP[PARTICIPANT_IDS.ESSENCE_PERSPECTIVIST],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.MEANING_SEEKER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.STRUCTURE_ARCHITECT],
     ],
   },
 
