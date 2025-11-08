@@ -27,10 +27,10 @@ import { mobileChatExtension } from "@/mobile/features/chat/extensions";
 import { useEffect, useState } from "react";
 import { HashRouter } from "react-router-dom";
 import { useProxyBeanState } from "rx-nested-bean";
+import { useMobileChatSceneStore } from "@/mobile/features/chat/stores/mobile-chat-scene.store";
+import { mobileChatSceneManager } from "@/mobile/features/chat/managers/mobile-chat-scene.manager";
 
 // 场景类型
-type Scene = "discussions" | "chat" | "agents" | "settings";
-
 export function MobileAppInner() {
   useSetupApp({
     extensions: [
@@ -46,7 +46,6 @@ export function MobileAppInner() {
   // agents/messages 由业务组件直连 presenter/store
   const presenter = usePresenter();
   const { currentDiscussion } = useDiscussions();
-  const [currentScene, setCurrentScene] = useState<Scene>("chat");
   const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
     false,
     {
@@ -66,13 +65,15 @@ export function MobileAppInner() {
   const { height } = useViewportHeight();
   const { openSettingsDialog } = useSettingsDialog();
   const [showMobileMemberDrawer, setShowMobileMemberDrawer] = useState(false);
+  const scene = useMobileChatSceneStore((state) => state.scene);
+  const { toChat, toDiscussions, toAgents, toSettings } = mobileChatSceneManager;
 
-  // 处理场景切换
   useEffect(() => {
-    if (currentDiscussion && isMobile) {
-      setCurrentScene("chat");
+    if (!isMobile || !currentDiscussionId) {
+      return;
     }
-  }, [currentDiscussion, isMobile]);
+    mobileChatSceneManager.handleDiscussionChange(currentDiscussionId);
+  }, [currentDiscussionId, isMobile]);
 
   const handleStatusChange = (status: Discussion["status"]) => {
     setIsPaused(status === "paused");
@@ -88,20 +89,13 @@ export function MobileAppInner() {
 
   // 业务消息在 ChatArea 内部处理
 
-  const handleSelectDiscussion = () => {
-    if (!isDesktop) {
-      setCurrentScene("chat");
-    }
-  };
-
-
   // 渲染当前场景内容
   const renderSceneContent = () => {
-    if (currentScene === "chat" && currentDiscussion) {
+    if (scene === "chat" && currentDiscussion) {
       return (
         <div className="flex flex-col h-full">
           <MobileHeader
-            onToggleSidebar={() => setCurrentScene("discussions")}
+            onToggleSidebar={toDiscussions}
             className="lg:hidden flex-none"
             title={currentDiscussion.title || "讨论系统"}
             status={status}
@@ -131,11 +125,11 @@ export function MobileAppInner() {
     return (
       <div className="flex flex-col h-full">
         <div className="flex-1 min-h-0">
-          {currentScene === "agents" ? (
+          {scene === "agents" ? (
             <div className="h-full p-4 overflow-y-auto">
               <AddAgentDialogContent />
             </div>
-          ) : currentScene === "settings" ? (
+          ) : scene === "settings" ? (
             <div className="h-full overflow-y-auto">
               <div className="space-y-6 p-4">
                 {/* 通用 */}
@@ -206,21 +200,35 @@ export function MobileAppInner() {
               </div>
             </div>
           ) : (
-            <DiscussionList onSelectDiscussion={handleSelectDiscussion} />
+            <DiscussionList />
           )}
         </div>
         {/* 只在主场景页面显示底部导航 */}
-        {currentScene !== "chat" && (
+        {scene !== "chat" && (
           <MobileBottomBar
-            currentScene={currentScene}
-            onSceneChange={setCurrentScene}
+            currentScene={scene}
+            onSceneChange={(nextScene) => {
+              switch (nextScene) {
+                case "chat":
+                  toChat();
+                  break;
+                case "discussions":
+                  toDiscussions();
+                  break;
+                case "agents":
+                  toAgents();
+                  break;
+                case "settings":
+                  toSettings();
+                  break;
+              }
+            }}
             className="lg:hidden"
           />
         )}
       </div>
     );
   };
-
 
   // 移动端布局
   return (

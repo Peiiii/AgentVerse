@@ -5,7 +5,7 @@ import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
-import { ChatPage } from "../pages/chat-page";
+import { ChatPage } from "@/mobile/features/chat/pages/chat-page";
 
 export const mobileChatExtension = defineExtension({
     manifest: {

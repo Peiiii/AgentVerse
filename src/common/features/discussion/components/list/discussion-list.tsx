@@ -14,15 +14,10 @@ export function DiscussionList({
   className,
   headerClassName,
   listClassName,
-  onSelectDiscussion,
 }: DiscussionListProps) {
   const { agents } = useAgents();
   const presenter = usePresenter();
-  const {
-    discussions,
-    currentDiscussion,
-    isLoading,
-  } = useDiscussions();
+  const { discussions, currentDiscussion, isLoading } = useDiscussions();
 
   const handleCreateDiscussion = async () => {
     if (agents.length === 0) return;
@@ -45,11 +40,6 @@ export function DiscussionList({
     }
   }, [messages]);
 
-  // 当当前会话变化时，通知外部（保持兼容）
-  useEffect(() => {
-    if (currentDiscussion?.id) onSelectDiscussion?.(currentDiscussion.id);
-  }, [currentDiscussion?.id]);
-
   return (
     <div
       className={cn("flex flex-col flex-1 overflow-hidden h-full", className)}
@@ -62,7 +52,10 @@ export function DiscussionList({
       />
 
       <div
-        className={cn("flex-1 min-h-0 overflow-y-auto scrollbar-custom", listClassName)}
+        className={cn(
+          "flex-1 min-h-0 overflow-y-auto scrollbar-custom",
+          listClassName
+        )}
       >
         <div className="divide-y divide-border/[0.06]">
           {discussions.map((discussion) => (
@@ -81,4 +74,4 @@ export function DiscussionList({
       </div>
     </div>
   );
-} 
+}

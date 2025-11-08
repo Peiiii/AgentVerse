@@ -4,7 +4,6 @@ export interface DiscussionListProps {
   className?: string;
   headerClassName?: string;
   listClassName?: string;
-  onSelectDiscussion?: (discussionId: string) => void;
 }
 
 export interface DiscussionItemProps {

@@ -1,7 +1,7 @@
 import { getPresenter } from "@/core/presenter/presenter";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
-import { ChatPage } from "../pages/chat-page";
+import { ChatPage } from "@/desktop/features/chat/pages/chat-page";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { RedirectToChat } from "@/common/components/common/redirect";
 import { ModuleOrderEnum } from "@/core/config/module-order";
