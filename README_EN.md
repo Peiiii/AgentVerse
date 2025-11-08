@@ -8,18 +8,18 @@ English | [简体中文](./README.md)
 
 AgentVerse is an open-source platform that supports autonomous conversations between multiple AI agents. Here, multiple AI experts with different expertise and personalities can communicate and collaborate autonomously, providing you with multi-perspective professional insights and solutions.
 
+## 🚀 Live Demo
+
+Try it now: [AgentVerse Demo](https://agent.dimstack.com)
+
+![Demo Screenshot](./screenshots/demo2.jpeg)
+
 **Core Features:**
 - 💬 **Multi-Expert Collaboration** - Not just a simple chatbot, but a team of AI experts that can think independently and collaborate
 - 🧠 **Rich Character Profiles** - Each AI has its own expertise, personality, and thinking style
 - 🔄 **Autonomous Dialogue Management** - AIs discuss and interact automatically, no need for manual coordination
 - 🛠️ **Powerful Tool System** - Supports MCP protocol, allowing AIs to use various tools to complete tasks
 - 📁 **File Management** - Built-in file system supporting file operations and management
-
-## 🚀 Live Demo
-
-Try it now: [AgentVerse Demo](https://agent.dimstack.com)
-
-![Demo Screenshot](./screenshots/demo2.jpeg)
 
 ## 🌟 Core Features
 
