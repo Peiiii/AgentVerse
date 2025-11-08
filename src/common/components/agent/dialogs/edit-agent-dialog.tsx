@@ -1,6 +1,5 @@
 import { useModal } from "@/common/components/ui/modal";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
-import { useAgents } from "@/core/hooks/useAgents";
 import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
@@ -37,7 +36,6 @@ export function EditAgentDialogContent({
 export function useEditAgentDialog() {
   const modal = useModal();
   const presenter = usePresenter();
-  const {} = useAgents();
   const { isMobile } = useBreakpointContext();
 
   const openEditAgentDialog = useCallback((agent: AgentDef) => {
