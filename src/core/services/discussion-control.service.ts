@@ -2,7 +2,7 @@ import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { RxEvent } from "@/common/lib/rx-event";
 import { getPresenter } from "@/core/presenter/presenter";
 import { discussionCapabilitiesResource } from "@/core/resources/discussion-capabilities.resource";
-import { AgentMessage, DiscussionSettings, NormalMessage } from "@/common/types/discussion";
+import { AgentMessage, DiscussionSettings, NormalMessage, ActionResultMessage } from "@/common/types/discussion";
 import { DiscussionError, DiscussionErrorType, handleDiscussionError } from "./discussion-error.util";
 import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { createNestedBean } from "packages/rx-nested-bean/src";
@@ -209,15 +209,19 @@ export class DiscussionControlService {
     const next = autos.find(m => m.agentId !== trigger.agentId); return next ? next.agentId : null;
   }
 
-  private async tryRunActions(agentMessage: NormalMessage) {
+  private async tryRunActions(agentMessage: NormalMessage): Promise<ActionResultMessage | null> {
     const parser = new ActionParser(); const exec = new DefaultActionExecutor(); const reg = Caps.getInstance();
-    const parsed = parser.parse(agentMessage.content); if (!parsed.length) return;
+    const parsed = parser.parse(agentMessage.content); if (!parsed.length) return null;
     const results = await exec.execute(parsed, reg);
     const resultMessage: Omit<import("@/common/types/discussion").ActionResultMessage, 'id' | 'discussionId'> = {
       type: 'action_result', agentId: 'system', timestamp: new Date(), originMessageId: agentMessage.id,
       results: results.map((r, i) => { const def = parsed[i].parsed as ActionDef | undefined; return ({ operationId: def?.operationId ?? `op-${i}`, capability: r.capability, params: r.params || {}, status: r.error ? 'error' : 'success', result: r.result, description: def?.description ?? '', error: r.error, startTime: r.startTime, endTime: r.endTime }); })
     };
-    await messageService.addMessage(agentMessage.discussionId, resultMessage);
+    const created = await getPresenter().messages.create({
+      ...resultMessage,
+      discussionId: agentMessage.discussionId,
+    });
+    return created as ActionResultMessage;
   }
 
   private async addSystemMessage(content: string) { const id = this.ctrl.discussionId; if (!id) return; const msg: Omit<NormalMessage, 'id'> = { type: 'text', content, agentId: 'system', timestamp: new Date(), discussionId: id }; await messageService.createMessage(msg); }
@@ -231,6 +235,7 @@ export class DiscussionControlService {
     const initial: Omit<NormalMessage, 'id'> = { type: 'text', content: '', agentId, timestamp: new Date(), discussionId: id, status: 'streaming', lastUpdateTime: new Date() };
     const created = await messageService.createMessage(initial) as NormalMessage;
     this.ctrl.currentSpeakerId = agentId; this.publishCtrl(); this.ctrl.currentAbort = new AbortController();
+    let finalMessage: AgentMessage | null = null;
     try {
       const stream = aiService.streamChatCompletion(prepared); let content = '';
       await new Promise<void>((resolve, reject) => {
@@ -238,11 +243,20 @@ export class DiscussionControlService {
         this.ctrl.currentAbort?.signal.addEventListener('abort', () => { sub.unsubscribe(); resolve(); });
       });
       await messageService.updateMessage(created.id, { status: 'completed', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id);
-      if (current.role === 'moderator') await this.tryRunActions(created);
+      finalMessage = await messageService.getMessage(created.id);
+      if (current.role === 'moderator') {
+        const actionResultMessage = await this.tryRunActions(finalMessage as NormalMessage);
+        if (actionResultMessage) {
+          finalMessage = actionResultMessage;
+        }
+      }
     } catch (e) {
       await messageService.updateMessage(created.id, { status: 'error', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id); throw e;
     } finally { this.ctrl.currentSpeakerId = null; this.ctrl.currentAbort = undefined; this.publishCtrl(); }
-    return await messageService.getMessage(created.id) as AgentMessage;
+    if (!finalMessage) {
+      finalMessage = await messageService.getMessage(created.id);
+    }
+    return finalMessage as AgentMessage;
   }
 
   private async processInternal(trigger: AgentMessage): Promise<void> {

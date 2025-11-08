@@ -260,14 +260,25 @@ const capabilities: Capability[] = [
   </notes>
 </capability>`,
     execute: async () => {
-      const members = discussionMembersResource.current.read().data;
-      const agents = agentListResource.read().data;
+      const discussionId = discussionControlService.getCurrentDiscussionId();
+      if (!discussionId) {
+        return [];
+      }
 
-      return members.map((member) => ({
-        ...member,
-        agentName:
-          agents.find((agent) => agent.id === member.agentId)?.name || "未知",
-      }));
+      const [members, agents] = await Promise.all([
+        discussionMemberService.list(discussionId),
+        // agentListResource 读取的是同步数据，直接 read 即可
+        Promise.resolve(agentListResource.read().data),
+      ]);
+
+      return members.map((member) => {
+        const agentName =
+          agents.find((agent) => agent.id === member.agentId)?.name || "未知";
+        return {
+          ...member,
+          agentName,
+        };
+      });
     },
   },
   {
