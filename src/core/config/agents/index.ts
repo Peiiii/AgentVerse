@@ -15,9 +15,18 @@ import { QUANTUM_ADVISOR } from "./top-agents/quantum-advisor";
 import { ESSENCE_PERSPECTIVIST } from "./top-agents/essence-perspectivist";
 import { MEANING_SEEKER } from "./top-agents/meaning-seeker";
 import { STRUCTURE_ARCHITECT } from "./top-agents/structure-architect";
+import { TROLL_PICKER } from "./top-agents/troll-picker";
+import { TROLL_ATTACKER } from "./top-agents/troll-attacker";
+import { TROLL_SABOTEUR } from "./top-agents/troll-saboteur";
+import { TROLL_CYNIC } from "./top-agents/troll-cynic";
+import { TROLL_HATER } from "./top-agents/troll-hater";
+import { TROLL_NONSENSE } from "./top-agents/troll-nonsense";
+import { TROLL_SPAMMER } from "./top-agents/troll-spammer";
 // 导入新的实用角色
 import { IMPLEMENTATION_ARCHITECT } from "./practical-agents/implementation-architect";
 import { STARTUP_NAVIGATOR } from "./practical-agents/startup-navigator";
+// 导入杠精主持人
+import { TROLL_MODERATOR } from "./moderators/troll-moderator";
 
 // 定义组合类型
 export type AgentCombinationType =
@@ -33,7 +42,8 @@ export type AgentCombinationType =
   | "emotionalDecision"
   | "narrativeExploration"
   | "practicalTeam"
-  | "experimentalThinking"; // 新增实验性思考团队
+  | "experimentalThinking" // 新增实验性思考团队
+  | "trollTeam"; // 杠精小队
 
 // 定义参与者 ID
 export const PARTICIPANT_IDS = {
@@ -73,6 +83,13 @@ export const PARTICIPANT_IDS = {
   ESSENCE_PERSPECTIVIST: "essence-perspectivist",
   MEANING_SEEKER: "meaning-seeker",
   STRUCTURE_ARCHITECT: "structure-architect",
+  TROLL_PICKER: "troll-picker",
+  TROLL_ATTACKER: "troll-attacker",
+  TROLL_SABOTEUR: "troll-saboteur",
+  TROLL_CYNIC: "troll-cynic",
+  TROLL_HATER: "troll-hater",
+  TROLL_NONSENSE: "troll-nonsense",
+  TROLL_SPAMMER: "troll-spammer",
 } as const;
 
 // 定义主持人 ID
@@ -85,6 +102,7 @@ export const MODERATOR_IDS = {
   DISCUSSION_MODERATOR: "discussion-moderator",
   META_COGNITIVE_ORCHESTRATOR: "meta-cognitive-orchestrator", // 新增
   STRUCTURED_THINKING_MODERATOR: "structured-thinking-moderator",
+  TROLL_MODERATOR: "troll-moderator",
 } as const;
 
 // 参与者映射
@@ -403,6 +421,13 @@ export const PARTICIPANTS_MAP: Record<string, Omit<AgentDef, "id">> = {
   [PARTICIPANT_IDS.ESSENCE_PERSPECTIVIST]: ESSENCE_PERSPECTIVIST,
   [PARTICIPANT_IDS.MEANING_SEEKER]: MEANING_SEEKER,
   [PARTICIPANT_IDS.STRUCTURE_ARCHITECT]: STRUCTURE_ARCHITECT,
+  [PARTICIPANT_IDS.TROLL_PICKER]: TROLL_PICKER,
+  [PARTICIPANT_IDS.TROLL_ATTACKER]: TROLL_ATTACKER,
+  [PARTICIPANT_IDS.TROLL_SABOTEUR]: TROLL_SABOTEUR,
+  [PARTICIPANT_IDS.TROLL_CYNIC]: TROLL_CYNIC,
+  [PARTICIPANT_IDS.TROLL_HATER]: TROLL_HATER,
+  [PARTICIPANT_IDS.TROLL_NONSENSE]: TROLL_NONSENSE,
+  [PARTICIPANT_IDS.TROLL_SPAMMER]: TROLL_SPAMMER,
 };
 
 // 主持人映射
@@ -625,6 +650,7 @@ export const MODERATORS_MAP: Record<string, Omit<AgentDef, "id">> = {
   },
   [MODERATOR_IDS.META_COGNITIVE_ORCHESTRATOR]: META_COGNITIVE_ORCHESTRATOR,
   [MODERATOR_IDS.STRUCTURED_THINKING_MODERATOR]: STRUCTURED_THINKING_MODERATOR,
+  [MODERATOR_IDS.TROLL_MODERATOR]: TROLL_MODERATOR,
 };
 
 // 组合配置
@@ -656,6 +682,22 @@ export const AGENT_COMBINATIONS = {
       PARTICIPANTS_MAP[PARTICIPANT_IDS.EMOTION_DESIGNER],
       PARTICIPANTS_MAP[PARTICIPANT_IDS.CULTURE_OBSERVER],
       PARTICIPANTS_MAP[PARTICIPANT_IDS.CROSS_THINKER],
+    ],
+  },
+
+  // 杠精小队
+  trollTeam: {
+    name: "杠精小队",
+    description: "一群无敌杠精，专门挑刺、抬杠、捣乱，互相攻击，从来不干正事",
+    moderator: MODERATORS_MAP[MODERATOR_IDS.TROLL_MODERATOR],
+    participants: [
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_PICKER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_ATTACKER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_SABOTEUR],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_CYNIC],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_HATER],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_NONSENSE],
+      PARTICIPANTS_MAP[PARTICIPANT_IDS.TROLL_SPAMMER],
     ],
   },
 
