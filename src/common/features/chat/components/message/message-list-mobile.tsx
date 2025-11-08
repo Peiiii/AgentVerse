@@ -3,6 +3,8 @@ import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 import { usePresenter } from "@/core/presenter";
+import { chatScrollManager } from "@/common/features/chat/managers/chat-scroll.manager";
+import { useChatScrollStore } from "@/common/features/chat/stores/chat-scroll.store";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -36,15 +38,20 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
     const [showScrollButton, setShowScrollButton] = useState(false);
     // 保存容器DOM引用
     const containerRef = useRef<HTMLDivElement>(null);
-    
+    const currentDiscussionId =
+      presenter.discussions.store((s) => s.currentId) ?? undefined;
+    const messages = presenter.messages.store((s) => s.messages);
+    const { pinned, initialSynced } = useChatScrollStore();
+
     const {
       scrollableLayoutRef,
       messagesContainerRef,
       reorganizedMessages,
-      scrollToBottom
+      scrollToBottom,
+      contentVersion,
     } = useMessageList({
-      messages: usePresenter().messages.store((s) => s.messages),
-      discussionId: usePresenter().discussions.store((s) => s.currentId) ?? undefined,
+      messages,
+      discussionId: currentDiscussionId,
       scrollButtonThreshold,
     });
 
@@ -83,6 +90,12 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
           initialAlignment="bottom"
           unpinThreshold={1}
           pinThreshold={30}
+          conversationId={currentDiscussionId ?? null}
+          contentVersion={contentVersion}
+          pinned={pinned}
+          initialSynced={initialSynced}
+          onPinnedChange={chatScrollManager.setPinned}
+          onInitialSynced={chatScrollManager.markInitialSynced}
         >
           {/* 消息列表 */}
           <div

@@ -9,8 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { MessageCapture } from "./message-capture";
 import { MessageItemWechat } from "./message-item-wechat";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
+import { useChatScrollStore } from "@/common/features/chat/stores/chat-scroll.store";
 import { useAgents } from "@/core/hooks/useAgents";
 import { usePresenter } from "@/core/presenter";
+import { chatScrollManager } from "@/common/features/chat/managers/chat-scroll.manager";
 
 /**
  * 微信PC端消息列表设计：
@@ -38,16 +40,20 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     const { agents } = useAgents();
     const presenter = usePresenter();
     const navigate = useNavigate();
+    const currentDiscussionId =
+      presenter.discussions.store((s) => s.currentId) ?? undefined;
+    const { pinned, initialSynced } = useChatScrollStore();
     const {
       scrollableLayoutRef,
       messagesContainerRef,
       showScrollButton,
       reorganizedMessages,
       handleScroll,
-      scrollToBottom
+      scrollToBottom,
+      contentVersion,
     } = useMessageList({
       messages: presenter.messages.store((s) => s.messages),
-      discussionId: presenter.discussions.store((s) => s.currentId) ?? undefined,
+      discussionId: currentDiscussionId,
       scrollButtonThreshold
     });
 
@@ -80,6 +86,12 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
             unpinThreshold={1}
             pinThreshold={30}
             onScroll={handleScroll}
+            conversationId={currentDiscussionId ?? null}
+            contentVersion={contentVersion}
+            pinned={pinned}
+            initialSynced={initialSynced}
+            onPinnedChange={chatScrollManager.setPinned}
+            onInitialSynced={chatScrollManager.markInitialSynced}
           >
             <div className={cn("py-4")}
               ref={messagesContainerRef}>

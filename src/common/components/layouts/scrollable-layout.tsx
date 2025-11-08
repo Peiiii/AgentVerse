@@ -15,6 +15,12 @@ interface ScrollableLayoutProps {
   onScroll?: (scrollTop: number, maxScroll: number) => void;
   pinThreshold?: number;
   unpinThreshold?: number;
+  conversationId?: string | null;
+  contentVersion?: string | number;
+  pinned?: boolean;
+  initialSynced?: boolean;
+  onPinnedChange?: (pinned: boolean) => void;
+  onInitialSynced?: () => void;
 }
 
 export interface ScrollableLayoutRef {
@@ -32,6 +38,12 @@ export const ScrollableLayout = forwardRef<
     onScroll,
     pinThreshold,
     unpinThreshold,
+    conversationId,
+    contentVersion,
+    pinned,
+    initialSynced,
+    onPinnedChange,
+    onInitialSynced,
   },
   ref
 ) {
@@ -39,6 +51,12 @@ export const ScrollableLayout = forwardRef<
   const { scrollToBottom } = useAutoScroll(containerRef, children, {
     pinThreshold,
     unpinThreshold,
+    conversationId,
+    contentVersion,
+    pinned,
+    initialSynced,
+    onPinnedChange,
+    onInitialSynced,
   });
 
   useImperativeHandle(ref, () => ({
