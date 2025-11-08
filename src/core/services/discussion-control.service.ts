@@ -131,13 +131,29 @@ export class DiscussionControlService {
 
   // --- merged controller methods ---
   private extractMention(content: string): string | null {
-    const re = /@(?:"([^"]+)"|'([^']+)'|([^\s@]+))/i; const m = content.match(re); return (m?.[1] || m?.[2] || m?.[3]) ?? null;
+    const re = /@(?:"([^"]+)"|'([^']+)'|“([^”]+)”|‘([^’]+)’|「([^」]+)」|『([^』]+)』|（([^）]+)）|【([^】]+)】|([^\s@]+))/i;
+    const match = content.match(re);
+    if (!match) return null;
+    const [, ...groups] = match;
+    return groups.find(Boolean) ?? null;
+  }
+
+  private normalizeMentionTarget(target: string | null): string | null {
+    if (!target) return null;
+    const cleaned = target
+      .trim()
+      .replace(/^["'“”‘’「」『』【】《》〈〉（）()]+/, "")
+      .replace(/["'“”‘’「」『』【】《》〈〉（）()\s，。,。！？!?:：；;、、]+$/u, "")
+      .trim();
+    return cleaned.length ? cleaned : null;
   }
 
   private async selectNextAgentId(trigger: AgentMessage, lastResponder: string | null): Promise<string | null> {
     const members = this.ctrl.members; if (members.length === 0) return null;
     if (trigger.type === 'action_result' && lastResponder) { if (members.find(m => m.agentId === lastResponder)) return lastResponder; }
-    const mention = trigger.type === 'text' ? this.extractMention(trigger.content) : null;
+    const mention = trigger.type === 'text'
+      ? this.normalizeMentionTarget(this.extractMention(trigger.content))
+      : null;
     if (mention) {
       const defs = agentListResource.read().data; const agent = defs.find(a => a.name.toLowerCase() === mention.toLowerCase());
       if (agent && members.find(m => m.agentId === agent.id)) return agent.id;
