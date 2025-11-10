@@ -196,9 +196,10 @@ export class DiscussionControlService {
     while (this.ctrl.pendingMentions.length) {
       const target = this.ctrl.pendingMentions.shift()!;
       const targetLower = target.toLowerCase();
+      const firstTokenLower = targetLower.split(/\s+/)[0];
 
-      // 1) Prefer exact slug match (stable across renames / i18n)
-      const bySlug = defs.find((a) => a.slug && a.slug.toLowerCase() === targetLower);
+      // 1) Prefer exact slug match on the first token (stable across renames / i18n)
+      const bySlug = defs.find((a) => a.slug && a.slug.toLowerCase() === firstTokenLower);
       if (bySlug && members.find((m) => m.agentId === bySlug.id)) {
         if (!this.ctrl.pendingMentions.length) {
           this.ctrl.pendingMentionSourceId = null;

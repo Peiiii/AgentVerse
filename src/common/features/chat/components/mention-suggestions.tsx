@@ -89,7 +89,14 @@ export function MentionSuggestions({
                 fallback={<span className="text-xs">{agentName[0]}</span>}
               />
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">{agentName}</div>
+                <div className="font-medium text-sm truncate flex items-center gap-2">
+                  <span className="truncate">{agentName}</span>
+                  {agent.slug && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground whitespace-nowrap">
+                      @{agent.slug}{agent.version ? ` v${agent.version}` : ""}
+                    </span>
+                  )}
+                </div>
                 {agent.personality && (
                   <div className="text-xs text-muted-foreground truncate">
                     {agent.personality}

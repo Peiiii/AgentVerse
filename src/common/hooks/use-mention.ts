@@ -79,24 +79,32 @@ export function useMention({
 
     return agents.filter((agent) => {
       const name = getAgentName(agent.id).toLowerCase();
-      return name.includes(query) || match.match(getAgentName(agent.id), query);
+      const slug = (agent.slug || "").toLowerCase();
+      return (
+        name.includes(query) ||
+        (!!slug && slug.includes(query)) ||
+        match.match(getAgentName(agent.id), query)
+      );
     });
   }, [mentionState, agents, getAgentName]);
 
   const selectMention = useCallback((agent: AgentDef) => {
     if (!mentionState || !inputRef.current) return;
 
-    const agentName = getAgentName(agent.id);
+    // Prefer inserting slug for stability; fallback to name
+    const insertion = agent.slug && agent.slug.length > 0
+      ? agent.slug
+      : getAgentName(agent.id);
     const beforeMention = value.slice(0, mentionState.startIndex);
     const afterMention = value.slice(mentionState.endIndex);
-    const newValue = `${beforeMention}@${agentName} ${afterMention}`;
+    const newValue = `${beforeMention}@${insertion} ${afterMention}`;
     
     onChange(newValue);
     setMentionState(null);
     
     setTimeout(() => {
       if (inputRef.current) {
-        const newCursorPos = beforeMention.length + agentName.length + 2;
+        const newCursorPos = beforeMention.length + insertion.length + 2;
         inputRef.current.setSelectionRange(newCursorPos, newCursorPos);
         inputRef.current.focus();
       }
@@ -154,4 +162,3 @@ export function useMention({
     handleInputChange,
   };
 }
-
