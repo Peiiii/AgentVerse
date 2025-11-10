@@ -16,7 +16,7 @@ interface UseDiscussionControlProps {
 
 export function useDiscussionControl({ status }: UseDiscussionControlProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const { data: settings, set: setSettings } = useProxyBeanState(
+  const { data: settings } = useProxyBeanState(
     discussionControlService.store,
     "settings"
   );
@@ -49,6 +49,11 @@ export function useDiscussionControl({ status }: UseDiscussionControlProps) {
   const handleStatusChange = (isActive: boolean) => {
     if (!isActive) discussionControlService.pause();
     else void discussionControlService.startIfEligible();
+  };
+
+  const setSettings = (next: typeof settings) => {
+    // Forward settings updates through service to keep runtime in sync
+    discussionControlService.setSettings(next);
   };
 
   return {

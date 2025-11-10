@@ -29,7 +29,7 @@ export function ChatPage() {
     discussionControlService.store,
     "currentDiscussionId"
   );
-  const { data: isPaused, set: setIsPaused } = useProxyBeanState(
+  const { data: isPaused } = useProxyBeanState(
     discussionControlService.store,
     "isPaused"
   );
@@ -44,7 +44,8 @@ export function ChatPage() {
   };
 
   const handleStatusChange = (status: Discussion["status"]) => {
-    setIsPaused(status === "paused");
+    if (status === "paused") discussionControlService.pause();
+    else void discussionControlService.startIfEligible();
   };
 
   // 业务消息在 ChatArea 内部处理

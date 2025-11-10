@@ -59,7 +59,7 @@ export function MobileAppInner() {
     discussionControlService.store,
     "currentDiscussionId"
   );
-  const { data: isPaused, set: setIsPaused } = useProxyBeanState(
+  const { data: isPaused } = useProxyBeanState(
     discussionControlService.store,
     "isPaused"
   );
@@ -78,7 +78,8 @@ export function MobileAppInner() {
   }, [currentDiscussionId, isMobile]);
 
   const handleStatusChange = (status: Discussion["status"]) => {
-    setIsPaused(status === "paused");
+    if (status === "paused") discussionControlService.pause();
+    else void discussionControlService.startIfEligible();
   };
 
   const handleToggleMembers = () => {
