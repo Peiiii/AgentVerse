@@ -50,7 +50,7 @@ export class DiscussionControlService {
   onError$ = new RxEvent<Error>();
   onCurrentDiscussionIdChange$ = new RxEvent<string | null>();
 
-  // rx-nested-bean store kept for UI hooks compatibility
+  // rx-nested-bean store kept for UI hooks compatibility (read-only view)
   store = createNestedBean<State>({
     isPaused: true,
     currentDiscussionId: null,
@@ -81,6 +81,25 @@ export class DiscussionControlService {
     // register capabilities once
     discussionCapabilitiesResource.whenReady().then((data) => {
       CapabilityRegistry.getInstance().registerAll(data);
+    });
+
+    // Bridge ctrl$ -> UI store (read-only view): keep isPaused/currentDiscussionId in sync
+    let prevDiscussionId: string | null = null;
+    this.ctrl$.subscribe((c) => {
+      const isPaused = !c.isRunning;
+      const currentDiscussionId = c.discussionId;
+      const prev = this.store.get();
+      // only write if changed to avoid extra recomputations
+      if (prev.isPaused !== isPaused) {
+        this.setState({ isPaused });
+      }
+      if (prev.currentDiscussionId !== currentDiscussionId) {
+        this.setState({ currentDiscussionId });
+      }
+      if (prevDiscussionId !== currentDiscussionId) {
+        prevDiscussionId = currentDiscussionId;
+        this.onCurrentDiscussionIdChange$.next(currentDiscussionId);
+      }
     });
   }
 
@@ -116,16 +135,13 @@ export class DiscussionControlService {
   private getCtrlState(): CtrlState { return this.ctrl$.getValue(); }
 
   // state accessors
-  getCurrentDiscussionId(): string | null { return this.getState().currentDiscussionId; }
-  getCurrentDiscussionId$() { return this.store.namespaces.currentDiscussionId.$ as unknown as import('rxjs').Observable<string | null>; }
-  isPaused(): boolean { return this.getState().isPaused; }
-  private setPaused(paused: boolean) { this.setState({ isPaused: paused }); }
+  getCurrentDiscussionId(): string | null { return this.getCtrlState().discussionId; }
+  getCurrentDiscussionId$() { return this.ctrl$.asObservable().pipe(map((c) => c.discussionId)); }
+  isPaused(): boolean { return !this.getCtrlState().isRunning; }
 
   // mutations
   setCurrentDiscussionId(id: string | null) {
-    if (this.getState().currentDiscussionId === id) return;
-    this.setState({ currentDiscussionId: id });
-    this.onCurrentDiscussionIdChange$.next(id);
+    if (this.getCtrlState().discussionId === id) return;
     const maxRounds = Math.trunc(Number(this.getState().settings.maxRounds) || 0);
     this.patchCtrl({ discussionId: id, roundLimit: Math.max(1, maxRounds || 1) });
   }
@@ -156,7 +172,6 @@ export class DiscussionControlService {
 
   // runtime
   pause() {
-    this.setPaused(true);
     const cur = this.getCtrlState();
     if (cur.currentAbort) {
       cur.currentAbort.abort();
@@ -164,7 +179,6 @@ export class DiscussionControlService {
     this.patchCtrl({ isRunning: false, currentAbort: undefined, currentSpeakerId: null });
   }
   resume() {
-    this.setPaused(false);
     this.patchCtrl({ isRunning: true, processed: 0 });
   }
 
@@ -172,7 +186,6 @@ export class DiscussionControlService {
     if (!this.isPaused()) return true;
     const { members } = this.getState();
     if (members.length <= 0) return false;
-    this.setPaused(false);
     this.patchCtrl({ isRunning: true, processed: 0 });
     return true;
   }
@@ -295,7 +308,10 @@ export class DiscussionControlService {
 
   private handleError(error: unknown, message: string, context?: Record<string, unknown>) {
     const discussionError = error instanceof DiscussionError ? error : new DiscussionError(DiscussionErrorType.GENERATE_RESPONSE, message, error, context);
-    const { shouldPause } = handleDiscussionError(discussionError); if (shouldPause) { this.setPaused(true); }
+    const { shouldPause } = handleDiscussionError(discussionError);
+    if (shouldPause) {
+      this.patchCtrl({ isRunning: false });
+    }
     this.onError$.next(discussionError);
   }
 
