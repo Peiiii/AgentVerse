@@ -1,8 +1,8 @@
 import { IconRegistry } from "@/common/components/common/icon-registry";
 import { ThemeToggle } from "@/common/components/common/theme";
 import { cn } from "@/common/lib/utils";
-import { useActivityBarService } from "@/core/services/activity-bar.service";
-import { ActivityItem } from "@/core/stores/activity-bar.store";
+import { usePresenter } from "@/core/presenter";
+import { useActivityBarStore, type ActivityItem } from "@/core/stores/activity-bar.store";
 import { ActivityBar } from "composite-kit";
 import { LayoutDashboard } from "lucide-react";
 interface ActivityBarProps {
@@ -10,25 +10,35 @@ interface ActivityBarProps {
 }
 
 export function ActivityBarComponent({ className }: ActivityBarProps) {
-  const {
-    expanded,
-    setExpanded,
-    activeId,
-    handleItemClick,
-    items,
-  } = useActivityBarService();
+  // subscribe state directly from zustand store (MVP: view subscribes state)
+  const expanded = useActivityBarStore((s) => s.expanded);
+  const activeId = useActivityBarStore((s) => s.activeId);
+  const rawItems = useActivityBarStore((s) => s.items);
 
-  // 从items中按组筛选，避免重复订阅
-  const mainGroupItems = items.filter(item => item.group === 'main');
-  const footerItems = items.filter(item => item.group === 'footer');
+  // actions are exposed via manager on presenter (MVP: actions via manager)
+  const presenter = usePresenter();
 
+  // sort items by order without mutating store state
+  const items = [...rawItems].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  // 按组筛选
+  const mainGroupItems = items.filter((item) => item.group === "main");
+  const footerItems = items.filter((item) => item.group === "footer");
 
   const handleExpandedChange = (newExpanded: boolean) => {
-    setExpanded(newExpanded);
+    presenter.activityBar.setExpanded(newExpanded);
   };
 
-  const handleActiveChange = (activeId: string) => {
-    handleItemClick(activeId);
+  const handleActiveChange = (nextActiveId: string) => {
+    const clicked = items.find((it) => it.id === nextActiveId);
+
+    // per-item click handler if provided by extension/feature
+    if (clicked?.onClick) {
+      try { clicked.onClick(); } catch (e: unknown) { /* no-op */ }
+    }
+
+    // update active state after handling side effects
+    presenter.activityBar.setActiveId(nextActiveId);
   };
 
   return (

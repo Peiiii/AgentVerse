@@ -1,4 +1,4 @@
-import { ActivityBarManager, IconManager, RouteTreeManager, NavigationManager, DiscussionsManager, AgentsManager, MessagesManager, DiscussionMembersManager } from "@/core/managers";
+import { ActivityBarManager, IconManager, RouteTreeManager, NavigationManager, DiscussionsManager, AgentsManager, MessagesManager, DiscussionMembersManager, SettingsManager } from "@/core/managers";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { RxEvent } from "@/common/lib/rx-event";
 
@@ -15,6 +15,7 @@ export class Presenter {
   readonly messages = new MessagesManager();
   readonly discussionMembers = new DiscussionMembersManager();
   readonly discussionControl = discussionControlService;
+  readonly settings = new SettingsManager();
 
   // simple app-wide event bus for cross-module communication when needed
   readonly events = {

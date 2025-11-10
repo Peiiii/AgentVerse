@@ -23,6 +23,7 @@ export const githubExtension = defineExtension({
             group: "footer",
             icon: "github",
             order: 40,
+            onClick: () => window.open("https://github.com/Peiiii/AgentVerse", "_blank"),
         })))
     },
 });     

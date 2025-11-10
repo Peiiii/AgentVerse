@@ -1,6 +1,7 @@
 import { ModuleOrderEnum } from "@/core/config/module-order";
 import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Settings } from "lucide-react";
 
@@ -24,6 +25,7 @@ export const settingsExtension = defineExtension({
             group: "footer",
             icon: "settings",
             order: ModuleOrderEnum.SETTINGS,
+            onClick: () => getPresenter().settings.open(),
         })))
     },
 });
