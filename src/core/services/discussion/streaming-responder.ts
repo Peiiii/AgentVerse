@@ -5,7 +5,7 @@ import type { IAgentConfig } from "@/common/types/agent-config";
 import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
 type Deps = {
-  aiService: { streamChatCompletion: (prepared: any) => import("rxjs").Observable<string> };
+  aiService: { streamChatCompletion: (prepared: unknown) => import("rxjs").Observable<string> };
   messageService: {
     createMessage: (m: Omit<NormalMessage, "id">) => Promise<AgentMessage>;
     updateMessage: (id: string, patch: Partial<NormalMessage>) => Promise<AgentMessage>;

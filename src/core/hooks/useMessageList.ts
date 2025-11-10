@@ -50,9 +50,9 @@ export function useMessageList({
   const reorganizedMessages = reorganizeMessages(messages);
   // Build a richer contentVersion so streaming updates (status/content/lastUpdateTime) trigger auto-scroll
   const last = reorganizedMessages[reorganizedMessages.length - 1];
-  const lastStatus = (last as any)?.status ?? '';
-  const lastUpdated = (last as any)?.lastUpdateTime ? new Date((last as any).lastUpdateTime).getTime() : 0;
-  const lastLen = typeof (last as any)?.content === 'string' ? ((last as any).content as string).length : 0;
+  const lastStatus = last?.status ?? '';
+  const lastUpdated = last?.lastUpdateTime ? new Date(last.lastUpdateTime).getTime() : 0;
+  const lastLen = typeof last?.content === 'string' ? last.content.length : 0;
   const contentVersion = `${discussionId ?? 'none'}:${reorganizedMessages.length}:${last?.id ?? 'none'}:${lastStatus}:${lastUpdated}:${lastLen}`;
   useEffect(() => {
     chatScrollManager.setConversation(discussionId ?? null);

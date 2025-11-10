@@ -104,6 +104,9 @@ export function useAutoScroll(
       lastScrollTop: 0,
       lastScrollHeight: 0,
     };
+    // On conversation switch, snap to bottom instantly to show the latest context
+    // This ensures default sticky experience when entering a chat
+    scrollToBottom(true);
   }, [conversationId]);
 
   useEffect(() => {
