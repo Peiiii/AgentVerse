@@ -1,11 +1,12 @@
 import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { PromptBuilder } from "@/common/lib/agent/prompt/prompt-builder";
 import { AgentDef } from "@/common/types/agent";
+import { ChatMessage } from "@/common/lib/ai-service";
 import type { IAgentConfig } from "@/common/types/agent-config";
 import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
 type Deps = {
-  aiService: { streamChatCompletion: (prepared: unknown) => import("rxjs").Observable<string> };
+  aiService: { streamChatCompletion: (messages: ChatMessage[]) => import("rxjs").Observable<string> };
   messageService: {
     createMessage: (m: Omit<NormalMessage, "id">) => Promise<AgentMessage>;
     updateMessage: (id: string, patch: Partial<NormalMessage>) => Promise<AgentMessage>;
