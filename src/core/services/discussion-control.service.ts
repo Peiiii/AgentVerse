@@ -196,7 +196,18 @@ export class DiscussionControlService {
     while (this.ctrl.pendingMentions.length) {
       const target = this.ctrl.pendingMentions.shift()!;
       const targetLower = target.toLowerCase();
-      const agent = defs.find((a) => {
+
+      // 1) Prefer exact slug match (stable across renames / i18n)
+      const bySlug = defs.find((a) => a.slug && a.slug.toLowerCase() === targetLower);
+      if (bySlug && members.find((m) => m.agentId === bySlug.id)) {
+        if (!this.ctrl.pendingMentions.length) {
+          this.ctrl.pendingMentionSourceId = null;
+        }
+        return bySlug.id;
+      }
+
+      // 2) Fallback: name-prefix with boundary (legacy behavior)
+      const byName = defs.find((a) => {
         const nameLower = a.name.toLowerCase();
         if (!targetLower.startsWith(nameLower)) {
           return false;
@@ -204,11 +215,11 @@ export class DiscussionControlService {
         const nextChar = targetLower.charAt(nameLower.length);
         return this.isBoundaryChar(nextChar);
       });
-      if (agent && members.find((m) => m.agentId === agent.id)) {
+      if (byName && members.find((m) => m.agentId === byName.id)) {
         if (!this.ctrl.pendingMentions.length) {
           this.ctrl.pendingMentionSourceId = null;
         }
-        return agent.id;
+        return byName.id;
       }
     }
     this.ctrl.pendingMentionSourceId = null;
