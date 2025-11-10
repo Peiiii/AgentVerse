@@ -1,4 +1,4 @@
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -23,7 +23,7 @@ export const desktopIndexedDBExtension = defineExtension({
         })))
 
         // 注册活动栏项目
-        subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
+        subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "indexeddb",
             label: "IndexedDB",
             title: "IndexedDB",

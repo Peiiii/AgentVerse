@@ -1,4 +1,4 @@
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -23,18 +23,14 @@ export const allInOneAgentExtension = defineExtension({
         })
       )
     );
-    subscriptions.push(
-      Disposable.from(
-        useActivityBarStore.getState().addItem({
-          id: "all-in-one-agent",
-          label: "All-in-One Agent",
-          title: "全局超级智能体",
-          group: "main",
-          icon: "sparkles",
-          order: 5,
-        })
-      )
-    );
+    subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
+      id: "all-in-one-agent",
+      label: "All-in-One Agent",
+      title: "全局超级智能体",
+      group: "main",
+      icon: "sparkles",
+      order: 5,
+    })));
     subscriptions.push(
       Disposable.from(
         useRouteTreeStore.getState().addRoutes([

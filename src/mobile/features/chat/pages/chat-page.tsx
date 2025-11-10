@@ -6,7 +6,6 @@ import { DiscussionList } from "@/common/features/discussion/components/list/dis
 import { MobileMemberDrawer } from "@/common/features/discussion/components/member/mobile-member-drawer";
 import { MobileBottomBar } from "@/common/features/app/components/mobile-bottom-bar";
 import { MobileHeader } from "@/common/features/discussion/components/mobile/mobile-header";
-import { useSettingsDialog } from "@/common/features/settings/components/settings-dialog";
 import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
 import { cn } from "@/common/lib/utils";
@@ -30,7 +29,7 @@ export function ChatPage() {
   const isPaused = useIsPaused();
   const status = isPaused ? "paused" : "active";
   const { height } = useViewportHeight();
-  const { openSettingsDialog } = useSettingsDialog();
+  
   const [showMobileMemberDrawer, setShowMobileMemberDrawer] = useState(false);
   const scene = useMobileChatSceneStore((state) => state.scene);
   const { toChat, toDiscussions, toAgents, toSettings } = mobileChatSceneManager;
@@ -57,7 +56,7 @@ export function ChatPage() {
             status={status}
             onStatusChange={handleStatusChange}
             onManageMembers={handleToggleMembers}
-            onOpenSettings={() => openSettingsDialog()}
+            // 移除非必要的 prop 透传：设置入口统一用 presenter.settings.open
             onClearMessages={() => {
               if (currentDiscussion) {
                 presenter.discussions.clearMessages(currentDiscussion.id);
@@ -111,7 +110,7 @@ export function ChatPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={openSettingsDialog}
+                      onClick={() => presenter.settings.open()}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       高级设置

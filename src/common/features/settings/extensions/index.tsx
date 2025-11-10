@@ -1,7 +1,6 @@
 import { ModuleOrderEnum } from "@/core/config/module-order";
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
-import { useIconStore } from "@/core/stores/icon.store";
 import { getPresenter } from "@/core/presenter/presenter";
+import { useIconStore } from "@/core/stores/icon.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Settings } from "lucide-react";
 
@@ -18,7 +17,7 @@ export const settingsExtension = defineExtension({
         subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
             "settings": Settings,
         })))
-        subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
+        subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "settings",
             label: "Settings",
             title: "Settings",

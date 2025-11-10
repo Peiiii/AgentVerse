@@ -1,4 +1,4 @@
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -22,7 +22,7 @@ export const desktopAgentsExtension = defineExtension({
         subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
             "bot": Bot,
         })))
-        subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
+        subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "agents",
             label: "Agents",
             title: "Agents",

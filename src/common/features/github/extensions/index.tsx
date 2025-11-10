@@ -1,4 +1,4 @@
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useIconStore } from "@/core/stores/icon.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Github } from "lucide-react";
@@ -16,7 +16,7 @@ export const githubExtension = defineExtension({
         subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
             "github": Github,
         })))
-        subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
+        subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "github",
             label: "Github",
             title: "Github",

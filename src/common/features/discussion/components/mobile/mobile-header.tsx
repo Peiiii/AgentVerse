@@ -19,7 +19,6 @@ interface MobileHeaderProps {
   status?: "active" | "paused";
   onStatusChange?: (status: "active" | "paused") => void;
   onManageMembers?: () => void;
-  onOpenSettings?: () => void;
   onClearMessages?: () => void;
 }
 

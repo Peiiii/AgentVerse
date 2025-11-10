@@ -5,7 +5,7 @@ import { useTheme } from "@/common/components/common/theme";
 import { Separator } from "@/common/components/ui/separator";
 import { cn } from "@/common/lib/utils";
 import { useModal } from "@/common/components/ui/modal";
-import { useSettingsDialog } from "@/common/features/settings/components/settings-dialog";
+import { usePresenter } from "@/core/presenter";
 
 interface MobileActionSheetProps {
   open: boolean;
@@ -20,7 +20,7 @@ export function MobileActionSheet({
 }: MobileActionSheetProps) {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const modal = useModal();
-  const { openSettingsDialog } = useSettingsDialog();
+  const presenter = usePresenter();
 
   const handleClearMessages = () => {
     modal.confirm({
@@ -84,7 +84,7 @@ export function MobileActionSheet({
             icon={Settings}
             label="讨论设置"
             onClick={() => {
-              openSettingsDialog();
+              presenter.settings.open();
               onOpenChange(false);
             }}
           />

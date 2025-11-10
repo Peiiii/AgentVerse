@@ -1,5 +1,5 @@
 import { RedirectToChat } from "@/common/components/common/redirect";
-import { useActivityBarStore } from "@/core/stores/activity-bar.store";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -20,7 +20,7 @@ export const mobileChatExtension = defineExtension({
         subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
             "message": MessageSquare,
         })))
-        subscriptions.push(Disposable.from(useActivityBarStore.getState().addItem({
+        subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "chat",
             label: "Chat",
             title: "Chat with the user",
