@@ -86,9 +86,9 @@ export function ChatArea({
       console.log("消息发送成功");
     } catch (error) {
       console.error("发送消息失败:", error);
-    } finally {
-      // 确保消息列表滚动到底部
-      messageListRef.current?.scrollToBottom();
+      } finally {
+      // 确保消息列表滚动到底部（用户发送后立即定位，使用 instant）
+      messageListRef.current?.scrollToBottom(true);
     }
   };
 

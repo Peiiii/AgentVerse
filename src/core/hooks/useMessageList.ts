@@ -48,10 +48,12 @@ export function useMessageList({
   };
 
   const reorganizedMessages = reorganizeMessages(messages);
-  const contentVersion =
-    reorganizedMessages.length > 0
-      ? `${discussionId ?? "none"}:${reorganizedMessages[reorganizedMessages.length - 1]?.id}`
-      : `empty-${discussionId ?? "none"}`;
+  // Build a richer contentVersion so streaming updates (status/content/lastUpdateTime) trigger auto-scroll
+  const last = reorganizedMessages[reorganizedMessages.length - 1];
+  const lastStatus = (last as any)?.status ?? '';
+  const lastUpdated = (last as any)?.lastUpdateTime ? new Date((last as any).lastUpdateTime).getTime() : 0;
+  const lastLen = typeof (last as any)?.content === 'string' ? ((last as any).content as string).length : 0;
+  const contentVersion = `${discussionId ?? 'none'}:${reorganizedMessages.length}:${last?.id ?? 'none'}:${lastStatus}:${lastUpdated}:${lastLen}`;
   useEffect(() => {
     chatScrollManager.setConversation(discussionId ?? null);
   }, [discussionId]);
