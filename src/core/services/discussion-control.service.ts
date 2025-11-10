@@ -86,6 +86,30 @@ export class DiscussionControlService {
     discussionCapabilitiesResource.whenReady().then((data) => {
       CapabilityRegistry.getInstance().registerAll(data);
     });
+
+    // Bridge store writes from UI to runtime ctrl$ where needed
+    // 1) settings -> update roundLimit in ctrl
+    (this.store.namespaces.settings.$ as unknown as import('rxjs').Observable<DiscussionSettings>)
+      .subscribe((s) => {
+        const maxRounds = Math.trunc(Number(s.maxRounds) || 0);
+        const nextLimit = Math.max(1, maxRounds || 1);
+        if (this.getCtrlState().roundLimit !== nextLimit) {
+          this.patchCtrl({ roundLimit: nextLimit });
+        }
+      });
+
+    // 2) isPaused -> call pause()/startIfEligible() to sync engine
+    (this.store.namespaces.isPaused.$ as unknown as import('rxjs').Observable<boolean>)
+      .subscribe((paused) => {
+        const running = this.getCtrlState().isRunning;
+        // if state already consistent, skip
+        if (paused === !running) return;
+        if (paused && running) {
+          this.pause();
+        } else if (!paused && !running) {
+          void this.startIfEligible();
+        }
+      });
   }
 
   // helpers
