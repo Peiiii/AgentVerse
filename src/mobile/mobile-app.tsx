@@ -23,11 +23,12 @@ import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { usePresenter } from "@/core/presenter";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
+import { useIsPaused } from "@/core/hooks/useDiscussionRuntime";
 import { mobileChatExtension } from "@/mobile/features/chat/extensions";
 import { useEffect, useState } from "react";
 import { HashRouter } from "react-router-dom";
-import { useProxyBeanState } from "rx-nested-bean";
+import { discussionControlService } from "@/core/services/discussion-control.service";
 import { useMobileChatSceneStore } from "@/mobile/features/chat/stores/mobile-chat-scene.store";
 import { mobileChatSceneManager } from "@/mobile/features/chat/managers/mobile-chat-scene.manager";
 
@@ -55,14 +56,8 @@ export function MobileAppInner() {
       version: 1,
     }
   );
-  const { data: currentDiscussionId } = useProxyBeanState(
-    discussionControlService.store,
-    "currentDiscussionId"
-  );
-  const { data: isPaused } = useProxyBeanState(
-    discussionControlService.store,
-    "isPaused"
-  );
+  const currentDiscussionId = useCurrentDiscussionId();
+  const isPaused = useIsPaused();
   const status = isPaused ? "paused" : "active";
   const { height } = useViewportHeight();
   const { openSettingsDialog } = useSettingsDialog();

@@ -4,9 +4,8 @@ import { discussionControlService } from "@/core/services/discussion-control.ser
 export function useCurrentDiscussionId() {
   const [id, setId] = useState<string | null>(discussionControlService.getCurrentDiscussionId());
   useEffect(() => {
-    const off = discussionControlService.onCurrentDiscussionIdChange$.listen((next) => setId(next));
-    return () => off();
+    const sub = discussionControlService.getCurrentDiscussionId$().subscribe(setId);
+    return () => sub.unsubscribe();
   }, []);
   return id;
 }
-

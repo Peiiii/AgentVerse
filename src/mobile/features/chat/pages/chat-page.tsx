@@ -15,8 +15,9 @@ import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { usePresenter } from "@/core/presenter";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
+import { useIsPaused } from "@/core/hooks/useDiscussionRuntime";
+import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
 import { useState } from "react";
-import { useProxyBeanState } from "rx-nested-bean";
 import { useMobileChatSceneStore } from "@/mobile/features/chat/stores/mobile-chat-scene.store";
 import { mobileChatSceneManager } from "@/mobile/features/chat/managers/mobile-chat-scene.manager";
 
@@ -25,14 +26,8 @@ export function ChatPage() {
   // agents/messages 由业务组件直连 presenter/store
   const presenter = usePresenter();
   const { currentDiscussion } = useDiscussions();
-  const { data: currentDiscussionId } = useProxyBeanState(
-    discussionControlService.store,
-    "currentDiscussionId"
-  );
-  const { data: isPaused } = useProxyBeanState(
-    discussionControlService.store,
-    "isPaused"
-  );
+  const currentDiscussionId = useCurrentDiscussionId();
+  const isPaused = useIsPaused();
   const status = isPaused ? "paused" : "active";
   const { height } = useViewportHeight();
   const { openSettingsDialog } = useSettingsDialog();

@@ -5,7 +5,6 @@ import { discussionCapabilitiesResource } from "@/core/resources/discussion-capa
 import { AgentMessage, DiscussionSettings, NormalMessage, ActionResultMessage } from "@/common/types/discussion";
 import { DiscussionError, DiscussionErrorType, handleDiscussionError } from "./discussion-error.util";
 import { DEFAULT_SETTINGS } from "@/core/config/settings";
-import { createNestedBean } from "packages/rx-nested-bean/src";
 import { BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
 import { agentListResource } from "@/core/resources";
@@ -17,14 +16,8 @@ import { NextSpeakerSelector } from "./discussion/next-speaker";
 import { streamAgentResponse } from "./discussion/streaming-responder";
 import { ActionRunner } from "./discussion/action-runner";
 
-// --- Minimal Rx Store State ---
+// --- Runtime + Config ---
 type Member = { agentId: string; isAutoReply: boolean };
-type State = {
-  isPaused: boolean;
-  currentDiscussionId: string | null;
-  settings: DiscussionSettings;
-  members: Member[];
-};
 
 export type Snapshot = {
   isRunning: boolean;
@@ -50,13 +43,8 @@ export class DiscussionControlService {
   onError$ = new RxEvent<Error>();
   onCurrentDiscussionIdChange$ = new RxEvent<string | null>();
 
-  // rx-nested-bean store kept for UI hooks compatibility (read-only view)
-  store = createNestedBean<State>({
-    isPaused: true,
-    currentDiscussionId: null,
-    settings: DEFAULT_SETTINGS,
-    members: [],
-  });
+  // discussion settings as a dedicated subject
+  private settings$ = new BehaviorSubject<DiscussionSettings>(DEFAULT_SETTINGS);
 
   // Runtime controller state managed by a single BehaviorSubject
   private ctrl$ = new BehaviorSubject<CtrlState>({
@@ -82,30 +70,11 @@ export class DiscussionControlService {
     discussionCapabilitiesResource.whenReady().then((data) => {
       CapabilityRegistry.getInstance().registerAll(data);
     });
-
-    // Bridge ctrl$ -> UI store (read-only view): keep isPaused/currentDiscussionId in sync
-    let prevDiscussionId: string | null = null;
-    this.ctrl$.subscribe((c) => {
-      const isPaused = !c.isRunning;
-      const currentDiscussionId = c.discussionId;
-      const prev = this.store.get();
-      // only write if changed to avoid extra recomputations
-      if (prev.isPaused !== isPaused) {
-        this.setState({ isPaused });
-      }
-      if (prev.currentDiscussionId !== currentDiscussionId) {
-        this.setState({ currentDiscussionId });
-      }
-      if (prevDiscussionId !== currentDiscussionId) {
-        prevDiscussionId = currentDiscussionId;
-        this.onCurrentDiscussionIdChange$.next(currentDiscussionId);
-      }
-    });
   }
 
   // helpers
-  private getState() { return this.store.get(); }
-  private setState(update: Partial<State>) { this.store.set((prev) => ({ ...prev, ...update })); }
+  getSettings(): DiscussionSettings { return this.settings$.getValue(); }
+  getSettings$() { return this.settings$.asObservable(); }
   getSnapshot(): Snapshot {
     const c = this.ctrl$.getValue();
     return {
@@ -142,27 +111,25 @@ export class DiscussionControlService {
   // mutations
   setCurrentDiscussionId(id: string | null) {
     if (this.getCtrlState().discussionId === id) return;
-    const maxRounds = Math.trunc(Number(this.getState().settings.maxRounds) || 0);
+    const maxRounds = Math.trunc(Number(this.getSettings().maxRounds) || 0);
     this.patchCtrl({ discussionId: id, roundLimit: Math.max(1, maxRounds || 1) });
+    this.onCurrentDiscussionIdChange$.next(id);
   }
 
-  setMembers(members: Member[]) {
-    this.setState({ members });
-    this.patchCtrl({ members });
-  }
+  setMembers(members: Member[]) { this.patchCtrl({ members }); }
 
   // setMessages removed: messages are managed by messageService/resources
 
   setSettings(settings: Partial<DiscussionSettings>) {
-    const merged = { ...this.getState().settings, ...settings } as DiscussionSettings;
-    this.setState({ settings: merged });
+    const merged = { ...this.getSettings(), ...settings } as DiscussionSettings;
+    this.settings$.next(merged);
     const maxRounds = Math.trunc(Number(merged.maxRounds) || 0);
     this.patchCtrl({ roundLimit: Math.max(1, maxRounds || 1) });
   }
 
   private agentCanUseActions(agent: AgentDef | undefined): boolean {
     if (!agent) return false;
-    const permissions = this.getState().settings.toolPermissions;
+    const permissions = this.getSettings().toolPermissions;
     const allowed = permissions?.[agent.role];
     if (typeof allowed === "boolean") {
       return allowed;
@@ -184,7 +151,7 @@ export class DiscussionControlService {
 
   async startIfEligible(): Promise<boolean> {
     if (!this.isPaused()) return true;
-    const { members } = this.getState();
+    const { members } = this.getCtrlState();
     if (members.length <= 0) return false;
     this.patchCtrl({ isRunning: true, processed: 0 });
     return true;

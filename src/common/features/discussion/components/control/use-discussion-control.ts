@@ -1,7 +1,7 @@
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { AgentMessage } from "@/common/types/discussion";
 import { useEffect, useState } from "react";
-import { useProxyBeanState } from "rx-nested-bean";
+import { useDiscussionSettings } from "@/core/hooks/useDiscussionSettings";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 
 interface UseDiscussionControlProps {
@@ -16,10 +16,7 @@ interface UseDiscussionControlProps {
 
 export function useDiscussionControl({ status }: UseDiscussionControlProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const { data: settings } = useProxyBeanState(
-    discussionControlService.store,
-    "settings"
-  );
+  const settings = useDiscussionSettings();
   const [messageCount, setMessageCount] = useState(0);
   const { members } = useDiscussionMembers();
 

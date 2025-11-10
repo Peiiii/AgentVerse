@@ -6,9 +6,9 @@ import { MemberList } from "@/common/features/discussion/components/member/membe
 import { ResponsiveContainer } from "@/common/components/layout/responsive-container";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
+import { useIsPaused } from "@/core/hooks/useDiscussionRuntime";
 import { useState } from "react";
-import { useProxyBeanState } from "rx-nested-bean";
 
 export function ChatPage() {
   const { isDesktop } = useBreakpointContext();
@@ -24,14 +24,8 @@ export function ChatPage() {
   const [isInitialState, setIsInitialState] = useState(false);
   const showDesktopMembers =
     isDesktop && showMembersForDesktop && !isInitialState;
-  const { data: currentDiscussionId } = useProxyBeanState(
-    discussionControlService.store,
-    "currentDiscussionId"
-  );
-  const { data: isPaused } = useProxyBeanState(
-    discussionControlService.store,
-    "isPaused"
-  );
+  const currentDiscussionId = useCurrentDiscussionId();
+  const isPaused = useIsPaused();
   const status = isPaused ? "paused" : "active";
 
   const handleToggleMembers = () => {
