@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/common/components/ui/dialog";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
-import { AGENT_COMBINATIONS } from "@/core/config/agents";
+import { AGENT_COMBINATIONS, AgentCombinationType, resolveCombination } from "@/core/config/agents";
 import { useAgents } from "@/core/hooks/useAgents";
 import { usePresenter } from "@/core/presenter";
 
@@ -50,14 +50,12 @@ export function TeamDetailsDialog({
       return presenter.agents.getAgentAvatar(agentByName.id);
     }
     
-    // 在预设组合中查找
-    for (const combination of Object.values(AGENT_COMBINATIONS)) {
-      // 检查主持人
+    // 在预设组合中查找（通过 resolve）
+    for (const [key] of Object.entries(AGENT_COMBINATIONS)) {
+      const combination = resolveCombination(key as AgentCombinationType);
       if (combination.moderator.name === memberRole) {
         return combination.moderator.avatar;
       }
-      
-      // 检查参与者
       for (const participant of combination.participants) {
         if (participant.name === memberRole) {
           return participant.avatar;

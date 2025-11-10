@@ -1,5 +1,5 @@
 import { CustomTeamDialog } from "@/common/features/agents/components/dialogs/custom-team-dialog";
-import { AGENT_COMBINATIONS, AgentCombinationType } from "@/core/config/agents";
+import { AGENT_COMBINATIONS, AgentCombinationType, resolveCombination } from "@/core/config/agents";
 import { useAgents } from "@/core/hooks/useAgents";
 import { usePresenter } from "@/core/presenter";
 import { cn } from "@/common/lib/utils";
@@ -44,16 +44,15 @@ export function InitialExperience({
     } else {
       // 从 agents 中找到对应的成员
       const combination = AGENT_COMBINATIONS[selectedCombinationKey];
-      const combinationMembers = [
-        combination.moderator,
-        ...combination.participants,
-      ]
-        .map((role) => {
-          const agent = agents.find((a) => a.name === role.name);
+      const moderatorSlug = combination.moderator as unknown as string;
+      const participantSlugs = combination.participants as unknown as string[];
+      const combinationMembers = [moderatorSlug, ...participantSlugs]
+        .map((slug) => {
+          const agent = agents.find((a) => a.slug === slug);
           return agent
             ? {
                 agentId: agent.id,
-                isAutoReply: agent.name === combination.moderator.name,
+                isAutoReply: slug === moderatorSlug,
               }
             : null;
         })
@@ -227,6 +226,7 @@ export function InitialExperience({
                             !customMembers.length &&
                             key === selectedCombinationKey;
                           const isRecommended = key === "thinkingTeam";
+                          const resolved = resolveCombination(key as AgentCombinationType);
                           return (
                             <button
                               key={key}
@@ -255,8 +255,8 @@ export function InitialExperience({
                                 )}
                               >
                                 <img
-                                  src={combination.moderator.avatar}
-                                  alt={combination.moderator.name}
+                                  src={resolved.moderator.avatar}
+                                  alt={resolved.moderator.name}
                                   className="w-full h-full object-cover"
                                 />
                               </div>
@@ -342,7 +342,7 @@ export function InitialExperience({
                           )}
                         </h3>
                         <span className="text-xs text-muted-foreground">
-                          {AGENT_COMBINATIONS[selectedCombinationKey]
+                          {resolveCombination(selectedCombinationKey)
                             .participants.length + 1}{" "}
                           位专家
                         </span>
@@ -356,21 +356,17 @@ export function InitialExperience({
                         <div className="text-xs font-medium text-muted-foreground">
                           主持人
                         </div>
-                        <AgentPopover
-                          name={
-                            AGENT_COMBINATIONS[selectedCombinationKey].moderator
-                              .name
-                          }
-                          avatar={
-                            AGENT_COMBINATIONS[selectedCombinationKey].moderator
-                              .avatar
-                          }
-                          role="主持人"
-                          expertise={
-                            AGENT_COMBINATIONS[selectedCombinationKey].moderator
-                              .expertise
-                          }
-                        />
+                        {(() => {
+                          const r = resolveCombination(selectedCombinationKey);
+                          return (
+                            <AgentPopover
+                              name={r.moderator.name}
+                              avatar={r.moderator.avatar}
+                              role="主持人"
+                              expertise={r.moderator.expertise}
+                            />
+                          );
+                        })()}
                       </div>
 
                       <div className="space-y-2">
@@ -378,9 +374,7 @@ export function InitialExperience({
                           团队成员
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {AGENT_COMBINATIONS[
-                            selectedCombinationKey
-                          ].participants.map((participant, idx) => (
+                          {resolveCombination(selectedCombinationKey).participants.map((participant, idx) => (
                             <AgentPopover
                               key={idx}
                               name={participant.name}
@@ -417,23 +411,21 @@ export function InitialExperience({
                       expertise: agent?.expertise || [],
                     };
                   })
-                : [
-                    {
-                      id: "moderator",
-                      role: AGENT_COMBINATIONS[selectedCombinationKey].moderator
-                        .name,
-                      expertise:
-                        AGENT_COMBINATIONS[selectedCombinationKey].moderator
-                          .expertise,
-                    },
-                    ...AGENT_COMBINATIONS[
-                      selectedCombinationKey
-                    ].participants.map((p, i) => ({
-                      id: `member-${i}`,
-                      role: p.name,
-                      expertise: p.expertise,
-                    })),
-                  ],
+                : (() => {
+                    const r = resolveCombination(selectedCombinationKey);
+                    return [
+                      {
+                        id: "moderator",
+                        role: r.moderator.name,
+                        expertise: r.moderator.expertise,
+                      },
+                      ...r.participants.map((p, i) => ({
+                        id: `member-${i}`,
+                        role: p.name,
+                        expertise: p.expertise,
+                      })),
+                    ];
+                  })(),
           }}
           open={isTeamDetailsOpen}
           onOpenChange={setIsTeamDetailsOpen}

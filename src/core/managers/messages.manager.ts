@@ -1,56 +1,40 @@
-import { useMessagesStore } from "@/core/stores/messages.store";
 import { messageService } from "@/core/services/message.service";
 import type { AgentMessage, NormalMessage } from "@/common/types/discussion";
+import { messagesResource } from "@/core/resources";
 
 export class MessagesManager {
-  store = useMessagesStore;
+  // Resource-first reads; writes refresh resource
 
-  loadForDiscussion = async (discussionId: string) => {
-    const s = this.store.getState();
-    s.setLoading(true);
-    try {
-      const list = await messageService.listMessages(discussionId);
-      s.setMessages(list);
-      s.setError(undefined);
-    } catch (e) {
-      s.setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      s.setLoading(false);
-    }
+  loadForDiscussion = async () => {
+    await messagesResource.current.reload();
   };
 
   add = async (discussionId: string, message: Omit<NormalMessage, "id" | "discussionId">) => {
     const created = await messageService.addMessage(discussionId, message);
-    const { messages, setMessages } = this.store.getState();
-    setMessages([...messages, created]);
+    await messagesResource.current.reload();
     // discussionService.updateLastMessage already done inside service
     return created;
   };
 
   create = async (message: Omit<AgentMessage, "id">) => {
     const created = await messageService.createMessage(message);
-    const { messages, setMessages } = this.store.getState();
-    if (created.discussionId === message.discussionId) {
-      setMessages([...messages, created]);
-    }
+    await messagesResource.current.reload();
     return created;
   };
 
   update = async (id: string, updates: Partial<AgentMessage>) => {
     const updated = await messageService.updateMessage(id, updates);
-    const { messages, setMessages } = this.store.getState();
-    setMessages(messages.map((m) => (m.id === id ? updated : m)));
+    await messagesResource.current.reload();
     return updated;
   };
 
   remove = async (id: string) => {
     await messageService.deleteMessage(id);
-    const { messages, setMessages } = this.store.getState();
-    setMessages(messages.filter((m) => m.id !== id));
+    await messagesResource.current.reload();
   };
 
   clearForDiscussion = async (discussionId: string) => {
     await messageService.clearMessages(discussionId);
-    this.store.getState().setMessages([]);
+    await messagesResource.current.reload();
   };
 }

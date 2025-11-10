@@ -3,6 +3,8 @@ import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList";
 import { usePresenter } from "@/core/presenter";
+import { useMessages } from "@/core/hooks/useMessages";
+import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
 import { chatScrollManager } from "@/common/features/chat/managers/chat-scroll.manager";
 import { useChatScrollStore } from "@/common/features/chat/stores/chat-scroll.store";
 import { AnimatePresence, motion } from "framer-motion";
@@ -38,9 +40,8 @@ export const MessageListMobile = forwardRef<MessageListRef, MessageListMobilePro
     const [showScrollButton, setShowScrollButton] = useState(false);
     // 保存容器DOM引用
     const containerRef = useRef<HTMLDivElement>(null);
-    const currentDiscussionId =
-      presenter.discussions.store((s) => s.currentId) ?? undefined;
-    const messages = presenter.messages.store((s) => s.messages);
+    const currentDiscussionId = useCurrentDiscussionId() ?? undefined;
+    const { messages } = useMessages();
     const { pinned, initialSynced } = useChatScrollStore();
 
     const {

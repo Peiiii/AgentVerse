@@ -1,19 +1,13 @@
-import { usePresenter } from "@/core/presenter";
+import { useResourceState } from "@/common/lib/resource";
+import { discussionsResource } from "@/core/resources";
 
-// Thin adapter to new DiscussionsManager + store. Kept for compatibility.
 export function useDiscussions() {
-  const presenter = usePresenter();
-  const discussions = presenter.discussions.store((s) => s.discussions);
-  const currentId = presenter.discussions.store((s) => s.currentId);
-  const isLoading = presenter.discussions.store((s) => s.isLoading);
-  const error = presenter.discussions.store((s) => s.error);
-
-  const currentDiscussion = discussions.find((d) => d.id === currentId) ?? null;
-
+  const listState = useResourceState(discussionsResource.list);
+  const currentState = useResourceState(discussionsResource.current);
   return {
-    discussions,
-    currentDiscussion,
-    isLoading,
-    error,
+    discussions: listState.data,
+    currentDiscussion: currentState.data,
+    isLoading: listState.isLoading || currentState.isLoading,
+    error: listState.error?.message || currentState.error?.message,
   };
 }

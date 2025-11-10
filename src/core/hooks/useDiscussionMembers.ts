@@ -1,14 +1,11 @@
-import { usePresenter } from "@/core/presenter";
+import { useResourceState } from "@/common/lib/resource";
+import { discussionMembersResource } from "@/core/resources";
 
 export function useDiscussionMembers() {
-  const presenter = usePresenter();
-  const members = presenter.discussionMembers.store((s) => s.members);
-  const isLoading = presenter.discussionMembers.store((s) => s.isLoading);
-  const error = presenter.discussionMembers.store((s) => s.error);
-
+  const state = useResourceState(discussionMembersResource.current);
   return {
-    members,
-    isLoading,
-    error,
+    members: state.data,
+    isLoading: state.isLoading,
+    error: state.error?.message,
   };
 }

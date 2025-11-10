@@ -12,6 +12,8 @@ import { useMessageList, type MessageListRef } from "@/core/hooks/useMessageList
 import { useChatScrollStore } from "@/common/features/chat/stores/chat-scroll.store";
 import { useAgents } from "@/core/hooks/useAgents";
 import { usePresenter } from "@/core/presenter";
+import { useMessages } from "@/core/hooks/useMessages";
+import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
 import { chatScrollManager } from "@/common/features/chat/managers/chat-scroll.manager";
 
 /**
@@ -40,8 +42,8 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
     const { agents } = useAgents();
     const presenter = usePresenter();
     const navigate = useNavigate();
-    const currentDiscussionId =
-      presenter.discussions.store((s) => s.currentId) ?? undefined;
+    const currentDiscussionId = useCurrentDiscussionId() ?? undefined;
+    const { messages } = useMessages();
     const { pinned, initialSynced } = useChatScrollStore();
     const {
       scrollableLayoutRef,
@@ -52,7 +54,7 @@ export const MessageListDesktop = forwardRef<MessageListRef, MessageListDesktopP
       scrollToBottom,
       contentVersion,
     } = useMessageList({
-      messages: presenter.messages.store((s) => s.messages),
+      messages,
       discussionId: currentDiscussionId,
       scrollButtonThreshold
     });

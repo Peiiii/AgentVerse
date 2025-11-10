@@ -1,5 +1,9 @@
 export interface AgentDef {
   id: string;
+  // Stable identifier for built-in agents; optional for user-created ones
+  slug?: string;
+  // Definition version for built-in agents; optional
+  version?: number;
   name: string;
   avatar: string;
   prompt: string;
@@ -21,4 +25,3 @@ export interface AgentCombination {
   moderator: CombinationParticipant;
   participants: CombinationParticipant[];
 }
-

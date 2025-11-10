@@ -18,6 +18,7 @@ import { cn } from "@/common/lib/utils";
 import { Discussion } from "@/common/types/discussion";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
+import { useAppBootstrap } from "@/core/hooks/use-app-bootstrap";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { usePresenter } from "@/core/presenter";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
@@ -32,6 +33,7 @@ import { mobileChatSceneManager } from "@/mobile/features/chat/managers/mobile-c
 
 // 场景类型
 export function MobileAppInner() {
+  useAppBootstrap();
   useSetupApp({
     extensions: [
       allInOneAgentExtension,

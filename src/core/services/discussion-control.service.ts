@@ -137,7 +137,7 @@ export class DiscussionControlService {
     try {
       const id = this.getCurrentDiscussionId(); if (!id) throw new Error('No discussion selected');
       if (this.isPaused()) { const started = await this.startIfEligible(); if (!started) return; }
-      await this.processInternal(message); await getPresenter().messages.loadForDiscussion(id);
+      await this.processInternal(message); await getPresenter().messages.loadForDiscussion();
     } catch (error) { this.handleError(error, '处理消息失败'); this.pause(); }
   }
 
@@ -268,10 +268,10 @@ export class DiscussionControlService {
     try {
       const stream = aiService.streamChatCompletion(prepared); let content = '';
       await new Promise<void>((resolve, reject) => {
-        const sub = stream.subscribe({ next: async (chunk: string) => { if (this.ctrl.currentAbort?.signal.aborted) { sub.unsubscribe(); resolve(); return; } content += chunk; await messageService.updateMessage(created.id, { content, lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id); }, error: (e) => { sub.unsubscribe(); reject(e); }, complete: () => { sub.unsubscribe(); resolve(); } });
+      const sub = stream.subscribe({ next: async (chunk: string) => { if (this.ctrl.currentAbort?.signal.aborted) { sub.unsubscribe(); resolve(); return; } content += chunk; await messageService.updateMessage(created.id, { content, lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(); }, error: (e) => { sub.unsubscribe(); reject(e); }, complete: () => { sub.unsubscribe(); resolve(); } });
         this.ctrl.currentAbort?.signal.addEventListener('abort', () => { sub.unsubscribe(); resolve(); });
       });
-      await messageService.updateMessage(created.id, { status: 'completed', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id);
+      await messageService.updateMessage(created.id, { status: 'completed', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion();
       finalMessage = await messageService.getMessage(created.id);
       if (canUseActions) {
         const actionResultMessage = await this.tryRunActions(finalMessage as NormalMessage);
@@ -280,7 +280,7 @@ export class DiscussionControlService {
         }
       }
     } catch (e) {
-      await messageService.updateMessage(created.id, { status: 'error', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(id); throw e;
+      await messageService.updateMessage(created.id, { status: 'error', lastUpdateTime: new Date() }); await getPresenter().messages.loadForDiscussion(); throw e;
     } finally { this.ctrl.currentSpeakerId = null; this.ctrl.currentAbort = undefined; this.publishCtrl(); }
     if (!finalMessage) {
       finalMessage = await messageService.getMessage(created.id);

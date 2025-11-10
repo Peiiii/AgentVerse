@@ -1,32 +1,18 @@
-import { useAgentsStore } from "@/core/stores/agents.store";
 import { agentService } from "@/core/services/agent.service";
+import { agentListResource } from "@/core/resources";
 import type { AgentDef } from "@/common/types/agent";
 
+// Repository-like manager with no local store. Reads from resource, writes via service then reloads resource.
 export class AgentsManager {
-  store = useAgentsStore;
-
-  // reads
-  getAll = () => this.store.getState().agents;
-
   // lifecycle
   load = async () => {
-    const s = this.store.getState();
-    s.setLoading(true);
-    try {
-      const data = await agentService.listAgents();
-      s.setAgents(data);
-      s.setError(undefined);
-    } catch (e) {
-      s.setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      s.setLoading(false);
-    }
+    await agentListResource.reload();
   };
 
+  // CRUD
   add = async (agent: Omit<AgentDef, "id">) => {
     const created = await agentService.createAgent(agent);
-    const { agents, setAgents } = this.store.getState();
-    setAgents([created, ...agents]);
+    await agentListResource.reload();
     return created;
   };
 
@@ -47,20 +33,21 @@ export class AgentsManager {
 
   update = async (id: string, data: Partial<AgentDef>) => {
     const updated = await agentService.updateAgent(id, data);
-    const { agents, setAgents } = this.store.getState();
-    setAgents(agents.map((a) => (a.id === id ? updated : a)));
+    await agentListResource.reload();
     return updated;
   };
 
   remove = async (id: string) => {
     await agentService.deleteAgent(id);
-    const { agents, setAgents } = this.store.getState();
-    setAgents(agents.filter((a) => a.id !== id));
+    await agentListResource.reload();
   };
 
+  // helpers
   getAgentName = (id: string) => {
     if (id === "user") return "我";
-    return this.store.getState().agents.find((a) => a.id === id)?.name ?? "未知";
+    const state = agentListResource.getState();
+    const data = state.data || [];
+    return (data as AgentDef[]).find((a) => a.id === id)?.name ?? "未知";
   };
 
   getAgentAvatar = (id: string) => {
@@ -72,6 +59,8 @@ export class AgentsManager {
         return "";
       }
     }
-    return this.store.getState().agents.find((a) => a.id === id)?.avatar || "";
+    const state = agentListResource.getState();
+    const data = state.data || [];
+    return (data as AgentDef[]).find((a) => a.id === id)?.avatar || "";
   };
 }

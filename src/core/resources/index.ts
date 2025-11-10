@@ -1,4 +1,3 @@
-import { DEFAULT_AGENTS } from "@/core/config/agents";
 import { createResource } from "@/common/lib/resource";
 import { agentService } from "@/core/services/agent.service";
 import { discussionControlService } from "@/core/services/discussion-control.service";
@@ -9,31 +8,9 @@ import { Discussion } from "@/common/types/discussion";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { filter, firstValueFrom, switchMap } from "rxjs";
 
-// 应用级资源
-export const agentListResource = createResource(() =>
-  agentService.listAgents().then(async (existingAgents) => {
-    // 检查每个预设的 agent 是否存在或需要更新
-    const agentUpdates = DEFAULT_AGENTS.map(async (defaultAgent) => {
-      const existingAgent = existingAgents.find(
-        (existing) => existing.name === defaultAgent.name
-      );
+// 应用级资源（只读查询，禁止在此处引入任何写入副作用）
+export const agentListResource = createResource(() => agentService.listAgents());
 
-      if (!existingAgent) {
-        // 创建新的 agent
-        return agentService.createAgent(defaultAgent);
-      } else {
-        // 更新现有的 agent
-        return agentService.updateAgent(existingAgent.id, {
-          ...defaultAgent,
-          id: existingAgent.id // 保持原有 ID
-        });
-      }
-    });
-
-    await Promise.all(agentUpdates);
-    return agentService.listAgents();
-  })
-);
 
 // 按领域组织资源
 export const agentsResource = {

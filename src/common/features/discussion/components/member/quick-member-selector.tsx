@@ -29,12 +29,11 @@ export function QuickMemberSelector({
       const combination = AGENT_COMBINATIONS[type];
       if (!combination) return;
 
-      // 查找主持人和参与者
-      const moderatorAgent = agents.find(
-        a => a.role === "moderator" && a.name === combination.moderator.name
-      );
-      const participantAgents = combination.participants
-        .map(p => agents.find(a => a.role === "participant" && a.name === p.name))
+      // 查找主持人和参与者（基于 slug）
+      const moderatorSlug = combination.moderator as unknown as string;
+      const moderatorAgent = agents.find(a => a.role === "moderator" && a.slug === moderatorSlug);
+      const participantAgents = (combination.participants as unknown as string[])
+        .map(slug => agents.find(a => a.role === "participant" && a.slug === slug))
         .filter(Boolean);
 
       // 准备所有要添加的成员

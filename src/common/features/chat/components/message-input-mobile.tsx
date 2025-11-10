@@ -30,7 +30,6 @@ interface MessageInputProps {
 export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>(
   function MessageInputMobile({ className }, ref) {
     const presenter = usePresenter();
-    const currentDiscussionId = presenter.discussions.store((s) => s.currentId);
     const isAgentResponding = presenter.discussionControl.getSnapshot().currentSpeakerId !== null;
 
     const {
@@ -43,8 +42,9 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
       handleKeyDown: baseHandleKeyDown
     } = useMessageInput({
       onSendMessage: async (content: string, agentId: string) => {
-        if (!currentDiscussionId) return;
-        const agentMessage = await presenter.messages.add(currentDiscussionId, {
+        const currentId = presenter.discussionControl.getCurrentDiscussionId();
+        if (!currentId) return;
+        const agentMessage = await presenter.messages.add(currentId, {
           content,
           agentId,
           type: "text",

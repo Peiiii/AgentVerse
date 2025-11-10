@@ -10,6 +10,9 @@ import { ChatEmptyGuide } from "./chat-empty-guide";
 import { MessageList, MessageListRef } from "./message";
 import { MessageInput, MessageInputRef } from "./message-input";
 import { usePresenter } from "@/core/presenter";
+import { useAgents } from "@/core/hooks/useAgents";
+import { useMessages } from "@/core/hooks/useMessages";
+import { discussionMembersResource } from "@/core/resources";
 
 interface ChatAreaProps {
   className?: string;
@@ -27,21 +30,20 @@ export function ChatArea({
   onInitialStateChange,
 }: ChatAreaProps) {
   const presenter = usePresenter();
-  const messages = presenter.messages.store((s) => s.messages);
+  const { messages } = useMessages();
   const { isKeyboardVisible } = useViewportHeight();
   const messageListRef = useRef<MessageListRef>(null);
   const messageInputRef = useRef<MessageInputRef>(null);
   const isFirstMessage = messages.length === 0;
   const { currentDiscussion } = useDiscussions();
   const { members } = useDiscussionMembers();
-  const agents = presenter.agents.store((s) => s.agents);
+  const { agents } = useAgents();
   // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 
   const syncDiscussionMembers = () => {
-    const latestMembers =
-      presenter.discussionMembers.store.getState().members;
-    presenter.discussionControl.setMembers(latestMembers);
+    const latest = discussionMembersResource.current.getState().data ?? [];
+    presenter.discussionControl.setMembers(latest);
   };
 
   useEffect(() => {
@@ -125,37 +127,33 @@ export function ChatArea({
 
       const membersToAdd = [];
 
-      // 查找代理ID
-      const findAgentIdByName = (name: string) => {
-        for (const agent of agents) {
-          if (agent.name === name) {
-            return agent.id;
-          }
-        }
-        return null;
-      };
+      // Always use latest agents list from hook
+      const agentList = agents;
 
       // 添加主持人（设置为自动回复）
-      const moderatorName = selectedCombination.moderator.name;
-      const moderatorId = findAgentIdByName(moderatorName);
+      const moderatorSlug = selectedCombination.moderator as unknown as string;
+      const findAgentIdBySlug = (slug: string) => {
+        const a = agentList.find((x) => x.slug === slug);
+        return a ? a.id : null;
+      };
+      const moderatorId = findAgentIdBySlug(moderatorSlug);
 
       if (moderatorId) {
-        console.log(`准备添加主持人: ${moderatorId} (${moderatorName})`);
+        console.log(`准备添加主持人: ${moderatorId} (${moderatorSlug})`);
         membersToAdd.push({ agentId: moderatorId, isAutoReply: true });
       } else {
-        console.error(`未找到匹配的主持人: ${moderatorName}`);
+        console.error(`未找到匹配的主持人: ${moderatorSlug}`);
       }
 
       // 添加参与者（不设置自动回复）
-      for (const participant of selectedCombination.participants) {
-        const participantName = participant.name;
-        const participantId = findAgentIdByName(participantName);
+      for (const slug of selectedCombination.participants as unknown as string[]) {
+        const participantId = findAgentIdBySlug(slug);
 
         if (participantId) {
-          console.log(`准备添加参与者: ${participantId} (${participantName})`);
+          console.log(`准备添加参与者: ${participantId} (${slug})`);
           membersToAdd.push({ agentId: participantId, isAutoReply: false });
         } else {
-          console.error(`未找到匹配的参与者: ${participantName}`);
+          console.error(`未找到匹配的参与者: ${slug}`);
         }
       }
 

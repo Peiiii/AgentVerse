@@ -6,6 +6,7 @@ import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
+import { useAppBootstrap } from "@/core/hooks/use-app-bootstrap";
 import { useMessages } from "@/core/hooks/useMessages";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { discussionControlService } from "@/core/services/discussion-control.service";
@@ -16,6 +17,7 @@ import { useEffect } from "react";
 import { HashRouter } from "react-router-dom";
 
 export function DesktopAppInner() {
+  useAppBootstrap();
   const { initialized } = useSetupApp({
     extensions: [
       allInOneAgentExtension,

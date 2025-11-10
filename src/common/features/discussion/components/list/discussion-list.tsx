@@ -2,6 +2,7 @@ import { useAgents } from "@/core/hooks/useAgents";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { cn } from "@/common/lib/utils";
 import { usePresenter } from "@/core/presenter";
+import { useMessages } from "@/core/hooks/useMessages";
 import { DEFAULT_DISCUSSION_TITLE } from "@/core/services/common.util";
 import { filterNormalMessages } from "@/core/services/message.util";
 import { Loader2 } from "lucide-react";
@@ -27,11 +28,11 @@ export function DiscussionList({
     }
   };
 
-  const messages = presenter.messages.store((s) => s.messages);
+  const { messages } = useMessages();
   useEffect(() => {
     const normals = filterNormalMessages(messages);
     if (!normals.length) return;
-    const cur = presenter.discussions.getCurrent();
+    const cur = currentDiscussion;
     if (cur && cur.title === DEFAULT_DISCUSSION_TITLE) {
       const first = normals[0];
       void presenter.discussions.update(first.discussionId, {
