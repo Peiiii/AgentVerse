@@ -7,6 +7,7 @@ import { DiscussionError, DiscussionErrorType, handleDiscussionError } from "./d
 import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { createNestedBean } from "packages/rx-nested-bean/src";
 import { BehaviorSubject } from "rxjs";
+import { map } from "rxjs/operators";
 import { agentListResource } from "@/core/resources";
 import { AgentDef } from "@/common/types/agent";
 import { aiService } from "@/core/services/ai.service";
@@ -34,6 +35,16 @@ export type Snapshot = {
   roundLimit: number;
 };
 
+type CtrlState = {
+  discussionId: string | null;
+  members: Member[];
+  isRunning: boolean;
+  processed: number;
+  roundLimit: number;
+  currentSpeakerId: string | null;
+  currentAbort?: AbortController | undefined;
+};
+
 // (removed standalone factory; merged into service below)
 
 // --- Single-file Service ---
@@ -51,19 +62,16 @@ export class DiscussionControlService {
     topic: "",
   });
 
-  // controller state (merged)
-  private ctrl = {
-    discussionId: null as string | null,
-    members: [] as Member[],
+  // Runtime controller state managed by a single BehaviorSubject
+  private ctrl$ = new BehaviorSubject<CtrlState>({
+    discussionId: null,
+    members: [],
     isRunning: false,
     processed: 0,
     roundLimit: 20,
-    currentSpeakerId: null as string | null,
-    currentAbort: undefined as AbortController | undefined,
-    snapshot$: new BehaviorSubject<Snapshot>({ isRunning: false, currentSpeakerId: null, processed: 0, roundLimit: 20 }),
-    pendingMentions: [] as string[],
-    pendingMentionSourceId: null as string | null,
-  };
+    currentSpeakerId: null,
+    currentAbort: undefined,
+  });
 
   // extracted helpers
   private mention = new MentionResolver();
@@ -83,12 +91,33 @@ export class DiscussionControlService {
   // helpers
   private getState() { return this.store.get(); }
   private setState(update: Partial<State>) { this.store.set((prev) => ({ ...prev, ...update })); }
-  private publishCtrl() {
-    const { isRunning, currentSpeakerId, processed, roundLimit } = this.ctrl;
-    this.ctrl.snapshot$.next({ isRunning, currentSpeakerId, processed, roundLimit });
+  getSnapshot(): Snapshot {
+    const c = this.ctrl$.getValue();
+    return {
+      isRunning: c.isRunning,
+      currentSpeakerId: c.currentSpeakerId,
+      processed: c.processed,
+      roundLimit: c.roundLimit,
+    };
   }
-  getSnapshot(): Snapshot { return this.ctrl.snapshot$.getValue(); }
-  getSnapshot$() { return this.ctrl.snapshot$.asObservable(); }
+  getSnapshot$() {
+    return this.ctrl$.asObservable().pipe(
+      map((c) => ({
+        isRunning: c.isRunning,
+        currentSpeakerId: c.currentSpeakerId,
+        processed: c.processed,
+        roundLimit: c.roundLimit,
+      }))
+    );
+  }
+
+  private patchCtrl(patch: Partial<CtrlState>) {
+    const cur = this.ctrl$.getValue();
+    this.ctrl$.next({ ...cur, ...patch });
+  }
+
+  // Internal: get the full ctrl state
+  private getCtrlState(): CtrlState { return this.ctrl$.getValue(); }
 
   // state accessors
   getCurrentDiscussionId(): string | null { return this.getState().currentDiscussionId; }
@@ -101,16 +130,13 @@ export class DiscussionControlService {
     if (this.getState().currentDiscussionId === id) return;
     this.setState({ currentDiscussionId: id });
     this.onCurrentDiscussionIdChange$.next(id);
-    this.ctrl.discussionId = id;
     const maxRounds = Math.trunc(Number(this.getState().settings.maxRounds) || 0);
-    this.ctrl.roundLimit = Math.max(1, maxRounds || 1);
-    this.publishCtrl();
+    this.patchCtrl({ discussionId: id, roundLimit: Math.max(1, maxRounds || 1) });
   }
 
   setMembers(members: Member[]) {
     this.setState({ members });
-    this.ctrl.members = members;
-    this.publishCtrl();
+    this.patchCtrl({ members });
   }
 
   setMessages(messages: AgentMessage[]) { this.setState({ messages }); }
@@ -119,8 +145,7 @@ export class DiscussionControlService {
     const merged = { ...this.getState().settings, ...settings } as DiscussionSettings;
     this.setState({ settings: merged });
     const maxRounds = Math.trunc(Number(merged.maxRounds) || 0);
-    this.ctrl.roundLimit = Math.max(1, maxRounds || 1);
-    this.publishCtrl();
+    this.patchCtrl({ roundLimit: Math.max(1, maxRounds || 1) });
   }
 
   private agentCanUseActions(agent: AgentDef | undefined): boolean {
@@ -136,19 +161,15 @@ export class DiscussionControlService {
   // runtime
   pause() {
     this.setPaused(true);
-    this.ctrl.isRunning = false;
-    if (this.ctrl.currentAbort) {
-      this.ctrl.currentAbort.abort();
-      this.ctrl.currentAbort = undefined;
+    const cur = this.getCtrlState();
+    if (cur.currentAbort) {
+      cur.currentAbort.abort();
     }
-    this.ctrl.currentSpeakerId = null;
-    this.publishCtrl();
+    this.patchCtrl({ isRunning: false, currentAbort: undefined, currentSpeakerId: null });
   }
   resume() {
     this.setPaused(false);
-    this.ctrl.isRunning = true;
-    this.ctrl.processed = 0;
-    this.publishCtrl();
+    this.patchCtrl({ isRunning: true, processed: 0 });
   }
 
   async startIfEligible(): Promise<boolean> {
@@ -156,9 +177,7 @@ export class DiscussionControlService {
     const { members } = this.getState();
     if (members.length <= 0) return false;
     this.setPaused(false);
-    this.ctrl.isRunning = true;
-    this.ctrl.processed = 0;
-    this.publishCtrl();
+    this.patchCtrl({ isRunning: true, processed: 0 });
     return true;
   }
 
@@ -186,7 +205,7 @@ export class DiscussionControlService {
 
 
   private async selectNextAgentId(trigger: AgentMessage, lastResponder: string | null): Promise<string | null> {
-    const members = this.ctrl.members;
+    const members = this.getCtrlState().members;
     const defs = agentListResource.read().data;
     return this.selector.select(trigger, lastResponder, members, defs);
   }
@@ -199,7 +218,7 @@ export class DiscussionControlService {
   }
 
   private async addSystemMessage(content: string) {
-    const id = this.ctrl.discussionId;
+    const id = this.getCtrlState().discussionId;
     if (!id) return;
     const msg: Omit<NormalMessage, 'id'> = {
       type: 'text',
@@ -212,16 +231,16 @@ export class DiscussionControlService {
   }
 
   private async generateStreamingResponse(agentId: string, trigger: AgentMessage): Promise<AgentMessage | null> {
-    const id = this.ctrl.discussionId;
+    const id = this.getCtrlState().discussionId;
     if (!id) return null;
     const defs = agentListResource.read().data;
     const current = defs.find(a => a.id === agentId);
     if (!current) return null;
-    const memberDefs: AgentDef[] = this.ctrl.members.map(m => defs.find(a => a.id === m.agentId)!).filter(Boolean);
+    const memberDefs: AgentDef[] = this.getCtrlState().members.map(m => defs.find(a => a.id === m.agentId)!).filter(Boolean);
 
-    this.ctrl.currentSpeakerId = agentId;
-    this.publishCtrl();
-    this.ctrl.currentAbort = new AbortController();
+    this.patchCtrl({ currentSpeakerId: agentId });
+    const abortCtrl = new AbortController();
+    this.patchCtrl({ currentAbort: abortCtrl });
 
     let finalMessage: AgentMessage | null = null;
     try {
@@ -234,7 +253,7 @@ export class DiscussionControlService {
           trigger,
           members: memberDefs,
           canUseActions: this.agentCanUseActions(current),
-          signal: this.ctrl.currentAbort.signal,
+          signal: abortCtrl.signal,
         }
       );
       if (this.agentCanUseActions(current)) {
@@ -248,35 +267,32 @@ export class DiscussionControlService {
       this.handleError(e, '生成回复失败');
       throw e;
     } finally {
-      this.ctrl.currentSpeakerId = null;
-      this.ctrl.currentAbort = undefined;
-      this.publishCtrl();
+      this.patchCtrl({ currentSpeakerId: null, currentAbort: undefined });
     }
     return finalMessage as AgentMessage;
   }
 
   private async processInternal(trigger: AgentMessage): Promise<void> {
-    const id = this.ctrl.discussionId;
+    const id = this.getCtrlState().discussionId;
     if (!id) return;
-    if (!this.ctrl.isRunning) this.resume();
+    if (!this.getCtrlState().isRunning) this.resume();
 
     let last: AgentMessage | null = trigger;
     let lastResponder: string | null = null;
-    this.ctrl.processed = 0;
-    this.publishCtrl();
+    this.patchCtrl({ processed: 0 });
 
-    while (this.ctrl.isRunning && this.ctrl.processed < this.ctrl.roundLimit && last) {
+    while (this.getCtrlState().isRunning && this.getCtrlState().processed < this.getCtrlState().roundLimit && last) {
       const next = await this.selectNextAgentId(last, lastResponder);
       if (!next) break;
       const resp = await this.generateStreamingResponse(next, last);
       if (!resp) break;
       lastResponder = next;
       last = resp;
-      this.ctrl.processed++;
-      this.publishCtrl();
+      this.patchCtrl({ processed: this.getCtrlState().processed + 1 });
     }
-    if (this.ctrl.processed >= this.ctrl.roundLimit) {
-      await this.addSystemMessage(`已达到消息上限（${this.ctrl.roundLimit}），对话已暂停。`);
+    if (this.getCtrlState().processed >= this.getCtrlState().roundLimit) {
+      const limit = this.getCtrlState().roundLimit;
+      await this.addSystemMessage(`已达到消息上限（${limit}），对话已暂停。`);
       this.pause();
     }
   }
