@@ -46,9 +46,7 @@ export function ChatArea({
     presenter.discussionControl.setMembers(latest);
   };
 
-  useEffect(() => {
-    presenter.discussionControl.setMessages(messages);
-  }, [messages]);
+  // messages are reactive via resources; no need to sync into discussion control service
 
   // 同步成员到讨论控制服务，以便 run() 能生效（需要 members + messages 条件）
   useEffect(() => {
@@ -80,10 +78,7 @@ export function ChatArea({
       if (agentMessage) {
         console.log("[chat-area] handleSendMessage after add message", members);
         syncDiscussionMembers();
-        presenter.discussionControl.setMessages([
-          ...messages,
-          agentMessage,
-        ]);
+        // no need to mirror messages into service; run loop consumes from store/services
         // 直接走简化控制器：先启动/恢复，再处理本条消息（无事件总线）
         await presenter.discussionControl.startIfEligible();
         await presenter.discussionControl.process(agentMessage);

@@ -24,8 +24,6 @@ type State = {
   currentDiscussionId: string | null;
   settings: DiscussionSettings;
   members: Member[];
-  messages: AgentMessage[];
-  topic: string;
 };
 
 export type Snapshot = {
@@ -58,8 +56,6 @@ export class DiscussionControlService {
     currentDiscussionId: null,
     settings: DEFAULT_SETTINGS,
     members: [],
-    messages: [],
-    topic: "",
   });
 
   // Runtime controller state managed by a single BehaviorSubject
@@ -139,7 +135,7 @@ export class DiscussionControlService {
     this.patchCtrl({ members });
   }
 
-  setMessages(messages: AgentMessage[]) { this.setState({ messages }); }
+  // setMessages removed: messages are managed by messageService/resources
 
   setSettings(settings: Partial<DiscussionSettings>) {
     const merged = { ...this.getState().settings, ...settings } as DiscussionSettings;

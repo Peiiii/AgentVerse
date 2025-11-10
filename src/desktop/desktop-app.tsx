@@ -7,13 +7,10 @@ import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useAppBootstrap } from "@/core/hooks/use-app-bootstrap";
-import { useMessages } from "@/core/hooks/useMessages";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
-import { discussionControlService } from "@/core/services/discussion-control.service";
 import { desktopAgentsExtension } from "@/desktop/features/agents/extensions";
 import { desktopChatExtension } from "@/desktop/features/chat/extensions";
 import { desktopMCPExtension } from "@/desktop/features/mcp/extensions";
-import { useEffect } from "react";
 import { HashRouter } from "react-router-dom";
 
 export function DesktopAppInner() {
@@ -32,13 +29,10 @@ export function DesktopAppInner() {
     ],
   });
   const { rootClassName } = useTheme();
-  const { messages } = useMessages();
 
   const { height } = useViewportHeight();
 
-  useEffect(() => {
-    discussionControlService.setMessages(messages);
-  }, [messages]);
+  // messages are managed by messageService/resources; no need to mirror into service
 
   return !initialized ? (
     <div>Loading...</div>
