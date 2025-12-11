@@ -5,6 +5,7 @@ import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-a
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Sparkles } from "lucide-react";
 import { AllInOneAgentPage } from "../pages/all-in-one-agent-page";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export const allInOneAgentExtension = defineExtension({
   manifest: {
@@ -25,8 +26,8 @@ export const allInOneAgentExtension = defineExtension({
     );
     subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
       id: "all-in-one-agent",
-      label: "All-in-One Agent",
-      title: "全局超级智能体",
+      label: i18n.t("activityBar.allInOneAgent.label"),
+      title: i18n.t("activityBar.allInOneAgent.title"),
       group: "main",
       icon: "sparkles",
       order: 5,

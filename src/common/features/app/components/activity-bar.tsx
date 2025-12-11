@@ -35,7 +35,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
 
     // per-item click handler if provided by extension/feature
     if (clicked?.onClick) {
-      try { clicked.onClick(); } catch (e: unknown) { /* no-op */ }
+      try { clicked.onClick(); } catch { /* no-op */ }
     }
 
     // update active state after handling side effects

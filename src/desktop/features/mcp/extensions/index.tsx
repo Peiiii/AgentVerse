@@ -6,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Cpu } from "lucide-react";
 import { MCPDemoPage } from "../pages/mcp-demo-page";
 import { ModuleOrderEnum } from "@/core/config/module-order";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export const desktopMCPExtension = defineExtension({
     manifest: {
@@ -22,8 +23,8 @@ export const desktopMCPExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "mcp",
-            label: "MCP Tools",
-            title: "Model Context Protocol tools",
+            label: i18n.t("activityBar.mcp.label"),
+            title: i18n.t("activityBar.mcp.title"),
             group: "main",
             icon: "cpu",
             order: ModuleOrderEnum.MCP,

@@ -7,6 +7,7 @@ import { Bot } from "lucide-react";
 import { AgentsPage } from "../pages/agents-page";
 import { AgentDetailPage } from "../pages/agent-detail-page";
 import { ModuleOrderEnum } from "@/core/config/module-order";
+import { i18n } from "@/core/hooks/use-i18n";
 
 
 export const desktopAgentsExtension = defineExtension({
@@ -24,8 +25,8 @@ export const desktopAgentsExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "agents",
-            label: "Agents",
-            title: "Agents",
+            label: i18n.t("activityBar.agents.label"),
+            title: i18n.t("activityBar.agents.title"),
             group: "main",
             icon: "bot",
             order: ModuleOrderEnum.AGENTS,

@@ -6,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Database } from "lucide-react";
 import { IndexedDBManagerPage } from "../pages/indexeddb-manager-page";
 import { ModuleOrderEnum } from "@/core/config/module-order";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export const desktopIndexedDBExtension = defineExtension({
     manifest: {
@@ -25,8 +26,8 @@ export const desktopIndexedDBExtension = defineExtension({
         // 注册活动栏项目
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "indexeddb",
-            label: "IndexedDB",
-            title: "IndexedDB",
+            label: i18n.t("activityBar.indexeddb.label"),
+            title: i18n.t("activityBar.indexeddb.title"),
             group: "main",
             icon: "database",
             order: ModuleOrderEnum.INDEXEDDB,

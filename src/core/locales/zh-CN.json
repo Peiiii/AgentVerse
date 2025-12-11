@@ -23,6 +23,40 @@
     "export": "导出记录",
     "moreOptions": "更多选项"
   },
+  "activityBar": {
+    "chat": {
+      "label": "聊天",
+      "title": "与用户聊天"
+    },
+    "agents": {
+      "label": "智能体",
+      "title": "智能体管理"
+    },
+    "allInOneAgent": {
+      "label": "超级智能体",
+      "title": "全局超级智能体"
+    },
+    "mcp": {
+      "label": "MCP 工具",
+      "title": "模型上下文协议工具"
+    },
+    "fileManager": {
+      "label": "文件管理器",
+      "title": "文件管理器"
+    },
+    "indexeddb": {
+      "label": "IndexedDB",
+      "title": "IndexedDB 浏览器管理器"
+    },
+    "settings": {
+      "label": "设置",
+      "title": "设置和 MCP 连接管理"
+    },
+    "github": {
+      "label": "Github",
+      "title": "Github"
+    }
+  },
   "settings": {
     "title": "设置",
     "resetToDefault": "恢复默认配置",

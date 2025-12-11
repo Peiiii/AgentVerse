@@ -3,6 +3,7 @@ import { getPresenter } from "@/core/presenter/presenter";
 import { useIconStore } from "@/core/stores/icon.store";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Settings } from "lucide-react";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export const settingsExtension = defineExtension({
     manifest: {
@@ -19,8 +20,8 @@ export const settingsExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "settings",
-            label: "Settings",
-            title: "Settings",
+            label: i18n.t("activityBar.settings.label"),
+            title: i18n.t("activityBar.settings.title"),
             group: "footer",
             icon: "settings",
             order: ModuleOrderEnum.SETTINGS,

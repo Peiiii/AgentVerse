@@ -5,6 +5,7 @@ import { ChatPage } from "@/desktop/features/chat/pages/chat-page";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { RedirectToChat } from "@/common/components/common/redirect";
 import { ModuleOrderEnum } from "@/core/config/module-order";
+import { i18n } from "@/core/hooks/use-i18n";
 
 
 export const desktopChatExtension = defineExtension({
@@ -23,8 +24,8 @@ export const desktopChatExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(presenter.activityBar.addItem({
             id: "chat",
-            label: "Chat",
-            title: "Chat with the user",
+            label: i18n.t("activityBar.chat.label"),
+            title: i18n.t("activityBar.chat.title"),
             group: "main",
             icon: "message",
             order: ModuleOrderEnum.CHAT,

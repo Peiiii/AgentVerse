@@ -6,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Folder } from "lucide-react";
 import { FileManagerPage } from "../pages/file-manager-page";
 import { ModuleOrderEnum } from "@/core/config/module-order";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export const desktopFileManagerExtension = defineExtension({
     manifest: {
@@ -22,8 +23,8 @@ export const desktopFileManagerExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "file-manager",
-            label: "File Manager",
-            title: "File Manager",
+            label: i18n.t("activityBar.fileManager.label"),
+            title: i18n.t("activityBar.fileManager.title"),
             group: "main",
             icon: "folder",
             order: ModuleOrderEnum.FILE_MANAGER,

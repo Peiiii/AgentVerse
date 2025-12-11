@@ -6,6 +6,7 @@ import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-a
 import { defineExtension, Disposable } from "@cardos/extension";
 import { MessageSquare } from "lucide-react";
 import { ChatPage } from "@/mobile/features/chat/pages/chat-page";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export const mobileChatExtension = defineExtension({
     manifest: {
@@ -22,8 +23,8 @@ export const mobileChatExtension = defineExtension({
         })))
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "chat",
-            label: "Chat",
-            title: "Chat with the user",
+            label: i18n.t("activityBar.chat.label"),
+            title: i18n.t("activityBar.chat.title"),
             group: "main",
             icon: "message",
             order: 10,
