@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export interface RecommendTopicsParams {
   context?: "greeting" | "general" | "learning" | "health" | "work" | "shopping" | "travel";
@@ -23,14 +24,14 @@ export function createRecommendTopicsTool(
 ): AgentTool {
   return {
     name: "recommend_topics",
-    description: "当用户打招呼或需要话题引导时使用。主动推荐相关服务话题让用户选择。",
+    description: i18n.t("tool.recommendTopics.description"),
     parameters: {
       type: "object",
       properties: {
         context: {
           type: "string",
           enum: ["greeting", "general", "learning", "health", "work", "shopping", "travel"],
-          description: "推荐上下文，greeting=问候时，general=通用，其他为特定领域"
+          description: i18n.t("tool.recommendTopics.contextDescription")
         },
         topics: {
           type: "array",
@@ -43,7 +44,7 @@ export function createRecommendTopicsTool(
             },
             required: ["id", "content"]
           },
-          description: "推荐话题列表，建议3-5个话题"
+          description: i18n.t("tool.recommendTopics.topicsDescription")
         }
       },
       required: ["topics"]

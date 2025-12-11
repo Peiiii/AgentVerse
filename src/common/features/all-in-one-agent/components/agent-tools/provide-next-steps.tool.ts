@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export interface ProvideNextStepsParams {
   context: string;
@@ -23,13 +24,13 @@ export function createProvideNextStepsTool(
 ): AgentTool {
   return {
     name: "provide_next_steps",
-    description: "当任务完成或需要提供后续指导时使用。提供具体的下一步行动建议。",
+    description: i18n.t("tool.provideNextSteps.description"),
     parameters: {
       type: "object",
       properties: {
         context: {
           type: "string",
-          description: "当前完成的任务或上下文，用于说明为什么提供这些建议"
+          description: i18n.t("tool.provideNextSteps.contextDescription")
         },
         nextSteps: {
           type: "array",
@@ -42,7 +43,7 @@ export function createProvideNextStepsTool(
             },
             required: ["id", "content"]
           },
-          description: "下一步建议列表，建议3-5个具体行动"
+          description: i18n.t("tool.provideNextSteps.nextStepsDescription")
         }
       },
       required: ["context", "nextSteps"]

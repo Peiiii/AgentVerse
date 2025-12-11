@@ -5,6 +5,7 @@ import { aiService } from "@/core/services/ai.service";
 import { settingsService } from "@/core/services/settings.service";
 import { SupportedAIProvider } from "@/common/types/ai";
 import { AIProviderSettingSchema, AutoFillStrategy, SettingItem } from "@/common/types/settings";
+import i18n from "@/core/config/i18n";
 
 const getDefaultAiProviderConfig: () => AIProviderSettingSchema = () => {
   const providerName = BasicAIConfig.AI_PROVIDER_NAME;
@@ -87,6 +88,20 @@ const defaultSettings: Omit<SettingItem, "id">[] = [
       message: "请输入模型名称",
     },
   },
+  // 语言设置
+  {
+    key: "app.language",
+    category: "app",
+    label: "语言",
+    description: "选择界面显示语言",
+    type: "select",
+    order: 1,
+    value: i18n.language || "zh-CN",
+    options: [
+      { label: "简体中文", value: "zh-CN" },
+      { label: "English", value: "en-US" },
+    ],
+  },
 ];
 
 
@@ -138,6 +153,8 @@ const settingListResource = createResource<SettingItem[]>(
           state.data
         ) {
           const settings = state.data;
+          
+          // 更新 AI 服务配置
           const providerType = settings.find(
             (setting) => setting.key === SETTING_KYES.AI.PROVIDER.ID
           )!.value;
@@ -158,6 +175,14 @@ const settingListResource = createResource<SettingItem[]>(
                 (setting) => setting.key === SETTING_KYES.AI.PROVIDER.API_URL
               )!.value as string) || providerConfig?.baseUrl || "",
           });
+          
+          // 更新语言设置
+          const languageSetting = settings.find(
+            (setting) => setting.key === "app.language"
+          );
+          if (languageSetting && languageSetting.value !== i18n.language) {
+            i18n.changeLanguage(languageSetting.value as string);
+          }
         }
       });
     },

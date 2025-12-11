@@ -10,19 +10,21 @@ import { useEffect } from "react";
 import { DiscussionListHeader } from "./discussion-list-header";
 import { DiscussionItem } from "./discussion-item";
 import { DiscussionListProps } from "./types";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 export function DiscussionList({
   className,
   headerClassName,
   listClassName,
 }: DiscussionListProps) {
+  const { t } = useTranslation();
   const { agents } = useAgents();
   const presenter = usePresenter();
   const { discussions, currentDiscussion, isLoading } = useDiscussions();
 
   const handleCreateDiscussion = async () => {
     if (agents.length === 0) return;
-    const discussion = await presenter.discussions.create("新的讨论");
+    const discussion = await presenter.discussions.create(t("discussion.new"));
     if (discussion) {
       presenter.discussions.select(discussion.id);
     }

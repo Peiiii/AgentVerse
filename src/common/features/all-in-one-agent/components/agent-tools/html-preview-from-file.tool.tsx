@@ -4,6 +4,7 @@ import { SidePanelConfig } from "@/common/features/world-class-chat/hooks/use-si
 import { WorldClassChatHtmlPreview } from "@/common/features/world-class-chat/components/world-class-chat-html-preview";
 import { useIframeManager } from "@/common/features/world-class-chat/hooks/use-iframe-manager";
 import { defaultFileManager } from "@/common/lib/file-manager.service";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export interface HtmlPreviewFromFileToolParams {
   filePath: string;
@@ -26,7 +27,7 @@ async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlC
     if (!readResult.success) {
       return {
         success: false,
-        error: readResult.error || "文件读取失败",
+        error: readResult.error || i18n.t("tool.htmlPreviewFromFile.fileReadError"),
       };
     }
 
@@ -36,7 +37,7 @@ async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlC
     if (!htmlContent) {
       return {
         success: false,
-        error: "文件内容为空",
+        error: i18n.t("tool.htmlPreviewFromFile.fileContentEmpty"),
       };
     }
 
@@ -44,7 +45,7 @@ async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlC
     if (!htmlContent.includes("<html") && !htmlContent.includes("<!DOCTYPE") && !htmlContent.includes("<html")) {
       return {
         success: false,
-        error: "文件内容不包含 HTML 标签，可能不是有效的 HTML 文件",
+        error: i18n.t("tool.htmlPreviewFromFile.invalidHtmlFile"),
       };
     }
 
@@ -55,7 +56,7 @@ async function readHtmlFile(filePath: string): Promise<{ success: boolean; htmlC
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "文件读取失败",
+      error: error instanceof Error ? error.message : i18n.t("tool.htmlPreviewFromFile.fileReadError"),
     };
   }
 }
@@ -73,13 +74,13 @@ export function createHtmlPreviewFromFileTool(
 
   return {
     name: "previewHtmlFromFile",
-    description: "从指定文件路径读取 HTML 内容并在右侧面板中预览",
+    description: i18n.t("tool.htmlPreviewFromFile.description"),
     parameters: {
       type: "object",
       properties: {
         filePath: {
           type: "string",
-          description: "要读取并预览的 HTML 文件路径",
+          description: i18n.t("tool.htmlPreviewFromFile.filePathDescription"),
         },
       },
       required: ["filePath"],
@@ -92,8 +93,8 @@ export function createHtmlPreviewFromFileTool(
           toolCallId: toolCall.id,
           result: {
             success: false,
-            message: "未指定文件路径",
-            error: "缺少 filePath 参数",
+            message: i18n.t("tool.htmlPreviewFromFile.filePathNotSpecified"),
+            error: i18n.t("tool.htmlPreviewFromFile.missingFilePathParam"),
           },
           status: "error" as const,
         };
@@ -107,8 +108,8 @@ export function createHtmlPreviewFromFileTool(
           toolCallId: toolCall.id,
           result: {
             success: false,
-            message: "文件读取失败",
-            error: readResult.error || "未知错误",
+            message: i18n.t("tool.htmlPreviewFromFile.fileReadFailed"),
+            error: readResult.error || i18n.t("tool.htmlPreviewFromFile.unknownError"),
           },
           status: "error" as const,
         };
@@ -147,7 +148,7 @@ export function createHtmlPreviewFromFileTool(
           }
         } else {
           // 如果刷新失败，抛出错误
-          throw new Error(refreshResult.error || "刷新失败");
+          throw new Error(refreshResult.error || i18n.t("tool.fileSystem.refreshFailed"));
         }
       };
 
@@ -185,7 +186,7 @@ export function createHtmlPreviewFromFileTool(
         toolCallId: toolCall.id,
         result: {
           success: true,
-          message: `已成功打开 HTML 预览面板：${args.filePath}`,
+          message: i18n.t("tool.htmlPreviewFromFile.previewSuccess", { filePath: args.filePath }),
           htmlContent: htmlContent.substring(0, 200) + "...", // 只显示前200字符
           iframeId: finalIframeId || undefined,
         },
@@ -217,7 +218,7 @@ export function createHtmlPreviewFromFileTool(
               marginBottom: 4,
             }}
           >
-            🖥️ HTML 文件预览工具
+            🖥️ {i18n.t("tool.htmlPreviewFromFile.title")}
           </div>
           <div style={{ fontSize: 15, color: "#64748b" }}>
             {toolCall.result?.success ? "✅ " : "❌ "}
@@ -225,7 +226,7 @@ export function createHtmlPreviewFromFileTool(
           </div>
           {toolCall.result?.error && (
             <div style={{ fontSize: 14, color: "#ef4444", background: "#fef2f2", padding: "8px 12px", borderRadius: 6 }}>
-              错误: {toolCall.result.error}
+              {i18n.t("tool.htmlPreviewFromFile.error")}: {toolCall.result.error}
             </div>
           )}
         </div>

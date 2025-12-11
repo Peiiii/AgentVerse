@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import { useIframeManager } from "@/common/features/world-class-chat/hooks/use-iframe-manager";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export interface SendMessageToIframeToolParams {
   iframeId: string;
@@ -24,21 +25,21 @@ export function createSendMessageToIframeTool(
 ): AgentTool {
   return {
     name: "sendMessageToIframe",
-    description: "向特定 iframe 发送 postMessage 消息，message 参数会被原样发送，无结构变换。",
+    description: i18n.t("tool.sendMessageToIframe.description"),
     parameters: {
       type: "object",
       properties: {
         iframeId: {
           type: "string",
-          description: "目标 iframe 的 ID",
+          description: i18n.t("tool.sendMessageToIframe.iframeIdDescription"),
         },
         message: {
           type: "object",
-          description: "要发送的消息内容（会被原样 postMessage）",
+          description: i18n.t("tool.sendMessageToIframe.messageDescription"),
         },
         targetOrigin: {
           type: "string",
-          description: "目标源，默认为 '*'",
+          description: i18n.t("tool.sendMessageToIframe.targetOriginDescription"),
         },
       },
       required: ["iframeId", "message"],
@@ -51,8 +52,8 @@ export function createSendMessageToIframeTool(
           toolCallId: toolCall.id,
           result: {
             success: false,
-            message: "缺少必要参数",
-            error: "需要提供 iframeId 和 message",
+            message: i18n.t("tool.sendMessageToIframe.missingRequiredParams"),
+            error: i18n.t("tool.sendMessageToIframe.needIframeIdAndMessage"),
           },
           status: "error" as const,
         };
@@ -71,8 +72,8 @@ export function createSendMessageToIframeTool(
             toolCallId: toolCall.id,
             result: {
               success: false,
-              message: `iframe ${iframeId} 不存在`,
-              error: "指定的 iframe ID 无效",
+              message: i18n.t("tool.sendMessageToIframe.iframeNotExists", { iframeId }),
+              error: i18n.t("tool.sendMessageToIframe.invalidIframeId"),
             },
             status: "error" as const,
           };
@@ -86,8 +87,8 @@ export function createSendMessageToIframeTool(
           toolCallId: toolCall.id,
           result: {
             success: false,
-            message: "消息发送失败",
-            error: "无法向指定的 iframe 发送消息",
+            message: i18n.t("tool.sendMessageToIframe.sendFailed"),
+            error: i18n.t("tool.sendMessageToIframe.cannotSendMessage"),
           },
           status: "error" as const,
         };
@@ -97,7 +98,7 @@ export function createSendMessageToIframeTool(
         toolCallId: toolCall.id,
         result: {
           success: true,
-          message: `已成功向 iframe ${iframeId} 发送消息`,
+          message: i18n.t("tool.sendMessageToIframe.sendSuccess", { iframeId }),
           sentMessage: message,
         },
         status: "success" as const,
@@ -130,7 +131,7 @@ export function createSendMessageToIframeTool(
               marginBottom: 4,
             }}
           >
-            📤 iframe 消息发送工具
+            📤 {i18n.t("tool.sendMessageToIframe.title")}
           </div>
           <div style={{ fontSize: 15, color: "#64748b" }}>
             {result?.success ? "✅ " : "❌ "}
@@ -138,12 +139,12 @@ export function createSendMessageToIframeTool(
           </div>
           {result?.sentMessage && (
             <div style={{ fontSize: 14, color: "#0ea5e9", background: "#f0f9ff", padding: "8px 12px", borderRadius: 6 }}>
-              消息类型: {result.sentMessage.type}
+              {i18n.t("tool.sendMessageToIframe.messageType")}: {result.sentMessage.type}
             </div>
           )}
           {result?.error && (
             <div style={{ fontSize: 14, color: "#ef4444", background: "#fef2f2", padding: "8px 12px", borderRadius: 6 }}>
-              错误: {result.error}
+              {i18n.t("tool.sendMessageToIframe.error")}: {result.error}
             </div>
           )}
         </div>

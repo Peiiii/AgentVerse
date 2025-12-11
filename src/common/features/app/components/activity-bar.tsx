@@ -1,5 +1,6 @@
 import { IconRegistry } from "@/common/components/common/icon-registry";
 import { ThemeToggle } from "@/common/components/common/theme";
+import { LanguageToggle } from "@/common/components/common/language";
 import { cn } from "@/common/lib/utils";
 import { usePresenter } from "@/core/presenter";
 import { useActivityBarStore, type ActivityItem } from "@/core/stores/activity-bar.store";
@@ -84,7 +85,8 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
           ))}
         </ActivityBar.Group>
         <ActivityBar.Separator />
-        <div className="px-3 py-2">
+        <div className="px-3 py-2 space-y-2">
+          <LanguageToggle className="w-full" />
           <ThemeToggle className="w-full" />
         </div>
       </ActivityBar.Footer>

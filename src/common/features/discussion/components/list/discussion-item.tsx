@@ -16,11 +16,13 @@ import { DiscussionItemProps } from "./types";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { DiscussionAvatar } from "./discussion-avatar";
 import { usePresenter } from "@/core/presenter";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 export function DiscussionItem({
   discussion,
   isActive,
 }: DiscussionItemProps) {
+  const { t } = useTranslation();
   const presenter = usePresenter();
   const [members, setMembers] = useState<DiscussionMember[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -65,10 +67,10 @@ export function DiscussionItem({
 
   const handleDelete = () => {
     modal.confirm({
-      title: "删除讨论",
-      description: "确定要删除这个讨论吗？此操作不可撤销。",
-      okText: "确认删除",
-      cancelText: "取消",
+      title: t("discussion.deleteTitle"),
+      description: t("discussion.deleteDescription"),
+      okText: t("discussion.deleteConfirm"),
+      cancelText: t("common.cancel"),
       onOk: () => presenter.discussions.remove(discussion.id)
     });
   };
@@ -150,7 +152,7 @@ export function DiscussionItem({
                 )}>{discussion.title}</span>
                 {members.length > 0 && (
                   <span className="shrink-0 text-[11px] leading-[1.2] text-muted-foreground/50 translate-y-[0.5px]">
-                    {members.length}人
+                    {members.length}{t("discussion.memberCount")}
                   </span>
                 )}
               </div>
@@ -194,7 +196,7 @@ export function DiscussionItem({
                     className="h-7 text-[11px] px-2"
                   >
                     <Pencil className="h-2.5 w-2.5 mr-1.5" />
-                    重命名
+                    {t("common.rename")}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={(e) => {
@@ -204,7 +206,7 @@ export function DiscussionItem({
                     className="h-7 text-[11px] px-2"
                   >
                     <Download className="h-2.5 w-2.5 mr-1.5" />
-                    导出记录
+                    {t("common.export")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="my-0.5" />
                   <DropdownMenuItem 
@@ -215,7 +217,7 @@ export function DiscussionItem({
                     className="h-7 text-[11px] px-2 text-destructive focus:text-destructive"
                   >
                     <Trash2 className="h-2.5 w-2.5 mr-1.5" />
-                    删除
+                    {t("common.delete")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -224,7 +226,7 @@ export function DiscussionItem({
         </div>
         
         <div className="text-[12px] leading-[1.4] text-muted-foreground/50 truncate mt-[2px]">
-          {discussion.lastMessage || "还没有人发言"}
+          {discussion.lastMessage || t("discussion.noMessages")}
         </div>
       </div>
     </div>

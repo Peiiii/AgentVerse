@@ -1,37 +1,38 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { defaultFileManager } from "@/common/lib/file-manager.service";
+import { i18n } from "@/core/hooks/use-i18n";
 
 // 文件系统工具：基于 LightningFS 的完整文件操作
 export const fileSystemTool: AgentTool = {
   name: "worldClassFileSystem",
-  description: "世界级聊天界面的文件系统操作（基于 LightningFS）",
+  description: i18n.t("tool.fileSystem.description"),
   parameters: {
     type: "object",
     properties: {
       operation: {
         type: "string",
         enum: ["list", "read", "write", "create", "delete", "rename", "search", "info", "upload", "download"],
-        description: "操作类型：list（列出）、read（读取）、write（写入）、create（创建）、delete（删除）、rename（重命名）、search（搜索）、info（信息）、upload（上传）、download（下载）"
+        description: i18n.t("tool.fileSystem.operationDescription")
       },
       path: {
         type: "string",
-        description: "文件路径"
+        description: i18n.t("tool.fileSystem.pathDescription")
       },
       content: {
         type: "string",
-        description: "文件内容（仅在 write 和 create 操作时需要）"
+        description: i18n.t("tool.fileSystem.contentDescription")
       },
       newPath: {
         type: "string",
-        description: "新路径（仅在 rename 操作时需要）"
+        description: i18n.t("tool.fileSystem.newPathDescription")
       },
       pattern: {
         type: "string",
-        description: "搜索模式（仅在 search 操作时需要）"
+        description: i18n.t("tool.fileSystem.patternDescription")
       },
       isDirectory: {
         type: "boolean",
-        description: "是否为目录（仅在 create 操作时需要）"
+        description: i18n.t("tool.fileSystem.isDirectoryDescription")
       }
     },
     required: ["operation"],
@@ -62,7 +63,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "read",
-                error: "缺少文件路径参数",
+                error: i18n.t("tool.fileSystem.missingFilePathParam"),
               },
               status: "error" as const,
             };
@@ -87,7 +88,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "write",
-                error: "缺少文件路径或内容参数",
+                error: i18n.t("tool.fileSystem.missingPathOrContentParam"),
               },
               status: "error" as const,
             };
@@ -112,7 +113,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "create",
-                error: "缺少路径参数",
+                error: i18n.t("tool.fileSystem.missingPathParam"),
               },
               status: "error" as const,
             };
@@ -142,7 +143,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "delete",
-                error: "缺少路径参数",
+                error: i18n.t("tool.fileSystem.missingPathParam"),
               },
               status: "error" as const,
             };
@@ -166,7 +167,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "rename",
-                error: "缺少原路径或新路径参数",
+                error: i18n.t("tool.fileSystem.missingOldOrNewPathParam"),
               },
               status: "error" as const,
             };
@@ -190,7 +191,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "search",
-                error: "缺少搜索模式参数",
+                error: i18n.t("tool.fileSystem.missingPatternParam"),
               },
               status: "error" as const,
             };
@@ -215,7 +216,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "info",
-                error: "缺少文件路径参数",
+                error: i18n.t("tool.fileSystem.missingFilePathParam"),
               },
               status: "error" as const,
             };
@@ -240,7 +241,7 @@ export const fileSystemTool: AgentTool = {
             toolCallId: toolCall.id,
             result: {
               operation: "upload",
-              message: "文件上传功能需要通过界面操作，请使用文件管理器界面",
+              message: i18n.t("tool.fileSystem.uploadRequiresUI"),
             },
             status: "success" as const,
           };
@@ -252,7 +253,7 @@ export const fileSystemTool: AgentTool = {
               toolCallId: toolCall.id,
               result: {
                 operation: "download",
-                error: "缺少文件路径参数",
+                error: i18n.t("tool.fileSystem.missingFilePathParam"),
               },
               status: "error" as const,
             };
@@ -275,7 +276,7 @@ export const fileSystemTool: AgentTool = {
             toolCallId: toolCall.id,
             result: {
               operation: args.operation,
-              error: `不支持的操作类型: ${args.operation}`,
+              error: i18n.t("tool.fileSystem.unsupportedOperation", { operation: args.operation }),
             },
             status: "error" as const,
           };
@@ -285,7 +286,9 @@ export const fileSystemTool: AgentTool = {
         toolCallId: toolCall.id,
         result: {
           operation: args.operation,
-          error: `文件系统操作失败: ${error instanceof Error ? error.message : "未知错误"}`,
+          error: i18n.t("tool.fileSystem.operationFailed", { 
+            error: error instanceof Error ? error.message : i18n.t("tool.fileSystem.unknownError")
+          }),
         },
         status: "error" as const,
       };

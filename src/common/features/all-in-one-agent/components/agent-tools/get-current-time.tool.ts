@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import React from "react";
+import { i18n } from "@/core/hooks/use-i18n";
 
 interface GetCurrentTimeResult {
   currentTime: string;
@@ -10,7 +11,7 @@ interface GetCurrentTimeResult {
 
 export const getCurrentTimeTool: AgentTool = {
   name: "getCurrentTime",
-  description: "获取当前时间",
+  description: i18n.t("tool.getCurrentTime.description"),
   parameters: {
     type: "object",
     properties: {},
@@ -22,7 +23,7 @@ export const getCurrentTimeTool: AgentTool = {
       result: {
         currentTime: new Date().toISOString(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        message: "当前时间已获取",
+        message: i18n.t("tool.getCurrentTime.timeRetrieved"),
       },
       status: "success" as const,
     };
@@ -47,10 +48,10 @@ export const getCurrentTimeTool: AgentTool = {
           minWidth: 220,
         }
       },
-      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#0ea5e9', marginBottom: 4 } }, "⏰ 当前时间"),
-      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, "时间："),
+      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#0ea5e9', marginBottom: 4 } }, `⏰ ${i18n.t("tool.getCurrentTime.title")}`),
+      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, `${i18n.t("tool.getCurrentTime.time")}：`),
       React.createElement("div", { style: { fontFamily: 'Menlo, monospace', fontSize: 18, color: '#22223b', background: '#fff', borderRadius: 8, padding: '6px 12px', margin: '4px 0' } }, currentTime),
-      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, "时区："),
+      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, `${i18n.t("tool.getCurrentTime.timezone")}：`),
       React.createElement("div", { style: { fontFamily: 'Menlo, monospace', fontSize: 16, color: '#6366f1', background: '#f1f5f9', borderRadius: 8, padding: '6px 12px', margin: '4px 0' } }, timezone)
     );
   },

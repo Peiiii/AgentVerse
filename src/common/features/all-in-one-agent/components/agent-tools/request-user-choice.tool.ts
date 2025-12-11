@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export interface RequestUserChoiceParams {
   title?: string;
@@ -24,17 +25,17 @@ export function createRequestUserChoiceTool(
 ): AgentTool {
   return {
     name: "request_user_choice",
-    description: "当需要用户从多个选项中选择时使用。提供选项让用户选择，而不是替用户做决定。",
+    description: i18n.t("tool.requestUserChoice.description"),
     parameters: {
       type: "object",
       properties: {
         title: {
           type: "string",
-          description: "选择标题，可选"
+          description: i18n.t("tool.requestUserChoice.titleDescription")
         },
         description: {
           type: "string", 
-          description: "选择说明，可选"
+          description: i18n.t("tool.requestUserChoice.descriptionDescription")
         },
         options: {
           type: "array",
@@ -47,7 +48,7 @@ export function createRequestUserChoiceTool(
             },
             required: ["id", "content"]
           },
-          description: "选项列表，建议3-5个选项"
+          description: i18n.t("tool.requestUserChoice.optionsDescription")
         }
       },
       required: ["options"]

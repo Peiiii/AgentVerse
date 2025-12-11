@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import React from "react";
+import { i18n } from "@/core/hooks/use-i18n";
 
 interface CalculatorResult {
   expression: string;
@@ -11,13 +12,13 @@ interface CalculatorResult {
 
 export const calculatorTool: AgentTool = {
   name: "calculator",
-  description: "简单计算器，支持基础四则运算表达式。",
+  description: i18n.t("tool.calculator.description"),
   parameters: {
     type: "object",
     properties: {
       expression: {
         type: "string",
-        description: "数学表达式，如 '2 + 3 * 4'"
+        description: i18n.t("tool.calculator.expressionDescription")
       }
     },
     required: ["expression"]
@@ -42,7 +43,7 @@ export const calculatorTool: AgentTool = {
         toolCallId: toolCall.id,
         result: {
           expression: args.expression,
-          error: "计算表达式失败",
+          error: i18n.t("tool.calculator.calculationFailed"),
         },
         status: "error" as const,
       };
@@ -70,10 +71,10 @@ export const calculatorTool: AgentTool = {
           minWidth: 220,
         }
       },
-      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#6366f1', marginBottom: 4 } }, "🧮 计算器"),
-      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, "表达式："),
+      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#6366f1', marginBottom: 4 } }, `🧮 ${i18n.t("tool.calculator.title")}`),
+      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, `${i18n.t("tool.calculator.expression")}：`),
       React.createElement("div", { style: { fontFamily: 'Menlo, monospace', fontSize: 18, color: '#22223b', background: '#fff', borderRadius: 8, padding: '6px 12px', margin: '4px 0' } }, expression),
-      result !== undefined && React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, "结果："),
+      result !== undefined && React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, `${i18n.t("tool.calculator.result")}：`),
       result !== undefined && React.createElement("div", { style: { fontFamily: 'Menlo, monospace', fontSize: 20, color: '#10b981', background: '#f0fdf4', borderRadius: 8, padding: '6px 12px', margin: '4px 0' } }, String(result)),
       error && React.createElement("div", { style: { color: '#ef4444', fontSize: 15 } }, error)
     );

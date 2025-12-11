@@ -1,0 +1,277 @@
+{
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "update": "更新",
+    "reset": "重置",
+    "close": "关闭",
+    "open": "打开",
+    "search": "搜索",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "unknown": "未知",
+    "unknownTime": "未知时间",
+    "createdAt": "创建于",
+    "me": "我",
+    "unknownAgent": "未知",
+    "rename": "重命名",
+    "export": "导出记录",
+    "moreOptions": "更多选项"
+  },
+  "settings": {
+    "title": "设置",
+    "resetToDefault": "恢复默认配置",
+    "resetConfirmTitle": "确认恢复默认配置？",
+    "resetConfirmDescription": "此操作将重置所有设置为默认值，且无法撤销。需要刷新页面才能生效。",
+    "resetConfirmAction": "确认重置",
+    "selectCategory": "请选择设置分类",
+    "language": {
+      "label": "语言",
+      "description": "选择界面显示语言",
+      "zh-CN": "简体中文",
+      "en-US": "English"
+    }
+  },
+  "agent": {
+    "create": "创建智能体",
+    "edit": "编辑智能体",
+    "name": "名称",
+    "description": "描述",
+    "role": "角色",
+    "personality": "性格",
+    "expertise": "专长",
+    "configurationAssistant": {
+      "title": "AI智能体创建助手",
+      "description": "通过对话创建你的专属智能体。请告诉我你想要什么样的智能体？比如它的专业领域、性格特征和主要用途。",
+      "placeholder": "描述你想要的智能体..."
+    }
+  },
+  "discussion": {
+    "title": "讨论",
+    "create": "创建讨论",
+    "new": "新的讨论",
+    "sessionList": "会话列表",
+    "createSession": "新建会话",
+    "members": "成员",
+    "messages": "消息",
+    "active": "活跃",
+    "paused": "暂停",
+    "deleteTitle": "删除讨论",
+    "deleteDescription": "确定要删除这个讨论吗？此操作不可撤销。",
+    "deleteConfirm": "确认删除",
+    "noMessages": "还没有人发言",
+    "memberCount": "人",
+    "clearMessages": "清空消息",
+    "clearMessagesTitle": "清空消息",
+    "clearMessagesDescription": "确定要清空所有消息吗？此操作不可撤销。",
+    "clearMessagesConfirm": "确认清空",
+    "discussionSettings": "讨论设置",
+    "moderator": "主持人",
+    "expert": "专家",
+    "unknownExpert": "未知专家"
+  },
+  "chat": {
+    "send": "发送",
+    "placeholder": "输入消息...",
+    "empty": "暂无消息",
+    "selectOrCreate": "请选择或创建一个会话",
+    "creatingDiscussion": "正在创建讨论…",
+    "inputPlaceholder": "在这里输入消息... (输入 @ 可以提及成员)",
+    "inputPlaceholderDesktop": "在这里输入消息... (输入 @ 可以提及成员)",
+    "sendHint": "按 Enter 键发送，按 Shift+Enter 键换行",
+    "clearChat": "清空对话"
+  },
+  "memory": {
+    "title": "记忆",
+    "add": "添加记忆",
+    "edit": "编辑记忆",
+    "delete": "删除记忆",
+    "empty": "暂无记忆"
+  },
+  "allInOneAgent": {
+    "name": "Atlas 超级智能体",
+    "prompt": "你是世界级的超级智能助手，极致体验，极致能力。",
+    "personality": "极致智能、极致体验",
+    "bias": "中立",
+    "expertise": {
+      "globalControl": "全局控制",
+      "aiAssistant": "AI助手",
+      "systemManagement": "系统管理"
+    },
+    "responseStyle": "专业、友好",
+    "suggestions": {
+      "whatCanYouDo": "你能做什么？",
+      "clearChat": "清空对话",
+      "summarizeToday": "帮我总结一下今天的工作",
+      "recommendTools": "推荐几个提升效率的AI工具"
+    }
+  },
+  "home": {
+    "selectTeam": "选择专家团队",
+    "customTeam": "自定义团队",
+    "selectExpertCombination": "选择你想要的专家组合",
+    "selectedExperts": "已选择 {{count}} 位专家",
+    "selectedExpertsCount": "已选择 {{count}} 位专家",
+    "recommended": "推荐",
+    "experts": "位专家",
+    "expertise": "专长领域",
+    "teamMembers": "团队成员",
+    "switchTeam": "切换团队",
+    "moderator": "主持人",
+    "expert": "专家",
+    "unknownExpert": "未知专家",
+    "welcomeHeader": {
+      "description": "让 AI 专家团队集思广益，碰撞灵感"
+    },
+    "initialInput": {
+      "placeholderMobile": "描述你想探讨的话题，点击✨开始...",
+      "placeholderDesktop": "描述你想探讨的话题，按回车开始...",
+      "hintMobile": "输入话题，点击✨开始",
+      "hintDesktop": "按回车开始，让 AI 专家团队为你解答",
+      "submitHintMobile": "点击✨提交",
+      "submitHintDesktop": "按回车键提交 ↵"
+    }
+  },
+  "tool": {
+    "tool": "工具",
+    "params": "参数",
+    "subscribeIframeMessages": {
+      "description": "订阅特定 iframe 的消息，监听 iframe 内部发送的 postMessage 消息，收到消息后自动通知 agent",
+      "iframeIdDescription": "要订阅消息的 iframe ID",
+      "timeoutDescription": "订阅超时时间（毫秒），超时后自动取消订阅",
+      "descriptionDescription": "订阅描述，用于标识订阅目的",
+      "autoNotifyAgentDescription": "是否在收到消息时自动通知 agent，默认为 true",
+      "iframeIdNotSpecified": "未指定 iframe ID",
+      "missingIframeIdParam": "缺少 iframeId 参数",
+      "iframeNotExists": "iframe {{iframeId}} 不存在",
+      "invalidIframeId": "指定的 iframe ID 无效",
+      "subscriptionSuccess": "已成功订阅 iframe {{iframeId}} 的消息",
+      "subscriptionSuccessWithAutoNotify": "已成功订阅 iframe {{iframeId}} 的消息，收到消息时将自动通知 agent",
+      "title": "iframe 消息订阅工具",
+      "subscriptionId": "订阅 ID",
+      "error": "错误",
+      "messageReceived": "收到来自 iframe {{iframeId}} 的消息：",
+      "messageType": "消息类型",
+      "messageContent": "消息内容",
+      "timestamp": "时间戳",
+      "source": "来源",
+      "processMessage": "请根据这个消息内容进行相应的处理或回复。"
+    },
+    "htmlPreviewFromFile": {
+      "description": "从指定文件路径读取 HTML 内容并在右侧面板中预览",
+      "filePathDescription": "要读取并预览的 HTML 文件路径",
+      "filePathNotSpecified": "未指定文件路径",
+      "missingFilePathParam": "缺少 filePath 参数",
+      "fileReadFailed": "文件读取失败",
+      "fileReadError": "文件读取失败",
+      "unknownError": "未知错误",
+      "fileContentEmpty": "文件内容为空",
+      "invalidHtmlFile": "文件内容不包含 HTML 标签，可能不是有效的 HTML 文件",
+      "previewSuccess": "已成功打开 HTML 预览面板：{{filePath}}",
+      "title": "HTML 文件预览工具",
+      "error": "错误"
+    },
+    "getCurrentTime": {
+      "description": "获取当前时间",
+      "timeRetrieved": "当前时间已获取",
+      "title": "当前时间",
+      "time": "时间",
+      "timezone": "时区"
+    },
+    "calculator": {
+      "description": "简单计算器，支持基础四则运算表达式。",
+      "expressionDescription": "数学表达式，如 '2 + 3 * 4'",
+      "calculationFailed": "计算表达式失败",
+      "title": "计算器",
+      "expression": "表达式",
+      "result": "结果"
+    },
+    "weather": {
+      "description": "查询指定城市的天气（模拟数据）",
+      "cityDescription": "城市名称，如 '北京'",
+      "title": "天气查询",
+      "city": "城市",
+      "weather": "天气",
+      "currentWeather": "{{city}} 当前天气：{{weather}}",
+      "defaultWeather": "晴 25°C 湿度 50% 西风2级（{{city}}，模拟数据）",
+      "defaultCity": "北京",
+      "beijing": "北京",
+      "shanghai": "上海",
+      "guangzhou": "广州",
+      "shenzhen": "深圳",
+      "hangzhou": "杭州",
+      "beijingWeather": "晴 27°C 湿度 40% 西南风3级",
+      "shanghaiWeather": "多云 25°C 湿度 55% 东风2级",
+      "guangzhouWeather": "小雨 29°C 湿度 70% 南风1级",
+      "shenzhenWeather": "阴 28°C 湿度 65% 东南风2级",
+      "hangzhouWeather": "晴转多云 26°C 湿度 50% 西风2级"
+    },
+    "sendMessageToIframe": {
+      "description": "向特定 iframe 发送 postMessage 消息，message 参数会被原样发送，无结构变换。",
+      "iframeIdDescription": "目标 iframe 的 ID",
+      "messageDescription": "要发送的消息内容（会被原样 postMessage）",
+      "targetOriginDescription": "目标源，默认为 '*'",
+      "missingRequiredParams": "缺少必要参数",
+      "needIframeIdAndMessage": "需要提供 iframeId 和 message",
+      "iframeNotExists": "iframe {{iframeId}} 不存在",
+      "invalidIframeId": "指定的 iframe ID 无效",
+      "sendFailed": "消息发送失败",
+      "cannotSendMessage": "无法向指定的 iframe 发送消息",
+      "sendSuccess": "已成功向 iframe {{iframeId}} 发送消息",
+      "title": "iframe 消息发送工具",
+      "messageType": "消息类型",
+      "error": "错误"
+    },
+    "requestUserChoice": {
+      "description": "当需要用户从多个选项中选择时使用。提供选项让用户选择，而不是替用户做决定。",
+      "titleDescription": "选择标题，可选",
+      "descriptionDescription": "选择说明，可选",
+      "optionsDescription": "选项列表，建议3-5个选项"
+    },
+    "recommendTopics": {
+      "description": "当用户打招呼或需要话题引导时使用。主动推荐相关服务话题让用户选择。",
+      "contextDescription": "推荐上下文，greeting=问候时，general=通用，其他为特定领域",
+      "topicsDescription": "推荐话题列表，建议3-5个话题"
+    },
+    "provideNextSteps": {
+      "description": "当任务完成或需要提供后续指导时使用。提供具体的下一步行动建议。",
+      "contextDescription": "当前完成的任务或上下文，用于说明为什么提供这些建议",
+      "nextStepsDescription": "下一步建议列表，建议3-5个具体行动"
+    },
+    "clearSuggestions": {
+      "description": "当当前建议不再相关或需要清理界面时使用此工具。适用于：话题转换后清除旧建议；任务完成后清理界面；用户明确拒绝所有建议后清除等场景。",
+      "reasonDescription": "清除建议的原因，可选"
+    },
+    "fileSystem": {
+      "description": "世界级聊天界面的文件系统操作（基于 LightningFS）",
+      "operationDescription": "操作类型：list（列出）、read（读取）、write（写入）、create（创建）、delete（删除）、rename（重命名）、search（搜索）、info（信息）、upload（上传）、download（下载）",
+      "pathDescription": "文件路径",
+      "contentDescription": "文件内容（仅在 write 和 create 操作时需要）",
+      "newPathDescription": "新路径（仅在 rename 操作时需要）",
+      "patternDescription": "搜索模式（仅在 search 操作时需要）",
+      "isDirectoryDescription": "是否为目录（仅在 create 操作时需要）",
+      "missingFilePathParam": "缺少文件路径参数",
+      "missingPathOrContentParam": "缺少文件路径或内容参数",
+      "missingPathParam": "缺少路径参数",
+      "missingOldOrNewPathParam": "缺少原路径或新路径参数",
+      "missingPatternParam": "缺少搜索模式参数",
+      "uploadRequiresUI": "文件上传功能需要通过界面操作，请使用文件管理器界面",
+      "unsupportedOperation": "不支持的操作类型: {{operation}}",
+      "operationFailed": "文件系统操作失败: {{error}}",
+      "unknownError": "未知错误",
+      "refreshFailed": "刷新失败"
+    }
+  },
+  "mobile": {
+    "discussionSystem": "讨论系统"
+  },
+  "theme": {
+    "switchToLight": "切换到浅色模式",
+    "switchToDark": "切换到深色模式"
+  }
+}

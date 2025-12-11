@@ -1,11 +1,13 @@
 import { cn } from "@/common/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface WelcomeHeaderProps {
   className?: string;
 }
 
 export function WelcomeHeader({ className }: WelcomeHeaderProps) {
+  const { t } = useTranslation();
   return (
     <div className={cn("space-y-4", className)}>
       <motion.div className="relative">
@@ -17,7 +19,6 @@ export function WelcomeHeader({ className }: WelcomeHeaderProps) {
           </span>
           <span className="invisible">AgentVerse</span>
         </motion.h1>
-        {/* 装饰光效 */}
         <div className="absolute -inset-x-20 -inset-y-10 pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-purple-500/10 blur-2xl opacity-30" />
         </div>
@@ -25,7 +26,7 @@ export function WelcomeHeader({ className }: WelcomeHeaderProps) {
       <motion.p 
         className="relative text-lg md:text-xl text-foreground/80"
       >
-        让 AI 专家团队集思广益，碰撞灵感
+        {t("home.welcomeHeader.description")}
       </motion.p>
     </div>
   );

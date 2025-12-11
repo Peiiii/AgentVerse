@@ -1,0 +1,277 @@
+{
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "reset": "Reset",
+    "close": "Close",
+    "open": "Open",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "unknown": "Unknown",
+    "unknownTime": "Unknown time",
+    "createdAt": "Created",
+    "me": "Me",
+    "unknownAgent": "Unknown",
+    "rename": "Rename",
+    "export": "Export Records",
+    "moreOptions": "More Options"
+  },
+  "settings": {
+    "title": "Settings",
+    "resetToDefault": "Reset to Default",
+    "resetConfirmTitle": "Confirm reset to default?",
+    "resetConfirmDescription": "This action will reset all settings to default values and cannot be undone. A page refresh is required for changes to take effect.",
+    "resetConfirmAction": "Confirm Reset",
+    "selectCategory": "Please select a settings category",
+    "language": {
+      "label": "Language",
+      "description": "Select interface display language",
+      "zh-CN": "简体中文",
+      "en-US": "English"
+    }
+  },
+  "agent": {
+    "create": "Create Agent",
+    "edit": "Edit Agent",
+    "name": "Name",
+    "description": "Description",
+    "role": "Role",
+    "personality": "Personality",
+    "expertise": "Expertise",
+    "configurationAssistant": {
+      "title": "AI Agent Creation Assistant",
+      "description": "Create your custom agent through conversation. Tell me what kind of agent you want? For example, its professional field, personality traits, and main purpose.",
+      "placeholder": "Describe the agent you want..."
+    }
+  },
+  "discussion": {
+    "title": "Discussion",
+    "create": "Create Discussion",
+    "new": "New Discussion",
+    "sessionList": "Session List",
+    "createSession": "New Session",
+    "members": "Members",
+    "messages": "Messages",
+    "active": "Active",
+    "paused": "Paused",
+    "deleteTitle": "Delete Discussion",
+    "deleteDescription": "Are you sure you want to delete this discussion? This action cannot be undone.",
+    "deleteConfirm": "Confirm Delete",
+    "noMessages": "No one has spoken yet",
+    "memberCount": "members",
+    "clearMessages": "Clear Messages",
+    "clearMessagesTitle": "Clear Messages",
+    "clearMessagesDescription": "Are you sure you want to clear all messages? This action cannot be undone.",
+    "clearMessagesConfirm": "Confirm Clear",
+    "discussionSettings": "Discussion Settings",
+    "moderator": "Moderator",
+    "expert": "Expert",
+    "unknownExpert": "Unknown Expert"
+  },
+  "chat": {
+    "send": "Send",
+    "placeholder": "Type a message...",
+    "empty": "No messages",
+    "selectOrCreate": "Please select or create a session",
+    "creatingDiscussion": "Creating discussion...",
+    "inputPlaceholder": "Type a message here... (Type @ to mention members)",
+    "inputPlaceholderDesktop": "Type a message here... (Type @ to mention members)",
+    "sendHint": "Press Enter to send, Shift+Enter for new line",
+    "clearChat": "Clear Chat"
+  },
+  "memory": {
+    "title": "Memory",
+    "add": "Add Memory",
+    "edit": "Edit Memory",
+    "delete": "Delete Memory",
+    "empty": "No memories"
+  },
+  "allInOneAgent": {
+    "name": "Atlas Super Agent",
+    "prompt": "You are a world-class super intelligent assistant with ultimate experience and capabilities.",
+    "personality": "Ultimate Intelligence, Ultimate Experience",
+    "bias": "Neutral",
+    "expertise": {
+      "globalControl": "Global Control",
+      "aiAssistant": "AI Assistant",
+      "systemManagement": "System Management"
+    },
+    "responseStyle": "Professional, Friendly",
+    "suggestions": {
+      "whatCanYouDo": "What can you do?",
+      "clearChat": "Clear Chat",
+      "summarizeToday": "Help me summarize today's work",
+      "recommendTools": "Recommend some AI tools to improve efficiency"
+    }
+  },
+  "home": {
+    "selectTeam": "Select Expert Team",
+    "customTeam": "Custom Team",
+    "selectExpertCombination": "Select your desired expert combination",
+    "selectedExperts": "{{count}} experts selected",
+    "selectedExpertsCount": "{{count}} experts selected",
+    "recommended": "Recommended",
+    "experts": "experts",
+    "expertise": "Expertise",
+    "teamMembers": "Team Members",
+    "switchTeam": "Switch Team",
+    "moderator": "Moderator",
+    "expert": "Expert",
+    "unknownExpert": "Unknown Expert",
+    "welcomeHeader": {
+      "description": "Let AI expert teams brainstorm and spark inspiration"
+    },
+    "initialInput": {
+      "placeholderMobile": "Describe the topic you want to explore, tap ✨ to start...",
+      "placeholderDesktop": "Describe the topic you want to explore, press Enter to start...",
+      "hintMobile": "Enter topic, tap ✨ to start",
+      "hintDesktop": "Press Enter to start, let AI expert teams answer for you",
+      "submitHintMobile": "Tap ✨ to submit",
+      "submitHintDesktop": "Press Enter to submit ↵"
+    }
+  },
+  "tool": {
+    "tool": "Tool",
+    "params": "Parameters",
+    "subscribeIframeMessages": {
+      "description": "Subscribe to messages from a specific iframe, listen to postMessage messages sent from within the iframe, and automatically notify the agent when messages are received",
+      "iframeIdDescription": "The iframe ID to subscribe to messages from",
+      "timeoutDescription": "Subscription timeout in milliseconds, automatically unsubscribe after timeout",
+      "descriptionDescription": "Subscription description to identify the purpose of the subscription",
+      "autoNotifyAgentDescription": "Whether to automatically notify the agent when messages are received, default is true",
+      "iframeIdNotSpecified": "Iframe ID not specified",
+      "missingIframeIdParam": "Missing iframeId parameter",
+      "iframeNotExists": "iframe {{iframeId}} does not exist",
+      "invalidIframeId": "Invalid iframe ID specified",
+      "subscriptionSuccess": "Successfully subscribed to messages from iframe {{iframeId}}",
+      "subscriptionSuccessWithAutoNotify": "Successfully subscribed to messages from iframe {{iframeId}}, agent will be automatically notified when messages are received",
+      "title": "iframe Message Subscription Tool",
+      "subscriptionId": "Subscription ID",
+      "error": "Error",
+      "messageReceived": "Message received from iframe {{iframeId}}:",
+      "messageType": "Message Type",
+      "messageContent": "Message Content",
+      "timestamp": "Timestamp",
+      "source": "Source",
+      "processMessage": "Please process or reply based on this message content."
+    },
+    "htmlPreviewFromFile": {
+      "description": "Read HTML content from the specified file path and preview it in the right panel",
+      "filePathDescription": "The HTML file path to read and preview",
+      "filePathNotSpecified": "File path not specified",
+      "missingFilePathParam": "Missing filePath parameter",
+      "fileReadFailed": "File read failed",
+      "fileReadError": "File read failed",
+      "unknownError": "Unknown error",
+      "fileContentEmpty": "File content is empty",
+      "invalidHtmlFile": "File content does not contain HTML tags, may not be a valid HTML file",
+      "previewSuccess": "Successfully opened HTML preview panel: {{filePath}}",
+      "title": "HTML File Preview Tool",
+      "error": "Error"
+    },
+    "getCurrentTime": {
+      "description": "Get current time",
+      "timeRetrieved": "Current time retrieved",
+      "title": "Current Time",
+      "time": "Time",
+      "timezone": "Timezone"
+    },
+    "calculator": {
+      "description": "Simple calculator supporting basic arithmetic expressions",
+      "expressionDescription": "Mathematical expression, e.g., '2 + 3 * 4'",
+      "calculationFailed": "Failed to calculate expression",
+      "title": "Calculator",
+      "expression": "Expression",
+      "result": "Result"
+    },
+    "weather": {
+      "description": "Query weather for a specified city (simulated data)",
+      "cityDescription": "City name, e.g., 'Beijing'",
+      "title": "Weather Query",
+      "city": "City",
+      "weather": "Weather",
+      "currentWeather": "Current weather in {{city}}: {{weather}}",
+      "defaultWeather": "Sunny 25°C Humidity 50% West Wind 2 ({{city}}, simulated data)",
+      "defaultCity": "Beijing",
+      "beijing": "Beijing",
+      "shanghai": "Shanghai",
+      "guangzhou": "Guangzhou",
+      "shenzhen": "Shenzhen",
+      "hangzhou": "Hangzhou",
+      "beijingWeather": "Sunny 27°C Humidity 40% Southwest Wind 3",
+      "shanghaiWeather": "Cloudy 25°C Humidity 55% East Wind 2",
+      "guangzhouWeather": "Light Rain 29°C Humidity 70% South Wind 1",
+      "shenzhenWeather": "Overcast 28°C Humidity 65% Southeast Wind 2",
+      "hangzhouWeather": "Sunny to Cloudy 26°C Humidity 50% West Wind 2"
+    },
+    "sendMessageToIframe": {
+      "description": "Send postMessage to a specific iframe, the message parameter will be sent as-is without structural transformation",
+      "iframeIdDescription": "Target iframe ID",
+      "messageDescription": "Message content to send (will be postMessage as-is)",
+      "targetOriginDescription": "Target origin, default is '*'",
+      "missingRequiredParams": "Missing required parameters",
+      "needIframeIdAndMessage": "Need to provide iframeId and message",
+      "iframeNotExists": "iframe {{iframeId}} does not exist",
+      "invalidIframeId": "Invalid iframe ID specified",
+      "sendFailed": "Failed to send message",
+      "cannotSendMessage": "Cannot send message to the specified iframe",
+      "sendSuccess": "Successfully sent message to iframe {{iframeId}}",
+      "title": "iframe Message Sending Tool",
+      "messageType": "Message Type",
+      "error": "Error"
+    },
+    "requestUserChoice": {
+      "description": "Use when user needs to choose from multiple options. Provide options for user to choose, rather than making decisions for them.",
+      "titleDescription": "Choice title, optional",
+      "descriptionDescription": "Choice description, optional",
+      "optionsDescription": "List of options, recommend 3-5 options"
+    },
+    "recommendTopics": {
+      "description": "Use when user greets or needs topic guidance. Actively recommend relevant service topics for user to choose.",
+      "contextDescription": "Recommendation context, greeting=greeting, general=general, others are specific domains",
+      "topicsDescription": "List of recommended topics, recommend 3-5 topics"
+    },
+    "provideNextSteps": {
+      "description": "Use when task is completed or needs to provide follow-up guidance. Provide specific next action suggestions.",
+      "contextDescription": "Currently completed task or context, used to explain why these suggestions are provided",
+      "nextStepsDescription": "List of next step suggestions, recommend 3-5 specific actions"
+    },
+    "clearSuggestions": {
+      "description": "Use this tool when current suggestions are no longer relevant or need to clean up the interface. Applicable scenarios: clear old suggestions after topic change; clean up interface after task completion; clear after user explicitly rejects all suggestions, etc.",
+      "reasonDescription": "Reason for clearing suggestions, optional"
+    },
+    "fileSystem": {
+      "description": "File system operations for world-class chat interface (based on LightningFS)",
+      "operationDescription": "Operation type: list (list), read (read), write (write), create (create), delete (delete), rename (rename), search (search), info (info), upload (upload), download (download)",
+      "pathDescription": "File path",
+      "contentDescription": "File content (required only for write and create operations)",
+      "newPathDescription": "New path (required only for rename operation)",
+      "patternDescription": "Search pattern (required only for search operation)",
+      "isDirectoryDescription": "Whether it is a directory (required only for create operation)",
+      "missingFilePathParam": "Missing file path parameter",
+      "missingPathOrContentParam": "Missing file path or content parameter",
+      "missingPathParam": "Missing path parameter",
+      "missingOldOrNewPathParam": "Missing original path or new path parameter",
+      "missingPatternParam": "Missing search pattern parameter",
+      "uploadRequiresUI": "File upload function requires interface operation, please use the file manager interface",
+      "unsupportedOperation": "Unsupported operation type: {{operation}}",
+      "operationFailed": "File system operation failed: {{error}}",
+      "unknownError": "Unknown error",
+      "refreshFailed": "Refresh failed"
+    }
+  },
+  "mobile": {
+    "discussionSystem": "Discussion System"
+  },
+  "theme": {
+    "switchToLight": "Switch to Light Mode",
+    "switchToDark": "Switch to Dark Mode"
+  }
+}

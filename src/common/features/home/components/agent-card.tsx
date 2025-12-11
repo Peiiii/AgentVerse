@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 // 可复用的AgentCard组件，用于展示代理信息的Popover卡片
 interface AgentCardProps {
@@ -19,6 +20,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
   description,
   className,
 }) => {
+  const { t } = useTranslation();
   // 确保头像URL是有效的
   const safeAvatar = avatar || "/avatars/default.png";
   
@@ -47,7 +49,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
       
       {expertise.length > 0 && (
         <div className="space-y-1.5">
-          <h4 className="text-xs font-medium text-muted-foreground">专长领域</h4>
+          <h4 className="text-xs font-medium text-muted-foreground">{t("home.expertise")}</h4>
           <div className="flex flex-wrap gap-1">
             {expertise.map((skill, index) => (
               <span 

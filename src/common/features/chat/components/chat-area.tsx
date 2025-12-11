@@ -13,6 +13,7 @@ import { usePresenter } from "@/core/presenter";
 import { useAgents } from "@/core/hooks/useAgents";
 import { useMessages } from "@/core/hooks/useMessages";
 import { discussionMembersResource } from "@/core/resources";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface ChatAreaProps {
   className?: string;
@@ -29,6 +30,7 @@ export function ChatArea({
   inputAreaClassName,
   onInitialStateChange,
 }: ChatAreaProps) {
+  const { t } = useTranslation();
   const presenter = usePresenter();
   const { messages } = useMessages();
   const { isKeyboardVisible } = useViewportHeight();
@@ -179,7 +181,7 @@ export function ChatArea({
   if (!currentDiscussion) {
     return (
       <div className="h-full flex items-center justify-center text-muted-foreground">
-        请选择或创建一个会话
+        {t("chat.selectOrCreate")}
       </div>
     );
   }
@@ -212,7 +214,7 @@ export function ChatArea({
           <div className="py-4 pr-4">
             {isStartingDiscussion ? (
               <div className="h-32 flex items-center justify-center text-muted-foreground">
-                正在创建讨论…
+                {t("chat.creatingDiscussion")}
               </div>
             ) : (
               <ChatEmptyGuide

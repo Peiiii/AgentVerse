@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { MobileActionSheet } from "./mobile-action-sheet";
 import { useDiscussionControl } from "@/common/features/discussion/components/control/use-discussion-control";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface MobileHeaderProps {
   title?: string;
@@ -23,7 +24,7 @@ interface MobileHeaderProps {
 }
 
 export function MobileHeader({
-  title = "讨论系统",
+  title,
   onToggleSidebar,
   className,
   status = "paused",
@@ -31,6 +32,8 @@ export function MobileHeader({
   onManageMembers = () => {},
   onClearMessages = () => {},
 }: MobileHeaderProps) {
+  const { t } = useTranslation();
+  const displayTitle = title || t("mobile.discussionSystem");
   const [showActions, setShowActions] = useState(false);
   const isActive = status === "active";
   const { members } = useDiscussionMembers();
@@ -60,7 +63,7 @@ export function MobileHeader({
           </Button>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-medium truncate">{title}</h1>
+            <h1 className="text-lg font-medium truncate">{displayTitle}</h1>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">

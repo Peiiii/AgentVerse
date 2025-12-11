@@ -8,6 +8,7 @@ import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { cn } from "@/common/lib/utils";
 import { forwardRef, useMemo } from "react";
 import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageInput";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 /**
  * 微信PC端消息输入框设计：
@@ -63,10 +64,11 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
       [agents, members]
     );
 
+    const { t } = useTranslation();
     const getAgentName = useMemo(() => (agentId: string) => {
-      if (agentId === "user") return "我";
-      return agents.find((a) => a.id === agentId)?.name ?? "未知";
-    }, [agents]);
+      if (agentId === "user") return t("common.me");
+      return agents.find((a) => a.id === agentId)?.name ?? t("common.unknownAgent");
+    }, [agents, t]);
 
     const getAgentAvatar = useMemo(() => (agentId: string) => {
       return agents.find((a) => a.id === agentId)?.avatar ?? "";
@@ -120,14 +122,14 @@ export const MessageInputDesktop = forwardRef<MessageInputRef, MessageInputProps
             value={input}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            placeholder="在这里输入消息... (输入 @ 可以提及成员)"
+            placeholder={t("chat.inputPlaceholderDesktop")}
             className="w-full resize-none text-sm outline-none border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-none focus-visible:shadow-none shadow-none bg-transparent text-gray-900 dark:text-gray-100"
             disabled={false}
             minRows={2}
             maxRows={6}
           />
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-right">
-            按 Enter 键发送，按 Shift+Enter 键换行
+            {t("chat.sendHint")}
           </div>
         </div>
         <MentionSuggestions

@@ -3,9 +3,11 @@ import { Check, Edit, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import type { SettingItemComponent } from "./types";
 import { useMemoryStore, type MemoryItem } from "../../stores/memory.store";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function MemorySetting(_props: SettingItemComponent) {
+  const { t, currentLanguage } = useTranslation();
   // 使用 Memory Store
   const { memories, addMemory, updateMemory, deleteMemory } = useMemoryStore();
   
@@ -54,10 +56,10 @@ export function MemorySetting(_props: SettingItemComponent) {
     try {
       // 确保 date 是有效的 Date 对象
       if (!(date instanceof Date) || isNaN(date.getTime())) {
-        return "未知时间";
+        return t("common.unknownTime");
       }
       
-      return new Intl.DateTimeFormat("zh-CN", {
+      return new Intl.DateTimeFormat(currentLanguage, {
         month: "short",
         day: "numeric",
         hour: "2-digit",
@@ -65,7 +67,7 @@ export function MemorySetting(_props: SettingItemComponent) {
       }).format(date);
     } catch (error) {
       console.error('Error formatting date:', error);
-      return "未知时间";
+      return t("common.unknownTime");
     }
   };
 
@@ -75,27 +77,27 @@ export function MemorySetting(_props: SettingItemComponent) {
       {isCreating && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-gray-900">添加新 Memory</h3>
+            <h3 className="text-sm font-medium text-gray-900">{t("memory.add")}</h3>
             <div className="flex gap-1">
               <button
                 onClick={handleCreate}
                 disabled={!newContent.trim()}
                 className="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title="确认添加"
+                title={t("common.confirm")}
               >
                 <Check size={14} />
               </button>
               <button
                 onClick={cancelCreate}
                 className="p-1.5 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition-colors"
-                title="取消"
+                title={t("common.cancel")}
               >
                 <X size={14} />
               </button>
             </div>
           </div>
           <AutoResizeTextarea
-            placeholder="输入记忆内容..."
+            placeholder={t("memory.add")}
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
             minRows={3}
@@ -108,21 +110,20 @@ export function MemorySetting(_props: SettingItemComponent) {
       {/* Memory 列表 */}
       <div className="flex-1 overflow-auto p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-gray-700">Memory 列表</h3>
+          <h3 className="text-sm font-medium text-gray-700">{t("memory.title")}</h3>
           <button
             onClick={() => setIsCreating(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm transition-colors font-medium"
           >
             <Plus size={14} />
-            添加
+            {t("memory.add")}
           </button>
         </div>
 
         <div className="space-y-3">
           {memories.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <p>暂无 Memory</p>
-              <p className="text-sm">点击"添加"按钮创建第一个 Memory</p>
+              <p>{t("memory.empty")}</p>
             </div>
           ) : (
             memories.map((memory) => {
@@ -140,27 +141,27 @@ export function MemorySetting(_props: SettingItemComponent) {
                     // 编辑模式
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-gray-700">编辑 Memory</span>
+                        <span className="text-sm font-medium text-gray-700">{t("memory.edit")}</span>
                         <div className="flex gap-1">
                           <button
                             onClick={handleUpdate}
                             disabled={!editContent.trim()}
                             className="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            title="保存"
+                            title={t("common.save")}
                           >
                             <Check size={14} />
                           </button>
                           <button
                             onClick={cancelEdit}
                             className="p-1.5 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition-colors"
-                            title="取消"
+                            title={t("common.cancel")}
                           >
                             <X size={14} />
                           </button>
                         </div>
                       </div>
                       <AutoResizeTextarea
-                        placeholder="输入记忆内容..."
+                        placeholder={t("memory.add")}
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
                         minRows={3}
@@ -179,14 +180,14 @@ export function MemorySetting(_props: SettingItemComponent) {
                           <button
                             onClick={() => startEdit(memory)}
                             className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-                            title="编辑"
+                            title={t("common.edit")}
                           >
                             <Edit size={14} />
                           </button>
                           <button
                             onClick={() => handleDelete(memory.id)}
                             className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                            title="删除"
+                            title={t("common.delete")}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -194,7 +195,7 @@ export function MemorySetting(_props: SettingItemComponent) {
                       </div>
 
                       <div className="text-xs text-gray-500">
-                        创建于: {formatDate(createdAt)}
+                        {t("common.createdAt")}: {formatDate(createdAt)}
                       </div>
                     </div>
                   )}

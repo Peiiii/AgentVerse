@@ -10,6 +10,7 @@ import { Send } from "lucide-react";
 import { forwardRef } from "react";
 import { useMessageInput, type MessageInputRef } from "@/core/hooks/useMessageInput";
 import { usePresenter } from "@/core/presenter";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 /**
  * 微信移动端消息输入框设计（简化版）：
@@ -62,9 +63,10 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
       members.some((member) => member.agentId === agent.id)
     );
 
+    const { t } = useTranslation();
     const getAgentName = (agentId: string) => {
-      if (agentId === "user") return "我";
-      return agents.find((a) => a.id === agentId)?.name ?? "未知";
+      if (agentId === "user") return t("common.me");
+      return agents.find((a) => a.id === agentId)?.name ?? t("common.unknownAgent");
     };
 
     const getAgentAvatar = (agentId: string) => {
@@ -120,7 +122,7 @@ export const MessageInputMobile = forwardRef<MessageInputRef, MessageInputProps>
               value={input}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              placeholder="在这里输入消息... (输入 @ 可以提及成员)"
+              placeholder={t("chat.inputPlaceholder")}
               className="flex-1 resize-none text-sm outline-none border-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:shadow-none focus-visible:shadow-none shadow-none bg-transparent px-3 py-2 min-h-[20px] leading-tight text-gray-900 dark:text-gray-100"
               disabled={false}
               minRows={1}

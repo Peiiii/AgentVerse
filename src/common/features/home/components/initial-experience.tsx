@@ -9,6 +9,7 @@ import { AgentPopover } from "./agent-popover";
 import { InitialInput } from "./initial-input";
 import { TeamDetailsDialog } from "./team-details-dialog";
 import { WelcomeHeader } from "./welcome-header";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface InitialExperienceProps {
   onStart: (
@@ -26,6 +27,7 @@ export function InitialExperience({
   onChangeTeam,
   className,
 }: InitialExperienceProps) {
+  const { t } = useTranslation();
   const [isTeamDetailsOpen, setIsTeamDetailsOpen] = useState(false);
   const [customMembers, setCustomMembers] = useState<
     { agentId: string; isAutoReply: boolean }[]
@@ -75,7 +77,7 @@ export function InitialExperience({
 
   // 处理组合选择
   const handleCombinationSelect = (key: AgentCombinationType) => {
-    console.log("选择团队:", key, AGENT_COMBINATIONS[key].name);
+    console.log(t("home.selectTeam") + ":", key, AGENT_COMBINATIONS[key].name);
     setSelectedCombinationKey(key);
     setCustomMembers([]); // 清空自定义成员
 
@@ -162,7 +164,7 @@ export function InitialExperience({
               <div className="flex items-center justify-center gap-2 mb-6 mt-2">
                 <div className="h-px flex-grow max-w-[80px] bg-gradient-to-r from-transparent to-purple-500/30"></div>
                 <h2 className="text-base font-medium text-foreground/90 px-3">
-                  选择专家团队
+                  {t("home.selectTeam")}
                 </h2>
                 <div className="h-px flex-grow max-w-[80px] bg-gradient-to-l from-transparent to-purple-500/30"></div>
               </div>
@@ -203,13 +205,13 @@ export function InitialExperience({
                               "text-blue-700 dark:text-blue-300"
                           )}
                         >
-                          自定义团队
+                          {t("home.customTeam")}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">
                         {customMembers.length > 0
-                          ? `已选择 ${customMembers.length} 位专家`
-                          : "选择你想要的专家组合"}
+                          ? t("home.selectedExpertsCount", { count: customMembers.length })
+                          : t("home.selectExpertCombination")}
                       </p>
                     </div>
                   </button>
@@ -275,13 +277,13 @@ export function InitialExperience({
                                     {combination.name}
                                     {isRecommended && (
                                       <span className="ml-1 text-xs text-purple-500 opacity-70">
-                                        ✦ 推荐
+                                        ✦ {t("home.recommended")}
                                       </span>
                                     )}
                                   </span>
                                 </div>
                                 <p className="text-xs text-muted-foreground truncate">
-                                  {combination.participants.length} 位专家
+                                  {combination.participants.length} {t("home.experts")}
                                 </p>
                               </div>
                             </button>
@@ -298,10 +300,10 @@ export function InitialExperience({
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <h3 className="font-medium text-blue-700 dark:text-blue-300">
-                          自定义团队
+                          {t("home.customTeam")}
                         </h3>
                         <span className="text-xs text-muted-foreground">
-                          {customMembers.length} 位专家
+                          {customMembers.length} {t("home.experts")}
                         </span>
                       </div>
 
@@ -337,14 +339,14 @@ export function InitialExperience({
                           {AGENT_COMBINATIONS[selectedCombinationKey].name}
                           {selectedCombinationKey === "thinkingTeam" && (
                             <span className="ml-1 text-xs text-purple-500 opacity-70">
-                              ✦ 推荐
+                              ✦ {t("home.recommended")}
                             </span>
                           )}
                         </h3>
                         <span className="text-xs text-muted-foreground">
                           {resolveCombination(selectedCombinationKey)
                             .participants.length + 1}{" "}
-                          位专家
+                          {t("home.experts")}
                         </span>
                       </div>
 
@@ -354,7 +356,7 @@ export function InitialExperience({
 
                       <div className="space-y-2">
                         <div className="text-xs font-medium text-muted-foreground">
-                          主持人
+                          {t("home.moderator")}
                         </div>
                         {(() => {
                           const r = resolveCombination(selectedCombinationKey);
@@ -362,7 +364,7 @@ export function InitialExperience({
                             <AgentPopover
                               name={r.moderator.name}
                               avatar={r.moderator.avatar}
-                              role="主持人"
+                              role={t("home.moderator")}
                               expertise={r.moderator.expertise}
                             />
                           );
@@ -371,7 +373,7 @@ export function InitialExperience({
 
                       <div className="space-y-2">
                         <div className="text-xs font-medium text-muted-foreground">
-                          团队成员
+                          {t("home.teamMembers")}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {resolveCombination(selectedCombinationKey).participants.map((participant, idx) => (
@@ -379,7 +381,7 @@ export function InitialExperience({
                               key={idx}
                               name={participant.name}
                               avatar={participant.avatar}
-                              role="专家"
+                              role={t("home.expert")}
                               expertise={participant.expertise}
                             />
                           ))}
@@ -399,7 +401,7 @@ export function InitialExperience({
             id: "default",
             name:
               customMembers.length > 0
-                ? "自定义团队"
+                ? t("home.customTeam")
                 : AGENT_COMBINATIONS[selectedCombinationKey].name,
             members:
               customMembers.length > 0
@@ -407,7 +409,7 @@ export function InitialExperience({
                     const agent = agents.find((a) => a.id === member.agentId);
                     return {
                       id: member.agentId,
-                      role: agent ? presenter.agents.getAgentName(agent.id) : "未知专家",
+                      role: agent ? presenter.agents.getAgentName(agent.id) : t("home.unknownExpert"),
                       expertise: agent?.expertise || [],
                     };
                   })

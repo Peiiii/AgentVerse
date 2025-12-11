@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import React from "react";
+import { i18n } from "@/core/hooks/use-i18n";
 
 interface WeatherResult {
   city: string;
@@ -11,42 +12,63 @@ interface WeatherResult {
 
 export const weatherTool: AgentTool = {
   name: "weather",
-  description: "查询指定城市的天气（模拟数据）",
+  description: i18n.t("tool.weather.description"),
   parameters: {
     type: "object",
     properties: {
       city: {
         type: "string",
-        description: "城市名称，如 '北京'"
+        description: i18n.t("tool.weather.cityDescription")
       }
     },
     required: ["city"]
   },
   execute: async (toolCall) => {
     const args = JSON.parse(toolCall.function.arguments);
-    // 模拟天气数据
-    const weatherMap: Record<string, string> = {
-      北京: "晴 27°C 湿度 40% 西南风3级",
-      上海: "多云 25°C 湿度 55% 东风2级",
-      广州: "小雨 29°C 湿度 70% 南风1级",
-      深圳: "阴 28°C 湿度 65% 东南风2级",
-      杭州: "晴转多云 26°C 湿度 50% 西风2级",
+    const city = args.city || i18n.t("tool.weather.defaultCity");
+    
+    const cityMap: Record<string, string> = {
+      "北京": "beijing",
+      "Beijing": "beijing",
+      "beijing": "beijing",
+      "上海": "shanghai",
+      "Shanghai": "shanghai",
+      "shanghai": "shanghai",
+      "广州": "guangzhou",
+      "Guangzhou": "guangzhou",
+      "guangzhou": "guangzhou",
+      "深圳": "shenzhen",
+      "Shenzhen": "shenzhen",
+      "shenzhen": "shenzhen",
+      "杭州": "hangzhou",
+      "Hangzhou": "hangzhou",
+      "hangzhou": "hangzhou",
     };
-    const city = args.city || "北京";
-    const weather = weatherMap[city] || `晴 25°C 湿度 50% 西风2级（${city}，模拟数据）`;
+    
+    const cityKey = cityMap[city] || city.toLowerCase();
+    const weatherMap: Record<string, string> = {
+      beijing: i18n.t("tool.weather.beijingWeather"),
+      shanghai: i18n.t("tool.weather.shanghaiWeather"),
+      guangzhou: i18n.t("tool.weather.guangzhouWeather"),
+      shenzhen: i18n.t("tool.weather.shenzhenWeather"),
+      hangzhou: i18n.t("tool.weather.hangzhouWeather"),
+    };
+    
+    const displayCity = cityMap[city] ? i18n.t(`tool.weather.${cityMap[city]}`) : city;
+    const weather = weatherMap[cityKey] || i18n.t("tool.weather.defaultWeather", { city: displayCity });
     return {
       toolCallId: toolCall.id,
       result: {
-        city,
+        city: displayCity,
         weather,
-        message: `${city} 当前天气：${weather}`,
+        message: i18n.t("tool.weather.currentWeather", { city: displayCity, weather }),
       },
       status: "success" as const,
     };
   },
   render: (toolCall: ToolCall & { result?: WeatherResult }) => {
     const args = JSON.parse(toolCall.function.arguments);
-    const city = args.city || "北京";
+    const city = args.city || i18n.t("tool.weather.defaultCity");
     const weather = toolCall.result?.weather || "-";
     const error = toolCall.result?.error;
     return React.createElement(
@@ -66,10 +88,10 @@ export const weatherTool: AgentTool = {
           minWidth: 220,
         }
       },
-      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#0ea5e9', marginBottom: 4 } }, "🌤️ 天气查询"),
-      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, "城市："),
+      React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: '#0ea5e9', marginBottom: 4 } }, `🌤️ ${i18n.t("tool.weather.title")}`),
+      React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, `${i18n.t("tool.weather.city")}：`),
       React.createElement("div", { style: { fontFamily: 'Menlo, monospace', fontSize: 18, color: '#22223b', background: '#fff', borderRadius: 8, padding: '6px 12px', margin: '4px 0' } }, city),
-      weather && React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, "天气："),
+      weather && React.createElement("div", { style: { fontSize: 15, color: '#64748b' } }, `${i18n.t("tool.weather.weather")}：`),
       weather && React.createElement("div", { style: { fontFamily: 'Menlo, monospace', fontSize: 20, color: '#0ea5e9', background: '#f0f9ff', borderRadius: 8, padding: '6px 12px', margin: '4px 0' } }, weather),
       error && React.createElement("div", { style: { color: '#ef4444', fontSize: 15 } }, error)
     );

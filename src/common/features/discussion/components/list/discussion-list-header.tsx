@@ -2,6 +2,7 @@ import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { Loader2, PlusCircle } from "lucide-react";
 import { usePresenter } from "@/core/presenter";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface DiscussionListHeaderProps {
   className?: string;
@@ -16,8 +17,9 @@ export function DiscussionListHeader({
   disabled,
   onCreateDiscussion,
 }: DiscussionListHeaderProps) {
+  const { t } = useTranslation();
   const presenter = usePresenter();
-  const handleCreate = onCreateDiscussion ?? (() => presenter.discussions.create("新的讨论"));
+  const handleCreate = onCreateDiscussion ?? (() => presenter.discussions.create(t("discussion.new")));
   return (
     <header
       className={cn(
@@ -27,7 +29,7 @@ export function DiscussionListHeader({
         className
       )}
     >
-      <h2 className="text-sm font-medium text-foreground/90">会话列表</h2>
+      <h2 className="text-sm font-medium text-foreground/90">{t("discussion.sessionList")}</h2>
       <Button
         onClick={handleCreate}
         variant="outline"
@@ -40,7 +42,7 @@ export function DiscussionListHeader({
         ) : (
           <PlusCircle className="w-3 h-3 mr-1" />
         )}
-        新建会话
+        {t("discussion.createSession")}
       </Button>
     </header>
   );

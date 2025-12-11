@@ -8,6 +8,7 @@ import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { AGENT_COMBINATIONS, AgentCombinationType, resolveCombination } from "@/core/config/agents";
 import { useAgents } from "@/core/hooks/useAgents";
 import { usePresenter } from "@/core/presenter";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 // 定义TeamMember和TeamConfig接口
 interface TeamMember {
@@ -33,6 +34,7 @@ export function TeamDetailsDialog({
   open,
   onOpenChange,
 }: TeamDetailsDialogProps) {
+  const { t } = useTranslation();
   const presenter = usePresenter();
   const { agents } = useAgents();
   
@@ -95,7 +97,7 @@ export function TeamDetailsDialog({
                 
                 {member.expertise.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">专长领域</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("home.expertise")}</h4>
                     <div className="flex flex-wrap gap-1">
                       {member.expertise.map((skill, index) => (
                         <span 

@@ -1,66 +1,72 @@
+import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
 import {
   WorldClassChatContainer,
   WorldClassChatContainerRef,
 } from "@/common/features/world-class-chat";
-import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import { useProvideAgentTools } from "@/common/hooks/use-provide-agent-tools";
 import { AgentDef } from "@/common/types/agent";
-import { useMemo, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "@/core/hooks/use-i18n";
 import { calculatorTool, weatherTool } from "../components/agent-tools";
+import { createClearSuggestionsTool } from "../components/agent-tools/clear-suggestions.tool";
 import { fileSystemTool } from "../components/agent-tools/file-system.tool";
 import { getCurrentTimeTool } from "../components/agent-tools/get-current-time.tool";
 import { createHtmlPreviewFromFileTool } from "../components/agent-tools/html-preview-from-file.tool";
-import { createSubscribeIframeMessagesTool } from "../components/agent-tools/subscribe-iframe-messages.tool";
-import { createSendMessageToIframeTool } from "../components/agent-tools/send-message-to-iframe.tool";
-import { createRequestUserChoiceTool } from "../components/agent-tools/request-user-choice.tool";
-import { createRecommendTopicsTool } from "../components/agent-tools/recommend-topics.tool";
 import { createProvideNextStepsTool } from "../components/agent-tools/provide-next-steps.tool";
-import { createClearSuggestionsTool } from "../components/agent-tools/clear-suggestions.tool";
-
-const AGENT_DEF: AgentDef = {
-  id: "atlas-all-in-one",
-  name: "Atlas 超级智能体",
-  avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Atlas",
-  prompt: "你是世界级的超级智能助手，极致体验，极致能力。",
-  role: "participant",
-  personality: "极致智能、极致体验",
-  expertise: ["全局控制", "AI助手", "系统管理"],
-  bias: "中立",
-  responseStyle: "专业、友好",
-};
-
-// 默认的 suggestions
-const DEFAULT_SUGGESTIONS: Suggestion[] = [
-  {
-    id: "1",
-    type: "question",
-    actionName: "你能做什么？",
-    content: "你能做什么？",
-  },
-  { 
-    id: "2", 
-    type: "action", 
-    actionName: "清空对话", 
-    content: "清空对话" 
-  },
-  {
-    id: "3",
-    type: "question",
-    actionName: "帮我总结一下今天的工作",
-    content: "帮我总结一下今天的工作",
-  },
-  {
-    id: "4",
-    type: "question",
-    actionName: "推荐几个提升效率的AI工具",
-    content: "推荐几个提升效率的AI工具",
-  },
-];
+import { createRecommendTopicsTool } from "../components/agent-tools/recommend-topics.tool";
+import { createRequestUserChoiceTool } from "../components/agent-tools/request-user-choice.tool";
+import { createSendMessageToIframeTool } from "../components/agent-tools/send-message-to-iframe.tool";
+import { createSubscribeIframeMessagesTool } from "../components/agent-tools/subscribe-iframe-messages.tool";
 
 export function AllInOneAgentPage() {
+  const { t } = useTranslation();
   const chatRef = useRef<WorldClassChatContainerRef>(null);
   
+  const AGENT_DEF: AgentDef = useMemo(() => ({
+    id: "atlas-all-in-one",
+    name: t("allInOneAgent.name"),
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Atlas",
+    prompt: t("allInOneAgent.prompt"),
+    role: "participant",
+    personality: t("allInOneAgent.personality"),
+    expertise: [
+      t("allInOneAgent.expertise.globalControl"),
+      t("allInOneAgent.expertise.aiAssistant"),
+      t("allInOneAgent.expertise.systemManagement"),
+    ],
+    bias: t("allInOneAgent.bias"),
+    responseStyle: t("allInOneAgent.responseStyle"),
+  }), [t]);
+
+  // 默认的 suggestions
+  const DEFAULT_SUGGESTIONS: Suggestion[] = useMemo(() => [
+    {
+      id: "1",
+      type: "question",
+      actionName: t("allInOneAgent.suggestions.whatCanYouDo"),
+      content: t("allInOneAgent.suggestions.whatCanYouDo"),
+    },
+    { 
+      id: "2", 
+      type: "action", 
+      actionName: t("allInOneAgent.suggestions.clearChat"), 
+      content: t("allInOneAgent.suggestions.clearChat") 
+    },
+    {
+      id: "3",
+      type: "question",
+      actionName: t("allInOneAgent.suggestions.summarizeToday"),
+      content: t("allInOneAgent.suggestions.summarizeToday"),
+    },
+    {
+      id: "4",
+      type: "question",
+      actionName: t("allInOneAgent.suggestions.recommendTools"),
+      content: t("allInOneAgent.suggestions.recommendTools"),
+    },
+  ], [t]);
+
   // 创建 HTML 预览工具
   const htmlPreviewFromFileTool = useMemo(
     () =>

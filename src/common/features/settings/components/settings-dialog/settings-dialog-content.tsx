@@ -14,8 +14,10 @@ import {
 } from "@/common/components/ui/alert-dialog";
 import { useState } from "react";
 import { recoverDefaultSettings, settingsResource } from "@/core/resources/settings.resource";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 export function SettingsDialogContent() {
+  const { t } = useTranslation();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleReset = async () => {
@@ -32,7 +34,7 @@ export function SettingsDialogContent() {
           marginTop: "-30px",
         }}
       >
-        <span className="text-lg font-medium">设置</span>{" "}
+        <span className="text-lg font-medium">{t("settings.title")}</span>{" "}
         <Button
           variant="secondary"
           size="sm"
@@ -40,7 +42,7 @@ export function SettingsDialogContent() {
           className="text-muted-foreground text-xs hover:text-primary flex items-center gap-2 mr-3"
         >
           <RotateCcw className="h-3 w-3" />
-          恢复默认配置
+          {t("settings.resetToDefault")}
         </Button>
       </DialogTitle>
       <SettingsPanel />
@@ -48,14 +50,14 @@ export function SettingsDialogContent() {
       <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>确认恢复默认配置？</AlertDialogTitle>
+            <AlertDialogTitle>{t("settings.resetConfirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              此操作将重置所有设置为默认值，且无法撤销。需要刷新页面才能生效。
+              {t("settings.resetConfirmDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReset}>确认重置</AlertDialogAction>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReset}>{t("settings.resetConfirmAction")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

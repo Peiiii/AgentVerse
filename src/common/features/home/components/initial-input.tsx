@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface InitialInputProps {
   onSubmit: (topic: string) => void;
@@ -15,6 +16,7 @@ export function InitialInput({
   autoFocus = true,
   className
 }: InitialInputProps) {
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -66,14 +68,14 @@ export function InitialInput({
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!input.trim()) return;
-    console.log("提交输入:", input.trim());
+    console.log("Submit input:", input.trim());
     onSubmit(input.trim());
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      console.log("检测到回车键");
+      console.log("Enter key detected");
       handleSubmit();
     }
   };
@@ -81,7 +83,7 @@ export function InitialInput({
   const handleIconClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (input.trim()) {
-      console.log("点击图标提交");
+      console.log("Icon clicked to submit");
       handleSubmit();
     } else {
       // 如果输入为空，聚焦到输入框
@@ -119,7 +121,7 @@ export function InitialInput({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onKeyDown={handleKeyDown}
-            placeholder={isMobile ? "描述你想探讨的话题，点击✨开始..." : "描述你想探讨的话题，按回车开始..."}
+            placeholder={isMobile ? t("home.initialInput.placeholderMobile") : t("home.initialInput.placeholderDesktop")}
             autoFocus={autoFocus}
             rows={1}
             className={cn(
@@ -188,7 +190,7 @@ export function InitialInput({
           "transition-all duration-200"
         )}
       >
-        {isMobile ? "输入话题，点击✨开始" : "按回车开始，让 AI 专家团队为你解答"}
+        {isMobile ? t("home.initialInput.hintMobile") : t("home.initialInput.hintDesktop")}
       </motion.div>
       
       {/* 输入提示 */}
@@ -198,7 +200,7 @@ export function InitialInput({
           animate={{ opacity: 1, y: 0 }}
           className="absolute -bottom-8 right-2 text-xs text-purple-500/70 font-medium"
         >
-          {isMobile ? "点击✨提交" : "按回车键提交 ↵"}
+          {isMobile ? t("home.initialInput.submitHintMobile") : t("home.initialInput.submitHintDesktop")}
         </motion.div>
       )}
     </motion.div>

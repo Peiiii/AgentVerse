@@ -2,6 +2,7 @@ import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import { useIframeManager } from "@/common/features/world-class-chat/hooks/use-iframe-manager";
 import { Message } from "@ag-ui/core";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export interface SubscribeIframeMessagesToolParams {
   iframeId: string;
@@ -156,13 +157,13 @@ export function createSubscribeIframeMessagesTool(
 ): AgentTool {
   return {
     name: "subscribeIframeMessages",
-    description: "订阅特定 iframe 的消息，监听 iframe 内部发送的 postMessage 消息，收到消息后自动通知 agent",
+    description: i18n.t("tool.subscribeIframeMessages.description"),
     parameters: {
       type: "object",
       properties: {
         iframeId: {
           type: "string",
-          description: "要订阅消息的 iframe ID",
+          description: i18n.t("tool.subscribeIframeMessages.iframeIdDescription"),
         },
         // messageTypes: {
         //   type: "array",
@@ -171,15 +172,15 @@ export function createSubscribeIframeMessagesTool(
         // },
         timeout: {
           type: "number",
-          description: "订阅超时时间（毫秒），超时后自动取消订阅",
+          description: i18n.t("tool.subscribeIframeMessages.timeoutDescription"),
         },
         description: {
           type: "string",
-          description: "订阅描述，用于标识订阅目的",
+          description: i18n.t("tool.subscribeIframeMessages.descriptionDescription"),
         },
         autoNotifyAgent: {
           type: "boolean",
-          description: "是否在收到消息时自动通知 agent，默认为 true",
+          description: i18n.t("tool.subscribeIframeMessages.autoNotifyAgentDescription"),
         },
       },
       required: ["iframeId"],
@@ -192,8 +193,8 @@ export function createSubscribeIframeMessagesTool(
           toolCallId: toolCall.id,
           result: {
             success: false,
-            message: "未指定 iframe ID",
-            error: "缺少 iframeId 参数",
+            message: i18n.t("tool.subscribeIframeMessages.iframeIdNotSpecified"),
+            error: i18n.t("tool.subscribeIframeMessages.missingIframeIdParam"),
           },
           status: "error" as const,
         };
@@ -213,8 +214,8 @@ export function createSubscribeIframeMessagesTool(
             toolCallId: toolCall.id,
             result: {
               success: false,
-              message: `iframe ${iframeId} 不存在`,
-              error: "指定的 iframe ID 无效",
+              message: i18n.t("tool.subscribeIframeMessages.iframeNotExists", { iframeId }),
+              error: i18n.t("tool.subscribeIframeMessages.invalidIframeId"),
             },
             status: "error" as const,
           };
@@ -228,7 +229,7 @@ export function createSubscribeIframeMessagesTool(
         timeout,
         (message) => {
           // 这里可以添加消息处理逻辑
-          console.log(`收到来自 ${iframeId} 的消息:`, message);
+          console.log(i18n.t("tool.subscribeIframeMessages.messageReceived", { iframeId }), message);
           
           // 如果启用了自动通知 agent，则发送系统消息
           if (autoNotifyAgent) {
@@ -237,14 +238,14 @@ export function createSubscribeIframeMessagesTool(
               const systemMessage = {
                 id: `iframe-message-${Date.now()}`,
                 role: 'system' as const,
-                content: `收到来自 iframe ${iframeId} 的消息：
+                content: `${i18n.t("tool.subscribeIframeMessages.messageReceived", { iframeId })}
                 
-消息类型: ${message.type}
-消息内容: ${JSON.stringify(message.data ?? null, null, 2)}
-时间戳: ${new Date(message.timestamp ?? Date.now()).toLocaleString()}
-来源: ${message.source}
+${i18n.t("tool.subscribeIframeMessages.messageType")}: ${message.type}
+${i18n.t("tool.subscribeIframeMessages.messageContent")}: ${JSON.stringify(message.data ?? null, null, 2)}
+${i18n.t("tool.subscribeIframeMessages.timestamp")}: ${new Date(message.timestamp ?? Date.now()).toLocaleString()}
+${i18n.t("tool.subscribeIframeMessages.source")}: ${message.source}
 
-请根据这个消息内容进行相应的处理或回复。`,
+${i18n.t("tool.subscribeIframeMessages.processMessage")}`,
                 timestamp: new Date().toISOString(),
               };
               
@@ -258,7 +259,9 @@ export function createSubscribeIframeMessagesTool(
         toolCallId: toolCall.id,
         result: {
           success: true,
-          message: `已成功订阅 iframe ${iframeId} 的消息${autoNotifyAgent ? '，收到消息时将自动通知 agent' : ''}`,
+          message: autoNotifyAgent 
+            ? i18n.t("tool.subscribeIframeMessages.subscriptionSuccessWithAutoNotify", { iframeId })
+            : i18n.t("tool.subscribeIframeMessages.subscriptionSuccess", { iframeId }),
           subscriptionId,
         },
         status: "success" as const,
@@ -291,7 +294,7 @@ export function createSubscribeIframeMessagesTool(
               marginBottom: 4,
             }}
           >
-            📡 iframe 消息订阅工具
+            📡 {i18n.t("tool.subscribeIframeMessages.title")}
           </div>
           <div style={{ fontSize: 15, color: "#64748b" }}>
             {result?.success ? "✅ " : "❌ "}
@@ -299,12 +302,12 @@ export function createSubscribeIframeMessagesTool(
           </div>
           {result?.subscriptionId && (
             <div style={{ fontSize: 14, color: "#0ea5e9", background: "#f0f9ff", padding: "8px 12px", borderRadius: 6 }}>
-              订阅 ID: {result.subscriptionId}
+              {i18n.t("tool.subscribeIframeMessages.subscriptionId")}: {result.subscriptionId}
             </div>
           )}
           {result?.error && (
             <div style={{ fontSize: 14, color: "#ef4444", background: "#fef2f2", padding: "8px 12px", borderRadius: 6 }}>
-              错误: {result.error}
+              {i18n.t("tool.subscribeIframeMessages.error")}: {result.error}
             </div>
           )}
         </div>

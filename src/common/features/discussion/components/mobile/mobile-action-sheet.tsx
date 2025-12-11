@@ -6,6 +6,7 @@ import { Separator } from "@/common/components/ui/separator";
 import { cn } from "@/common/lib/utils";
 import { useModal } from "@/common/components/ui/modal";
 import { usePresenter } from "@/core/presenter";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface MobileActionSheetProps {
   open: boolean;
@@ -18,16 +19,17 @@ export function MobileActionSheet({
   onOpenChange,
   onClearMessages,
 }: MobileActionSheetProps) {
+  const { t } = useTranslation();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const modal = useModal();
   const presenter = usePresenter();
 
   const handleClearMessages = () => {
     modal.confirm({
-      title: "清空消息",
-      description: "确定要清空所有消息吗？此操作不可撤销。",
-      okText: "确认清空",
-      cancelText: "取消",
+      title: t("discussion.clearMessagesTitle"),
+      description: t("discussion.clearMessagesDescription"),
+      okText: t("discussion.clearMessagesConfirm"),
+      cancelText: t("common.cancel"),
       onOk: () => {
         onClearMessages();
         onOpenChange(false);
@@ -69,7 +71,7 @@ export function MobileActionSheet({
         className="px-0 max-h-[85vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between px-6 pt-4 pb-2 border-b">
-          <h2 className="text-lg font-medium">更多选项</h2>
+          <h2 className="text-lg font-medium">{t("common.moreOptions")}</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -82,7 +84,7 @@ export function MobileActionSheet({
         <div className="px-2 py-1">
           <ActionItem
             icon={Settings}
-            label="讨论设置"
+            label={t("discussion.discussionSettings")}
             onClick={() => {
               presenter.settings.open();
               onOpenChange(false);
@@ -90,7 +92,7 @@ export function MobileActionSheet({
           />
           <ActionItem
             icon={isDarkMode ? Sun : Moon}
-            label={isDarkMode ? "切换到浅色模式" : "切换到深色模式"}
+            label={isDarkMode ? t("theme.switchToLight") : t("theme.switchToDark")}
             onClick={() => {
               toggleDarkMode();
               onOpenChange(false);
@@ -99,7 +101,7 @@ export function MobileActionSheet({
           <Separator className="my-2" />
           <ActionItem
             icon={Eraser}
-            label="清空消息"
+            label={t("discussion.clearMessages")}
             onClick={handleClearMessages}
             destructive
           />

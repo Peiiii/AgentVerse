@@ -1,6 +1,7 @@
 import type { AgentTool } from "@/common/hooks/use-provide-agent-tools";
 import type { ToolCall } from "@agent-labs/agent-chat";
 import type { Suggestion } from "@/common/features/chat/components/suggestions/suggestion.types";
+import { i18n } from "@/core/hooks/use-i18n";
 
 export function createClearSuggestionsTool(
   getSuggestionsManager: () => {
@@ -14,13 +15,13 @@ export function createClearSuggestionsTool(
 ): AgentTool {
   return {
     name: "clear_suggestions",
-    description: "当当前建议不再相关或需要清理界面时使用此工具。适用于：话题转换后清除旧建议；任务完成后清理界面；用户明确拒绝所有建议后清除等场景。",
+    description: i18n.t("tool.clearSuggestions.description"),
     parameters: {
       type: "object",
       properties: {
         reason: {
           type: "string",
-          description: "清除建议的原因，可选"
+          description: i18n.t("tool.clearSuggestions.reasonDescription")
         }
       }
     },

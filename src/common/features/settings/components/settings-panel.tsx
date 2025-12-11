@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { SettingsList } from "./settings-list";
 import { CategoryList } from "./category-list";
 import { autoFillStrategies } from "@/core/resources/settings.resource";
+import { useTranslation } from "@/core/hooks/use-i18n";
 
 export const SettingsPanel: React.FC = () => {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string>();
   const { categories } = useSettingCategories();
   const { updateSetting, settings } = useSettings();
@@ -42,7 +44,7 @@ export const SettingsPanel: React.FC = () => {
           />
         ) : (
           <div className="text-center text-muted-foreground">
-            请选择设置分类
+            {t("settings.selectCategory")}
           </div>
         )}
       </div>

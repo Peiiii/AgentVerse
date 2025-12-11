@@ -1,0 +1,41 @@
+# i18n Ally 配置文件
+# 文档: https://github.com/lokalise/i18n-ally
+
+# 语言文件路径
+localesPaths:
+  - src/core/locales
+
+# 翻译键的样式
+keystyle: nested
+
+# 启用的框架
+enabledFrameworks:
+  - i18next
+  - react
+
+# 源语言（主要开发语言）
+sourceLanguage: zh-CN
+
+# 显示语言
+displayLanguage: zh-CN
+
+# 命名空间
+namespace: false
+
+# 路径匹配模式
+pathMatcher: "{locale}.json"
+
+# 扫描忽略的文件
+usage:
+  scanningIgnore:
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/*.spec.{js,jsx,ts,tsx}"
+    - "**/*.test.{js,jsx,ts,tsx}"
+  scanningDepth: 10
+
+# 内联注释显示
+annotation:
+  inPlace: true
+  maxLength: 30
+
