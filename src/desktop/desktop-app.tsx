@@ -2,7 +2,6 @@ import { PluginRouter } from "@/common/components/common/plugin-router";
 import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/features/app/components/activity-bar";
 import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
-import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
@@ -10,7 +9,6 @@ import { useAppBootstrap } from "@/core/hooks/use-app-bootstrap";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { desktopAgentsExtension } from "@/desktop/features/agents/extensions";
 import { desktopChatExtension } from "@/desktop/features/chat/extensions";
-import { desktopMCPExtension } from "@/desktop/features/mcp/extensions";
 import { HashRouter } from "react-router-dom";
 
 export function DesktopAppInner() {
@@ -21,11 +19,9 @@ export function DesktopAppInner() {
       desktopChatExtension,
       desktopAgentsExtension,
       settingsExtension,
-      desktopMCPExtension,
       // desktopIndexedDBExtension,
       // desktopFileManagerExtension,
-      // desktopPortalDemoExtension,
-      githubExtension,
+      // desktopPortalDemoExtension
     ],
   });
   const { rootClassName } = useTheme();

@@ -10,7 +10,6 @@ import { MobileHeader } from "@/common/features/discussion/components/mobile/mob
 import { Button } from "@/common/components/ui/button";
 import { Switch } from "@/common/components/ui/switch";
 import { commonAgentsExtension } from "@/common/features/agents/extensions";
-import { githubExtension } from "@/common/features/github/extensions";
 import { settingsExtension } from "@/common/features/settings/extensions";
 import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
 import { cn } from "@/common/lib/utils";
@@ -40,7 +39,6 @@ export function MobileAppInner() {
       mobileChatExtension,
       commonAgentsExtension,
       settingsExtension,
-      githubExtension,
     ],
   });
   const { isDesktop, isMobile } = useBreakpointContext();
