@@ -9,12 +9,24 @@ export function useSettingCategories() {
 
   const categories = useMemo(() => {
     if (!settingsByCategory) return [];
-    
-    return Object.keys(settingsByCategory).map(key => ({
-      key,
-      label: key, // 可以后续添加标签映射
-      count: settingsByCategory[key].length
-    }));
+
+    const labelMap = Object.fromEntries(
+      settingsResource.categories.map((c) => [c.key, c.label])
+    );
+
+    return Object.keys(settingsByCategory)
+      .map((key) => ({
+        key,
+        label: labelMap[key] || key,
+        count: settingsByCategory[key].length,
+      }))
+      .sort(
+        (a, b) =>
+          (settingsResource.categories.find((c) => c.key === a.key)?.order ||
+            Infinity) -
+          (settingsResource.categories.find((c) => c.key === b.key)?.order ||
+            Infinity)
+      );
   }, [settingsByCategory]);
 
   return {

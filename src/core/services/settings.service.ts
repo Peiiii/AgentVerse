@@ -1,73 +1,90 @@
-import { STORAGE_CONFIG } from "@/core/config/storage";
-import { DataProvider, MockHttpProvider } from "@/common/lib/storage";
 import { SettingItem } from "@/common/types/settings";
+import { DEFAULT_SETTINGS } from "@/core/config/settings-schema";
+import { STORAGE_CONFIG } from "@/core/config/storage";
 
-export type SettingDataProvider = DataProvider<SettingItem>;
+const hasWindow = typeof window !== "undefined";
+const memoryStore: Record<string, unknown> = {};
+
+function readStore(key: string) {
+  if (hasWindow && window.localStorage) {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return {};
+    try {
+      return JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      return {};
+    }
+  }
+  return memoryStore[key] && typeof memoryStore[key] === "object"
+    ? (memoryStore[key] as Record<string, unknown>)
+    : {};
+}
+
+function writeStore(key: string, value: Record<string, unknown>) {
+  if (hasWindow && window.localStorage) {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } else {
+    memoryStore[key] = value;
+  }
+}
 
 export class SettingsService {
-  constructor(private readonly provider: SettingDataProvider) {}
+  constructor(
+    private readonly storageKey: string,
+    private readonly defaults: Omit<SettingItem, "id">[]
+  ) {}
+
+  private normalizeSettings(): SettingItem[] {
+    const savedValues = readStore(this.storageKey);
+    return this.defaults.map((item) => ({
+      ...item,
+      id: item.key,
+      value:
+        Object.prototype.hasOwnProperty.call(savedValues, item.key) &&
+        savedValues[item.key] !== undefined
+          ? savedValues[item.key]
+          : item.value,
+    }));
+  }
 
   async listSettings(): Promise<SettingItem[]> {
-    return this.provider.list();
-  }
-
-  async getSetting(id: string): Promise<SettingItem> {
-    return this.provider.get(id);
-  }
-
-  async createSetting(data: Omit<SettingItem, "id">): Promise<SettingItem> {
-    return this.provider.create(data);
+    return this.normalizeSettings();
   }
 
   async updateSetting(
-    id: string,
+    key: string,
     data: Partial<SettingItem>
   ): Promise<SettingItem> {
-    return this.provider.update(id, data);
-  }
-
-  async deleteSetting(id: string): Promise<void> {
-    return this.provider.delete(id);
-  }
-
-  // 批量创建
-  async createMany(data: Omit<SettingItem, "id">[]): Promise<SettingItem[]> {
-    return this.provider.createMany(data);
-  }
-
-  // 辅助方法：按分类获取
-  async getSettingsByCategory(category: string): Promise<SettingItem[]> {
-    const settings = await this.listSettings();
-    return settings.filter((item) => item.category === category);
-  }
-
-  async listCategories(): Promise<string[]> {
-    const settings = await this.listSettings();
-    return [...new Set(settings.map((item) => item.category))];
-  }
-
-  // 辅助方法：按key获取
-  async getSettingByKey(key: string): Promise<SettingItem | undefined> {
-    const settings = await this.listSettings();
-    return settings.find((item) => item.key === key);
-  }
-
-  // 验证
-  public validateSetting(setting: SettingItem): boolean {
-    if (!setting.validation) return true;
-
-    if (setting.validation.required && !setting.value) {
-      return false;
+    const settings = this.normalizeSettings();
+    const target = settings.find((s) => s.key === key || s.id === key);
+    if (!target) {
+      throw new Error(`Setting not found: ${key}`);
     }
+    const next = { ...target, ...data, id: target.key };
+    const savedValues = readStore(this.storageKey);
+    savedValues[next.key] = next.value;
+    writeStore(this.storageKey, savedValues);
+    return next;
+  }
 
-    if (setting.validation.pattern && typeof setting.value === "string") {
-      return setting.validation.pattern.test(setting.value);
-    }
+  async updateMany(
+    updates: Record<string, unknown>
+  ): Promise<SettingItem[]> {
+    const savedValues = readStore(this.storageKey);
+    Object.entries(updates).forEach(([key, value]) => {
+      savedValues[key] = value;
+    });
+    writeStore(this.storageKey, savedValues);
+    return this.normalizeSettings();
+  }
 
-    return true;
+  async resetToDefaults(): Promise<SettingItem[]> {
+    writeStore(this.storageKey, {});
+    return this.normalizeSettings();
   }
 }
 
 export const settingsService = new SettingsService(
-  new MockHttpProvider<SettingItem>(STORAGE_CONFIG.KEYS.SETTINGS, { delay: STORAGE_CONFIG.MOCK_DELAY_MS })
+  STORAGE_CONFIG.KEYS.SETTINGS,
+  DEFAULT_SETTINGS
 );

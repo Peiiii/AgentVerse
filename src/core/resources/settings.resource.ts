@@ -1,199 +1,57 @@
-import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/core/config/ai";
-import { SETTING_KYES } from "@/core/config/settings";
 import { createResource } from "@/common/lib/resource";
+import { AUTO_FILL_STRATEGIES, DEFAULT_SETTINGS, SETTINGS_CATEGORIES } from "@/core/config/settings-schema";
 import { aiService } from "@/core/services/ai.service";
 import { settingsService } from "@/core/services/settings.service";
-import { SupportedAIProvider } from "@/common/types/ai";
-import { AIProviderSettingSchema, AutoFillStrategy, SettingItem } from "@/common/types/settings";
+import { SETTING_KYES } from "@/core/config/settings";
+import { SettingItem } from "@/common/types/settings";
 import i18n from "@/core/config/i18n";
 
-const getDefaultAiProviderConfig: () => AIProviderSettingSchema = () => {
-  const providerName = BasicAIConfig.AI_PROVIDER_NAME;
-  const provider = AI_PROVIDER_CONFIG[providerName];
-  return {
-    provider: providerName,
-    apiUrl: provider.baseUrl,
-    apiKey: "",
-    model: provider.model,
-  };
+const applySettings = (settings: SettingItem[]) => {
+  const providerType =
+    settings.find((setting) => setting.key === SETTING_KYES.AI.PROVIDER.ID)
+      ?.value || DEFAULT_SETTINGS[0].value;
+
+  aiService.configure({
+    apiKey:
+      (settings.find(
+        (setting) => setting.key === SETTING_KYES.AI.PROVIDER.API_KEY
+      )?.value as string) || "",
+    model:
+      (settings.find(
+        (setting) => setting.key === SETTING_KYES.AI.PROVIDER.MODEL
+      )?.value as string) || "",
+    baseUrl:
+      (settings.find(
+        (setting) => setting.key === SETTING_KYES.AI.PROVIDER.API_URL
+      )?.value as string) || "",
+    provider: String(providerType),
+  });
+
+  const languageSetting = settings.find(
+    (setting) => setting.key === "app.language"
+  );
+  if (languageSetting && languageSetting.value !== i18n.language) {
+    i18n.changeLanguage(languageSetting.value as string);
+  }
 };
 
-export const autoFillStrategies: AutoFillStrategy[] = Object.entries(AI_PROVIDER_CONFIG).map(([key, value]) => ({
-  settingKey: SETTING_KYES.AI.PROVIDER.ID,
-  whenValueSatisfies: key as SupportedAIProvider,
-  fillItems: [
-    { settingKey: SETTING_KYES.AI.PROVIDER.API_URL, value: value.baseUrl },
-    { settingKey: SETTING_KYES.AI.PROVIDER.API_KEY, value: value.apiKey },
-    { settingKey: SETTING_KYES.AI.PROVIDER.MODEL, value: value.model },
-  ],
-}));
+export const autoFillStrategies = AUTO_FILL_STRATEGIES;
 
-// 默认设置
-const defaultSettings: Omit<SettingItem, "id">[] = [
-  // 全局 AI 设置
-  {
-    key: "ai.provider.id",
-    category: "ai.provider",
-    label: "AI 提供商",
-    description: "选择要使用的 AI 服务提供商",
-    type: "select",
-    order: 1,
-    value: getDefaultAiProviderConfig().provider,
-    options: [
-      { label: "阿里云 DashScope", value: SupportedAIProvider.DASHSCOPE },
-      { label: "DeepSeek", value: SupportedAIProvider.DEEPSEEK },
-      { label: "豆包", value: SupportedAIProvider.DOBRAIN },
-      { label: "Moonshot", value: SupportedAIProvider.MOONSHOT },
-      { label: "OpenAI", value: SupportedAIProvider.OPENAI },
-      { label: "自定义", value: "custom" },
-    ],
-  },
-  {
-    key: SETTING_KYES.AI.PROVIDER.API_URL,
-    category: "ai.provider",
-    label: "API 地址",
-    description: "服务接口地址",
-    type: "text",
-    order: 2,
-    value: getDefaultAiProviderConfig().apiUrl,
-    validation: {
-      required: true,
-      pattern: /^https?:\/\/.+/,
-      message: "请输入有效的 API 地址",
-    },
-  },
-  {
-    key: SETTING_KYES.AI.PROVIDER.API_KEY,
-    category: "ai.provider",
-    label: "API Key",
-    description: "服务访问密钥",
-    type: "password",
-    order: 3,
-    value: getDefaultAiProviderConfig().apiKey,
-    validation: {
-      required: true,
-      message: "API Key 不能为空",
-    },
-  },
-  {
-    key: SETTING_KYES.AI.PROVIDER.MODEL,
-    category: "ai.provider",
-    label: "模型",
-    description: "使用的模型名称",
-    type: "text",
-    value: getDefaultAiProviderConfig().model,
-    order: 4,
-    validation: {
-      required: true,
-      message: "请输入模型名称",
-    },
-  },
-  // 语言设置
-  {
-    key: "app.language",
-    category: "app",
-    label: "语言",
-    description: "选择界面显示语言",
-    type: "select",
-    order: 1,
-    value: i18n.language || "zh-CN",
-    options: [
-      { label: "简体中文", value: "zh-CN" },
-      { label: "English", value: "en-US" },
-    ],
-  },
-];
-
-
+const settingListResource = createResource<SettingItem[]>(async () => {
+  const settings = await settingsService.listSettings();
+  applySettings(settings);
+  return settings;
+});
 
 export const recoverDefaultSettings = async () => {
-  const settings = await settingsService.listSettings();
-  const existingSettings = settings.map((setting) => setting.key);
-  const newSettings = defaultSettings.filter(
-    (setting) => !existingSettings.includes(setting.key)
-  );
-  const overrideSettings = defaultSettings.filter((setting) =>
-    existingSettings.includes(setting.key)
-  );
-  if (overrideSettings.length > 0) {
-    await Promise.all(
-      overrideSettings.map((setting) => {
-        return settingsService.updateSetting(
-          settings.find((s) => s.key === setting.key)!.id,
-          setting
-        );
-      })
-    );
-  }
-  if (newSettings.length > 0) {
-    await settingsService.createMany(newSettings);
-  }
+  const settings = await settingsService.resetToDefaults();
+  applySettings(settings);
+  settingListResource.mutate(settings);
+  return settings;
 };
 
-const settingListResource = createResource<SettingItem[]>(
-  async () => {
-    const settings = await settingsService.listSettings();
-    const existingSettings = settings.map((setting) => setting.key);
-    const newSettings = defaultSettings.filter(
-      (setting) => !existingSettings.includes(setting.key)
-    );
-    if (newSettings.length > 0) {
-      await settingsService.createMany(newSettings);
-      return await settingsService.listSettings();
-    }
-    return settings;
-  },
-  {
-    onCreated: async (resource) => {
-      resource.subscribe((state) => {
-        if (
-          !state.isLoading &&
-          !state.isValidating &&
-          !state.error &&
-          state.data
-        ) {
-          const settings = state.data;
-          
-          // 更新 AI 服务配置
-          const providerType = settings.find(
-            (setting) => setting.key === SETTING_KYES.AI.PROVIDER.ID
-          )!.value;
-          const providerConfig = Object.entries(AI_PROVIDER_CONFIG).find(
-            ([key]) => key === providerType
-          )?.[1];
-          aiService.configure({
-            apiKey:
-              (settings.find(
-                (setting) => setting.key === SETTING_KYES.AI.PROVIDER.API_KEY
-              )!.value as string) || providerConfig?.apiKey||"",
-            model:
-              (settings.find(
-                (setting) => setting.key === SETTING_KYES.AI.PROVIDER.MODEL
-              )!.value as string) || providerConfig?.model || "",
-            baseUrl:
-              (settings.find(
-                (setting) => setting.key === SETTING_KYES.AI.PROVIDER.API_URL
-              )!.value as string) || providerConfig?.baseUrl || "",
-          });
-          
-          // 更新语言设置
-          const languageSetting = settings.find(
-            (setting) => setting.key === "app.language"
-          );
-          if (languageSetting && languageSetting.value !== i18n.language) {
-            i18n.changeLanguage(languageSetting.value as string);
-          }
-        }
-      });
-    },
-  }
-);
-// 设置资源
 export const settingsResource = {
-  // 所有设置列表
   list: settingListResource,
-
-  // 按分类组织的设置
   byCategory: createResource(async () => {
     const settings = await settingListResource.whenReady();
     return settings.reduce((acc, setting) => {
@@ -204,4 +62,5 @@ export const settingsResource = {
       return acc;
     }, {} as Record<string, SettingItem[]>);
   }),
+  categories: SETTINGS_CATEGORIES,
 };

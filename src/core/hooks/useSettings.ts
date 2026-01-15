@@ -21,7 +21,9 @@ export function useSettings({ onChange }: UseSettingsProps = {}) {
       return withOptimisticUpdate(
         // 乐观更新
         (settings) =>
-          settings.map((s) => (s.id === id ? { ...s, ...data } : s)),
+          settings.map((s) =>
+            s.id === id || s.key === id ? { ...s, ...data } : s
+          ),
         // API 调用
         () => settingsService.updateSetting(id, data)
       );
@@ -29,21 +31,13 @@ export function useSettings({ onChange }: UseSettingsProps = {}) {
   );
 
   const createSetting = useMemoizedFn(async (data: Omit<SettingItem, "id">) => {
-    return withOptimisticUpdate(
-      // 乐观更新
-      (settings) => [...settings, { ...data, id: `temp-${Date.now()}` }],
-      // API 调用
-      () => settingsService.createSetting(data)
-    );
+    // 简化后不支持动态创建，直接返回当前设置列表
+    return settings;
   });
 
   const deleteSetting = useMemoizedFn(async (id: string) => {
-    return withOptimisticUpdate(
-      // 乐观更新
-      (settings) => settings.filter((s) => s.id !== id),
-      // API 调用
-      () => settingsService.deleteSetting(id)
-    );
+    // 简化后不支持删除，直接返回当前设置列表
+    return settings;
   });
 
   const getSettingValue = useMemoizedFn(<T>(key: string): T | undefined => {
@@ -52,7 +46,7 @@ export function useSettings({ onChange }: UseSettingsProps = {}) {
   });
 
   const orderedSettings = useMemo(() => {
-    return settings.sort(
+    return settings.slice().sort(
       (a, b) => (a.order || Infinity) - (b.order || Infinity)
     );
   }, [settings]);

@@ -12,6 +12,8 @@
 - 特征结构报告增加 Tree 视图（common / desktop / mobile 分支）
 - 删除冗余功能模块：`src/common/features/mcp`、`src/common/features/examples`、`src/common/features/github`、`src/desktop/features/mcp`
 - 删除冗余功能模块：`src/desktop/features/portal-demo`
+- 简化设置模块：固定 schema（`settings-schema.ts`），去掉动态注册/删除，设置读写收口到本地存储并直接驱动 AI 配置与语言切换
+- 默认设置读取 `.env` 中的 AI 提供商配置（包括 API Key），避免空 Key 导致 401
 
 ## 测试/验证/验收
 
