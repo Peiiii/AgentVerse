@@ -21,9 +21,39 @@ const IGNORE_DIRS = new Set([
 
 const IGNORE_FILES = new Set([".DS_Store"]);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ANSI Colors
+// ─────────────────────────────────────────────────────────────────────────────
+
+function createColors(enabled) {
+  const wrap = (code) => (text) =>
+    enabled ? `${code}${text}\x1b[0m` : String(text);
+  return {
+    dim: wrap("\x1b[2m"),
+    accent: wrap("\x1b[38;5;114m"),
+    cyan: wrap("\x1b[38;5;81m"),
+    muted: wrap("\x1b[38;5;240m"),
+    tree: wrap("\x1b[38;5;240m"),
+  };
+}
+
+// Tree-drawing characters
+const TREE = {
+  pipe: "│",
+  tee: "├──",
+  corner: "└──",
+  space: "    ",
+  pipeSpace: "│   ",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CLI Argument Parsing
+// ─────────────────────────────────────────────────────────────────────────────
+
 function parseArgs(argv) {
   const args = argv.slice(2);
   let outDir;
+  let color = true;
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
     if (arg === "--out") {
@@ -31,18 +61,28 @@ function parseArgs(argv) {
       i += 1;
     } else if (arg.startsWith("--out=")) {
       outDir = arg.slice("--out=".length);
+    } else if (arg === "--no-color") {
+      color = false;
     } else if (arg === "--help" || arg === "-h") {
       printHelp();
       process.exit(0);
     }
   }
-  return { outDir };
+  return { outDir, color };
 }
 
 function printHelp() {
-  console.log("Usage: node scripts/metrics/feature-structure.cjs [--out <dir>]");
-  console.log("Example: node scripts/metrics/feature-structure.cjs --out docs/logs/metrics/latest");
+  console.log("Usage: node scripts/metrics/feature-structure.cjs [options]");
+  console.log("");
+  console.log("Options:");
+  console.log("  --out <dir>   Write output to file in specified directory");
+  console.log("  --no-color    Disable ANSI colors");
+  console.log("  -h, --help    Show this help message");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// File System Utilities
+// ─────────────────────────────────────────────────────────────────────────────
 
 function shouldIgnoreDir(name) {
   return IGNORE_DIRS.has(name);
@@ -75,10 +115,17 @@ function walkDir(dirPath, stats) {
     } else if (entry.isFile()) {
       if (shouldIgnoreFile(entry.name)) continue;
       stats.fileCount += 1;
-      const ext = path.extname(entry.name) || "<no_ext>";
-      stats.extensions[ext] = (stats.extensions[ext] || 0) + 1;
     }
   }
+}
+
+function collectSubdirs(dirPath) {
+  if (!fs.existsSync(dirPath)) return [];
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  return entries
+    .filter((e) => e.isDirectory() && !shouldIgnoreDir(e.name))
+    .map((e) => e.name)
+    .sort();
 }
 
 function buildFeatureStats(rootDir, featureName) {
@@ -88,7 +135,7 @@ function buildFeatureStats(rootDir, featureName) {
     path: featurePath,
     fileCount: 0,
     dirCount: 0,
-    extensions: {},
+    subdirs: collectSubdirs(featurePath),
   };
   walkDir(featurePath, stats);
   return stats;
@@ -97,6 +144,10 @@ function buildFeatureStats(rootDir, featureName) {
 function toRelativePath(p) {
   return p.split(path.sep).join("/");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Report Building
+// ─────────────────────────────────────────────────────────────────────────────
 
 function buildReport() {
   const roots = [];
@@ -108,19 +159,12 @@ function buildReport() {
     const rootPath = path.resolve(process.cwd(), root);
     const exists = fs.existsSync(rootPath);
     if (!exists) {
-      roots.push({
-        root,
-        exists: false,
-        featureCount: 0,
-        features: [],
-      });
+      roots.push({ root, exists: false, featureCount: 0, features: [] });
       continue;
     }
 
     const featureNames = collectFeatureDirs(rootPath);
-    const features = featureNames.map((name) =>
-      buildFeatureStats(rootPath, name)
-    );
+    const features = featureNames.map((name) => buildFeatureStats(rootPath, name));
 
     const featureCount = features.length;
     const fileCount = features.reduce((acc, f) => acc + f.fileCount, 0);
@@ -134,12 +178,14 @@ function buildReport() {
       root,
       exists: true,
       featureCount,
+      fileCount,
+      dirCount,
       features: features.map((f) => ({
         name: f.name,
         path: toRelativePath(path.relative(process.cwd(), f.path)),
         fileCount: f.fileCount,
         dirCount: f.dirCount,
-        extensions: f.extensions,
+        subdirs: f.subdirs,
       })),
     });
   }
@@ -147,63 +193,124 @@ function buildReport() {
   return {
     generatedAt: new Date().toISOString(),
     roots,
-    totals: {
-      featureCount: totalFeatureCount,
-      fileCount: totalFileCount,
-      dirCount: totalDirCount,
-    },
+    totals: { featureCount: totalFeatureCount, fileCount: totalFileCount, dirCount: totalDirCount },
   };
 }
 
-function formatExtensions(extensions) {
-  const entries = Object.entries(extensions);
-  if (entries.length === 0) return "none";
-  return entries
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([ext, count]) => `${ext}(${count})`)
-    .join(" ");
+// ─────────────────────────────────────────────────────────────────────────────
+// Tree Rendering
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getBranchLabel(rootPath) {
+  return rootPath.split("/")[1] || rootPath;
 }
 
-function formatMarkdown(report) {
-  const lines = [];
-  lines.push("# Feature Structure");
-  lines.push("");
-  lines.push(`Generated: ${report.generatedAt}`);
-  lines.push("");
+function getBranchComment(branch) {
+  const comments = { common: "跨平台共享代码", desktop: "桌面端专用代码", mobile: "移动端专用代码" };
+  return comments[branch] || "";
+}
 
-  for (const root of report.roots) {
-    lines.push(`## ${root.root}`);
-    if (!root.exists) {
-      lines.push("");
-      lines.push("- missing");
-      lines.push("");
-      continue;
-    }
-    if (root.features.length === 0) {
-      lines.push("");
-      lines.push("- none");
-      lines.push("");
-      continue;
-    }
-    lines.push("");
-    for (const feature of root.features) {
-      const extText = formatExtensions(feature.extensions);
+function getSubdirComment(subdir) {
+  const comments = {
+    components: "UI 组件",
+    hooks: "React Hooks",
+    stores: "状态管理",
+    services: "业务逻辑/API",
+    types: "TypeScript 类型",
+    utils: "工具函数",
+    pages: "页面组件",
+    layouts: "布局组件",
+    contexts: "React Context",
+    constants: "常量定义",
+  };
+  return comments[subdir] || "";
+}
+
+function renderTree(report, c) {
+  const lines = [];
+
+  lines.push(c.accent("src/"));
+
+  for (let ri = 0; ri < report.roots.length; ri++) {
+    const root = report.roots[ri];
+    const isLastRoot = ri === report.roots.length - 1;
+    const branchLabel = getBranchLabel(root.root);
+    const rootConnector = isLastRoot ? TREE.corner : TREE.tee;
+    const rootPrefix = isLastRoot ? TREE.space : TREE.pipeSpace;
+
+    const branchComment = getBranchComment(branchLabel);
+    const branchStats = root.exists ? `(${root.fileCount} files, ${root.dirCount} dirs)` : "(not found)";
+    lines.push(
+      `${c.tree(rootConnector)} ${c.accent(branchLabel + "/")}` +
+      `  ${c.muted(branchStats)}` +
+      (branchComment ? `  ${c.dim("# " + branchComment)}` : "")
+    );
+
+    if (!root.exists || root.features.length === 0) continue;
+
+    // features/ subfolder
+    lines.push(`${c.tree(rootPrefix)}${c.tree(TREE.corner)} features/`);
+    const featuresPrefix = rootPrefix + TREE.space;
+
+    // Sort features by file count (descending)
+    const sortedFeatures = [...root.features].sort((a, b) => b.fileCount - a.fileCount);
+
+    for (let fi = 0; fi < sortedFeatures.length; fi++) {
+      const feature = sortedFeatures[fi];
+      const isLastFeature = fi === sortedFeatures.length - 1;
+      const featureConnector = isLastFeature ? TREE.corner : TREE.tee;
+      const featurePrefix = featuresPrefix + (isLastFeature ? TREE.space : TREE.pipeSpace);
+
+      const stats = `(${feature.fileCount} files, ${feature.dirCount} dirs)`;
       lines.push(
-        `- ${feature.name} (files: ${feature.fileCount}, dirs: ${feature.dirCount}) ext: ${extText}`
+        `${c.tree(featuresPrefix)}${c.tree(featureConnector)} ${c.cyan(feature.name + "/")}  ${c.muted(stats)}`
       );
+
+      // Subdirectories
+      if (feature.subdirs.length > 0) {
+        for (let si = 0; si < feature.subdirs.length; si++) {
+          const subdir = feature.subdirs[si];
+          const isLastSubdir = si === feature.subdirs.length - 1;
+          const subdirConnector = isLastSubdir ? TREE.corner : TREE.tee;
+          const subdirComment = getSubdirComment(subdir);
+
+          lines.push(
+            `${c.tree(featurePrefix)}${c.tree(subdirConnector)} ${subdir}/` +
+            (subdirComment ? `  ${c.dim("# " + subdirComment)}` : "")
+          );
+        }
+      }
     }
-    lines.push("");
   }
 
-  lines.push("## Totals");
+  return lines;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Text Formatter
+// ─────────────────────────────────────────────────────────────────────────────
+
+function formatText(report, colorize) {
+  const c = createColors(colorize);
+  const lines = [];
+
   lines.push("");
-  lines.push(`- features: ${report.totals.featureCount}`);
-  lines.push(`- files: ${report.totals.fileCount}`);
-  lines.push(`- dirs: ${report.totals.dirCount}`);
+  lines.push(`Feature Structure  ${c.muted(`(${report.totals.featureCount} features, ${report.totals.fileCount} files, ${report.totals.dirCount} dirs)`)}`);
+  lines.push("");
+
+  const treeLines = renderTree(report, c);
+  for (const line of treeLines) {
+    lines.push(line);
+  }
+
   lines.push("");
 
   return lines.join("\n");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// File Output
+// ─────────────────────────────────────────────────────────────────────────────
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
@@ -211,26 +318,27 @@ function ensureDir(dirPath) {
 
 function writeOutput(outDir, report) {
   ensureDir(outDir);
-  const jsonPath = path.join(outDir, "feature-structure.json");
-  const mdPath = path.join(outDir, "feature-structure.md");
-  fs.writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
-  fs.writeFileSync(mdPath, `${formatMarkdown(report)}\n`, "utf8");
-  return { jsonPath, mdPath };
+  const txtPath = path.join(outDir, "feature-structure.txt");
+  fs.writeFileSync(txtPath, `${formatText(report, false)}\n`, "utf8");
+  return { txtPath };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Entry Point
+// ─────────────────────────────────────────────────────────────────────────────
+
 function main() {
-  const { outDir } = parseArgs(process.argv);
+  const { outDir, color } = parseArgs(process.argv);
   const report = buildReport();
 
   if (outDir) {
     const resolved = path.resolve(process.cwd(), outDir);
-    const { jsonPath, mdPath } = writeOutput(resolved, report);
-    console.log(`Wrote: ${toRelativePath(path.relative(process.cwd(), jsonPath))}`);
-    console.log(`Wrote: ${toRelativePath(path.relative(process.cwd(), mdPath))}`);
+    const { txtPath } = writeOutput(resolved, report);
+    console.log(`Wrote: ${toRelativePath(path.relative(process.cwd(), txtPath))}`);
     return;
   }
 
-  console.log(JSON.stringify(report, null, 2));
+  console.log(formatText(report, color));
 }
 
 main();

@@ -16,7 +16,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "i18n:scan": "i18next-scanner --config i18next-scanner.config.cjs",
-    "metrics:features": "node scripts/metrics/feature-structure.cjs"
+    "metrics:features": "node scripts/metrics/feature-structure.cjs",
+    "metrics:loc": "node scripts/metrics/top-loc.cjs"
   },
   "dependencies": {
     "@ag-ui/client": "^0.0.30",
