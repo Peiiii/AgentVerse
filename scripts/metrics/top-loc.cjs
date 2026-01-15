@@ -17,17 +17,26 @@ const IGNORE_DIRS = new Set([
 const IGNORE_FILES = new Set([".DS_Store"]);
 const DEFAULT_LIMIT = 20;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ANSI Colors
+// ─────────────────────────────────────────────────────────────────────────────
+
 function createColors(enabled) {
   const wrap = (code) => (text) =>
     enabled ? `${code}${text}\x1b[0m` : String(text);
   return {
-    title: wrap("\x1b[1;36m"),
-    heading: wrap("\x1b[1;34m"),
-    label: wrap("\x1b[90m"),
-    value: wrap("\x1b[33m"),
-    accent: wrap("\x1b[32m"),
+    dim: wrap("\x1b[2m"),
+    accent: wrap("\x1b[38;5;114m"),
+    cyan: wrap("\x1b[38;5;81m"),
+    yellow: wrap("\x1b[38;5;221m"),
+    muted: wrap("\x1b[38;5;240m"),
+    pink: wrap("\x1b[38;5;211m"),
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CLI Argument Parsing
+// ─────────────────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
   const args = argv.slice(2);
@@ -57,11 +66,18 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log("Usage: node scripts/metrics/top-loc.cjs [--limit <n>] [--out <dir>]");
-  console.log("Example: node scripts/metrics/top-loc.cjs --limit 20 --out docs/logs/metrics/latest");
+  console.log("Usage: node scripts/metrics/top-loc.cjs [options]");
+  console.log("");
   console.log("Options:");
-  console.log("  --no-color    Disable ANSI colors (always off when writing to file)");
+  console.log("  --limit <n>   Number of files to show (default: 20)");
+  console.log("  --out <dir>   Write output to file in specified directory");
+  console.log("  --no-color    Disable ANSI colors");
+  console.log("  -h, --help    Show this help message");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// File System Utilities
+// ─────────────────────────────────────────────────────────────────────────────
 
 function shouldIgnoreDir(name) {
   return IGNORE_DIRS.has(name);
@@ -89,7 +105,8 @@ function walkDir(dirPath, results) {
       if (shouldIgnoreFile(entry.name)) continue;
       const filePath = path.join(dirPath, entry.name);
       const { total, nonEmpty } = countLines(filePath);
-      results.push({ path: filePath, total, nonEmpty });
+      const ext = path.extname(entry.name);
+      results.push({ path: filePath, total, nonEmpty, ext });
     }
   }
 }
@@ -104,42 +121,70 @@ function collectFiles() {
   return files;
 }
 
-function formatText(files, limit, generatedAt, colorize) {
-  const pad = (str, len) => String(str).padEnd(len, " ");
-  const num = (n, len) => String(n).padStart(len, " ");
+// ─────────────────────────────────────────────────────────────────────────────
+// Formatting
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getExtColor(ext, c) {
+  const colors = {
+    ".tsx": c.cyan,
+    ".ts": c.accent,
+    ".jsx": c.cyan,
+    ".js": c.yellow,
+    ".md": c.pink,
+    ".css": c.yellow,
+  };
+  return colors[ext] || c.dim;
+}
+
+function createBar(value, max, width, c) {
+  const percentage = max > 0 ? value / max : 0;
+  const filled = Math.round(percentage * width);
+  const empty = width - filled;
+  return c.accent("█".repeat(filled)) + c.muted("░".repeat(empty));
+}
+
+function formatText(files, limit, colorize) {
   const c = createColors(colorize);
   const lines = [];
-  lines.push(c.title(`Top ${limit} Files by Lines of Code`));
-  lines.push(c.label(`Generated: ${generatedAt}`));
-  lines.push("");
-  lines.push(
-    c.label(
-      pad("Path", 60) + num("Total", 8) + "  " + num("Non-empty", 10)
-    )
-  );
-  lines.push(
-    c.label("-".repeat(60) + " " + "-".repeat(8) + "  " + "-".repeat(10))
-  );
-  for (const file of files.slice(0, limit)) {
+  const topFiles = files.slice(0, limit);
+  const maxLoc = topFiles.length > 0 ? topFiles[0].total : 0;
+  const totalLoc = files.reduce((sum, f) => sum + f.total, 0);
+  const totalFiles = files.length;
+
+  lines.push(`Top ${limit} Files by Lines of Code  ${c.muted(`(${totalFiles} files, ${totalLoc.toLocaleString()} total lines)`)}`);
+
+  // Calculate max path length for alignment
+  const pathWidth = 50;
+
+  for (let i = 0; i < topFiles.length; i++) {
+    const file = topFiles[i];
     const rel = path.relative(process.cwd(), file.path).split(path.sep).join("/");
-    const truncated =
-      rel.length > 60 ? `...${rel.slice(rel.length - 57)}` : rel.padEnd(60, " ");
+    const ext = file.ext;
+    const extColor = getExtColor(ext, c);
+
+    // Truncate path if needed
+    let displayPath = rel;
+    if (rel.length > pathWidth) {
+      displayPath = "…" + rel.slice(rel.length - pathWidth + 1);
+    }
+
+    // Format: rank. path (loc lines)  [bar]
+    const rank = String(i + 1).padStart(2, " ");
+    const bar = createBar(file.total, maxLoc, 20, c);
+    const locStr = String(file.total).padStart(4, " ");
+
     lines.push(
-      c.heading(truncated) +
-        c.value(num(file.total, 8)) +
-        "  " +
-        c.accent(num(file.nonEmpty, 10))
+      `${c.muted(rank + ".")} ${extColor(displayPath.padEnd(pathWidth))}  ${c.cyan(locStr)} ${c.muted("lines")}  ${bar}`
     );
   }
-  lines.push("");
-  lines.push(c.heading("Notes"));
-  lines.push(
-    c.label(
-      "  ignored dirs: node_modules, .git, dist, build, coverage, tmp, .next, public"
-    )
-  );
+
   return lines.join("\n");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// File Output
+// ─────────────────────────────────────────────────────────────────────────────
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
@@ -152,13 +197,16 @@ function writeOutput(outDir, content) {
   return { txtPath };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Entry Point
+// ─────────────────────────────────────────────────────────────────────────────
+
 function main() {
   const { outDir, limit, color } = parseArgs(process.argv);
   const files = collectFiles();
   files.sort((a, b) => b.total - a.total || b.nonEmpty - a.nonEmpty);
-  const generatedAt = new Date().toISOString();
   const useColor = outDir ? false : color;
-  const text = formatText(files, limit, generatedAt, useColor);
+  const text = formatText(files, limit, useColor);
 
   if (outDir) {
     const resolved = path.resolve(process.cwd(), outDir);
