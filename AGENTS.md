@@ -27,6 +27,7 @@
   - `/new-command`：创建新指令
   - `/config-meta`：调整或更新本文件（AGENTS.md）的机制/元信息
   - `/commit`：进行提交操作（提交信息需使用英文）
+  - `/validate`：运行项目验证，至少包含 `build`、`lint`、`tsc`，必要时冒烟测试
 
 ## 规则/Rule 机制
 
@@ -39,3 +40,4 @@
 
 - **post-dev-stage-validation**：每个开发阶段结束必须做验证，至少运行 `build`、`lint`、`tsc`（如确认为无关可有理由地省略），如条件允许应做基础冒烟测试。
 - **no-self-commit-without-request**：除非用户明确要求，否则禁止擅自提交/推送代码。
+- **use-chinese-when-communicating**：与用户交流时使用中文。
