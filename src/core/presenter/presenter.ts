@@ -7,9 +7,9 @@ import {
   AgentsManager,
   MessagesManager,
   DiscussionMembersManager,
-  DiscussionControlManager,
   SettingsManager,
 } from "@/core/managers";
+import { DiscussionControlManager } from "@/core/managers/discussion-control.manager";
 
 // Presenter only exposes managers.
 export class Presenter {
@@ -24,6 +24,11 @@ export class Presenter {
   readonly discussionMembers = new DiscussionMembersManager();
   readonly discussionControl = new DiscussionControlManager();
   readonly settings = new SettingsManager();
+
+  constructor() {
+    this.messages.init(this.discussionControl);
+    this.discussionMembers.init(this.discussionControl);
+  }
 }
 
 let singleton: Presenter | null = null;

@@ -1,4 +1,4 @@
-import { settingsService } from "@/core/services/settings.service";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useTranslation as useI18nTranslation } from "react-i18next";
 import i18n from "../config/i18n";
 
@@ -9,7 +9,8 @@ const APP_LANGUAGE_SETTING_KEY = "app.language";
 // Otherwise settings load can override the language back to the old value.
 async function syncAppLanguageSetting(lng: string) {
   try {
-    const settings = await settingsService.listSettings();
+    const settingsManager = getPresenter().settings;
+    const settings = await settingsManager.listRaw();
     const languageSetting = settings.find(
       (setting) => setting.key === APP_LANGUAGE_SETTING_KEY
     );
@@ -18,7 +19,7 @@ async function syncAppLanguageSetting(lng: string) {
       return;
     }
 
-    await settingsService.updateSetting(languageSetting.id, { value: lng });
+    await settingsManager.update(languageSetting.id, { value: lng });
   } catch (error) {
     // Failing to sync the settings should not block language switching.
     console.error("Failed to sync app.language setting", error);

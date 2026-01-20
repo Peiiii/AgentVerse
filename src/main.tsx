@@ -1,7 +1,4 @@
 import { TooltipProvider } from "@/common/components/ui/tooltip.tsx";
-import { discussionControlService } from "@/core/services/discussion-control.service.ts";
-import { discussionMemberService } from "@/core/services/discussion-member.service.ts";
-import { discussionService } from "@/core/services/discussion.service.ts";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
@@ -14,10 +11,6 @@ import { PresenterProvider } from "@/core/presenter/presenter-context";
 import "@/core/config/i18n";
 import "./core/styles/theme.css";
 import "./index.css";
-
-window.discussionService = discussionService;
-window.discussionControlService = discussionControlService;
-window.discussionMemberService = discussionMemberService;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

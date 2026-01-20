@@ -1,4 +1,4 @@
-import { AI_PROVIDER_CONFIG, BasicAIConfig } from "@/core/config/ai";
+import { getLLMProviderConfig } from "@/core/config/ai";
 import {
   BaseConfig,
   ChatMessage,
@@ -7,8 +7,7 @@ import {
   ProxyAPIAdapter,
   StandardProvider,
 } from "@/common/lib/ai-service";
-import { filterNormalMessages } from "@/core/services/message.util";
-import { SupportedAIProvider } from "@/common/types/ai";
+import { filterNormalMessages } from "@/core/utils/message.util";
 import { AgentMessage } from "@/common/types/discussion";
 import { Observable } from "rxjs";
 // 核心服务类
@@ -53,10 +52,8 @@ export class AIService {
 
 // 工厂函数
 export function createAIService(): AIService {
-  const useProxy = BasicAIConfig.AI_USE_PROXY;
-  const proxyUrl = BasicAIConfig.AI_PROXY_URL;
-  const providerType = BasicAIConfig.AI_PROVIDER_NAME as SupportedAIProvider;
-  const providerConfig = AI_PROVIDER_CONFIG[providerType];
+  const { useProxy, proxyUrl, providerType, providerConfig } =
+    getLLMProviderConfig();
 
   const adapter = useProxy
     ? new ProxyAPIAdapter(proxyUrl)
@@ -68,17 +65,3 @@ export function createAIService(): AIService {
 
 // 默认实例
 export const aiService = createAIService();
-
-export const getLLMProviderConfig = () => {
-  const useProxy = BasicAIConfig.AI_USE_PROXY;
-  const proxyUrl = BasicAIConfig.AI_PROXY_URL;
-  const providerType = BasicAIConfig.AI_PROVIDER_NAME as SupportedAIProvider;
-  const providerConfig = AI_PROVIDER_CONFIG[providerType];
-
-  return {
-    useProxy,
-    proxyUrl,
-    providerType,
-    providerConfig,
-  };
-};

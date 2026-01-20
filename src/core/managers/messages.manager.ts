@@ -1,19 +1,33 @@
-import { messageService } from "@/core/services/message.service";
+import { messageRepository } from "@/core/repositories/message.repository";
 import type { AgentMessage, NormalMessage } from "@/common/types/discussion";
 import { useMessagesStore } from "@/core/stores/messages.store";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { getPresenter } from "@/core/presenter/presenter";
+import type { DiscussionControlManager } from "@/core/managers/discussion-control.manager";
 
 export class MessagesManager {
-  constructor() {
-    discussionControlService.onCurrentDiscussionIdChange$.listen((id) => {
+  private subscribed = false;
+  private control: DiscussionControlManager | null = null;
+
+  init(control: DiscussionControlManager) {
+    if (this.subscribed) return;
+    this.control = control;
+    this.subscribed = true;
+    control.onCurrentDiscussionIdChange$.listen((id) => {
       void this.loadForDiscussion(id);
     });
   }
 
+  private getControl() {
+    return this.control ?? getPresenter().discussionControl;
+  }
+
   loadForDiscussion = async (discussionId?: string | null) => {
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
     const store = useMessagesStore.getState();
     store.setLoading(true);
-    const currentId = discussionControlService.getCurrentDiscussionId();
+    const currentId = this.getControl().getCurrentDiscussionId();
     if (discussionId && discussionId !== currentId) {
       store.setData(store.data, store.currentDiscussionId);
       return store.data;
@@ -24,7 +38,7 @@ export class MessagesManager {
       return [] as AgentMessage[];
     }
     try {
-      const list = await messageService.listMessages(id);
+      const list = await messageRepository.listMessages(id);
       store.setData(list, id);
       return list;
     } catch (error) {
@@ -34,36 +48,54 @@ export class MessagesManager {
   };
 
   loadForCurrent = async () => {
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
     return this.loadForDiscussion();
   };
 
   add = async (discussionId: string, message: Omit<NormalMessage, "id" | "discussionId">) => {
-    const created = await messageService.addMessage(discussionId, message);
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
+    const created = await messageRepository.addMessage(discussionId, message);
     await this.loadForDiscussion();
-    // discussionService.updateLastMessage already done inside service
+    // discussionRepository.updateLastMessage already handled in repository
     return created;
   };
 
   create = async (message: Omit<AgentMessage, "id">) => {
-    const created = await messageService.createMessage(message);
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
+    const created = await messageRepository.createMessage(message);
     await this.loadForDiscussion();
     return created;
   };
 
   update = async (id: string, updates: Partial<AgentMessage>) => {
-    const updated = await messageService.updateMessage(id, updates);
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
+    const updated = await messageRepository.updateMessage(id, updates);
     await this.loadForDiscussion();
     return updated;
   };
 
   remove = async (id: string) => {
-    await messageService.deleteMessage(id);
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
+    await messageRepository.deleteMessage(id);
     await this.loadForDiscussion();
   };
 
   clearForDiscussion = async (discussionId: string) => {
-    await messageService.clearMessages(discussionId);
-    if (discussionControlService.getCurrentDiscussionId() === discussionId) {
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
+    await messageRepository.clearMessages(discussionId);
+    if (this.getControl().getCurrentDiscussionId() === discussionId) {
       await this.loadForDiscussion(discussionId);
     }
   };

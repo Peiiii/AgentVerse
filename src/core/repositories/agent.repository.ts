@@ -1,39 +1,35 @@
-/**
- * AgentRepository 接口定义
- * Agent 定义存储抽象层
- * @module core/repositories/agent.repository
- */
+import { AgentDef } from "@/common/types/agent";
+import { AgentDataProvider } from "@/common/types/storage";
+import { dataProviders } from "@/core/repositories/data-providers";
 
-import type { Timestamp } from './shared.types';
+export class AgentRepository {
+  constructor(private readonly provider: AgentDataProvider) {}
 
-/** Agent 定义 */
-export interface Agent {
-    id: string;
-    name: string;
-    description?: string;
-    systemPrompt?: string;
-    avatar?: string;
-    createdAt: Timestamp;
-    updatedAt: Timestamp;
+  async listAgents(): Promise<AgentDef[]> {
+    return this.provider.list();
+  }
+
+  async getAgent(id: string): Promise<AgentDef> {
+    return this.provider.get(id);
+  }
+
+  async createAgent(data: Omit<AgentDef, "id">): Promise<AgentDef> {
+    if (!data.name) {
+      throw new Error("Agent name is required");
+    }
+
+    return this.provider.create(data);
+  }
+
+  async updateAgent(id: string, data: Partial<AgentDef>): Promise<AgentDef> {
+    return this.provider.update(id, data);
+  }
+
+  async deleteAgent(id: string): Promise<void> {
+    await this.provider.delete(id);
+  }
 }
 
-/**
- * Agent 存储接口
- *
- * Adapters:
- * - MockAdapter: 当前默认
- * - HttpAdapter: 后端 API
- */
-export interface AgentRepository {
-    /** 获取所有 Agent */
-    list(): Promise<Agent[]>;
-
-    /** 获取单个 Agent */
-    get(id: string): Promise<Agent | undefined>;
-
-    /** 创建或更新 Agent */
-    upsert(agent: Omit<Agent, 'createdAt' | 'updatedAt'>): Promise<Agent>;
-
-    /** 删除 Agent */
-    delete(id: string): Promise<void>;
-}
+export const agentRepository = new AgentRepository(
+  dataProviders.agents as AgentDataProvider
+);

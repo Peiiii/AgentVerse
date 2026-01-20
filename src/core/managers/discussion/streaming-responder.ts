@@ -7,7 +7,7 @@ import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
 type Deps = {
   aiService: { streamChatCompletion: (messages: ChatMessage[]) => import("rxjs").Observable<string> };
-  messageService: {
+  messageRepo: {
     createMessage: (m: Omit<NormalMessage, "id">) => Promise<AgentMessage>;
     updateMessage: (id: string, patch: Partial<NormalMessage>) => Promise<AgentMessage>;
     getMessage: (id: string) => Promise<AgentMessage>;
@@ -30,11 +30,11 @@ export async function streamAgentResponse(
     signal: AbortSignal;
   }
 ): Promise<AgentMessage> {
-  const { aiService, messageService, reload } = deps;
+  const { aiService, messageRepo, reload } = deps;
   const capabilityRegistry = deps.capabilityRegistry ?? CapabilityRegistry.getInstance();
   const promptBuilder = deps.promptBuilder ?? new PromptBuilder();
 
-  const messages = await messageService.listMessages(params.discussionId);
+  const messages = await messageRepo.listMessages(params.discussionId);
   const cfg: IAgentConfig = { ...params.agent, agentId: params.agentId, canUseActions: params.canUseActions };
   const prepared = promptBuilder.buildPrompt({
     currentAgent: params.agent,
@@ -54,26 +54,26 @@ export async function streamAgentResponse(
     status: "streaming",
     lastUpdateTime: new Date(),
   };
-  const created = (await messageService.createMessage(initial)) as NormalMessage;
+  const created = (await messageRepo.createMessage(initial)) as NormalMessage;
 
   const stream = aiService.streamChatCompletion(prepared);
   let content = "";
   try {
     await consumeObservable(stream, params.signal, async (chunk) => {
       content += chunk;
-      await messageService.updateMessage(created.id, { content, lastUpdateTime: new Date() });
+      await messageRepo.updateMessage(created.id, { content, lastUpdateTime: new Date() });
       await reload();
     });
     // If aborted, the consumer resolves; finalize with completed state
-    await messageService.updateMessage(created.id, { status: "completed", lastUpdateTime: new Date() });
+    await messageRepo.updateMessage(created.id, { status: "completed", lastUpdateTime: new Date() });
     await reload();
   } catch (e) {
-    await messageService.updateMessage(created.id, { status: "error", lastUpdateTime: new Date() });
+    await messageRepo.updateMessage(created.id, { status: "error", lastUpdateTime: new Date() });
     await reload();
     throw e;
   }
 
-  const finalMessage = await messageService.getMessage(created.id);
+  const finalMessage = await messageRepo.getMessage(created.id);
   return finalMessage;
 }
 

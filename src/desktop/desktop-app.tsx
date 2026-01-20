@@ -28,7 +28,7 @@ export function DesktopAppInner() {
 
   const { height } = useViewportHeight();
 
-  // messages are managed by messageService/resources; no need to mirror into service
+  // messages are managed by manager/store; no need to mirror into runtime
 
   return !initialized ? (
     <div>Loading...</div>

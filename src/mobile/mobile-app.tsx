@@ -26,7 +26,7 @@ import { useIsPaused } from "@/core/hooks/useDiscussionRuntime";
 import { mobileChatExtension } from "@/mobile/features/chat/extensions";
 import { useEffect, useState } from "react";
 import { HashRouter } from "react-router-dom";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useMobileChatSceneStore } from "@/mobile/features/chat/stores/mobile-chat-scene.store";
 import { mobileChatSceneManager } from "@/mobile/features/chat/managers/mobile-chat-scene.manager";
 
@@ -70,8 +70,9 @@ export function MobileAppInner() {
   }, [currentDiscussionId, isMobile]);
 
   const handleStatusChange = (status: Discussion["status"]) => {
-    if (status === "paused") discussionControlService.pause();
-    else void discussionControlService.startIfEligible();
+    const discussionControl = getPresenter().discussionControl;
+    if (status === "paused") discussionControl.pause();
+    else void discussionControl.startIfEligible();
   };
 
   const handleToggleMembers = () => {

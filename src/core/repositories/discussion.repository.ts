@@ -1,70 +1,65 @@
-/**
- * DiscussionRepository / MessageRepository 接口定义
- * 讨论与消息存储抽象层
- * @module core/repositories/discussion.repository
- */
+import { AgentMessage, Discussion } from "@/common/types/discussion";
+import { DiscussionDataProvider } from "@/common/types/storage";
+import { dataProviders } from "@/core/repositories/data-providers";
 
-import type { Timestamp } from './shared.types';
+export class DiscussionRepository {
+  constructor(private readonly provider: DiscussionDataProvider) {}
 
-export type DiscussionId = string;
-export type MessageId = string;
+  async listDiscussions(): Promise<Discussion[]> {
+    return this.provider.list();
+  }
 
-/** 讨论 */
-export interface Discussion {
-    id: DiscussionId;
-    title: string;
-    status: 'active' | 'paused' | 'archived';
-    createdAt: Timestamp;
-    updatedAt: Timestamp;
+  async getDiscussion(id: string): Promise<Discussion> {
+    return this.provider.get(id);
+  }
+
+  async createDiscussion(title: string): Promise<Discussion> {
+    const discussion: Omit<Discussion, "id"> = {
+      title,
+      topic: "",
+      status: "paused",
+      settings: {
+        maxRounds: 20,
+        temperature: 0.7,
+        interval: 3000,
+        moderationStyle: "relaxed",
+        focusTopics: [],
+        allowConflict: true,
+        toolPermissions: {
+          moderator: true,
+          participant: false,
+        },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    return this.provider.create(discussion);
+  }
+
+  async updateDiscussion(
+    id: string,
+    data: Partial<Discussion>
+  ): Promise<Discussion> {
+    return this.provider.update(id, data);
+  }
+
+  async updateLastMessage(
+    id: string,
+    message: AgentMessage
+  ): Promise<Discussion> {
+    return this.provider.update(id, {
+      lastMessageTime: message.timestamp,
+      lastMessage: message.type === "text" ? message.content : undefined,
+      updatedAt: new Date(),
+    });
+  }
+
+  async deleteDiscussion(id: string): Promise<void> {
+    return this.provider.delete(id);
+  }
 }
 
-/** 消息 */
-export interface Message {
-    id: MessageId;
-    discussionId: DiscussionId;
-    senderId: string;
-    role: 'user' | 'assistant';
-    content: string;
-    createdAt: Timestamp;
-}
-
-/**
- * 讨论存储接口
- *
- * Adapters:
- * - MockAdapter: 当前默认
- * - HttpAdapter: 后端 API
- * - IndexedDBAdapter: 离线存储（可选）
- */
-export interface DiscussionRepository {
-    /** 获取所有讨论 */
-    list(): Promise<Discussion[]>;
-
-    /** 获取单个讨论 */
-    get(id: DiscussionId): Promise<Discussion | undefined>;
-
-    /** 创建讨论 */
-    create(
-        data: Omit<Discussion, 'id' | 'createdAt' | 'updatedAt'>
-    ): Promise<Discussion>;
-
-    /** 更新讨论 */
-    update(id: DiscussionId, patch: Partial<Discussion>): Promise<Discussion>;
-
-    /** 删除讨论 */
-    delete(id: DiscussionId): Promise<void>;
-}
-
-/**
- * 消息存储接口
- */
-export interface MessageRepository {
-    /** 获取讨论的所有消息 */
-    list(discussionId: DiscussionId): Promise<Message[]>;
-
-    /** 追加消息 */
-    append(message: Omit<Message, 'id' | 'createdAt'>): Promise<Message>;
-
-    /** 清空讨论的所有消息 */
-    clear(discussionId: DiscussionId): Promise<void>;
-}
+export const discussionRepository = new DiscussionRepository(
+  dataProviders.discussions as DiscussionDataProvider
+);

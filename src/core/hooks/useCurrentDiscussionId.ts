@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { getPresenter } from "@/core/presenter/presenter";
 
 export function useCurrentDiscussionId() {
-  const [id, setId] = useState<string | null>(discussionControlService.getCurrentDiscussionId());
+  const discussionControl = getPresenter().discussionControl;
+  const [id, setId] = useState<string | null>(
+    discussionControl.getCurrentDiscussionId()
+  );
   useEffect(() => {
-    const sub = discussionControlService.getCurrentDiscussionId$().subscribe(setId);
+    const sub = discussionControl.getCurrentDiscussionId$().subscribe(setId);
     return () => sub.unsubscribe();
-  }, []);
+  }, [discussionControl]);
   return id;
 }

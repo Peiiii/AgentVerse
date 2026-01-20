@@ -1,4 +1,4 @@
-import { agentService } from "@/core/services/agent.service";
+import { agentRepository } from "@/core/repositories/agent.repository";
 import type { AgentDef } from "@/common/types/agent";
 import { useAgentsStore } from "@/core/stores/agents.store";
 
@@ -9,7 +9,7 @@ export class AgentsManager {
     const store = useAgentsStore.getState();
     store.setLoading(true);
     try {
-      const list = await agentService.listAgents();
+      const list = await agentRepository.listAgents();
       store.setData(list);
       return list;
     } catch (error) {
@@ -18,9 +18,28 @@ export class AgentsManager {
     }
   };
 
+  ensureDefaults = async (
+    entries: Array<{ slug: string; def: Omit<AgentDef, "id"> }>
+  ) => {
+    const existing = await agentRepository.listAgents();
+    await Promise.all(
+      entries.map(async ({ slug, def }) => {
+        const found =
+          existing.find((a) => a.slug === slug) ||
+          existing.find((a) => a.name === def.name);
+        if (!found) {
+          await agentRepository.createAgent(def);
+          return;
+        }
+        await agentRepository.updateAgent(found.id, { ...def, id: found.id });
+      })
+    );
+    await this.load();
+  };
+
   // CRUD
   add = async (agent: Omit<AgentDef, "id">) => {
-    const created = await agentService.createAgent(agent);
+    const created = await agentRepository.createAgent(agent);
     await this.load();
     return created;
   };
@@ -41,13 +60,13 @@ export class AgentsManager {
   };
 
   update = async (id: string, data: Partial<AgentDef>) => {
-    const updated = await agentService.updateAgent(id, data);
+    const updated = await agentRepository.updateAgent(id, data);
     await this.load();
     return updated;
   };
 
   remove = async (id: string) => {
-    await agentService.deleteAgent(id);
+    await agentRepository.deleteAgent(id);
     await this.load();
   };
 

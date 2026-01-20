@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { discussionControlService } from "@/core/services/discussion-control.service";
-import type { Snapshot } from "@/core/services/discussion-control.service";
+import type { Snapshot } from "@/core/managers/discussion-control.manager";
+import { getPresenter } from "@/core/presenter/presenter";
 
 export function useDiscussionSnapshot() {
-  const [snap, setSnap] = useState<Snapshot>(discussionControlService.getSnapshot());
+  const discussionControl = getPresenter().discussionControl;
+  const [snap, setSnap] = useState<Snapshot>(
+    discussionControl.getSnapshot()
+  );
   useEffect(() => {
-    const sub = discussionControlService.getSnapshot$().subscribe(setSnap);
+    const sub = discussionControl.getSnapshot$().subscribe(setSnap);
     return () => sub.unsubscribe();
-  }, []);
+  }, [discussionControl]);
   return snap;
 }
 
@@ -15,4 +18,3 @@ export function useIsPaused() {
   const snap = useDiscussionSnapshot();
   return !snap.isRunning;
 }
-

@@ -58,3 +58,17 @@ export const BasicAIConfig = {
   AI_USE_PROXY: import.meta.env.VITE_AI_USE_PROXY === "true",
   AI_PROXY_URL: import.meta.env.VITE_AI_PROXY_URL,
 };
+
+export const getLLMProviderConfig = () => {
+  const useProxy = BasicAIConfig.AI_USE_PROXY;
+  const proxyUrl = BasicAIConfig.AI_PROXY_URL;
+  const providerType = BasicAIConfig.AI_PROVIDER_NAME as SupportedAIProvider;
+  const providerConfig = AI_PROVIDER_CONFIG[providerType];
+
+  return {
+    useProxy,
+    proxyUrl,
+    providerType,
+    providerConfig,
+  };
+};

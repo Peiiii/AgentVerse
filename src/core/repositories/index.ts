@@ -1,19 +1,10 @@
-/**
- * Repositories 统一导出
- * @module core/repositories
- */
+// 统一导出 Repository 与基础类型
+export * from "./shared.types";
+export * from "./ai.client";
+export * from "./data-providers";
 
-// 共享类型
-export * from './shared.types';
-
-// 客户端接口
-export * from './chat.client';
-
-// 存储接口
-export * from './settings.repository';
-export * from './discussion.repository';
-export * from './agent.repository';
-
-// Adapters
-export * from './adapters';
-
+export * from "./agent.repository";
+export * from "./discussion.repository";
+export * from "./message.repository";
+export * from "./discussion-member.repository";
+export * from "./settings.repository";

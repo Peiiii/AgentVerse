@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { discussionControlService } from "@/core/services/discussion-control.service";
 import { DiscussionSettings } from "@/common/types/discussion";
+import { getPresenter } from "@/core/presenter/presenter";
 
 export function useDiscussionSettings() {
-  const [settings, setSettings] = useState<DiscussionSettings>(discussionControlService.getSettings());
+  const discussionControl = getPresenter().discussionControl;
+  const [settings, setSettings] = useState<DiscussionSettings>(
+    discussionControl.getSettings()
+  );
   useEffect(() => {
-    const sub = discussionControlService.getSettings$().subscribe(setSettings);
+    const sub = discussionControl.getSettings$().subscribe(setSettings);
     return () => sub.unsubscribe();
-  }, []);
+  }, [discussionControl]);
   return settings;
 }
-

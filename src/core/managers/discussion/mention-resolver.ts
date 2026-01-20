@@ -1,7 +1,7 @@
 import { AgentDef } from "@/common/types/agent";
 import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 
-// Lightweight @mention resolver extracted from DiscussionControlService
+// Lightweight @mention resolver extracted from DiscussionControlManager
 // - Keeps an internal queue of mention targets for a given source message
 // - Resolves to agent ids by slug first, then by name with a word-boundary check
 // - Stateless towards external services; agents list is provided by caller
@@ -102,4 +102,3 @@ export class MentionResolver {
     return /\s|[，。,。！？!?:：；;、]/u.test(char);
   }
 }
-

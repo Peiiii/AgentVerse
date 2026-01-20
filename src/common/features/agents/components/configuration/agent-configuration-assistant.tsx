@@ -4,7 +4,7 @@ import { ChatWelcomeHeader } from "@/common/features/chat/components/chat-welcom
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { getLLMProviderConfig } from "@/core/services/ai.service";
+import { getLLMProviderConfig } from "@/core/config/ai";
 import { useAgentChat } from "@agent-labs/agent-chat";
 import {
   Wand2,

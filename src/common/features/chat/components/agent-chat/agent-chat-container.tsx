@@ -5,7 +5,7 @@ import {
 } from "@/common/lib/rx-state";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage } from "@/common/types/chat";
-import { getLLMProviderConfig } from "@/core/services/ai.service";
+import { getLLMProviderConfig } from "@/core/config/ai";
 import { useAgentChat } from "@agent-labs/agent-chat";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { map } from "rxjs";

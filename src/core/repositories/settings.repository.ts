@@ -1,39 +1,62 @@
-/**
- * SettingsRepository 接口定义
- * 设置存储抽象层
- * @module core/repositories/settings.repository
- */
+import { SettingItem } from "@/common/types/settings";
+import { DEFAULT_SETTINGS } from "@/core/config/settings-schema";
+import { SettingsStore, settingsStore } from "@/core/repositories/data-providers";
 
-/** 设置项 */
-export interface SettingItem<T = unknown> {
-    key: string;
-    value: T;
-    category: string;
-    label: string;
-    description?: string;
+export class SettingsRepository {
+  constructor(
+    private readonly store: SettingsStore,
+    private readonly defaults: Omit<SettingItem, "id">[]
+  ) {}
+
+  private async normalizeSettings(): Promise<SettingItem[]> {
+    const savedValues = await this.store.readAll();
+    return this.defaults.map((item) => ({
+      ...item,
+      id: item.key,
+      value:
+        Object.prototype.hasOwnProperty.call(savedValues, item.key) &&
+        savedValues[item.key] !== undefined
+          ? savedValues[item.key]
+          : item.value,
+    }));
+  }
+
+  async listSettings(): Promise<SettingItem[]> {
+    return this.normalizeSettings();
+  }
+
+  async updateSetting(
+    key: string,
+    data: Partial<SettingItem>
+  ): Promise<SettingItem> {
+    const settings = await this.normalizeSettings();
+    const target = settings.find((s) => s.key === key || s.id === key);
+    if (!target) {
+      throw new Error(`Setting not found: ${key}`);
+    }
+    const next = { ...target, ...data, id: target.key };
+    const savedValues = await this.store.readAll();
+    savedValues[next.key] = next.value;
+    await this.store.writeAll(savedValues);
+    return next;
+  }
+
+  async updateMany(updates: Record<string, unknown>): Promise<SettingItem[]> {
+    const savedValues = await this.store.readAll();
+    Object.entries(updates).forEach(([key, value]) => {
+      savedValues[key] = value;
+    });
+    await this.store.writeAll(savedValues);
+    return this.normalizeSettings();
+  }
+
+  async resetToDefaults(): Promise<SettingItem[]> {
+    await this.store.clear();
+    return this.normalizeSettings();
+  }
 }
 
-/**
- * 设置存储接口
- *
- * Adapters:
- * - LocalStorageAdapter: 使用 localStorage
- * - HttpAdapter: 通过后端 API（预留）
- * - SecureStorageAdapter: 安全存储（可选）
- */
-export interface SettingsRepository {
-    /** 获取所有设置 */
-    list(): Promise<SettingItem[]>;
-
-    /** 获取单个设置 */
-    get<T>(key: string): Promise<T | undefined>;
-
-    /** 更新设置 */
-    update(key: string, value: unknown): Promise<void>;
-
-    /** 重置为默认值 */
-    reset(): Promise<SettingItem[]>;
-
-    /** 监听设置变化 */
-    watch(cb: (settings: SettingItem[]) => void): () => void;
-}
+export const settingsRepository = new SettingsRepository(
+  settingsStore,
+  DEFAULT_SETTINGS
+);

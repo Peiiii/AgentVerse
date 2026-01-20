@@ -1,14 +1,14 @@
 import { Capability } from "@/common/lib/capabilities";
-import { agentService } from "@/core/services/agent.service";
-import { discussionControlService } from "@/core/services/discussion-control.service";
-import { discussionMemberService } from "@/core/services/discussion-member.service";
+import { agentRepository } from "@/core/repositories/agent.repository";
+import { discussionMemberRepository } from "@/core/repositories/discussion-member.repository";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useAgentsStore } from "@/core/stores/agents.store";
 import { useDiscussionMembersStore } from "@/core/stores/discussion-members.store";
 
 const getAgents = async () => {
   const cached = useAgentsStore.getState().data;
   if (cached.length > 0) return cached;
-  const list = await agentService.listAgents();
+  const list = await agentRepository.listAgents();
   useAgentsStore.getState().setData(list);
   return list;
 };
@@ -19,27 +19,27 @@ const findAgentById = async (id: string) => {
 };
 
 const refreshMembers = async (discussionId: string) => {
-  const list = await discussionMemberService.list(discussionId);
-  if (discussionControlService.getCurrentDiscussionId() === discussionId) {
+  const list = await discussionMemberRepository.list(discussionId);
+  if (getPresenter().discussionControl.getCurrentDiscussionId() === discussionId) {
     useDiscussionMembersStore.getState().setData(list, discussionId);
   }
   return list;
 };
 
 const refreshAgents = async () => {
-  const list = await agentService.listAgents();
+  const list = await agentRepository.listAgents();
   useAgentsStore.getState().setData(list);
   return list;
 };
 
 const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
-  const discussionId = discussionControlService.getCurrentDiscussionId();
+  const discussionId = getPresenter().discussionControl.getCurrentDiscussionId();
   if (!discussionId) return null;
   const agent = await findAgentById(agentId);
   if (!agent) {
     throw new Error("Agent not found");
   }
-  const members = await discussionMemberService.createMany(discussionId, [
+  const members = await discussionMemberRepository.createMany(discussionId, [
     {
       agentId,
       isAutoReply: false,
@@ -242,7 +242,7 @@ const capabilities: Capability[] = [
 
       try {
         // 创建Agent
-        const agent = await agentService.createAgent({
+        const agent = await agentRepository.createAgent({
           name: params.name,
           role: params.role,
           personality: params.personality,
@@ -286,13 +286,13 @@ const capabilities: Capability[] = [
   </notes>
 </capability>`,
     execute: async () => {
-      const discussionId = discussionControlService.getCurrentDiscussionId();
+      const discussionId = getPresenter().discussionControl.getCurrentDiscussionId();
       if (!discussionId) {
         return [];
       }
 
       const [members, agents] = await Promise.all([
-        discussionMemberService.list(discussionId),
+        discussionMemberRepository.list(discussionId),
         getAgents(),
       ]);
 
@@ -345,8 +345,8 @@ const capabilities: Capability[] = [
     execute: async (rawParams: unknown) => {
       const { memberId } = rawParams as { memberId: string };
       console.log("[Capabilities] memberId:", memberId);
-      await discussionMemberService.delete(memberId);
-      const discussionId = discussionControlService.getCurrentDiscussionId();
+      await discussionMemberRepository.delete(memberId);
+      const discussionId = getPresenter().discussionControl.getCurrentDiscussionId();
       if (!discussionId) return [];
       return refreshMembers(discussionId);
     },
@@ -472,7 +472,7 @@ const capabilities: Capability[] = [
 
       try {
         // 更新Agent
-        const agent = await agentService.updateAgent(params.id, {
+        const agent = await agentRepository.updateAgent(params.id, {
           name: params.name,
           role: params.role,
           personality: params.personality,

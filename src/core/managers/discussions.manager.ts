@@ -1,13 +1,13 @@
-import { discussionService } from "@/core/services/discussion.service";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { discussionRepository } from "@/core/repositories/discussion.repository";
+import { messageRepository } from "@/core/repositories/message.repository";
+import { getPresenter } from "@/core/presenter/presenter";
 import type { Discussion } from "@/common/types/discussion";
-import { messageService } from "@/core/services/message.service";
 import { useDiscussionsStore } from "@/core/stores/discussions.store";
 import { useMessagesStore } from "@/core/stores/messages.store";
 
 export class DiscussionsManager {
   getAll = () => useDiscussionsStore.getState().data;
-  getCurrentId = () => discussionControlService.getCurrentDiscussionId();
+  getCurrentId = () => getPresenter().discussionControl.getCurrentDiscussionId();
   getCurrent = () => {
     const id = this.getCurrentId();
     if (!id) return null;
@@ -18,14 +18,14 @@ export class DiscussionsManager {
     const store = useDiscussionsStore.getState();
     store.setLoading(true);
     try {
-      let list = await discussionService.listDiscussions();
+      let list = await discussionRepository.listDiscussions();
       if (!list.length) {
-        const created = await discussionService.createDiscussion("新会话");
+        const created = await discussionRepository.createDiscussion("新会话");
         list = [created];
       }
       store.setData(list);
-      if (!discussionControlService.getCurrentDiscussionId() && list.length > 0) {
-        discussionControlService.setCurrentDiscussionId(list[0].id);
+      if (!getPresenter().discussionControl.getCurrentDiscussionId() && list.length > 0) {
+        getPresenter().discussionControl.setCurrentDiscussionId(list[0].id);
       }
       return list;
     } catch (error) {
@@ -35,7 +35,7 @@ export class DiscussionsManager {
   };
 
   create = async (title: string) => {
-    const d = await discussionService.createDiscussion(title);
+    const d = await discussionRepository.createDiscussion(title);
     const list = await this.load();
     if (!list.find((item) => item.id === d.id)) {
       list.unshift(d);
@@ -46,35 +46,35 @@ export class DiscussionsManager {
   };
 
   update = async (id: string, data: Partial<Discussion>) => {
-    const updated = await discussionService.updateDiscussion(id, data);
+    const updated = await discussionRepository.updateDiscussion(id, data);
     await this.load();
     return updated;
   };
 
   remove = async (id: string) => {
-    await discussionService.deleteDiscussion(id);
+    await discussionRepository.deleteDiscussion(id);
     const list = await this.load();
-    if (discussionControlService.getCurrentDiscussionId() === id) {
+    if (getPresenter().discussionControl.getCurrentDiscussionId() === id) {
       const next = list[0]?.id ?? null;
-      discussionControlService.setCurrentDiscussionId(next);
+      getPresenter().discussionControl.setCurrentDiscussionId(next);
     }
   };
 
   select = (id: string | null) => {
-    discussionControlService.setCurrentDiscussionId(id);
+    getPresenter().discussionControl.setCurrentDiscussionId(id);
   };
 
   clearMessages = async (discussionId: string) => {
-    await messageService.clearMessages(discussionId);
-    if (discussionControlService.getCurrentDiscussionId() === discussionId) {
+    await messageRepository.clearMessages(discussionId);
+    if (getPresenter().discussionControl.getCurrentDiscussionId() === discussionId) {
       useMessagesStore.getState().setData([], discussionId);
     }
   };
 
   clearAllMessages = async () => {
     const list = this.getAll();
-    await Promise.all(list.map((d) => messageService.clearMessages(d.id)));
-    const currentId = discussionControlService.getCurrentDiscussionId();
+    await Promise.all(list.map((d) => messageRepository.clearMessages(d.id)));
+    const currentId = getPresenter().discussionControl.getCurrentDiscussionId();
     if (currentId) {
       useMessagesStore.getState().setData([], currentId);
     }

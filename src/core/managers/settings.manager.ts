@@ -2,8 +2,8 @@ import { RxEvent } from "@/common/lib/rx-event";
 import type { SettingItem } from "@/common/types/settings";
 import { SETTING_KYES } from "@/core/config/settings";
 import i18n from "@/core/config/i18n";
-import { aiService } from "@/core/services/ai.service";
-import { settingsService } from "@/core/services/settings.service";
+import { aiService } from "@/core/repositories/ai.client";
+import { settingsRepository } from "@/core/repositories/settings.repository";
 import { useSettingsStore } from "@/core/stores/settings.store";
 
 // Manager for Settings related UI actions.
@@ -46,7 +46,7 @@ export class SettingsManager {
     const store = useSettingsStore.getState();
     store.setLoading(true);
     try {
-      const settings = await settingsService.listSettings();
+      const settings = await settingsRepository.listSettings();
       this.applySettings(settings);
       store.setData(settings);
       return settings;
@@ -56,8 +56,12 @@ export class SettingsManager {
     }
   };
 
+  listRaw = async () => {
+    return settingsRepository.listSettings();
+  };
+
   update = async (id: string, data: Partial<SettingItem>) => {
-    const updated = await settingsService.updateSetting(id, data);
+    const updated = await settingsRepository.updateSetting(id, data);
     const store = useSettingsStore.getState();
     const next = store.data.map((item) =>
       item.key === updated.key ? updated : item
@@ -68,7 +72,7 @@ export class SettingsManager {
   };
 
   reset = async () => {
-    const settings = await settingsService.resetToDefaults();
+    const settings = await settingsRepository.resetToDefaults();
     this.applySettings(settings);
     useSettingsStore.getState().setData(settings);
     return settings;

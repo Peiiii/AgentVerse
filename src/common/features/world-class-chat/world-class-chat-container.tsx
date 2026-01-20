@@ -21,7 +21,7 @@ import { useWorldClassChatSettingsStore } from "./stores/world-class-chat-settin
 import { AgentChatProviderWrapper } from "@/common/features/chat/components/agent-chat/agent-chat-provider-wrapper";
 import { SuggestionsProvider } from "@/common/features/chat/components/suggestions";
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent/experimental-inbrowser-agent";
-import { getLLMProviderConfig } from "@/core/services/ai.service";
+import { getLLMProviderConfig } from "@/core/config/ai";
 import { Message } from "@ag-ui/core";
 import { WorldClassSettingsPanel } from "./components/settings-panel";
 import { WorldClassChatHtmlPreview } from "./components/world-class-chat-html-preview";

@@ -13,7 +13,7 @@ import { Discussion } from "@/common/types/discussion";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
 import { usePresenter } from "@/core/presenter";
 import { useViewportHeight } from "@/core/hooks/useViewportHeight";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { getPresenter } from "@/core/presenter/presenter";
 import { useIsPaused } from "@/core/hooks/useDiscussionRuntime";
 import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
 import { useState } from "react";
@@ -38,8 +38,9 @@ export function ChatPage() {
   };
 
   const handleStatusChange = (status: Discussion["status"]) => {
-    if (status === "paused") discussionControlService.pause();
-    else void discussionControlService.startIfEligible();
+    const discussionControl = getPresenter().discussionControl;
+    if (status === "paused") discussionControl.pause();
+    else void discussionControl.startIfEligible();
   };
 
   // 业务消息在 ChatArea 内部处理
