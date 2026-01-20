@@ -1,13 +1,18 @@
-import { useResourceState } from "@/common/lib/resource";
-import { discussionsResource } from "@/core/resources";
+import { useMemo } from "react";
+import { useDiscussionsStore } from "@/core/stores/discussions.store";
+import { useCurrentDiscussionId } from "@/core/hooks/useCurrentDiscussionId";
 
 export function useDiscussions() {
-  const listState = useResourceState(discussionsResource.list);
-  const currentState = useResourceState(discussionsResource.current);
+  const { data, isLoading, error } = useDiscussionsStore();
+  const currentId = useCurrentDiscussionId();
+  const currentDiscussion = useMemo(() => {
+    if (!currentId) return null;
+    return data.find((item) => item.id === currentId) ?? null;
+  }, [data, currentId]);
   return {
-    discussions: listState.data,
-    currentDiscussion: currentState.data,
-    isLoading: listState.isLoading || currentState.isLoading,
-    error: listState.error?.message || currentState.error?.message,
+    discussions: data,
+    currentDiscussion,
+    isLoading,
+    error: error || undefined,
   };
 }

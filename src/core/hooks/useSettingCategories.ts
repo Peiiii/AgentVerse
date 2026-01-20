@@ -1,17 +1,26 @@
-import { useResourceState } from "@/common/lib/resource";
-import { settingsResource } from "@/core/resources/settings.resource";
 import { useMemo } from "react";
+import { SETTINGS_CATEGORIES } from "@/core/config/settings-schema";
+import { useSettingsStore } from "@/core/stores/settings.store";
+import type { SettingItem } from "@/common/types/settings";
 
 export function useSettingCategories() {
-  const { data: settingsByCategory } = useResourceState(
-    settingsResource.byCategory
-  );
+  const { data: settings } = useSettingsStore();
+
+  const settingsByCategory = useMemo(() => {
+    return settings.reduce((acc, setting) => {
+      if (!acc[setting.category]) {
+        acc[setting.category] = [];
+      }
+      acc[setting.category].push(setting);
+      return acc;
+    }, {} as Record<string, SettingItem[]>);
+  }, [settings]);
 
   const categories = useMemo(() => {
     if (!settingsByCategory) return [];
 
     const labelMap = Object.fromEntries(
-      settingsResource.categories.map((c) => [c.key, c.label])
+      SETTINGS_CATEGORIES.map((c) => [c.key, c.label])
     );
 
     return Object.keys(settingsByCategory)
@@ -22,15 +31,15 @@ export function useSettingCategories() {
       }))
       .sort(
         (a, b) =>
-          (settingsResource.categories.find((c) => c.key === a.key)?.order ||
+          (SETTINGS_CATEGORIES.find((c) => c.key === a.key)?.order ||
             Infinity) -
-          (settingsResource.categories.find((c) => c.key === b.key)?.order ||
+          (SETTINGS_CATEGORIES.find((c) => c.key === b.key)?.order ||
             Infinity)
       );
   }, [settingsByCategory]);
 
   return {
     categories,
-    settingsByCategory
+    settingsByCategory,
   };
 } 

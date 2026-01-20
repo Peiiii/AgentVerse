@@ -1,9 +1,4 @@
 import { TooltipProvider } from "@/common/components/ui/tooltip.tsx";
-import {
-  discussionMembersResource,
-  discussionsResource,
-  messagesResource,
-} from "@/core/resources/index.ts";
 import { discussionControlService } from "@/core/services/discussion-control.service.ts";
 import { discussionMemberService } from "@/core/services/discussion-member.service.ts";
 import { discussionService } from "@/core/services/discussion.service.ts";
@@ -23,9 +18,6 @@ import "./index.css";
 window.discussionService = discussionService;
 window.discussionControlService = discussionControlService;
 window.discussionMemberService = discussionMemberService;
-window.discussionsResource = discussionsResource;
-window.discussionMembersResource = discussionMembersResource;
-window.messagesResource = messagesResource;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

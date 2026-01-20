@@ -1,12 +1,11 @@
-import { useResourceState } from "@/common/lib/resource";
-import { agentsResource } from "@/core/resources";
+import { useAgentsStore } from "@/core/stores/agents.store";
 
-// Resource-first hook for Agent list; prefer此钩子而不是直接读取 store。
+// Store-first hook for Agent list.
 export function useAgents() {
-  const { data, isLoading, error } = useResourceState(agentsResource.list);
+  const { data, isLoading, error } = useAgentsStore();
   return {
     agents: data,
     isLoading,
-    error: error ? error.message : undefined,
+    error: error || undefined,
   };
 }

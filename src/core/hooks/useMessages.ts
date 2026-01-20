@@ -1,11 +1,9 @@
-import { useResourceState } from "@/common/lib/resource";
-import { messagesResource } from "@/core/resources";
 import type { AgentMessage, NormalMessage } from "@/common/types/discussion";
 import { usePresenter } from "@/core/presenter";
-import { discussionControlService } from "@/core/services/discussion-control.service";
+import { useMessagesStore } from "@/core/stores/messages.store";
 
 export function useMessages() {
-  const state = useResourceState(messagesResource.current);
+  const state = useMessagesStore();
   const presenter = usePresenter();
 
   const addMessage = async ({
@@ -19,7 +17,7 @@ export function useMessages() {
     type?: AgentMessage["type"];
     replyTo?: string;
   }) => {
-    const currentDiscussionId = discussionControlService.getCurrentDiscussionId();
+    const currentDiscussionId = presenter.discussions.getCurrentId();
     if (!currentDiscussionId) return;
     return presenter.messages.add(currentDiscussionId, {
       content,
@@ -33,7 +31,7 @@ export function useMessages() {
   return {
     messages: state.data,
     isLoading: state.isLoading,
-    error: state.error?.message,
+    error: state.error || undefined,
     addMessage,
   };
 }

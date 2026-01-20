@@ -1,14 +1,41 @@
 import { Capability } from "@/common/lib/capabilities";
-import { createResource } from "@/common/lib/resource";
-import { agentListResource, discussionMembersResource } from "@/core/resources";
 import { agentService } from "@/core/services/agent.service";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import { discussionMemberService } from "@/core/services/discussion-member.service";
+import { useAgentsStore } from "@/core/stores/agents.store";
+import { useDiscussionMembersStore } from "@/core/stores/discussion-members.store";
+
+const getAgents = async () => {
+  const cached = useAgentsStore.getState().data;
+  if (cached.length > 0) return cached;
+  const list = await agentService.listAgents();
+  useAgentsStore.getState().setData(list);
+  return list;
+};
+
+const findAgentById = async (id: string) => {
+  const list = await getAgents();
+  return list.find((agent) => agent.id === id);
+};
+
+const refreshMembers = async (discussionId: string) => {
+  const list = await discussionMemberService.list(discussionId);
+  if (discussionControlService.getCurrentDiscussionId() === discussionId) {
+    useDiscussionMembersStore.getState().setData(list, discussionId);
+  }
+  return list;
+};
+
+const refreshAgents = async () => {
+  const list = await agentService.listAgents();
+  useAgentsStore.getState().setData(list);
+  return list;
+};
 
 const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
   const discussionId = discussionControlService.getCurrentDiscussionId();
   if (!discussionId) return null;
-  const agent = await agentService.getAgent(agentId);
+  const agent = await findAgentById(agentId);
   if (!agent) {
     throw new Error("Agent not found");
   }
@@ -18,7 +45,7 @@ const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
       isAutoReply: false,
     },
   ]);
-  discussionMembersResource.current.reload();
+  await refreshMembers(discussionId);
   return members;
 };
 
@@ -48,7 +75,7 @@ const capabilities: Capability[] = [
   </notes>
 </capability>`,
     execute: async () => {
-      const agents = agentListResource.read().data;
+      const agents = await getAgents();
       // 截断prompt，避免数据过大
       return agents.map((agent) => ({
         ...agent,
@@ -94,7 +121,7 @@ const capabilities: Capability[] = [
       }
 
       try {
-        const agent = await agentService.getAgent(id);
+        const agent = await findAgentById(id);
         if (!agent) {
           throw new Error(`Agent with ID ${id} not found`);
         }
@@ -226,8 +253,7 @@ const capabilities: Capability[] = [
           responseStyle: params.responseStyle || "待设置",
         });
 
-        // 重新加载Agent列表资源
-        await agentListResource.reload();
+        await refreshAgents();
         if (params.addToDiscussion) {
           await addMemberToDiscussion({ agentId: agent.id });
         }
@@ -267,8 +293,7 @@ const capabilities: Capability[] = [
 
       const [members, agents] = await Promise.all([
         discussionMemberService.list(discussionId),
-        // agentListResource 读取的是同步数据，直接 read 即可
-        Promise.resolve(agentListResource.read().data),
+        getAgents(),
       ]);
 
       return members.map((member) => {
@@ -321,7 +346,9 @@ const capabilities: Capability[] = [
       const { memberId } = rawParams as { memberId: string };
       console.log("[Capabilities] memberId:", memberId);
       await discussionMemberService.delete(memberId);
-      return discussionMembersResource.current.reload();
+      const discussionId = discussionControlService.getCurrentDiscussionId();
+      if (!discussionId) return [];
+      return refreshMembers(discussionId);
     },
   },
   //   {
@@ -456,8 +483,7 @@ const capabilities: Capability[] = [
           responseStyle: params.responseStyle,
         });
 
-        // 重新加载Agent列表资源
-        await agentListResource.reload();
+        await refreshAgents();
         return agent;
       } catch (error) {
         if (error instanceof Error) {
@@ -470,6 +496,4 @@ const capabilities: Capability[] = [
   // ...dbCapabilities,
 ];
 
-export const discussionCapabilitiesResource = createResource(() =>
-  Promise.resolve(capabilities)
-);
+export const discussionCapabilities = capabilities;

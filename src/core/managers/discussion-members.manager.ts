@@ -1,25 +1,43 @@
 import { discussionMemberService } from "@/core/services/discussion-member.service";
 import { discussionControlService } from "@/core/services/discussion-control.service";
 import type { DiscussionMember } from "@/common/types/discussion-member";
-import { discussionMembersResource } from "@/core/resources";
+import { useDiscussionMembersStore } from "@/core/stores/discussion-members.store";
 
 export class DiscussionMembersManager {
+  constructor() {
+    discussionControlService.onCurrentDiscussionIdChange$.listen(() => {
+      void this.load();
+    });
+  }
+
   load = async (discussionId?: string) => {
-    const id = discussionId ?? discussionControlService.getCurrentDiscussionId();
-    if (!id) {
-      await discussionMembersResource.current.reload();
-      return [] as DiscussionMember[]; // no current discussion
+    const store = useDiscussionMembersStore.getState();
+    store.setLoading(true);
+    const currentId = discussionControlService.getCurrentDiscussionId();
+    if (discussionId && discussionId !== currentId) {
+      store.setData(store.data, store.currentDiscussionId);
+      return store.data;
     }
-    const list = await discussionMemberService.list(id);
-    await discussionMembersResource.current.reload();
-    return list;
+    const id = discussionId ?? currentId;
+    if (!id) {
+      store.setData([], null);
+      return [] as DiscussionMember[];
+    }
+    try {
+      const list = await discussionMemberService.list(id);
+      store.setData(list, id);
+      return list;
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : "加载失败");
+      return [] as DiscussionMember[];
+    }
   };
 
   add = async (agentId: string, isAutoReply = false) => {
     const id = discussionControlService.getCurrentDiscussionId();
     if (!id) return null;
     const created = await discussionMemberService.create(id, agentId, isAutoReply);
-    await discussionMembersResource.current.reload();
+    await this.load(id);
     return created;
   };
 
@@ -27,23 +45,23 @@ export class DiscussionMembersManager {
     const id = discussionControlService.getCurrentDiscussionId();
     if (!id) return [] as DiscussionMember[];
     const created = await discussionMemberService.createMany(id, members);
-    await discussionMembersResource.current.reload();
+    await this.load(id);
     return created;
   };
 
   update = async (memberId: string, data: Partial<DiscussionMember>) => {
     const updated = await discussionMemberService.update(memberId, data);
-    await discussionMembersResource.current.reload();
+    await this.load();
     return updated;
   };
 
   remove = async (memberId: string) => {
     await discussionMemberService.delete(memberId);
-    await discussionMembersResource.current.reload();
+    await this.load();
   };
 
   toggleAutoReply = async (memberId: string) => {
-    const m = (discussionMembersResource.current.getState().data ?? []).find((x) => x.id === memberId);
+    const m = useDiscussionMembersStore.getState().data.find((x) => x.id === memberId);
     if (!m) return null;
     return this.update(memberId, { isAutoReply: !m.isAutoReply });
   };

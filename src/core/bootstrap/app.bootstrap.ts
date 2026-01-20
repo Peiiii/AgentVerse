@@ -1,10 +1,11 @@
 import { ensureDefaultAgents } from "@/core/bootstrap/agents.bootstrap";
-import { agentListResource, discussionsResource } from "@/core/resources";
+import { getPresenter } from "@/core/presenter";
 
 export async function bootstrapApp() {
-  // Seed/upgrade built-in agents, then prime resources
+  // Seed/upgrade built-in agents, then prime stores
   await ensureDefaultAgents();
-  await agentListResource.reload();
-  await discussionsResource.list.reload();
+  const presenter = getPresenter();
+  await presenter.agents.load();
+  await presenter.discussions.load();
+  await presenter.settings.load();
 }
-

@@ -1,7 +1,6 @@
-import { STORAGE_CONFIG } from "@/core/config/storage";
-import { MockHttpProvider } from "@/common/lib/storage";
 import { AgentMessage, Discussion } from "@/common/types/discussion";
 import { DiscussionDataProvider } from "@/common/types/storage";
+import { dataProviders } from "./data-providers";
 
 export class DiscussionService {
   constructor(private provider: DiscussionDataProvider) {}
@@ -63,26 +62,5 @@ export class DiscussionService {
 
 // 创建服务实例
 export const discussionService = new DiscussionService(
-  new MockHttpProvider<Discussion>(STORAGE_CONFIG.KEYS.DISCUSSIONS, {
-    delay: STORAGE_CONFIG.MOCK_DELAY_MS,
-    maxItems: 1000,
-    // 使用多字段排序
-    comparator: (a, b) => {
-      return (
-        new Date(b.lastMessageTime || b.createdAt).getTime() -
-        new Date(a.lastMessageTime || a.createdAt).getTime()
-      );
-    },
-    // sortFields: [
-    //   {
-    //     field: "lastMessageTime",
-    //     // 自定义比较器处理 undefined 情况
-    //     comparator: (a?: Date, b?: Date) => {
-    //       const timeA = (a ? new Date(a).getTime() : Infinity) as number;
-    //       const timeB = (b ? new Date(b).getTime() : Infinity) as number;
-    //       return timeB - timeA;
-    //     },
-    //   } as SortField<Discussion, "lastMessageTime">,
-    // ],
-  })
+  dataProviders.discussions as DiscussionDataProvider
 );

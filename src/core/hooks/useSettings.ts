@@ -1,41 +1,31 @@
-import { useResourceState } from "@/common/lib/resource";
-import { settingsResource } from "@/core/resources/settings.resource";
-import { settingsService } from "@/core/services/settings.service";
 import { SettingItem } from "@/common/types/settings";
 import { useMemoizedFn } from "ahooks";
-import { useOptimisticUpdate } from "./useOptimisticUpdate";
 import { useMemo } from "react";
+import { useSettingsStore } from "@/core/stores/settings.store";
+import { usePresenter } from "@/core/presenter";
 
 interface UseSettingsProps {
   onChange?: (settings: SettingItem[]) => void;
 }
 
 export function useSettings({ onChange }: UseSettingsProps = {}) {
-  const resource = useResourceState(settingsResource.list);
-  const { data: settings = [] } = resource;
-
-  const withOptimisticUpdate = useOptimisticUpdate(resource, { onChange });
+  const presenter = usePresenter();
+  const { data: settings = [], isLoading, error } = useSettingsStore();
 
   const updateSetting = useMemoizedFn(
     async (id: string, data: Partial<SettingItem>) => {
-      return withOptimisticUpdate(
-        // 乐观更新
-        (settings) =>
-          settings.map((s) =>
-            s.id === id || s.key === id ? { ...s, ...data } : s
-          ),
-        // API 调用
-        () => settingsService.updateSetting(id, data)
-      );
+      const result = await presenter.settings.update(id, data);
+      onChange?.(presenter.settings.getAll());
+      return result;
     }
   );
 
-  const createSetting = useMemoizedFn(async (data: Omit<SettingItem, "id">) => {
+  const createSetting = useMemoizedFn(async () => {
     // 简化后不支持动态创建，直接返回当前设置列表
     return settings;
   });
 
-  const deleteSetting = useMemoizedFn(async (id: string) => {
+  const deleteSetting = useMemoizedFn(async () => {
     // 简化后不支持删除，直接返回当前设置列表
     return settings;
   });
@@ -52,8 +42,8 @@ export function useSettings({ onChange }: UseSettingsProps = {}) {
   }, [settings]);
   return {
     settings: orderedSettings,
-    isLoading: resource.isLoading,
-    error: resource.error,
+    isLoading,
+    error,
     updateSetting,
     createSetting,
     deleteSetting,

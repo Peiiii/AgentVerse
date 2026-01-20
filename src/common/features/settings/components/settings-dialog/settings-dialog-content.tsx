@@ -13,16 +13,16 @@ import {
   AlertDialogTitle,
 } from "@/common/components/ui/alert-dialog";
 import { useState } from "react";
-import { recoverDefaultSettings, settingsResource } from "@/core/resources/settings.resource";
 import { useTranslation } from "@/core/hooks/use-i18n";
+import { usePresenter } from "@/core/presenter";
 
 export function SettingsDialogContent() {
   const { t } = useTranslation();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const presenter = usePresenter();
 
   const handleReset = async () => {
-    await recoverDefaultSettings();
-    await settingsResource.list.reload();
+    await presenter.settings.reset();
     setShowResetConfirm(false);
   };
 

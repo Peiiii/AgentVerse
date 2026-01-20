@@ -35,9 +35,12 @@
 - 约定元指令：输入 `/new-rule` 触发创建新规则流程
 - 规则条目包含：名称（英文 kebab-case）、约束/适用范围、示例/反例、执行方式（工具/流程）、维护责任人
 - 后续新增或修改规则时，直接在本文件的 **Rulebook** 区域追加/更新
+- 默认所有规则必须严格遵守（无额外声明即视为强制）；如需例外必须在规则中明确说明
 
 ## Rulebook
 
 - **post-dev-stage-validation**：每个开发阶段结束必须做验证，至少运行 `build`、`lint`、`tsc`（如确认为无关可有理由地省略），如条件允许应做基础冒烟测试。
 - **no-self-commit-without-request**：除非用户明确要求，否则禁止擅自提交/推送代码。
 - **use-chinese-when-communicating**：与用户交流时使用中文。
+- **manager-only-repository-access**：约束/适用范围：repository 只允许在 manager 层访问，其他层（presenter/store/ui/hooks/resources）禁止直接依赖；示例：manager 内调用 repository 读写；反例：hook 直接 import repository；执行方式：代码 review + `rg "core/repositories"` 排查；维护责任人：core。
+- **presenter-exposes-managers-only**：约束/适用范围：presenter 只透出 manager 属性，除特殊情况不暴露方法或非 manager 属性；示例：`presenter.messages`；反例：`presenter.emit()` 或 `presenter.events`；执行方式：代码 review；维护责任人：core。

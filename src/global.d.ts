@@ -1,4 +1,3 @@
-import type { discussionsResource, discussionMembersResource, messagesResource } from "@/core/resources";
 import type { DiscussionService } from "@/core/services/discussion.service";
 import type { DiscussionControlService } from "@/core/services/discussion-control.service";
 import type { DiscussionMemberService } from "@/core/services/discussion-member.service";
@@ -8,11 +7,7 @@ declare global {
     discussionService: DiscussionService;
     discussionControlService: DiscussionControlService;
     discussionMemberService: DiscussionMemberService;
-    discussionsResource: typeof discussionsResource;
-    discussionMembersResource: typeof discussionMembersResource;
-    messagesResource: typeof messagesResource;
   }
 }
 
 export {};
-

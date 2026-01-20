@@ -1,7 +1,6 @@
-import { MockHttpProvider } from "@/common/lib/storage";
 import { DiscussionMember } from "@/common/types/discussion-member";
 import { DiscussionMemberDataProvider } from "@/common/types/storage";
-import { STORAGE_CONFIG } from "@/core/config/storage";
+import { dataProviders } from "./data-providers";
 import { nanoid } from "nanoid";
 
 class DiscussionMemberError extends Error {
@@ -89,5 +88,5 @@ export class DiscussionMemberService {
 }
 
 export const discussionMemberService = new DiscussionMemberService(
-  new MockHttpProvider<DiscussionMember>(STORAGE_CONFIG.KEYS.DISCUSSION_MEMBERS, { delay: STORAGE_CONFIG.MOCK_DELAY_MS })
+  dataProviders.discussionMembers as DiscussionMemberDataProvider
 );

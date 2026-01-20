@@ -1,7 +1,6 @@
-import { STORAGE_CONFIG } from "@/core/config/storage";
-import { MockHttpProvider } from "@/common/lib/storage";
 import { AgentDef } from "@/common/types/agent";
 import { AgentDataProvider } from "@/common/types/storage";
+import { dataProviders } from "./data-providers";
 
 export class AgentService {
   constructor(private provider: AgentDataProvider) {}
@@ -49,8 +48,5 @@ export class AgentService {
 }
 
 export const agentService = new AgentService(
-  new MockHttpProvider<AgentDef>(
-    STORAGE_CONFIG.KEYS.AGENTS,
-    { delay: STORAGE_CONFIG.MOCK_DELAY_MS }
-  )
+  dataProviders.agents as AgentDataProvider
 );

@@ -3,7 +3,7 @@ import { useSettings } from "@/core/hooks/useSettings";
 import { useEffect, useMemo, useState } from "react";
 import { SettingsList } from "./settings-list";
 import { CategoryList } from "./category-list";
-import { autoFillStrategies } from "@/core/resources/settings.resource";
+import { AUTO_FILL_STRATEGIES } from "@/core/config/settings-schema";
 import { useTranslation } from "@/core/hooks/use-i18n";
 
 export const SettingsPanel: React.FC = () => {
@@ -39,7 +39,7 @@ export const SettingsPanel: React.FC = () => {
         {activeCategory ? (
           <SettingsList
             settings={currentSettings}
-            autoFillStrategies={autoFillStrategies}
+            autoFillStrategies={AUTO_FILL_STRATEGIES}
             onUpdate={updateSetting}
           />
         ) : (

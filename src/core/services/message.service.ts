@@ -1,8 +1,7 @@
-import { STORAGE_CONFIG } from "@/core/config/storage";
-import { MockHttpProvider } from "@/common/lib/storage";
 import { AgentMessage } from "@/common/types/discussion";
 import { MessageDataProvider } from "@/common/types/storage";
 import { discussionService } from "./discussion.service";
+import { dataProviders } from "./data-providers";
 
 export class MessageService {
   constructor(private readonly provider: MessageDataProvider) {}
@@ -58,10 +57,5 @@ export class MessageService {
 
 // 创建服务实例
 export const messageService = new MessageService(
-  new MockHttpProvider<AgentMessage>(
-    STORAGE_CONFIG.KEYS.MESSAGES,
-    {
-      delay: STORAGE_CONFIG.MOCK_DELAY_MS,
-    }
-  )
-); 
+  dataProviders.messages as MessageDataProvider
+);

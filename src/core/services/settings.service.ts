@@ -1,41 +1,15 @@
 import { SettingItem } from "@/common/types/settings";
 import { DEFAULT_SETTINGS } from "@/core/config/settings-schema";
-import { STORAGE_CONFIG } from "@/core/config/storage";
-
-const hasWindow = typeof window !== "undefined";
-const memoryStore: Record<string, unknown> = {};
-
-function readStore(key: string) {
-  if (hasWindow && window.localStorage) {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return {};
-    try {
-      return JSON.parse(raw) as Record<string, unknown>;
-    } catch {
-      return {};
-    }
-  }
-  return memoryStore[key] && typeof memoryStore[key] === "object"
-    ? (memoryStore[key] as Record<string, unknown>)
-    : {};
-}
-
-function writeStore(key: string, value: Record<string, unknown>) {
-  if (hasWindow && window.localStorage) {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } else {
-    memoryStore[key] = value;
-  }
-}
+import { SettingsStore, settingsStore } from "./data-providers";
 
 export class SettingsService {
   constructor(
-    private readonly storageKey: string,
+    private readonly store: SettingsStore,
     private readonly defaults: Omit<SettingItem, "id">[]
   ) {}
 
-  private normalizeSettings(): SettingItem[] {
-    const savedValues = readStore(this.storageKey);
+  private async normalizeSettings(): Promise<SettingItem[]> {
+    const savedValues = await this.store.readAll();
     return this.defaults.map((item) => ({
       ...item,
       id: item.key,
@@ -55,36 +29,36 @@ export class SettingsService {
     key: string,
     data: Partial<SettingItem>
   ): Promise<SettingItem> {
-    const settings = this.normalizeSettings();
+    const settings = await this.normalizeSettings();
     const target = settings.find((s) => s.key === key || s.id === key);
     if (!target) {
       throw new Error(`Setting not found: ${key}`);
     }
     const next = { ...target, ...data, id: target.key };
-    const savedValues = readStore(this.storageKey);
+    const savedValues = await this.store.readAll();
     savedValues[next.key] = next.value;
-    writeStore(this.storageKey, savedValues);
+    await this.store.writeAll(savedValues);
     return next;
   }
 
   async updateMany(
     updates: Record<string, unknown>
   ): Promise<SettingItem[]> {
-    const savedValues = readStore(this.storageKey);
+    const savedValues = await this.store.readAll();
     Object.entries(updates).forEach(([key, value]) => {
       savedValues[key] = value;
     });
-    writeStore(this.storageKey, savedValues);
+    await this.store.writeAll(savedValues);
     return this.normalizeSettings();
   }
 
   async resetToDefaults(): Promise<SettingItem[]> {
-    writeStore(this.storageKey, {});
+    await this.store.clear();
     return this.normalizeSettings();
   }
 }
 
 export const settingsService = new SettingsService(
-  STORAGE_CONFIG.KEYS.SETTINGS,
+  settingsStore,
   DEFAULT_SETTINGS
 );

@@ -1,18 +1,27 @@
 import { agentService } from "@/core/services/agent.service";
-import { agentListResource } from "@/core/resources";
 import type { AgentDef } from "@/common/types/agent";
+import { useAgentsStore } from "@/core/stores/agents.store";
 
 // Repository-like manager with no local store. Reads from resource, writes via service then reloads resource.
 export class AgentsManager {
   // lifecycle
   load = async () => {
-    await agentListResource.reload();
+    const store = useAgentsStore.getState();
+    store.setLoading(true);
+    try {
+      const list = await agentService.listAgents();
+      store.setData(list);
+      return list;
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : "加载失败");
+      return [];
+    }
   };
 
   // CRUD
   add = async (agent: Omit<AgentDef, "id">) => {
     const created = await agentService.createAgent(agent);
-    await agentListResource.reload();
+    await this.load();
     return created;
   };
 
@@ -33,21 +42,20 @@ export class AgentsManager {
 
   update = async (id: string, data: Partial<AgentDef>) => {
     const updated = await agentService.updateAgent(id, data);
-    await agentListResource.reload();
+    await this.load();
     return updated;
   };
 
   remove = async (id: string) => {
     await agentService.deleteAgent(id);
-    await agentListResource.reload();
+    await this.load();
   };
 
   // helpers
+  getAll = () => useAgentsStore.getState().data;
   getAgentName = (id: string) => {
     if (id === "user") return "我";
-    const state = agentListResource.getState();
-    const data = state.data || [];
-    return (data as AgentDef[]).find((a) => a.id === id)?.name ?? "未知";
+    return this.getAll().find((a) => a.id === id)?.name ?? "未知";
   };
 
   getAgentAvatar = (id: string) => {
@@ -59,8 +67,6 @@ export class AgentsManager {
         return "";
       }
     }
-    const state = agentListResource.getState();
-    const data = state.data || [];
-    return (data as AgentDef[]).find((a) => a.id === id)?.avatar || "";
+    return this.getAll().find((a) => a.id === id)?.avatar || "";
   };
 }

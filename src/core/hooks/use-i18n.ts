@@ -6,7 +6,7 @@ const LANGUAGE_STORAGE_KEY = "app:language";
 const APP_LANGUAGE_SETTING_KEY = "app.language";
 
 // Keep i18n's current language and the settings entry `app.language` in sync.
-// Otherwise settings.resource can override the language back to the old value on reload.
+// Otherwise settings load can override the language back to the old value.
 async function syncAppLanguageSetting(lng: string) {
   try {
     const settings = await settingsService.listSettings();

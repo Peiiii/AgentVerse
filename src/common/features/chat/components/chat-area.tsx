@@ -12,7 +12,6 @@ import { MessageInput, MessageInputRef } from "./message-input";
 import { usePresenter } from "@/core/presenter";
 import { useAgents } from "@/core/hooks/useAgents";
 import { useMessages } from "@/core/hooks/useMessages";
-import { discussionMembersResource } from "@/core/resources";
 import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface ChatAreaProps {
@@ -43,8 +42,8 @@ export function ChatArea({
   // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
 
-  const syncDiscussionMembers = () => {
-    const latest = discussionMembersResource.current.getState().data ?? [];
+  const syncDiscussionMembers = async () => {
+    const latest = await presenter.discussionMembers.load();
     presenter.discussionControl.setMembers(latest);
   };
 
@@ -79,7 +78,7 @@ export function ChatArea({
       });
       if (agentMessage) {
         console.log("[chat-area] handleSendMessage after add message", members);
-        syncDiscussionMembers();
+        await syncDiscussionMembers();
         // no need to mirror messages into service; run loop consumes from store/services
         // 直接走简化控制器：先启动/恢复，再处理本条消息（无事件总线）
         await presenter.discussionControl.startIfEligible();
@@ -112,7 +111,7 @@ export function ChatArea({
       if (customMembers && customMembers.length > 0) {
         console.log(`使用自定义成员: ${customMembers.length} 个成员`);
         await presenter.discussionMembers.addMany(customMembers);
-        syncDiscussionMembers();
+        await syncDiscussionMembers();
         await handleSendMessage(topic, "user");
         return;
       }
@@ -160,7 +159,7 @@ export function ChatArea({
       if (membersToAdd.length > 0) {
         console.log(`批量添加 ${membersToAdd.length} 个成员...`);
         await presenter.discussionMembers.addMany(membersToAdd);
-        syncDiscussionMembers();
+        await syncDiscussionMembers();
         await handleSendMessage(topic, "user");
       } else {
         console.error("没有成功添加任何成员，无法启动讨论");

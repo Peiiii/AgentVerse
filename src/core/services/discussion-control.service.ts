@@ -1,13 +1,12 @@
 import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { RxEvent } from "@/common/lib/rx-event";
 import { getPresenter } from "@/core/presenter/presenter";
-import { discussionCapabilitiesResource } from "@/core/resources/discussion-capabilities.resource";
+import { discussionCapabilities } from "@/core/services/discussion-capabilities";
 import { AgentMessage, DiscussionSettings, NormalMessage, ActionResultMessage } from "@/common/types/discussion";
 import { DiscussionError, DiscussionErrorType, handleDiscussionError } from "./discussion-error.util";
 import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
-import { agentListResource } from "@/core/resources";
 import { AgentDef } from "@/common/types/agent";
 import { aiService } from "@/core/services/ai.service";
 import { messageService } from "@/core/services/message.service";
@@ -64,12 +63,16 @@ export class DiscussionControlService {
     create: (msg) => getPresenter().messages.create(msg) as Promise<ActionResultMessage>,
   });
   private runLock: Promise<void> = Promise.resolve();
+  private getAgentDefs = async (): Promise<AgentDef[]> => {
+    const presenter = getPresenter();
+    const current = presenter.agents.getAll();
+    if (current.length > 0) return current;
+    return presenter.agents.load();
+  };
 
   constructor() {
     // register capabilities once
-    discussionCapabilitiesResource.whenReady().then((data) => {
-      CapabilityRegistry.getInstance().registerAll(data);
-    });
+    CapabilityRegistry.getInstance().registerAll(discussionCapabilities);
   }
 
   // helpers
@@ -118,7 +121,7 @@ export class DiscussionControlService {
 
   setMembers(members: Member[]) { this.patchCtrl({ members }); }
 
-  // setMessages removed: messages are managed by messageService/resources
+  // setMessages removed: messages are managed by messageService/managers
 
   setSettings(settings: Partial<DiscussionSettings>) {
     const merged = { ...this.getSettings(), ...settings } as DiscussionSettings;
@@ -182,12 +185,12 @@ export class DiscussionControlService {
 
   private async selectNextAgentId(trigger: AgentMessage, lastResponder: string | null): Promise<string | null> {
     const members = this.getCtrlState().members;
-    const defs = agentListResource.read().data;
+    const defs = await this.getAgentDefs();
     return this.selector.select(trigger, lastResponder, members, defs);
   }
 
   private async tryRunActions(agentMessage: NormalMessage): Promise<ActionResultMessage | null> {
-    const defs = agentListResource.read().data;
+    const defs = await this.getAgentDefs();
     const author = defs.find((a) => a.id === agentMessage.agentId);
     const canUse = this.agentCanUseActions(author);
     return this.actions.runIfAny(author, canUse, agentMessage);
@@ -209,7 +212,7 @@ export class DiscussionControlService {
   private async generateStreamingResponse(agentId: string, trigger: AgentMessage): Promise<AgentMessage | null> {
     const id = this.getCtrlState().discussionId;
     if (!id) return null;
-    const defs = agentListResource.read().data;
+    const defs = await this.getAgentDefs();
     const current = defs.find(a => a.id === agentId);
     if (!current) return null;
     const memberDefs: AgentDef[] = this.getCtrlState().members.map(m => defs.find(a => a.id === m.agentId)!).filter(Boolean);

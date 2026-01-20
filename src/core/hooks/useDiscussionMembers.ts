@@ -1,11 +1,10 @@
-import { useResourceState } from "@/common/lib/resource";
-import { discussionMembersResource } from "@/core/resources";
+import { useDiscussionMembersStore } from "@/core/stores/discussion-members.store";
 
 export function useDiscussionMembers() {
-  const state = useResourceState(discussionMembersResource.current);
+  const state = useDiscussionMembersStore();
   return {
     members: state.data,
     isLoading: state.isLoading,
-    error: state.error?.message,
+    error: state.error || undefined,
   };
 }

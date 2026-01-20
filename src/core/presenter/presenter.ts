@@ -1,9 +1,17 @@
-import { ActivityBarManager, IconManager, RouteTreeManager, NavigationManager, DiscussionsManager, AgentsManager, MessagesManager, DiscussionMembersManager, SettingsManager } from "@/core/managers";
-import { discussionControlService } from "@/core/services/discussion-control.service";
-import { RxEvent } from "@/common/lib/rx-event";
+import {
+  ActivityBarManager,
+  IconManager,
+  RouteTreeManager,
+  NavigationManager,
+  DiscussionsManager,
+  AgentsManager,
+  MessagesManager,
+  DiscussionMembersManager,
+  DiscussionControlManager,
+  SettingsManager,
+} from "@/core/managers";
 
-// Global Presenter aggregates all managers and cross-cutting capabilities
-// All fields and functions are arrow functions or readonly properties to avoid 'this' issues.
+// Presenter only exposes managers.
 export class Presenter {
   // managers
   readonly activityBar = new ActivityBarManager();
@@ -14,19 +22,8 @@ export class Presenter {
   readonly agents = new AgentsManager();
   readonly messages = new MessagesManager();
   readonly discussionMembers = new DiscussionMembersManager();
-  readonly discussionControl = discussionControlService;
+  readonly discussionControl = new DiscussionControlManager();
   readonly settings = new SettingsManager();
-
-  // simple app-wide event bus for cross-module communication when needed
-  readonly events = {
-    // Generic channel for string-keyed payloads
-    app: new RxEvent<unknown>()
-  } as const;
-
-  // helper to emit on app channel
-  emit = (value: unknown) => {
-    this.events.app.next(value);
-  };
 }
 
 let singleton: Presenter | null = null;
