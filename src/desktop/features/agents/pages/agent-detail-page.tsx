@@ -1,7 +1,6 @@
 import { AgentEmbeddedForm } from "@/common/features/agents/components/forms";
 import { AgentConfigurationAssistant } from "@/common/features/agents/components/configuration";
 import { AgentPreviewChat } from "@/common/features/agents/components/preview";
-// Avatar primitives are not used directly here
 import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
@@ -18,10 +17,13 @@ import { useCallback, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { combineLatest, distinctUntilChanged, filter, map, take, tap } from "rxjs";
 import { useAgentChatPageHelper } from "@/core/hooks/use-agent-chat-page-helper";
+import { AgentProfileView } from "../components/agent-profile-view";
+
+type ViewMode = "profile" | "edit";
 
 export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const presenter = usePresenter();
   const { agents } = useAgents();
@@ -29,8 +31,30 @@ export function AgentDetailPage() {
   const { enterAgentChat } = useAgentChatPageHelper();
 
   const [agent, setAgent] = useState<AgentDef | null>(null);
-  const initialTab = (searchParams.get("tab") as "configure" | "ai-create" | null) || "ai-create";
-  const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">(initialTab);
+
+  // Determine the view mode from URL params, default to "profile"
+  const mode = (searchParams.get("mode") as ViewMode) || "profile";
+  const editTab = (searchParams.get("tab") as "configure" | "ai-create" | null) || "ai-create";
+  const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">(editTab);
+
+  // 切换到编辑模式
+  const handleEnterEditMode = useCallback((tab?: "configure" | "ai-create") => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("mode", "edit");
+    if (tab) {
+      newParams.set("tab", tab);
+      setSidebarTab(tab);
+    }
+    setSearchParams(newParams);
+  }, [searchParams, setSearchParams]);
+
+  // 返回 profile 模式
+  const handleBackToProfile = useCallback(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("mode");
+    newParams.delete("tab");
+    setSearchParams(newParams);
+  }, [searchParams, setSearchParams]);
 
   // 所有回调函数必须在条件返回之前定义
   const handleAgentUpdate = useCallback((updatedAgentData: Omit<AgentDef, "id">) => {
@@ -54,7 +78,7 @@ export function AgentDetailPage() {
       setAgent(agent);
     }),
     take(1)
-  ), () => {})
+  ), () => { })
 
   // 一键和TA对话逻辑
   const handleChatWithAgent = useCallback(async () => {
@@ -110,6 +134,29 @@ export function AgentDetailPage() {
 
   const roleConfig = getRoleConfig(agent.role);
 
+  // Profile View (默认)
+  if (mode === "profile") {
+    return (
+      <div className="h-full w-full flex overflow-hidden">
+        {/* 左侧 Agent Profile */}
+        <AgentProfileView
+          agent={agent}
+          onBack={() => navigate("/agents")}
+          onEdit={() => handleEnterEditMode()}
+          onChat={handleChatWithAgent}
+          className="w-1/2 border-r"
+        />
+
+        {/* 右侧智能体预览聊天区 */}
+        <AgentPreviewChat
+          className="w-1/2"
+          agentDef={agent}
+        />
+      </div>
+    );
+  }
+
+  // Edit View
   return (
     <div className="h-full w-full flex overflow-hidden">
       {/* 左侧设置区 - 统一使用50%宽度 */}
@@ -120,7 +167,7 @@ export function AgentDetailPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/agents")}
+              onClick={handleBackToProfile}
               className="flex-shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -212,7 +259,7 @@ export function AgentDetailPage() {
             <TabsContent value="ai-create" className="h-full m-0">
               <AgentConfigurationAssistant
                 onAgentCreate={handleAgentUpdate}
-                className="h-full" 
+                className="h-full"
                 editingAgent={agent}
               />
             </TabsContent>
