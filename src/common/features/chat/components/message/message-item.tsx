@@ -4,35 +4,89 @@ import { useCopy } from "@/core/hooks/use-copy";
 import { useToast } from "@/core/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
 import { MessageWithResults } from "@/common/types/discussion";
+import { AgentDef } from "@/common/types/agent";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { MessageMarkdownContent } from "../agent-action-display";
+import { AgentHoverCard } from "@/common/features/agents/components/cards/agent-hover-card";
 
 interface MessageItemProps {
   message: MessageWithResults;
   agentInfo: {
     getName: (agentId: string) => string;
     getAvatar: (agentId: string) => string;
+    getAgent?: (agentId: string) => AgentDef | undefined;
   };
+  onViewAgentDetail?: (agentId: string) => void;
+  onChatWithAgent?: (agent: AgentDef) => void;
+}
+
+// 头像组件 - 支持 HoverCard
+function AvatarWithHoverCard({
+  agentId,
+  agentInfo,
+  className,
+  onViewDetail,
+  onChat,
+}: {
+  agentId: string;
+  agentInfo: MessageItemProps["agentInfo"];
+  className?: string;
+  onViewDetail?: (agentId: string) => void;
+  onChat?: (agent: AgentDef) => void;
+}) {
+  const { getName, getAvatar, getAgent } = agentInfo;
+  const agent = getAgent?.(agentId);
+
+  const avatarElement = (
+    <SmartAvatar
+      src={getAvatar(agentId)}
+      alt={getName(agentId)}
+      className={cn("cursor-pointer", className)}
+      fallback={<span>{getName(agentId)[0]}</span>}
+    />
+  );
+
+  // 如果是用户消息或没有 agent 信息，不展示 hover card
+  if (agentId === "user" || !agent) {
+    return avatarElement;
+  }
+
+  return (
+    <AgentHoverCard
+      agent={agent}
+      onViewDetail={onViewDetail}
+      onChat={onChat}
+      side="right"
+      align="start"
+    >
+      {avatarElement}
+    </AgentHoverCard>
+  );
 }
 
 // 移动端头像和用户信息组件
 function MessageHeader({
   message,
   agentInfo,
+  onViewDetail,
+  onChat,
 }: {
   message: MessageWithResults;
   agentInfo: MessageItemProps["agentInfo"];
+  onViewDetail?: (agentId: string) => void;
+  onChat?: (agent: AgentDef) => void;
 }) {
-  const { getName, getAvatar } = agentInfo;
+  const { getName } = agentInfo;
 
   return (
     <div className="sm:hidden flex items-center gap-2 mb-2">
-      <SmartAvatar
-        src={getAvatar(message.agentId)}
-        alt={getName(message.agentId)}
+      <AvatarWithHoverCard
+        agentId={message.agentId}
+        agentInfo={agentInfo}
         className="w-5 h-5 shrink-0"
-        fallback={<span>{getName(message.agentId)[0]}</span>}
+        onViewDetail={onViewDetail}
+        onChat={onChat}
       />
       <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
         {getName(message.agentId)}
@@ -48,20 +102,25 @@ function MessageHeader({
 function DesktopMessageHeader({
   message,
   agentInfo,
+  onViewDetail,
+  onChat,
 }: {
   message: MessageWithResults;
   agentInfo: MessageItemProps["agentInfo"];
+  onViewDetail?: (agentId: string) => void;
+  onChat?: (agent: AgentDef) => void;
 }) {
-  const { getName, getAvatar } = agentInfo;
+  const { getName } = agentInfo;
 
   return (
     <div className="hidden sm:flex items-start gap-3">
-        <SmartAvatar
-          src={getAvatar(message.agentId)}
-          alt={getName(message.agentId)}
-          className="w-8 h-8 shrink-0 ring-2 ring-transparent group-hover:ring-purple-500/30 transition-all duration-200"
-          fallback={<span>{getName(message.agentId)[0]}</span>}
-        />
+      <AvatarWithHoverCard
+        agentId={message.agentId}
+        agentInfo={agentInfo}
+        className="w-8 h-8 shrink-0 ring-2 ring-transparent group-hover:ring-purple-500/30 transition-all duration-200"
+        onViewDetail={onViewDetail}
+        onChat={onChat}
+      />
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center gap-2">
           <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
@@ -76,7 +135,12 @@ function DesktopMessageHeader({
   );
 }
 
-export function MessageItem({ message, agentInfo }: MessageItemProps) {
+export function MessageItem({
+  message,
+  agentInfo,
+  onViewAgentDetail,
+  onChatWithAgent,
+}: MessageItemProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const { copy: handleCopy } = useCopy({
@@ -99,8 +163,18 @@ export function MessageItem({ message, agentInfo }: MessageItemProps) {
   return (
     <div className="group animate-fadeIn hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all duration-200">
       <div className="px-3 sm:px-4 py-2 max-w-full sm:max-w-3xl mx-auto">
-        <MessageHeader message={message} agentInfo={agentInfo} />
-        <DesktopMessageHeader message={message} agentInfo={agentInfo} />
+        <MessageHeader
+          message={message}
+          agentInfo={agentInfo}
+          onViewDetail={onViewAgentDetail}
+          onChat={onChatWithAgent}
+        />
+        <DesktopMessageHeader
+          message={message}
+          agentInfo={agentInfo}
+          onViewDetail={onViewAgentDetail}
+          onChat={onChatWithAgent}
+        />
 
         {/* 消息内容部分 */}
         <div className="relative">
