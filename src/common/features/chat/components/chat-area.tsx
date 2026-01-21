@@ -13,6 +13,9 @@ import { usePresenter } from "@/core/presenter";
 import { useAgents } from "@/core/hooks/useAgents";
 import { useMessages } from "@/core/hooks/useMessages";
 import { useTranslation } from "@/core/hooks/use-i18n";
+import { useInteractionStore } from "@/common/features/chat/stores/interaction.store";
+import { InteractionOverlay } from "./message/interaction-overlay";
+import { usePoopTriggerFromMessages } from "@/common/features/chat/hooks/use-poop-trigger";
 
 interface ChatAreaProps {
   className?: string;
@@ -39,8 +42,14 @@ export function ChatArea({
   const { currentDiscussion } = useDiscussions();
   const { members } = useDiscussionMembers();
   const { agents } = useAgents();
+  const triggerInteraction = useInteractionStore((s) => s.triggerInteraction);
   // 避免在"开始讨论"后短暂出现空会话引导造成的闪烁
   const [isStartingDiscussion, setIsStartingDiscussion] = useState(false);
+  usePoopTriggerFromMessages({
+    messages,
+    agents,
+    triggerInteraction,
+  });
 
   const syncDiscussionMembers = async () => {
     const latest = await presenter.discussionMembers.load();
@@ -61,8 +70,7 @@ export function ChatArea({
 
   const handleSendMessage = async (content: string, agentId: string) => {
     console.log(
-      `发送消息: ${content.slice(0, 30)}${
-        content.length > 30 ? "..." : ""
+      `发送消息: ${content.slice(0, 30)}${content.length > 30 ? "..." : ""
       } (来自: ${agentId})`
     );
 
@@ -87,7 +95,7 @@ export function ChatArea({
       console.log("消息发送成功");
     } catch (error) {
       console.error("发送消息失败:", error);
-      } finally {
+    } finally {
       // 确保消息列表滚动到底部（用户发送后立即定位，使用 instant）
       messageListRef.current?.scrollToBottom(true);
     }
@@ -250,6 +258,7 @@ export function ChatArea({
           data-testid="chat-message-input"
         />
       </div>
+      <InteractionOverlay />
     </div>
   );
 }

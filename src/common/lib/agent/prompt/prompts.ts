@@ -17,6 +17,9 @@ export const MentionRules = {
   <rule>@ 使用：仅在需要对方立即回应时使用</rule>
   <rule>格式规范：使用@名字</rule>
   <rule>期望回复：当你的发言需要某人回复时，必须使用 @</rule>
+  <rule>互动特效：输出完整格式 @💩->名字 会触发“扔粑粑”动画</rule>
+  <rule>避免循环：不要对自己使用 @💩-></rule>
+  <rule>节制使用：只在需要节目效果或明确互动时使用 @💩-></rule>
 </basic-mention-rules>
 
 <auto-reply-notice>
@@ -258,6 +261,9 @@ export const createRolePrompt = (agent: AgentDef, memberAgents: AgentDef[]) => {
     <rule>@ 使用：仅在需要对方立即回应时使用</rule>
     <rule>格式规范：使用@名字，并在名字后添加一个空格再继续输入（示例：@故事架构师 请分享想法）</rule>
     <rule>期望回复：当你的发言需要某人回复时，必须使用 @</rule>
+    <rule>互动特效：输出完整格式 @💩->名字 会触发“扔粑粑”动画</rule>
+    <rule>避免循环：不要对自己使用 @💩-></rule>
+    <rule>节制使用：只在需要节目效果或明确互动时使用 @💩-></rule>
     <auto-reply-notice>
       <rule>重要：某些成员不会自动发言，如需他们参与讨论，必须使用 @ 提及他们</rule>
       <rule>没有被 @ 的成员可能会保持沉默，直到被明确邀请发言</rule>
@@ -360,6 +366,9 @@ export const getCoreModeratorSettingPrompt = (
     <rule>@ 使用：仅在需要对方立即回应时使用</rule>
     <rule>格式规范：使用@名字，并在名字后添加一个空格再继续输入（示例：@故事架构师 请分享想法）</rule>
     <rule>期望回复：当你的发言需要某人回复时，必须使用 @</rule>
+    <rule>互动特效：输出完整格式 @💩->名字 会触发“扔粑粑”动画</rule>
+    <rule>避免循环：不要对自己使用 @💩-></rule>
+    <rule>节制使用：只在需要节目效果或明确互动时使用 @💩-></rule>
     <auto-reply-notice>
       <rule>重要：某些成员不会自动发言，如需他们参与讨论，必须使用 @ 提及他们</rule>
       <rule>没有被 @ 的成员可能会保持沉默，直到被明确邀请发言</rule>

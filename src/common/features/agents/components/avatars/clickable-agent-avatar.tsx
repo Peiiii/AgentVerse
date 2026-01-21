@@ -6,6 +6,8 @@ import { AgentDef } from "@/common/types/agent";
 import { cn } from "@/common/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
+import { useAvatarInteraction } from "./use-avatar-interaction";
 
 export interface ClickableAgentAvatarProps {
   agent: AgentDef | undefined;
@@ -47,6 +49,14 @@ export function ClickableAgentAvatar({
   const [open, setOpen] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isHoveringRef = useRef(false);
+  const userInteraction = useAvatarInteraction<HTMLSpanElement>({
+    agentId: "user",
+    isUser: true,
+  });
+  const agentInteraction = useAvatarInteraction<HTMLButtonElement>({
+    agentId: agent?.id,
+    enableDoubleClick: true,
+  });
 
   // 点击头像跳转到详情页
   const handleViewDetail = useCallback((agentId: string) => {
@@ -82,27 +92,32 @@ export function ClickableAgentAvatar({
   if (isUser || !agent) {
     // For user, always show text avatar (no image)
     return (
-      <SmartAvatar
-        src={avatar || undefined}
-        alt={name}
-        className={cn(
-          sizeClass,
-          "shrink-0 bg-gradient-to-br from-primary/80 to-primary",
-          className
-        )}
-        fallback={<span className="text-white text-xs font-medium">{name[0] || "我"}</span>}
-      />
+      <span ref={userInteraction.avatarRef} className="inline-flex">
+        <SmartAvatar
+          src={avatar || undefined}
+          alt={name}
+          className={cn(
+            sizeClass,
+            "shrink-0 bg-gradient-to-br from-primary/80 to-primary",
+            className
+          )}
+          fallback={<span className="text-white text-xs font-medium">{name[0] || "我"}</span>}
+        />
+      </span>
     );
   }
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button
+        <motion.button
+          ref={agentInteraction.avatarRef}
+          animate={agentInteraction.controls}
           className="cursor-pointer hover:opacity-80 transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 active:scale-95 relative"
           aria-label={`查看 ${name} 的详细信息`}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onDoubleClick={agentInteraction.handleDoubleClick}
         >
           {/* 响应时的圆形轨迹动画 - 优雅的光点沿着边框移动 */}
           {isResponding && (
@@ -135,7 +150,7 @@ export function ClickableAgentAvatar({
             )}
             fallback={<span className="text-white text-xs">{name[0]}</span>}
           />
-        </button>
+        </motion.button>
       </PopoverTrigger>
       <PopoverContent
         className="w-80 p-0 border shadow-xl bg-popover/95 backdrop-blur-sm"
