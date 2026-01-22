@@ -84,9 +84,69 @@ export class DiscussionMembersManager {
     if (!this.subscribed) {
       this.init(this.getControl());
     }
-    const m = useDiscussionMembersStore.getState().data.find((x) => x.id === memberId);
+    const store = useDiscussionMembersStore.getState();
+    const m = store.data.find((x) => x.id === memberId);
     if (!m) return null;
-    return this.update(memberId, { isAutoReply: !m.isAutoReply });
+
+    const previous = store.data;
+    const next = store.data.map((member) =>
+      member.id === memberId
+        ? { ...member, isAutoReply: !member.isAutoReply }
+        : member
+    );
+    store.setData(next, store.currentDiscussionId);
+
+    try {
+      const updated = await discussionMemberRepository.update(memberId, {
+        isAutoReply: !m.isAutoReply,
+      });
+      const merged = useDiscussionMembersStore
+        .getState()
+        .data.map((member) =>
+          member.id === memberId ? { ...member, ...updated } : member
+        );
+      store.setData(merged, store.currentDiscussionId);
+      return updated;
+    } catch (error) {
+      store.setData(previous, store.currentDiscussionId);
+      store.setError(error instanceof Error ? error.message : "更新失败");
+      return null;
+    }
+  };
+
+  setAllAutoReply = async (enabled: boolean) => {
+    if (!this.subscribed) {
+      this.init(this.getControl());
+    }
+    const store = useDiscussionMembersStore.getState();
+    const members = store.data;
+    const currentDiscussionId =
+      this.getControl().getCurrentDiscussionId() ?? store.currentDiscussionId;
+    if (!currentDiscussionId || members.length === 0) return;
+
+    const previous = members;
+    const next = members.map((member) => ({ ...member, isAutoReply: enabled }));
+    store.setData(next, currentDiscussionId);
+
+    try {
+      const updated = await Promise.all(
+        members.map((member) =>
+          discussionMemberRepository.update(member.id, { isAutoReply: enabled })
+        )
+      );
+      const updatedMap = new Map(updated.map((member) => [member.id, member]));
+      const merged = useDiscussionMembersStore
+        .getState()
+        .data.map((member) =>
+          updatedMap.has(member.id)
+            ? { ...member, ...updatedMap.get(member.id)! }
+            : member
+        );
+      store.setData(merged, currentDiscussionId);
+    } catch (error) {
+      store.setData(previous, currentDiscussionId);
+      store.setError(error instanceof Error ? error.message : "更新失败");
+    }
   };
 
   getMembersForDiscussion = (discussionId: string) => {

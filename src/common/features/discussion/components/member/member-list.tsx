@@ -13,6 +13,10 @@ import { MemberSkeleton } from "./member-skeleton";
 import { QuickMemberSelector } from "./quick-member-selector";
 import { useAgentForm } from "@/core/hooks/useAgentForm";
 import { AgentForm } from "@/common/features/agents/components/forms";
+import { Switch } from "@/common/components/ui/switch";
+import { Label } from "@/common/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/common/components/ui/tooltip";
+import { MessageSquareOff, MessageSquareText } from "lucide-react";
 
 interface MemberListProps {
   className?: string;
@@ -51,26 +55,62 @@ export function MemberList({
   const renderHeader = () => (
     <header
       className={cn(
-        "flex-none flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-3.5 mb-3 border-b border-border/40",
+        "flex-none flex flex-col gap-3 sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-3.5 mb-3 border-b border-border/40",
         headerClassName
       )}
     >
-      <div className="flex items-center gap-3">
-        <h2 className="text-lg font-semibold text-foreground">成员</h2>
-        <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-md bg-muted/50">
-          {memberCount}{autoReplyCount > 0 && ` · ${autoReplyCount} 自动回复`}
-        </span>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold text-foreground">成员</h2>
+          <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-md bg-muted/50">
+            {memberCount}{autoReplyCount > 0 && ` · ${autoReplyCount} 自动回复`}
+          </span>
+        </div>
+        <Button
+          onClick={() => setShowAddDialog(true)}
+          variant="outline"
+          size="sm"
+          disabled={isLoading}
+          className="h-8 px-3 gap-1.5 hover:bg-muted/60 transition-colors"
+        >
+          <PlusCircle className="w-3.5 h-3.5" />
+          <span>添加</span>
+        </Button>
       </div>
-      <Button
-        onClick={() => setShowAddDialog(true)}
-        variant="outline"
-        size="sm"
-        disabled={isLoading}
-        className="h-8 px-3 gap-1.5 hover:bg-muted/60 transition-colors"
-      >
-        <PlusCircle className="w-3.5 h-3.5" />
-        <span>添加</span>
-      </Button>
+
+      {memberCount > 0 && (
+        <div className="flex items-center justify-between px-1">
+          <TooltipProvider>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="batch-auto-reply"
+                checked={autoReplyCount === memberCount && memberCount > 0}
+                onCheckedChange={(checked) => presenter.discussionMembers.setAllAutoReply(checked)}
+                className="scale-90"
+              />
+              <Label htmlFor="batch-auto-reply" className="text-xs text-muted-foreground cursor-pointer select-none">
+                全员自动回复
+              </Label>
+            </div>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 transition-colors hover:text-muted-foreground">
+                  {autoReplyCount === memberCount ? (
+                    <MessageSquareText className="w-3 h-3" />
+                  ) : (
+                    <MessageSquareOff className="w-3 h-3" />
+                  )}
+                  <span>控制所有 AI 的响应状态</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-[11px] max-w-[200px]">
+                一键开启或关闭讨论组内所有 AI 成员的自动回复功能。
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
     </header>
   );
 
@@ -95,7 +135,7 @@ export function MemberList({
       );
     }
 
-    const validMembers = members.filter(member => 
+    const validMembers = members.filter(member =>
       agents.some(agent => agent.id === member.agentId)
     );
 

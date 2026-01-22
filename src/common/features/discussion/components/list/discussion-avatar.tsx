@@ -41,7 +41,7 @@ export function DiscussionAvatar({
 
   if (count === 0) {
     return (
-      <div className={cn(containerSizeClass, "bg-muted/30 rounded-full flex items-center justify-center border border-black/5")}>
+      <div className={cn(containerSizeClass, "bg-[#e8e8e8] dark:bg-gray-700 rounded-full flex items-center justify-center border border-black/5")}>
         <Users className="w-1/2 h-1/2 text-muted-foreground/40" />
       </div>
     );
@@ -50,11 +50,11 @@ export function DiscussionAvatar({
   if (count === 1) {
     const member = items[0];
     return (
-      <div className={cn(containerSizeClass, "bg-muted/40 rounded-full shrink-0 overflow-hidden border border-black/5 flex items-center justify-center")}>
+      <div className={cn(containerSizeClass, "bg-[#e8e8e8] dark:bg-gray-700 rounded-full shrink-0 overflow-hidden border border-black/5 p-[1px] flex items-center justify-center")}>
         <img
           src={presenter.agents.getAgentAvatar(member.agentId)}
           alt={presenter.agents.getAgentName(member.agentId)}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-full"
         />
       </div>
     );
