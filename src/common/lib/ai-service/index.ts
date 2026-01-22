@@ -79,6 +79,78 @@ const parseToolArguments = (raw: string) => {
   }
 };
 
+type ToolDelta = {
+  index?: number;
+  id?: string;
+  function?: { name?: string; arguments?: string };
+};
+
+const createToolCallCollector = () => {
+  const calls = new Map<
+    string,
+    { id?: string; name?: string; args: string; order: number; index?: number }
+  >();
+  let order = 0;
+  let lastKey: string | null = null;
+
+  const resolveKey = (delta: ToolDelta) => {
+    if (typeof delta.index === "number") return `index:${delta.index}`;
+    if (delta.id) return `id:${delta.id}`;
+    return null;
+  };
+
+  const ensureEntry = (delta: ToolDelta) => {
+    let key = resolveKey(delta);
+    if (key && calls.has(key)) {
+      lastKey = key;
+      return calls.get(key)!;
+    }
+    if (!key && lastKey && calls.has(lastKey)) {
+      return calls.get(lastKey)!;
+    }
+    if (!key) {
+      key = `auto:${order}`;
+    }
+    const entry = {
+      id: delta.id,
+      name: delta.function?.name,
+      args: "",
+      order,
+      index: delta.index,
+    };
+    calls.set(key, entry);
+    lastKey = key;
+    order += 1;
+    return entry;
+  };
+
+  return {
+    push(delta: ToolDelta) {
+      const entry = ensureEntry(delta);
+      if (delta.id) entry.id = delta.id;
+      if (delta.function?.name) entry.name = delta.function.name;
+      if (delta.function?.arguments) {
+        entry.args += delta.function.arguments;
+      }
+    },
+    flush() {
+      const now = Date.now();
+      return Array.from(calls.values())
+        .sort((a, b) => {
+          if (a.index != null && b.index != null) {
+            return a.index - b.index;
+          }
+          return a.order - b.order;
+        })
+        .map((data, idx) => ({
+          id: data.id || `toolcall-${data.index ?? idx}-${now}`,
+          name: data.name || "unknown_tool",
+          arguments: parseToolArguments(data.args),
+        }));
+    },
+  };
+};
+
 // 核心类型
 export type ChatRole = "system" | "user" | "assistant" | "tool";
 
@@ -254,7 +326,7 @@ export class DirectAPIAdapter implements APIAdapter {
   makeStreamRequest(params: AIRequestParams): Observable<StreamEvent> {
     return new Observable<StreamEvent>((subscriber) => {
       const { messages, temperature, maxTokens, model, tools } = params;
-      const toolCalls = new Map<number, { id?: string; name?: string; args: string }>();
+      const toolCalls = createToolCallCollector();
 
       const processStream = async () => {
         try {
@@ -275,21 +347,10 @@ export class DirectAPIAdapter implements APIAdapter {
             }
             const toolDeltas = delta?.tool_calls ?? [];
             for (const toolDelta of toolDeltas) {
-              const index = toolDelta.index ?? 0;
-              const current = toolCalls.get(index) ?? { args: "" };
-              if (toolDelta.id) current.id = toolDelta.id;
-              if (toolDelta.function?.name) current.name = toolDelta.function.name;
-              if (toolDelta.function?.arguments) {
-                current.args += toolDelta.function.arguments;
-              }
-              toolCalls.set(index, current);
+              toolCalls.push(toolDelta);
             }
           }
-          const calls = Array.from(toolCalls.entries()).map(([index, data]) => ({
-            id: data.id || `toolcall-${index}-${Date.now()}`,
-            name: data.name || "unknown_tool",
-            arguments: parseToolArguments(data.args),
-          }));
+          const calls = toolCalls.flush();
           if (calls.length > 0) {
             subscriber.next({ type: "tool_calls", calls });
           }
@@ -356,18 +417,14 @@ export class ProxyAPIAdapter implements APIAdapter {
         }
       });
 
-      const toolCalls = new Map<number, { id?: string; name?: string; args: string }>();
+      const toolCalls = createToolCallCollector();
       const eventSource = new EventSource(
         `${this.baseURL}/api/ai/chat/stream?${searchParams.toString()}`
       );
 
       eventSource.onmessage = (event) => {
         if (event.data === "[DONE]") {
-          const calls = Array.from(toolCalls.entries()).map(([index, data]) => ({
-            id: data.id || `toolcall-${index}-${Date.now()}`,
-            name: data.name || "unknown_tool",
-            arguments: parseToolArguments(data.args),
-          }));
+          const calls = toolCalls.flush();
           if (calls.length > 0) {
             subscriber.next({ type: "tool_calls", calls });
           }
@@ -386,14 +443,7 @@ export class ProxyAPIAdapter implements APIAdapter {
           }
           const toolDeltas = delta?.tool_calls ?? [];
           for (const toolDelta of toolDeltas) {
-            const index = toolDelta.index ?? 0;
-            const current = toolCalls.get(index) ?? { args: "" };
-            if (toolDelta.id) current.id = toolDelta.id;
-            if (toolDelta.function?.name) current.name = toolDelta.function.name;
-            if (toolDelta.function?.arguments) {
-              current.args += toolDelta.function.arguments;
-            }
-            toolCalls.set(index, current);
+            toolCalls.push(toolDelta);
           }
         } catch (error) {
           console.error("Error parsing SSE message:", error);

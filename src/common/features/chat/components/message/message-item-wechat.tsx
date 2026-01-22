@@ -120,6 +120,7 @@ export function MessageItemWechat({
                   <MessageMarkdownContent content={message.content} />
                   <ToolResultList
                     className="mt-2"
+                    toolCalls={message.toolCalls}
                     toolResults={message.toolResults}
                   />
                 </>

@@ -195,7 +195,10 @@ export function MessageItem({
           >
             <div className={cn("space-y-2", isUserMessage && "pr-6")}>
               <MessageMarkdownContent content={message.content} />
-              <ToolResultList toolResults={message.toolResults} />
+              <ToolResultList
+                toolCalls={message.toolCalls}
+                toolResults={message.toolResults}
+              />
               {/* 复制按钮 */}
               {isUserMessage ? (
                 <button
