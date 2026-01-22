@@ -15,12 +15,91 @@ export class AIServiceError extends Error {
   }
 }
 
+const toOpenAiTools = (tools?: ToolDefinition[]) =>
+  tools?.map((tool) => ({
+    type: "function" as const,
+    function: {
+      name: tool.name,
+      description: tool.description,
+      parameters: tool.parameters,
+    },
+  }));
+
+const toOpenAiMessages = (
+  messages: ChatMessage[]
+): ChatCompletionMessageParam[] =>
+  messages.map((message) => {
+    switch (message.role) {
+      case "tool": {
+        if (!message.toolCallId) {
+          throw new AIServiceError("Missing toolCallId for tool message");
+        }
+        return {
+          role: "tool",
+          content: message.content,
+          tool_call_id: message.toolCallId,
+        };
+      }
+      case "assistant": {
+        const toolCalls =
+          message.toolCalls && message.toolCalls.length > 0
+            ? message.toolCalls.map((call) => ({
+                id: call.id,
+                type: "function" as const,
+                function: {
+                  name: call.name,
+                  arguments: JSON.stringify(call.arguments ?? {}),
+                },
+              }))
+            : undefined;
+        return {
+          role: "assistant",
+          content: message.content,
+          ...(message.name ? { name: message.name } : {}),
+          ...(toolCalls ? { tool_calls: toolCalls } : {}),
+        };
+      }
+      case "system":
+      case "user":
+      default:
+        return {
+          role: message.role,
+          content: message.content,
+          ...(message.name ? { name: message.name } : {}),
+        };
+    }
+  });
+
+const parseToolArguments = (raw: string) => {
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return { _raw: raw };
+  }
+};
+
 // 核心类型
-export type ChatRole = "system" | "user" | "assistant";
+export type ChatRole = "system" | "user" | "assistant" | "tool";
+
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  parameters: Record<string, unknown>;
+}
+
+export interface ToolCall {
+  id: string;
+  name: string;
+  arguments: Record<string, unknown>;
+}
 
 export interface ChatMessage {
   role: ChatRole;
   content: string;
+  name?: string;
+  toolCallId?: string;
+  toolCalls?: ToolCall[];
 }
 
 // 核心接口
@@ -38,7 +117,7 @@ export interface BaseConfig {
 export interface APIAdapter {
   configure(config: BaseConfig): void;
   makeRequest(params: AIRequestParams): Promise<string>;
-  makeStreamRequest(params: AIRequestParams): Observable<string>;
+  makeStreamRequest(params: AIRequestParams): Observable<StreamEvent>;
 }
 
 export interface AIRequestParams {
@@ -46,6 +125,7 @@ export interface AIRequestParams {
   model: string; // 改为必需
   temperature?: number;
   maxTokens?: number;
+  tools?: ToolDefinition[];
   [key: string]: unknown;
 }
 
@@ -60,8 +140,9 @@ export interface LLMProvider {
   generateStreamCompletion(
     messages: ChatMessage[],
     temperature?: number,
-    maxTokens?: number
-  ): Observable<string>;
+    maxTokens?: number,
+    tools?: ToolDefinition[]
+  ): Observable<StreamEvent>;
 }
 
 // Provider 参数接口
@@ -114,9 +195,15 @@ export abstract class BaseLLMProvider implements LLMProvider {
   public abstract generateStreamCompletion(
     messages: ChatMessage[],
     temperature?: number,
-    maxTokens?: number
-  ): Observable<string>;
+    maxTokens?: number,
+    tools?: ToolDefinition[]
+  ): Observable<StreamEvent>;
 }
+
+export type StreamEvent =
+  | { type: "delta"; content: string }
+  | { type: "tool_calls"; calls: ToolCall[] }
+  | { type: "done" };
 
 // 通用适配器实现
 export class DirectAPIAdapter implements APIAdapter {
@@ -140,13 +227,14 @@ export class DirectAPIAdapter implements APIAdapter {
 
   async makeRequest(params: AIRequestParams): Promise<string> {
     try {
-      const { messages, temperature, maxTokens, model } = params;
+      const { messages, temperature, maxTokens, model, tools } = params;
       const completion = await this.client.chat.completions.create({
-        messages: messages as ChatCompletionMessageParam[],
+        messages: toOpenAiMessages(messages),
         temperature,
         max_tokens: maxTokens,
         model,
         stream: false,
+        tools: toOpenAiTools(tools),
       } as ChatCompletionCreateParams);
 
       if (!("choices" in completion)) {
@@ -163,26 +251,49 @@ export class DirectAPIAdapter implements APIAdapter {
     }
   }
 
-  makeStreamRequest(params: AIRequestParams): Observable<string> {
-    return new Observable<string>((subscriber) => {
-      const { messages, temperature, maxTokens, model } = params;
+  makeStreamRequest(params: AIRequestParams): Observable<StreamEvent> {
+    return new Observable<StreamEvent>((subscriber) => {
+      const { messages, temperature, maxTokens, model, tools } = params;
+      const toolCalls = new Map<number, { id?: string; name?: string; args: string }>();
 
       const processStream = async () => {
         try {
           const stream = await this.client.chat.completions.create({
-            messages: messages as ChatCompletionMessageParam[],
+            messages: toOpenAiMessages(messages),
             temperature,
             max_tokens: maxTokens,
             model,
             stream: true,
+            tools: toOpenAiTools(tools),
           } as ChatCompletionCreateParams);
 
           for await (const chunk of stream as AsyncIterable<ChatCompletionChunk>) {
-            const content = chunk.choices[0]?.delta?.content;
+            const delta = chunk.choices[0]?.delta;
+            const content = delta?.content;
             if (content) {
-              subscriber.next(content);
+              subscriber.next({ type: "delta", content });
+            }
+            const toolDeltas = delta?.tool_calls ?? [];
+            for (const toolDelta of toolDeltas) {
+              const index = toolDelta.index ?? 0;
+              const current = toolCalls.get(index) ?? { args: "" };
+              if (toolDelta.id) current.id = toolDelta.id;
+              if (toolDelta.function?.name) current.name = toolDelta.function.name;
+              if (toolDelta.function?.arguments) {
+                current.args += toolDelta.function.arguments;
+              }
+              toolCalls.set(index, current);
             }
           }
+          const calls = Array.from(toolCalls.entries()).map(([index, data]) => ({
+            id: data.id || `toolcall-${index}-${Date.now()}`,
+            name: data.name || "unknown_tool",
+            arguments: parseToolArguments(data.args),
+          }));
+          if (calls.length > 0) {
+            subscriber.next({ type: "tool_calls", calls });
+          }
+          subscriber.next({ type: "done" });
           subscriber.complete();
         } catch (error) {
           subscriber.error(
@@ -234,8 +345,8 @@ export class ProxyAPIAdapter implements APIAdapter {
     }
   }
 
-  makeStreamRequest(params: AIRequestParams): Observable<string> {
-    return new Observable<string>((subscriber) => {
+  makeStreamRequest(params: AIRequestParams): Observable<StreamEvent> {
+    return new Observable<StreamEvent>((subscriber) => {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
         if (typeof value === "string") {
@@ -245,12 +356,22 @@ export class ProxyAPIAdapter implements APIAdapter {
         }
       });
 
+      const toolCalls = new Map<number, { id?: string; name?: string; args: string }>();
       const eventSource = new EventSource(
         `${this.baseURL}/api/ai/chat/stream?${searchParams.toString()}`
       );
 
       eventSource.onmessage = (event) => {
         if (event.data === "[DONE]") {
+          const calls = Array.from(toolCalls.entries()).map(([index, data]) => ({
+            id: data.id || `toolcall-${index}-${Date.now()}`,
+            name: data.name || "unknown_tool",
+            arguments: parseToolArguments(data.args),
+          }));
+          if (calls.length > 0) {
+            subscriber.next({ type: "tool_calls", calls });
+          }
+          subscriber.next({ type: "done" });
           subscriber.complete();
           eventSource.close();
           return;
@@ -258,9 +379,21 @@ export class ProxyAPIAdapter implements APIAdapter {
 
         try {
           const parsed = JSON.parse(event.data);
-          const content = parsed.choices[0]?.delta?.content;
+          const delta = parsed.choices[0]?.delta;
+          const content = delta?.content;
           if (content) {
-            subscriber.next(content);
+            subscriber.next({ type: "delta", content });
+          }
+          const toolDeltas = delta?.tool_calls ?? [];
+          for (const toolDelta of toolDeltas) {
+            const index = toolDelta.index ?? 0;
+            const current = toolCalls.get(index) ?? { args: "" };
+            if (toolDelta.id) current.id = toolDelta.id;
+            if (toolDelta.function?.name) current.name = toolDelta.function.name;
+            if (toolDelta.function?.arguments) {
+              current.args += toolDelta.function.arguments;
+            }
+            toolCalls.set(index, current);
           }
         } catch (error) {
           console.error("Error parsing SSE message:", error);
@@ -299,13 +432,15 @@ export class StandardProvider extends BaseLLMProvider {
   public generateStreamCompletion(
     messages: ChatMessage[],
     temperature?: number,
-    maxTokens?: number
-  ): Observable<string> {
+    maxTokens?: number,
+    tools?: ToolDefinition[]
+  ): Observable<StreamEvent> {
     const { model, ...providerParams } = this.getProviderParams();
     return this.adapter.makeStreamRequest({
       messages,
       temperature: temperature || this.config.temperature,
       maxTokens: maxTokens || this.config.maxTokens,
+      tools,
       model,
       ...providerParams,
     });

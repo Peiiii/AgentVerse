@@ -1,4 +1,4 @@
-import { MarkdownActionResults } from "@/common/features/chat/components/markdown";
+import type { ToolCall } from "@/common/lib/ai-service";
 
 // 基础消息类型
 export interface BaseMessage {
@@ -17,31 +17,28 @@ export interface NormalMessage extends BaseMessage {
   replyTo?: string;      // 回复某条消息的ID
   status?: 'pending' | 'streaming' | 'completed' | 'error';  // 消息状态
   lastUpdateTime?: Date;  // 最后更新时间，用于判断是否超时
+  toolCalls?: ToolCall[]; // 标准 tool call 列表
 }
 
-// Action执行结果消息
-export interface ActionResultMessage extends BaseMessage {
-  type: "action_result";
-  originMessageId: string;  // 关联到触发action的原始消息
-  results: Array<{
-    operationId: string;    // 关联到具体的 action 操作
-    capability: string;
-    description: string;    // GPT生成的操作描述
-    params: Record<string, unknown>;
-    status: 'success' | 'error';
-    result?: unknown;
-    error?: string;
-    startTime?: number;
-    endTime?: number;
-  }>;
+// Tool 执行结果消息
+export interface ToolResultMessage extends BaseMessage {
+  type: "tool_result";
+  originMessageId: string; // 关联到触发 tool call 的原始消息
+  toolCallId: string;
+  toolName: string;
+  status: "success" | "error";
+  result?: unknown;
+  error?: string;
+  startTime?: number;
+  endTime?: number;
 }
 
-// 带有 action 结果的消息
-export interface MessageWithResults extends NormalMessage {
-  actionResults?: MarkdownActionResults;
+// 带有 tool 结果的消息
+export interface MessageWithTools extends NormalMessage {
+  toolResults?: Record<string, ToolResultMessage>;
 }
 
-export type AgentMessage = NormalMessage | ActionResultMessage;
+export type AgentMessage = NormalMessage | ToolResultMessage;
 
 export interface Discussion {
   id: string;

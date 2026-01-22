@@ -1,8 +1,8 @@
-import { MarkdownActionResults } from "@/common/features/chat/components/markdown";
 import {
   AgentMessage,
-  MessageWithResults,
   NormalMessage,
+  MessageWithTools,
+  ToolResultMessage,
 } from "@/common/types/discussion";
 
 // 定义消息合并的时间阈值（毫秒）
@@ -44,59 +44,61 @@ function shouldMergeMessages(
 //   description: string;
 // };
 
+type ToolResultMap = Record<string, ToolResultMessage>;
+
 /**
- * 第一阶段：合并消息和其对应的action结果
+ * 第一阶段：合并消息和其对应的 tool 结果
  */
-function mergeActionResults(messages: AgentMessage[]): MessageWithResults[] {
-  const result: MessageWithResults[] = [];
+function mergeToolResults(messages: AgentMessage[]): MessageWithTools[] {
+  const result: MessageWithTools[] = [];
+  const messageIndex = new Map<string, number>();
+  const toolResultsByOrigin = new Map<string, ToolResultMap>();
 
-  for (let i = 0; i < messages.length; i++) {
-    const current = messages[i];
+  const updateToolResults = (
+    originMessageId: string,
+    patch: ToolResultMap
+  ) => {
+    const current = toolResultsByOrigin.get(originMessageId) ?? {};
+    const next = { ...current, ...patch };
+    toolResultsByOrigin.set(originMessageId, next);
+    return next;
+  };
 
-    if (current.type === "text") {
-      const next = messages[i + 1];
-
-      if (
-        next?.type === "action_result" &&
-        next.originMessageId === current.id
-      ) {
-        // 构建 actionResults 对象
-        const actionResults = next.results.reduce(
-          (acc: MarkdownActionResults, r) => {
-            acc[r.operationId] = {
-              // capability: r.capability,
-              // params: r.params,
-              status: r.status,
-              result: r.result,
-              error: r.error,
-              // description: r.description,
-            };
-            return acc;
-          },
-          {}
-        );
-
-        result.push({
+  for (const message of messages) {
+    if (message.type === "tool_result") {
+      const toolResult = message as ToolResultMessage;
+      const nextToolResults = updateToolResults(toolResult.originMessageId, {
+        [toolResult.toolCallId]: toolResult,
+      });
+      const targetIndex = messageIndex.get(toolResult.originMessageId);
+      if (targetIndex !== undefined) {
+        const current = result[targetIndex];
+        result[targetIndex] = {
           ...current,
-          actionResults,
-        });
-        i++; // 跳过action结果消息
-      } else {
-        result.push(current as MessageWithResults);
+          toolResults: nextToolResults,
+        };
       }
+      continue;
     }
+
+    const toolResults = toolResultsByOrigin.get(message.id);
+    result.push({
+      ...(message as NormalMessage),
+      toolResults: toolResults ? { ...toolResults } : undefined,
+    });
+    messageIndex.set(message.id, result.length - 1);
   }
 
   return result;
 }
 
 /**
- * 合并两个消息的actionResults
+ * 合并两个消息的 toolResults
  */
-function mergeActionResultsObjects(
-  current: MessageWithResults["actionResults"],
-  next: MessageWithResults["actionResults"]
-): MessageWithResults["actionResults"] {
+function mergeToolResultObjects(
+  current: MessageWithTools["toolResults"],
+  next: MessageWithTools["toolResults"]
+): MessageWithTools["toolResults"] {
   if (!current) return next;
   if (!next) return current;
 
@@ -110,14 +112,14 @@ function mergeActionResultsObjects(
  * 第二阶段：合并相邻的消息
  */
 function mergeAdjacentMessages(
-  messages: MessageWithResults[]
-): MessageWithResults[] {
-  const result: MessageWithResults[] = [];
+  messages: MessageWithTools[]
+): MessageWithTools[] {
+  const result: MessageWithTools[] = [];
 
   for (let i = 0; i < messages.length; i++) {
     const current = messages[i];
     let mergedContent = current.content;
-    let mergedActionResults = current.actionResults;
+    let mergedToolResults = current.toolResults;
     let nextIndex = i + 1;
 
     // 检查并合并后续消息
@@ -127,9 +129,9 @@ function mergeAdjacentMessages(
     ) {
       const next = messages[nextIndex];
       mergedContent += "\n\n" + next.content;
-      mergedActionResults = mergeActionResultsObjects(
-        mergedActionResults,
-        next.actionResults
+      mergedToolResults = mergeToolResultObjects(
+        mergedToolResults,
+        next.toolResults
       );
       nextIndex++;
     }
@@ -139,7 +141,7 @@ function mergeAdjacentMessages(
       result.push({
         ...current,
         content: mergedContent,
-        actionResults: mergedActionResults,
+        toolResults: mergedToolResults,
       });
       i = nextIndex - 1; // 跳过已合并的消息
     } else {
@@ -156,10 +158,10 @@ function mergeAdjacentMessages(
  */
 export function reorganizeMessages(
   messages: AgentMessage[]
-): MessageWithResults[] {
-  // 第一阶段：合并action结果
-  const messagesWithActions = mergeActionResults(messages);
+): MessageWithTools[] {
+  // 第一阶段：合并 tool 结果
+  const messagesWithTools = mergeToolResults(messages);
 
   // 第二阶段：合并相邻消息
-  return mergeAdjacentMessages(messagesWithActions);
+  return mergeAdjacentMessages(messagesWithTools);
 }

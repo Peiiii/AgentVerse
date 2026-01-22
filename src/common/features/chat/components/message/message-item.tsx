@@ -3,15 +3,16 @@ import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { useCopy } from "@/core/hooks/use-copy";
 import { useToast } from "@/core/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
-import { MessageWithResults } from "@/common/types/discussion";
+import { MessageWithTools } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { MessageMarkdownContent } from "../agent-action-display";
+import { MessageMarkdownContent } from "./message-markdown-content";
+import { ToolResultList } from "./tool-result-list";
 import { AgentHoverCard } from "@/common/features/agents/components/cards/agent-hover-card";
 
 interface MessageItemProps {
-  message: MessageWithResults;
+  message: MessageWithTools;
   agentInfo: {
     getName: (agentId: string) => string;
     getAvatar: (agentId: string) => string;
@@ -72,7 +73,7 @@ function MessageHeader({
   onViewDetail,
   onChat,
 }: {
-  message: MessageWithResults;
+  message: MessageWithTools;
   agentInfo: MessageItemProps["agentInfo"];
   onViewDetail?: (agentId: string) => void;
   onChat?: (agent: AgentDef) => void;
@@ -105,7 +106,7 @@ function DesktopMessageHeader({
   onViewDetail,
   onChat,
 }: {
-  message: MessageWithResults;
+  message: MessageWithTools;
   agentInfo: MessageItemProps["agentInfo"];
   onViewDetail?: (agentId: string) => void;
   onChat?: (agent: AgentDef) => void;
@@ -193,10 +194,8 @@ export function MessageItem({
             )}
           >
             <div className={cn("space-y-2", isUserMessage && "pr-6")}>
-              <MessageMarkdownContent
-                content={message.content}
-                actionResults={message.actionResults}
-              />
+              <MessageMarkdownContent content={message.content} />
+              <ToolResultList toolResults={message.toolResults} />
               {/* 复制按钮 */}
               {isUserMessage ? (
                 <button

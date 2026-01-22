@@ -1,5 +1,5 @@
 import { reorganizeMessages } from "@/common/lib/discussion/message-utils";
-import { AgentMessage, MessageWithResults } from "@/common/types/discussion";
+import { AgentMessage, MessageWithTools } from "@/common/types/discussion";
 import { useEffect, useRef, useState } from "react";
 import { ScrollableLayoutRef } from "@/common/components/layouts/scrollable-layout";
 import { chatScrollManager } from "@/common/features/chat/managers/chat-scroll.manager";
@@ -19,7 +19,7 @@ export interface MessageListHookResult {
   messagesContainerRef: React.RefObject<HTMLDivElement>;
   showScrollButton: boolean;
   isTransitioning: boolean;
-  reorganizedMessages: MessageWithResults[];
+  reorganizedMessages: MessageWithTools[];
   handleScroll: (scrollTop: number, maxScroll: number) => void;
   scrollToBottom: (instant?: boolean) => void;
   contentVersion: string;

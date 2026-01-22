@@ -2,7 +2,7 @@ import { CapabilityRegistry } from "@/common/lib/capabilities";
 import { RxEvent } from "@/common/lib/rx-event";
 import { getPresenter } from "@/core/presenter/presenter";
 import { discussionCapabilities } from "@/core/managers/discussion-capabilities";
-import { AgentMessage, DiscussionSettings, NormalMessage, ActionResultMessage } from "@/common/types/discussion";
+import { AgentMessage, DiscussionSettings, NormalMessage } from "@/common/types/discussion";
 import { DiscussionError, DiscussionErrorType, handleDiscussionError } from "@/core/utils/discussion-error.util";
 import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { BehaviorSubject } from "rxjs";
@@ -13,7 +13,6 @@ import { messageRepository } from "@/core/repositories/message.repository";
 import { MentionResolver } from "./discussion/mention-resolver";
 import { NextSpeakerSelector } from "./discussion/next-speaker";
 import { streamAgentResponse } from "./discussion/streaming-responder";
-import { ActionRunner } from "./discussion/action-runner";
 
 // --- Runtime + Config ---
 type Member = { agentId: string; isAutoReply: boolean };
@@ -59,9 +58,6 @@ export class DiscussionControlManager {
   // extracted helpers
   private mention = new MentionResolver();
   private selector = new NextSpeakerSelector(this.mention);
-  private actions = new ActionRunner({
-    create: (msg) => getPresenter().messages.create(msg) as Promise<ActionResultMessage>,
-  });
   private runLock: Promise<void> = Promise.resolve();
   private getAgentDefs = async (): Promise<AgentDef[]> => {
     const presenter = getPresenter();
@@ -183,17 +179,10 @@ export class DiscussionControlManager {
   }
 
 
-  private async selectNextAgentId(trigger: AgentMessage, lastResponder: string | null): Promise<string | null> {
+  private async selectNextAgentId(trigger: AgentMessage): Promise<string | null> {
     const members = this.getCtrlState().members;
     const defs = await this.getAgentDefs();
-    return this.selector.select(trigger, lastResponder, members, defs);
-  }
-
-  private async tryRunActions(agentMessage: NormalMessage): Promise<ActionResultMessage | null> {
-    const defs = await this.getAgentDefs();
-    const author = defs.find((a) => a.id === agentMessage.agentId);
-    const canUse = this.agentCanUseActions(author);
-    return this.actions.runIfAny(author, canUse, agentMessage);
+    return this.selector.select(trigger, members, defs);
   }
 
   private async addSystemMessage(content: string) {
@@ -235,12 +224,6 @@ export class DiscussionControlManager {
           signal: abortCtrl.signal,
         }
       );
-      if (this.agentCanUseActions(current)) {
-        const actionResultMessage = await this.tryRunActions(finalMessage as NormalMessage);
-        if (actionResultMessage) {
-          finalMessage = actionResultMessage;
-        }
-      }
     } catch (e) {
       // Best-effort error marking: the stream function already attempts to mark completion
       this.handleError(e, '生成回复失败');
@@ -257,15 +240,13 @@ export class DiscussionControlManager {
     if (!this.getCtrlState().isRunning) this.resume();
 
     let last: AgentMessage | null = trigger;
-    let lastResponder: string | null = null;
     this.patchCtrl({ processed: 0 });
 
     while (this.getCtrlState().isRunning && this.getCtrlState().processed < this.getCtrlState().roundLimit && last) {
-      const next = await this.selectNextAgentId(last, lastResponder);
+      const next = await this.selectNextAgentId(last);
       if (!next) break;
       const resp = await this.generateStreamingResponse(next, last);
       if (!resp) break;
-      lastResponder = next;
       last = resp;
       this.patchCtrl({ processed: this.getCtrlState().processed + 1 });
     }

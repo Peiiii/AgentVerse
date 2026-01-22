@@ -49,9 +49,16 @@ const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
   return members;
 };
 
+const emptySchema = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+};
+
 const capabilities: Capability[] = [
   {
     name: "listAgentLibrary",
+    schema: emptySchema,
     description: `<capability>
   <name>列出系统中所有可用的Agent库</name>
   <params>无</params>
@@ -88,6 +95,14 @@ const capabilities: Capability[] = [
   },
   {
     name: "getAgentDetail",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+      },
+      required: ["id"],
+      additionalProperties: false,
+    },
     description: `<capability>
   <name>获取单个Agent的完整详细信息</name>
   <params>
@@ -136,6 +151,25 @@ const capabilities: Capability[] = [
   },
   {
     name: "createAgent",
+    schema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        role: { type: "string", enum: ["moderator", "participant"] },
+        personality: { type: "string" },
+        expertise: {
+          type: "array",
+          items: { type: "string" },
+        },
+        prompt: { type: "string" },
+        avatar: { type: "string" },
+        bias: { type: "string" },
+        responseStyle: { type: "string" },
+        addToDiscussion: { type: "boolean" },
+      },
+      required: ["name", "role", "personality", "expertise", "prompt"],
+      additionalProperties: false,
+    },
     description: `<capability>
   <name>创建新的Agent(不会自动添加到当前讨论中)</name>
   <params>
@@ -268,6 +302,7 @@ const capabilities: Capability[] = [
   },
   {
     name: "getCurrentDiscussionMembers",
+    schema: emptySchema,
     description: `<capability>
   <name>获取当前讨论的所有成员</name>
   <params>无</params>
@@ -308,6 +343,14 @@ const capabilities: Capability[] = [
   },
   {
     name: "addMemberToDiscussion",
+    schema: {
+      type: "object",
+      properties: {
+        agentId: { type: "string" },
+      },
+      required: ["agentId"],
+      additionalProperties: false,
+    },
     description: `<capability>
   <name>添加成员到当前讨论中</name>
   <params>
@@ -327,6 +370,14 @@ const capabilities: Capability[] = [
   },
   {
     name: "removeMemberFromDiscussion",
+    schema: {
+      type: "object",
+      properties: {
+        memberId: { type: "string" },
+      },
+      required: ["memberId"],
+      additionalProperties: false,
+    },
     description: `<capability>
   <name>从当前讨论中移除成员</name>
   <params>
@@ -420,6 +471,25 @@ const capabilities: Capability[] = [
   //   },
   {
     name: "updateAgent",
+    schema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        role: { type: "string", enum: ["moderator", "participant"] },
+        personality: { type: "string" },
+        expertise: {
+          type: "array",
+          items: { type: "string" },
+        },
+        prompt: { type: "string" },
+        avatar: { type: "string" },
+        bias: { type: "string" },
+        responseStyle: { type: "string" },
+      },
+      required: ["id"],
+      additionalProperties: false,
+    },
     description: `<capability>
   <name>更新Agent信息</name>
   <params>

@@ -2,6 +2,8 @@ import { getLLMProviderConfig } from "@/core/config/ai";
 import {
   BaseConfig,
   ChatMessage,
+  StreamEvent,
+  ToolDefinition,
   DirectAPIAdapter,
   LLMProvider,
   ProxyAPIAdapter,
@@ -22,8 +24,16 @@ export class AIService {
     return this.provider.generateCompletion(messages);
   }
 
-  public streamChatCompletion(messages: ChatMessage[]): Observable<string> {
-    return this.provider.generateStreamCompletion(messages);
+  public streamChatCompletion(options: {
+    messages: ChatMessage[];
+    tools?: ToolDefinition[];
+  }): Observable<StreamEvent> {
+    return this.provider.generateStreamCompletion(
+      options.messages,
+      undefined,
+      undefined,
+      options.tools
+    );
   }
 
   public async generateDiscussionTitle(

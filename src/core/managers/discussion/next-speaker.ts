@@ -10,18 +10,12 @@ export class NextSpeakerSelector {
 
   select(
     trigger: AgentMessage,
-    lastResponder: string | null,
     members: Member[],
     defs: AgentDef[],
   ): string | null {
     if (members.length === 0) return null;
 
-    // 1) action_result replies should go back to the same agent if still present
-    if (trigger.type === "action_result" && lastResponder) {
-      if (members.find((m) => m.agentId === lastResponder)) return lastResponder;
-    }
-
-    // 2) @mention takes priority for text messages
+    // 1) @mention takes priority for text messages
     if (trigger.type === "text") {
       this.mention.feed(trigger);
       const mentionTarget = this.mention.takeNext(members, defs);
@@ -36,9 +30,8 @@ export class NextSpeakerSelector {
       return mod ? mod.agentId : members[0]?.agentId ?? null;
     }
 
-    // 3) otherwise, next auto-reply member different from current agent
+    // 2) otherwise, next auto-reply member different from current agent
     const next = autos.find((m) => m.agentId !== trigger.agentId);
     return next ? next.agentId : null;
   }
 }
-

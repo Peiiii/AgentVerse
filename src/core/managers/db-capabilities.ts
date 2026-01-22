@@ -39,10 +39,16 @@ interface DBResponse {
   data?: unknown;
 }
 
+const defaultSchema = {
+  type: "object",
+  additionalProperties: true,
+};
+
 // 数据库管理能力
 export const dbCapabilities: Capability[] = [
   {
     name: "db_list_stores",
+    schema: defaultSchema,
     description: `<capability>
   <name>列出数据库中的所有存储</name>
   <params>
@@ -125,6 +131,7 @@ export const dbCapabilities: Capability[] = [
 
   {
     name: "db_list_databases",
+    schema: defaultSchema,
     description: `<capability>
   <name>列出所有数据库</name>
   <params>无</params>
@@ -175,6 +182,7 @@ export const dbCapabilities: Capability[] = [
 
   {
     name: "db_init",
+    schema: defaultSchema,
     description: `<capability>
   <name>初始化数据库和存储</name>
   <params>
@@ -258,6 +266,7 @@ export const dbCapabilities: Capability[] = [
   
   {
     name: "db_add",
+    schema: defaultSchema,
     description: `<capability>
   <name>添加数据</name>
   <params>
@@ -337,6 +346,7 @@ export const dbCapabilities: Capability[] = [
   
   {
     name: "db_get",
+    schema: defaultSchema,
     description: `<capability>
   <name>获取数据</name>
   <params>
@@ -399,6 +409,7 @@ export const dbCapabilities: Capability[] = [
   
   {
     name: "db_update",
+    schema: defaultSchema,
     description: `<capability>
   <name>更新数据</name>
   <params>
@@ -457,6 +468,7 @@ export const dbCapabilities: Capability[] = [
   
   {
     name: "db_delete",
+    schema: defaultSchema,
     description: `<capability>
   <name>删除数据</name>
   <params>
@@ -515,6 +527,7 @@ export const dbCapabilities: Capability[] = [
   
   {
     name: "db_list",
+    schema: defaultSchema,
     description: `<capability>
   <name>列出所有数据</name>
   <params>

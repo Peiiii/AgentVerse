@@ -2,14 +2,15 @@ import { ClickableAgentAvatar } from "@/common/features/agents/components";
 import { useCopy } from "@/core/hooks/use-copy";
 import { useToast } from "@/core/hooks/use-toast";
 import { cn } from "@/common/lib/utils";
-import { MessageWithResults } from "@/common/types/discussion";
+import { MessageWithTools } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { MessageMarkdownContent } from "../agent-action-display";
+import { MessageMarkdownContent } from "./message-markdown-content";
+import { ToolResultList } from "./tool-result-list";
 
 interface MessageItemWechatProps {
-  message: MessageWithResults;
+  message: MessageWithTools;
   agentInfo: {
     getName: (agentId: string) => string;
     getAvatar: (agentId: string) => string;
@@ -115,10 +116,13 @@ export function MessageItemWechat({
               {isEmpty ? (
                 <span className="opacity-0">&nbsp;</span>
               ) : (
-                <MessageMarkdownContent
-                  content={message.content}
-                  actionResults={message.actionResults}
-                />
+                <>
+                  <MessageMarkdownContent content={message.content} />
+                  <ToolResultList
+                    className="mt-2"
+                    toolResults={message.toolResults}
+                  />
+                </>
               )}
             </div>
             

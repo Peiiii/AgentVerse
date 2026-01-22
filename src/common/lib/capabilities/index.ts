@@ -1,6 +1,19 @@
+import type { ToolDefinition } from "@/common/lib/ai-service";
+
+export interface JsonSchema {
+  type?: string;
+  properties?: Record<string, JsonSchema>;
+  required?: string[];
+  items?: JsonSchema;
+  enum?: unknown[];
+  description?: string;
+  [key: string]: unknown;
+}
+
 export interface Capability {
   name: string;
   description: string;
+  schema: JsonSchema;
   execute: (params: unknown) => Promise<unknown>;
 }
 
@@ -47,3 +60,11 @@ export class CapabilityRegistry {
   }
 }
 
+export const toToolDefinitions = (
+  capabilities: Capability[]
+): ToolDefinition[] =>
+  capabilities.map((capability) => ({
+    name: capability.name,
+    description: capability.description,
+    parameters: capability.schema,
+  }));

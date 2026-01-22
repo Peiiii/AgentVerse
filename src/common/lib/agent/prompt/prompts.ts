@@ -1,6 +1,5 @@
 import { Capability } from "@/common/lib/capabilities";
 import { AgentDef } from "@/common/types/agent";
-import { ActionResultMessage } from "@/common/types/discussion";
 
 // @ 相关的规则和提示词统一管理
 export const MentionRules = {
@@ -40,16 +39,16 @@ export const MentionRules = {
 </moderator-specific-rules>
 
 <capability-usage>
-  <rule>不要同时使用 @ 和 action 能力</rule>
-  <rule>当需要调用 action 时，等待上一个对话回合结束</rule>
-  <rule>优先通过语言引导而非直接调用能力</rule>
-  <rule>在总结或需要查证时才使用 action</rule>
+  <rule>不要同时使用 @ 和工具调用</rule>
+  <rule>当需要调用工具时，等待上一个对话回合结束</rule>
+  <rule>优先通过语言引导而非直接调用工具</rule>
+  <rule>在总结或需要查证时才使用工具</rule>
 </capability-usage>
 
 <conversation-rhythm>
   <rule>在使用 @ 后，等待对方回应</rule>
-  <rule>在使用 action 后，等待执行结果</rule>
-  <rule>避免连续的能力调用</rule>
+  <rule>在使用工具后，等待执行结果</rule>
+  <rule>避免连续的工具调用</rule>
   <rule>保持对话的自然流畅性</rule>
 </conversation-rhythm>`;
     }
@@ -78,34 +77,33 @@ export function generateCapabilityPrompt(
   capabilities: Capability[],
   options?: { role?: AgentDef["role"] }
 ): string {
-  const timestamp = Date.now().toString().slice(-6);
   const role = options?.role ?? "moderator";
   const permissionNotice =
     role === "moderator"
       ? `<permission-notice>
   <rule>你是主持人，拥有完整的工具权限</rule>
   <rule>你负责判断何时通过能力推进讨论</rule>
-  <rule>若系统提示暂停或撤回权限，必须立即停止 action</rule>
+  <rule>若系统提示暂停或撤回权限，必须立即停止工具调用</rule>
 </permission-notice>`
       : `<permission-notice>
   <rule>你是受邀成员，系统暂时授予工具权限</rule>
-  <rule>仅在主持人、系统或用户明确要求你执行操作时才调用 action</rule>
-  <rule>如果收到“无权限”“请停止”之类的提示，立即停止 action 并说明原因</rule>
+  <rule>仅在主持人、系统或用户明确要求你执行操作时才调用工具</rule>
+  <rule>如果收到“无权限”“请停止”之类的提示，立即停止工具调用并说明原因</rule>
 </permission-notice>`;
 
   const roleUsageBlock =
     role === "moderator"
       ? `<capability-usage>
-  <rule>不要同时使用 @ 和 action 能力</rule>
-  <rule>当需要调用 action 时，等待上一个对话回合结束</rule>
-  <rule>优先通过语言引导而非直接调用能力</rule>
-  <rule>在总结或需要查证时才使用 action</rule>
+  <rule>不要同时使用 @ 和工具调用</rule>
+  <rule>当需要调用工具时，等待上一个对话回合结束</rule>
+  <rule>优先通过语言引导而非直接调用工具</rule>
+  <rule>在总结或需要查证时才使用工具</rule>
 </capability-usage>`
       : `<capability-usage>
-  <rule>一次只发送一个 :::action 块，保持流程清晰</rule>
-  <rule>在调用前后说明目的，提醒主持人你正在执行能力</rule>
-  <rule>若未获明确授权，优先通过文字讨论而非调用能力</rule>
-  <rule>等待 action-result 返回后再继续你的发言</rule>
+  <rule>一次只发起一次工具调用，保持流程清晰</rule>
+  <rule>在调用前后说明目的，提醒主持人你正在使用工具</rule>
+  <rule>若未获明确授权，优先通过文字讨论而非调用工具</rule>
+  <rule>等待工具结果返回后再继续你的发言</rule>
 </capability-usage>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -123,75 +121,19 @@ export function generateCapabilityPrompt(
 
   ${permissionNotice}
 
-  <action-syntax>
-    <rule>使用 :::action 容器语法调用能力</rule>
-    <rule>每个 action 必须包含 operationId 和 description</rule>
-    <rule>description 用自然语言描述正在执行的操作</rule>
-  </action-syntax>
-
-  <operation-id-rules>
-    <rule>格式：{capability}_{timestamp}_{sequence}</rule>
-    <rule>sequence 从0开始，每个消息内自增</rule>
-    <rule>当前时间戳：${timestamp}</rule>
-  </operation-id-rules>
-
-  <example>
-    <content><![CDATA[
-接下来我要搜索相关文件：
-:::action
-{
-  "operationId": "searchFiles_${timestamp}_0",
-  "capability": "searchFiles",
-  "description": "让我搜索一下相关的文件",
-  "params": {
-    "query": "*.ts"
-  }
-}
-:::
-
-找到文件后我来查看内容：
-:::action
-{
-  "operationId": "readFile_${timestamp}_1",
-  "capability": "readFile",
-  "description": "我来看看这段代码的实现",
-  "params": {
-    "path": "src/main.ts"
-  }
-}
-:::
-    ]]></content>
-  </example>
+  <tool-usage>
+    <rule>当需要调用工具时，直接调用系统提供的工具</rule>
+    <rule>工具参数必须符合 schema，字段名和类型要准确</rule>
+    <rule>工具调用由系统执行，等待结果返回后再继续</rule>
+    <rule>不要编造工具结果</rule>
+  </tool-usage>
 
   ${roleUsageBlock}
 
-  <description-rules>
-    <rule>使用第一人称，像对话一样自然</rule>
-    <rule>描述要简短但明确</rule>
-    <rule>说明操作目的</rule>
-    <rule>避免技术术语</rule>
-  </description-rules>
-
-  <action-result-handling>
-    <rule>发送 action 后，等待系统返回结果</rule>
-    <rule>系统会以 &lt;action-result&gt; 标签返回执行状态</rule>
-    <rule>根据返回的状态码采取对应措施：
-      <status-codes>
-        <code name="success">操作成功，继续后续步骤</code>
-        <code name="parse_error">检查并修正格式错误</code>
-        <code name="execution_error">尝试替代方案</code>
-        <code name="unknown_error">报告错误并等待指示</code>
-      </status-codes>
-    </rule>
-    <rule>不要自行模拟或构造执行结果</rule>
-    <rule>等待真实的系统响应后再继续</rule>
-  </action-result-handling>
-
   <notes>
-    <note>每个操作都需要唯一的 operationId</note>
-    <note>根据执行结果及时调整策略</note>
+    <note>调用工具前先说明目的</note>
+    <note>根据工具结果及时调整策略</note>
     <note>保持用户友好的交互方式</note>
-    <note>在复杂操作时说明目的</note>
   </notes>
 </capability-system>`;
 }
@@ -404,16 +346,4 @@ export const formatMessage = (
   if (isMyMessage) {
     return `[${speakerName}](我):${content}`;
   } else return `[${speakerName}]: ${content}`;
-};
-
-// Action 结果格式化
-export const formatActionResult = (results: ActionResultMessage["results"]) => {
-  return `[The System]:
-  ${results
-    .map(
-      (r) => `<action-result>
-      ${JSON.stringify(r, null, 2)}
-  </action-result>`
-    )
-    .join("\n")}`;
 };

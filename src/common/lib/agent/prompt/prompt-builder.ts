@@ -2,14 +2,9 @@ import { IAgentConfig } from "@/common/types/agent-config";
 import { ChatMessage } from "@/common/lib/ai-service";
 import { Capability } from "@/common/lib/capabilities";
 import { AgentDef } from "@/common/types/agent";
-import {
-  ActionResultMessage,
-  AgentMessage,
-  NormalMessage,
-} from "@/common/types/discussion";
+import { AgentMessage, NormalMessage } from "@/common/types/discussion";
 import {
   createRolePrompt,
-  formatActionResult,
   formatMessage,
   generateCapabilityPrompt,
 } from "./prompts";
@@ -20,7 +15,7 @@ export class PromptBuilder {
     currentAgentConfig: IAgentConfig;
     agents: AgentDef[];
     messages: AgentMessage[];
-    triggerMessage?: NormalMessage | ActionResultMessage;
+    triggerMessage?: NormalMessage;
     capabilities: Capability[];
   }): ChatMessage[] {
     const {
@@ -50,23 +45,21 @@ export class PromptBuilder {
     const messageCountThreshold = currentAgentConfig.conversation?.contextMessages ?? 10; // b: 消息条数阈值
     
     // 先格式化所有消息
-    const formattedMessages = messages.map((msg) => {
-      if (msg.type === "action_result") {
+    const formattedMessages = messages
+      .map((msg) => {
+        if (msg.type !== "text") {
+          return null;
+        }
         return {
-          role: "system" as const,
-          content: formatActionResult((msg as ActionResultMessage).results),
+          role: "user" as const,
+          content: formatMessage(
+            (msg as NormalMessage).content,
+            msg.agentId === currentAgentConfig.agentId,
+            getAgentName(msg.agentId)
+          ),
         };
-      }
-
-      return {
-        role: "user" as const,
-        content: formatMessage(
-          (msg as NormalMessage).content,
-          msg.agentId === currentAgentConfig.agentId,
-          getAgentName(msg.agentId)
-        ),
-      };
-    });
+      })
+      .filter(Boolean) as ChatMessage[];
     
     // c: 实际消息总条数
     const totalMessageCount = formattedMessages.length;

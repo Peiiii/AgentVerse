@@ -48,11 +48,14 @@ export class DiscussionRepository {
     id: string,
     message: AgentMessage
   ): Promise<Discussion> {
-    return this.provider.update(id, {
+    const payload: Partial<Discussion> = {
       lastMessageTime: message.timestamp,
-      lastMessage: message.type === "text" ? message.content : undefined,
       updatedAt: new Date(),
-    });
+    };
+    if (message.type === "text") {
+      payload.lastMessage = message.content;
+    }
+    return this.provider.update(id, payload);
   }
 
   async deleteDiscussion(id: string): Promise<void> {
