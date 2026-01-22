@@ -32,7 +32,7 @@ export function DiscussionAvatar({
   // 空状态：使用超淡灰色
   if (count === 0) {
     return (
-      <div className={cn(containerSizeClass, "bg-[#f9f9f9] dark:bg-muted/10 rounded-full flex items-center justify-center border border-black/[0.03]")}>
+      <div className={cn(containerSizeClass, "bg-[#f9f9f9] dark:bg-muted/10 rounded-full flex items-center justify-center border border-black/[0.08] dark:border-white/[0.08]")}>
         <Users className="w-1/2 h-1/2 text-muted-foreground/25" />
       </div>
     );
@@ -42,7 +42,7 @@ export function DiscussionAvatar({
   if (count === 1) {
     const member = items[0];
     return (
-      <div className={cn(containerSizeClass, "bg-[#f9f9f9] dark:bg-muted/10 rounded-full shrink-0 overflow-hidden border border-black/[0.03] flex items-center justify-center p-[5px]")}>
+      <div className={cn(containerSizeClass, "bg-[#f9f9f9] dark:bg-muted/10 rounded-full shrink-0 overflow-hidden border border-black/[0.08] dark:border-white/[0.08] flex items-center justify-center p-[5px]")}>
         <div className="w-full h-full rounded-full overflow-hidden shadow-sm">
           <img
             src={presenter.agents.getAgentAvatar(member.agentId)}
