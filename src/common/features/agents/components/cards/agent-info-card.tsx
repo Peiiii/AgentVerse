@@ -3,7 +3,8 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { Bot, Brain, Sparkles, Target, User, Wand2 } from "lucide-react";
+import { Bot, Brain, Sparkles, Target, User, Wand2, Copy, Check } from "lucide-react";
+import { useState } from "react";
 
 interface AgentInfoCardProps {
   agent: AgentDef;
@@ -25,6 +26,31 @@ export function AgentInfoCard({
   showEditActions = false,
   onViewDetail,
 }: AgentInfoCardProps) {
+  const [copied, setCopied] = useState(false);
+  const handleCopyId = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(agent.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const renderIdBadge = () => (
+    <div
+      className="group/id flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/60 hover:bg-muted cursor-pointer transition-colors max-w-fit"
+      onClick={handleCopyId}
+      title="点击复制 ID"
+    >
+      <span className="text-[9px] font-mono text-muted-foreground/75 group-hover/id:text-muted-foreground truncate max-w-[100px]">
+        ID: {agent.id}
+      </span>
+      {copied ? (
+        <Check className="w-2.5 h-2.5 text-green-500" />
+      ) : (
+        <Copy className="w-2.5 h-2.5 text-muted-foreground/40 group-hover/id:text-muted-foreground/60" />
+      )}
+    </div>
+  );
+
   const getRoleConfig = (role?: string) => {
     switch (role) {
       case "moderator":
@@ -125,33 +151,38 @@ export function AgentInfoCard({
           </button>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-bold text-base text-foreground truncate flex-1 min-w-0">{agent.name}</h3>
-              <Badge
-                variant="outline"
-                className={cn(
-                  "text-xs px-2 py-0.5 shrink-0",
-                  roleConfig.borderColor,
-                  roleConfig.bgColor,
-                  roleConfig.color
-                )}
-              >
-                {roleConfig.label}
-              </Badge>
-              {hasEditActions && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 shrink-0 hover:bg-accent"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditWithAI?.(agent);
-                  }}
-                  aria-label="AI 编辑智能体"
+            <div className="flex flex-col gap-1.5 mb-2.5">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-base text-foreground truncate min-w-0">{agent.name}</h3>
+                {renderIdBadge()}
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs px-2 py-0.5 shrink-0 w-fit",
+                    roleConfig.borderColor,
+                    roleConfig.bgColor,
+                    roleConfig.color
+                  )}
                 >
-                  <Wand2 className="h-3.5 w-3.5" />
-                </Button>
-              )}
+                  {roleConfig.label}
+                </Badge>
+                {hasEditActions && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 shrink-0 hover:bg-accent rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditWithAI?.(agent);
+                    }}
+                    aria-label="AI 编辑智能体"
+                  >
+                    <Wand2 className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2 text-sm">
@@ -205,7 +236,7 @@ export function AgentInfoCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-xl font-bold text-foreground">{agent.name}</h3>
+            <h3 className="text-xl font-bold text-foreground truncate">{agent.name}</h3>
             <Badge
               variant="outline"
               className={cn(
@@ -217,6 +248,7 @@ export function AgentInfoCard({
             >
               {roleConfig.label}
             </Badge>
+            {renderIdBadge()}
           </div>
 
           <div className="space-y-3 text-sm">
@@ -272,4 +304,4 @@ export function AgentInfoCard({
       </div>
     </div>
   );
-} 
+}

@@ -16,8 +16,10 @@ import {
     Target,
     User,
     Zap,
+    Copy,
+    Check
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 interface AgentHoverCardProps {
     agent: AgentDef;
@@ -76,6 +78,14 @@ export const AgentHoverCard: React.FC<AgentHoverCardProps> = ({
     const safeName = agent.name || "未命名";
     const nameInitial = safeName.length > 0 ? safeName[0] : "?";
     const roleConfig = getRoleConfig(agent.role);
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyId = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(agent.id);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     return (
         <HoverCard openDelay={200} closeDelay={100}>
@@ -103,13 +113,29 @@ export const AgentHoverCard: React.FC<AgentHoverCardProps> = ({
                         </Avatar>
                         <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-white truncate">{safeName}</h3>
-                            <Badge
-                                variant="outline"
-                                className="mt-1 bg-white/20 text-white border-white/30 text-xs"
-                            >
-                                <roleConfig.icon className="w-3 h-3 mr-1" />
-                                {roleConfig.label}
-                            </Badge>
+                            <div className="flex items-center gap-2 mt-1">
+                                <Badge
+                                    variant="outline"
+                                    className="bg-white/20 text-white border-white/30 text-xs"
+                                >
+                                    <roleConfig.icon className="w-3 h-3 mr-1" />
+                                    {roleConfig.label}
+                                </Badge>
+                                <div
+                                    className="group/id flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/10 hover:bg-black/20 cursor-pointer transition-all border border-white/10"
+                                    onClick={handleCopyId}
+                                    title="复制 ID"
+                                >
+                                    <span className="text-[10px] font-mono text-white/70 group-hover/id:text-white">
+                                        ID: {agent.id}
+                                    </span>
+                                    {copied ? (
+                                        <Check className="w-2.5 h-2.5 text-white" />
+                                    ) : (
+                                        <Copy className="w-2.5 h-2.5 text-white/40 group-hover/id:text-white/70" />
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

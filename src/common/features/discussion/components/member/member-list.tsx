@@ -172,6 +172,7 @@ export function MemberList({
         <AddMemberDialog
           open={showAddDialog}
           onOpenChange={setShowAddDialog}
+          members={members}
         />
       </div>
 

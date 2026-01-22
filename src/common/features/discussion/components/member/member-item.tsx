@@ -7,6 +7,7 @@ import { DiscussionMember } from "@/common/types/discussion-member";
 import { ChevronRight, UserX, Settings, Briefcase, Lightbulb, Target } from "lucide-react";
 import { SmartAvatar } from "@/common/components/ui/smart-avatar";
 import { RoleBadge } from "@/common/components/common/role-badge";
+import { } from "react";
 
 interface MemberItemProps {
   member: DiscussionMember;
@@ -39,19 +40,19 @@ function MemberExpandedContent({
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
               <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>专业领域</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
+              <span>专业领域</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
               {agent.expertise.map((item, index) => (
-              <span 
-                key={index}
+                <span
+                  key={index}
                   className="px-2.5 py-1 text-xs rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 text-muted-foreground border border-primary/20 backdrop-blur-sm"
-              >
-                {item}
-              </span>
-            ))}
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
         )}
 
         {(agent.bias || agent.responseStyle) && (
@@ -60,24 +61,24 @@ function MemberExpandedContent({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                   <Target className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>偏好倾向</span>
-          </div>
+                  <span>偏好倾向</span>
+                </div>
                 <p className="text-sm text-muted-foreground pl-5">
                   {agent.bias}
-          </p>
-        </div>
+                </p>
+              </div>
             )}
 
             {agent.responseStyle && (
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                   <Lightbulb className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>回复风格</span>
-          </div>
+                  <span>回复风格</span>
+                </div>
                 <p className="text-sm text-muted-foreground pl-5">
                   {agent.responseStyle}
-          </p>
-        </div>
+                </p>
+              </div>
             )}
           </div>
         )}
@@ -85,7 +86,7 @@ function MemberExpandedContent({
 
       <div className="flex items-center justify-between pt-3 border-t border-border/30">
         <span className="text-xs text-muted-foreground/80">
-          {new Date(member.joinedAt).toLocaleString('zh-CN', { 
+          {new Date(member.joinedAt).toLocaleString('zh-CN', {
             month: 'numeric',
             day: 'numeric',
             hour: 'numeric',
@@ -144,14 +145,15 @@ export function MemberItem({
     return gradients[index];
   };
 
+
   return (
     <Card
       className={cn(
         "relative transition-all duration-300 cursor-pointer group overflow-hidden outline-none shadow-none",
         "bg-gradient-to-br from-background via-card to-background",
         "border border-border/70",
-        isExpanded 
-          ? "border-primary/40 bg-gradient-to-br from-primary/5 via-card/50 to-background" 
+        isExpanded
+          ? "border-primary/40 bg-gradient-to-br from-primary/5 via-card/50 to-background"
           : "hover:border-primary/30 hover:bg-gradient-to-br hover:from-primary/3 hover:via-card/50 hover:to-background",
         "focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
         "rounded-xl",
@@ -161,16 +163,16 @@ export function MemberItem({
       {...props}
     >
       {/* 左侧装饰条 */}
-      <div 
+      <div
         className={cn(
           "absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b transition-all duration-300",
           getGradientColor(agent.id),
           isExpanded ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}
       />
-      
+
       {/* 微妙的背景光效 */}
-      <div 
+      <div
         className={cn(
           "absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 pointer-events-none",
           getGradientColor(agent.id),
@@ -182,11 +184,11 @@ export function MemberItem({
         <div className="flex gap-3.5">
           <div className="relative">
             <SmartAvatar
-            src={agent.avatar}
-            alt={agent.name}
+              src={agent.avatar}
+              alt={agent.name}
               className="w-12 h-12 rounded-xl shrink-0 ring-2 ring-border/30 group-hover:ring-primary/20 transition-all duration-300 group-hover:scale-105"
               fallback={<span className="text-white text-xs font-medium">{agent.name[0]}</span>}
-          />
+            />
             {/* 在线状态指示器 */}
             {member.isAutoReply && (
               <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary ring-2 ring-background border border-primary/20" />
@@ -196,27 +198,29 @@ export function MemberItem({
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-base truncate text-foreground group-hover:text-primary/80 transition-colors duration-200">
-                    {agent.name}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-base truncate text-foreground group-hover:text-primary/80 transition-colors duration-200">
+                      {agent.name}
+                    </h3>
+                  </div>
                 </div>
-                <ChevronRight 
+                <ChevronRight
                   className={cn(
                     "w-4 h-4 text-muted-foreground/40 transition-all duration-300 shrink-0",
-                    isExpanded 
-                      ? "rotate-90 text-primary/60" 
+                    isExpanded
+                      ? "rotate-90 text-primary/60"
                       : "group-hover:text-primary/50 group-hover:translate-x-0.5"
-                  )} 
+                  )}
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <RoleBadge 
-                  role={agent.role} 
+                <RoleBadge
+                  role={agent.role}
                   size="sm"
                   className="shrink-0"
                 />
-                <div 
-                  className="flex items-center gap-2 shrink-0" 
+                <div
+                  className="flex items-center gap-2 shrink-0"
                   onClick={e => e.stopPropagation()}
                 >
                   <span className="text-xs text-muted-foreground/70 whitespace-nowrap">自动回复</span>
@@ -230,7 +234,7 @@ export function MemberItem({
           </div>
         </div>
       </div>
-      <div 
+      <div
         className={cn(
           "grid transition-all duration-300 ease-out relative",
           isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
@@ -247,4 +251,4 @@ export function MemberItem({
       </div>
     </Card>
   );
-} 
+}

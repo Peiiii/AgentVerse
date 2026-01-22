@@ -6,7 +6,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { Card, CardHeader } from "@/common/components/ui/card";
 import { Label } from "@/common/components/ui/label";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { RoleBadge } from "@/common/components/common/role-badge";
 
@@ -26,20 +26,20 @@ export interface AgentCardProps {
     responseStyle?: string;
     prompt?: string;
   };
-  
+
   // 模式控制
   mode?: AgentCardMode;
-  
+
   // 交互回调
   onEditWithAI?: (agent: AgentDef) => void;
   onDelete?: (agentId: string) => void;
-  
+
   // 样式
   className?: string;
-  
+
   // 描述（仅在preview模式使用）
   description?: string;
-  
+
   // 是否默认展开（仅在detail和management模式使用）
   defaultExpanded?: boolean;
 }
@@ -54,23 +54,54 @@ export const AgentCard: React.FC<AgentCardProps> = ({
   defaultExpanded = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [copied, setCopied] = useState(false);
   const { isMobile } = useBreakpointContext();
-  
+
+  const handleCopyId = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if ('id' in agent) {
+      navigator.clipboard.writeText(agent.id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   // 确保头像URL是有效的
   const safeAvatar = agent.avatar || "/avatars/default.png";
-  
+
   // 确保name是有效的
   const safeName = agent.name || "未命名";
   const nameInitial = safeName.length > 0 ? safeName[0] : "?";
-  
+
+  // 渲染 ID 徽章的辅助函数
+  const renderIdBadge = () => {
+    if (!('id' in agent)) return null;
+    return (
+      <div
+        className="group/id flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/60 hover:bg-muted cursor-pointer transition-colors max-w-fit"
+        onClick={handleCopyId}
+        title="点击复制 ID"
+      >
+        <span className="text-[9px] font-mono text-muted-foreground/75 group-hover/id:text-muted-foreground truncate max-w-[120px]">
+          ID: {agent.id}
+        </span>
+        {copied ? (
+          <Check className="w-2.5 h-2.5 text-green-500" />
+        ) : (
+          <Copy className="w-2.5 h-2.5 text-muted-foreground/40 group-hover/id:text-muted-foreground/60" />
+        )}
+      </div>
+    );
+  };
+
   // 预览模式 - 简单展示
   if (mode === "preview") {
     return (
       <div className={cn("p-3 space-y-3", className)}>
         <div className="flex items-center gap-3">
           <div className={cn("rounded-full overflow-hidden bg-muted", isMobile ? "w-10 h-10" : "w-12 h-12")}>
-            <img 
-              src={safeAvatar} 
+            <img
+              src={safeAvatar}
               alt={safeName}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -78,22 +109,25 @@ export const AgentCard: React.FC<AgentCardProps> = ({
               }}
             />
           </div>
-          <div>
-            <h3 className="font-medium text-base">{safeName}</h3>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium text-base truncate">{safeName}</h3>
+              {renderIdBadge()}
+            </div>
             {agent.role && <p className="text-sm text-muted-foreground">{agent.role === "moderator" ? "主持人" : "参与者"}</p>}
           </div>
         </div>
-        
+
         {description && (
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
-        
+
         {agent.expertise && agent.expertise.length > 0 && (
           <div className="space-y-1.5">
             <h4 className="text-xs font-medium text-muted-foreground">专长领域</h4>
             <div className="flex flex-wrap gap-1">
               {agent.expertise.slice(0, isMobile ? 2 : 4).map((skill, index) => (
-                <span 
+                <span
                   key={index}
                   className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary"
                 >
@@ -111,7 +145,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
       </div>
     );
   }
-  
+
   // 详情模式和管理模式 - 使用Card组件
   return (
     <Card
@@ -129,14 +163,33 @@ export const AgentCard: React.FC<AgentCardProps> = ({
               {nameInitial}
             </AvatarFallback>
           </Avatar>
-          <div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className={cn("font-medium truncate", isMobile ? "text-sm" : "text-base")}>{safeName}</span>
+              {renderIdBadge()}
+            </div>
             <div className="flex items-center gap-1.5">
-              <span className={cn("font-medium", isMobile ? "text-sm" : "text-base")}>{safeName}</span>
               {agent.role && (
-                <RoleBadge 
-                  role={agent.role} 
+                <RoleBadge
+                  role={agent.role}
                   size="sm"
                 />
+              )}
+              {'id' in agent && (
+                <div
+                  className="group/id flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors ml-1"
+                  onClick={handleCopyId}
+                  title="点击复制 ID"
+                >
+                  <span className="text-[10px] font-mono text-muted-foreground/50 group-hover/id:text-muted-foreground">
+                    ID: {agent.id}
+                  </span>
+                  {copied ? (
+                    <Check className="w-2.5 h-2.5 text-green-500" />
+                  ) : (
+                    <Copy className="w-2.5 h-2.5 text-muted-foreground/30 group-hover/id:text-muted-foreground/50" />
+                  )}
+                </div>
               )}
             </div>
             <div className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
@@ -152,7 +205,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
             </div>
           </div>
         </div>
-        
+
         {/* 管理模式才显示操作按钮 */}
         {mode === "management" && (
           <div className="flex items-center justify-between gap-2 mt-3">
@@ -201,7 +254,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
             </div>
           </div>
         )}
-        
+
         {/* 详情模式只有展开/折叠按钮 */}
         {mode === "detail" && (
           <div className="flex items-center justify-end mt-3">
@@ -222,7 +275,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
             </Button>
           </div>
         )}
-        
+
         {/* 展开的详细信息 */}
         {isExpanded && (
           <div className="mt-3 pt-3 space-y-3 border-t dark:border-gray-700">

@@ -2,7 +2,8 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { AgentDef } from "@/common/types/agent";
-import { Bot, Brain, Edit3, Info, Sparkles, Target, User, X } from "lucide-react";
+import { Bot, Brain, Edit3, Info, Sparkles, Target, User, X, Copy, Check } from "lucide-react";
+import { useState } from "react";
 
 interface FloatingAgentInfoProps {
   agent: AgentDef;
@@ -27,6 +28,14 @@ export function FloatingAgentInfo({
 
   const handleClose = () => {
     onVisibilityChange(false);
+  };
+
+  const [copied, setCopied] = useState(false);
+  const handleCopyId = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(agent.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const getRoleConfig = (role?: string) => {
@@ -104,8 +113,22 @@ export function FloatingAgentInfo({
                 >
                   {roleConfig.label}
                 </Badge>
+                <div
+                  className="group/id flex items-center gap-2 px-2.5 py-1 rounded-lg bg-muted/50 hover:bg-primary/5 hover:border-primary/30 cursor-pointer transition-all border border-border/50 ml-1"
+                  onClick={handleCopyId}
+                  title="复制 Agent ID"
+                >
+                  <span className="text-[11px] font-mono text-muted-foreground/80 group-hover/id:text-primary transition-colors">
+                    ID: {agent.id}
+                  </span>
+                  {copied ? (
+                    <Check className="w-3.5 h-3.5 text-green-500" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 text-muted-foreground/40 group-hover/id:text-primary/60 transition-colors" />
+                  )}
+                </div>
               </div>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -115,12 +138,12 @@ export function FloatingAgentInfo({
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            
+
             {/* 描述信息 */}
             <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               {agent.personality || "一个智能助手，随时为您提供帮助"}
             </p>
-            
+
             {/* 详细信息网格 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* 左侧信息 */}
@@ -135,7 +158,7 @@ export function FloatingAgentInfo({
                     </div>
                   </div>
                 </div>
-                
+
                 {/* 回应风格 */}
                 <div className="flex items-start gap-3">
                   <Target className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
@@ -147,7 +170,7 @@ export function FloatingAgentInfo({
                   </div>
                 </div>
               </div>
-              
+
               {/* 右侧信息 */}
               <div className="space-y-3">
                 {/* 专业技能 */}
@@ -168,7 +191,7 @@ export function FloatingAgentInfo({
                     )}
                   </div>
                 </div>
-                
+
                 {/* 系统提示词预览 */}
                 {agent.prompt && (
                   <div className="flex items-start gap-3">
@@ -185,7 +208,7 @@ export function FloatingAgentInfo({
                 )}
               </div>
             </div>
-            
+
             {/* 底部提示 */}
             {autoHide && (
               <div className="mt-4 pt-3 border-t border-border/50">
