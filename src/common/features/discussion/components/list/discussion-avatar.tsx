@@ -10,17 +10,7 @@ interface DiscussionAvatarProps {
 }
 
 /**
- * WeChat-style Group Avatar Layout
- * 
- * 1 member: 1x1
- * 2 members: [1, 2] (Row-centered 2-column)
- * 3 members: [1] (Row 1 centered), [2, 3] (Row 2)
- * 4 members: [1, 2], [3, 4] (2x2)
- * 5 members: [1, 2], [3, 4, 5] (Row 1 centered among 3-col space)
- * 6 members: [1, 2, 3], [4, 5, 6]
- * 7 members: [1], [2, 3, 4], [5, 6, 7]
- * 8 members: [1, 2], [3, 4, 5], [6, 7, 8]
- * 9 members: [1, 2, 3], [4, 5, 6], [7, 8, 9]
+ * WeChat-style Group Avatar Layout (Optimized for Premium Minimalist Aesthetic)
  */
 export function DiscussionAvatar({
   members,
@@ -39,19 +29,21 @@ export function DiscussionAvatar({
   const count = Math.min(members.length, 9);
   const items = members.slice(0, count);
 
+  // 空状态：使用超淡灰色
   if (count === 0) {
     return (
-      <div className={cn(containerSizeClass, "bg-[#e8e8e8] dark:bg-gray-700 rounded-full flex items-center justify-center border border-black/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)]")}>
-        <Users className="w-1/2 h-1/2 text-muted-foreground/40" />
+      <div className={cn(containerSizeClass, "bg-[#f9f9f9] dark:bg-muted/10 rounded-full flex items-center justify-center border border-black/[0.03]")}>
+        <Users className="w-1/2 h-1/2 text-muted-foreground/25" />
       </div>
     );
   }
 
+  // 单人：超淡灰色圆框 + 内部头像气泡，确保视觉高度统一
   if (count === 1) {
     const member = items[0];
     return (
-      <div className={cn(containerSizeClass, "bg-[#e8e8e8] dark:bg-gray-700 rounded-full shrink-0 overflow-hidden border border-black/5 flex items-center justify-center p-[5px] shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)]")}>
-        <div className="w-full h-full rounded-full overflow-hidden">
+      <div className={cn(containerSizeClass, "bg-[#f9f9f9] dark:bg-muted/10 rounded-full shrink-0 overflow-hidden border border-black/[0.03] flex items-center justify-center p-[5px]")}>
+        <div className="w-full h-full rounded-full overflow-hidden shadow-sm">
           <img
             src={presenter.agents.getAgentAvatar(member.agentId)}
             alt={presenter.agents.getAgentName(member.agentId)}
@@ -62,13 +54,12 @@ export function DiscussionAvatar({
     );
   }
 
-  // WeChat-specific Layout Calculation
-  const isLarge = count > 4; // 5-9 members use 3-column grid
+  // 多人：根据微信逻辑计算布局，统一使用超淡背景
+  const isLarge = count > 4;
   const columns = isLarge ? 3 : 2;
-  const gap = 0.5; // 进一步缩小间距
+  const gap = 0.5;
   const itemSize = (containerSize - (columns + 1) * gap) / columns;
 
-  // Split items into rows based on WeChat's pattern
   let rows: DiscussionMember[][] = [];
   if (count === 2) {
     rows = [items];
@@ -92,7 +83,7 @@ export function DiscussionAvatar({
     <div
       className={cn(
         containerSizeClass,
-        "bg-[#e8e8e8] dark:bg-gray-700 rounded-full flex flex-col items-center justify-center gap-[1px] border border-black/5 overflow-hidden shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)]"
+        "bg-[#f9f9f9] dark:bg-muted/10 rounded-full flex flex-col items-center justify-center gap-[1px] border border-black/[0.03] overflow-hidden"
       )}
       style={{ padding: count > 4 ? '1.5px' : '2px' }}
     >
@@ -101,7 +92,7 @@ export function DiscussionAvatar({
           {row.map((member) => (
             <div
               key={member.id}
-              className="shrink-0 overflow-hidden rounded-full"
+              className="shrink-0 overflow-hidden rounded-full shadow-sm"
               style={{ width: `${itemSize}px`, height: `${itemSize}px` }}
             >
               <img
