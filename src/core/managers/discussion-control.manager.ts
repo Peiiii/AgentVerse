@@ -213,6 +213,7 @@ export class DiscussionControlManager {
 
     let finalMessage: AgentMessage | null = null;
     try {
+      const discussionNote = getPresenter().discussions.getCurrent()?.note || "";
       const { providerType, providerConfig } = resolveLLMProviderConfigByTags(
         current.tags
       );
@@ -228,6 +229,7 @@ export class DiscussionControlManager {
           members: memberDefs,
           canUseActions: this.agentCanUseActions(current),
           signal: abortCtrl.signal,
+          discussionNote,
         }
       );
     } catch (e) {

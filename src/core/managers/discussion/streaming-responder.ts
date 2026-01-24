@@ -45,6 +45,7 @@ export async function streamAgentResponse(
     members: AgentDef[];
     canUseActions: boolean;
     signal: AbortSignal;
+    discussionNote?: string;
   }
 ): Promise<AgentMessage> {
   const { aiService, messageRepo, reload } = deps;
@@ -63,6 +64,7 @@ export async function streamAgentResponse(
     messages,
     triggerMessage: params.trigger.type === "text" ? (params.trigger as NormalMessage) : undefined,
     capabilities: capabilityRegistry.getCapabilities(),
+    discussionNote: params.discussionNote,
   });
 
   const runOnce = async (chatMessages: ChatMessage[]) => {

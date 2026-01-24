@@ -49,6 +49,21 @@ const addMemberToDiscussion = async ({ agentId }: { agentId: string }) => {
   return members;
 };
 
+const updateDiscussionNote = async ({ note }: { note?: string }) => {
+  const discussionId = getPresenter().discussionControl.getCurrentDiscussionId();
+  if (!discussionId) {
+    throw new Error("No active discussion");
+  }
+  const normalizedNote = typeof note === "string" ? note : "";
+  const updated = await getPresenter().discussions.update(discussionId, {
+    note: normalizedNote,
+  });
+  return {
+    success: true,
+    note: updated.note || "",
+  };
+};
+
 const emptySchema = {
   type: "object",
   properties: {},
@@ -298,6 +313,40 @@ const capabilities: Capability[] = [
         }
         throw error;
       }
+    },
+  },
+  {
+    name: "updateDiscussionNote",
+    schema: {
+      type: "object",
+      properties: {
+        note: { type: "string" },
+      },
+      required: ["note"],
+      additionalProperties: false,
+    },
+    description: `<capability>
+  <name>更新当前讨论的共享笔记</name>
+  <params>
+    <schema>
+      note: string  // 共享笔记内容（将覆盖原笔记）
+    </schema>
+  </params>
+  <returns>
+    <type>object</type>
+    <schema>
+      success: boolean
+      note: string
+    </schema>
+  </returns>
+  <notes>
+    <note>笔记对当前讨论内所有Agent可见</note>
+    <note>将完整替换现有笔记内容</note>
+  </notes>
+</capability>`,
+    execute: async (rawParams: unknown) => {
+      const { note } = rawParams as { note?: string };
+      return updateDiscussionNote({ note });
     },
   },
   {

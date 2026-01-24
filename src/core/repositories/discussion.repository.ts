@@ -30,6 +30,7 @@ export class DiscussionRepository {
           participant: false,
         },
       },
+      note: "",
       createdAt: new Date(),
       updatedAt: new Date(),
     };

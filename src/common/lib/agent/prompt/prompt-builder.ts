@@ -17,6 +17,7 @@ export class PromptBuilder {
     messages: AgentMessage[];
     triggerMessage?: NormalMessage;
     capabilities: Capability[];
+    discussionNote?: string;
   }): ChatMessage[] {
     const {
       currentAgent,
@@ -32,6 +33,10 @@ export class PromptBuilder {
         ? generateCapabilityPrompt(capabilities, { role: currentAgent.role })
         : "",
     ].filter(Boolean);
+    const note = context.discussionNote?.trim();
+    if (note) {
+      systemPromptList.push(`【共享笔记】\n${note}`);
+    }
 
     const systemPrompt = systemPromptList.join("\n\n");
 

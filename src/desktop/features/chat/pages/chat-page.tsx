@@ -2,7 +2,7 @@ import { ChatArea } from "@/common/features/chat/components/chat-area";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { DiscussionController } from "@/common/features/discussion/components/control/discussion-controller";
 import { DiscussionList } from "@/common/features/discussion/components/list/discussion-list";
-import { MemberList } from "@/common/features/discussion/components/member/member-list";
+import { DiscussionSidebar } from "@/common/features/discussion/components/sidebar/discussion-sidebar";
 import { ResponsiveContainer } from "@/common/components/layout/responsive-container";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
@@ -73,9 +73,7 @@ export function ChatPage() {
       </div>
       {showDesktopMembers && (
         <div className="w-80 flex-none border-l border-border bg-card">
-          <div className="p-4 h-full">
-            <MemberList />
-          </div>
+          <DiscussionSidebar />
         </div>
       )}
     </>

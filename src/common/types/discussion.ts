@@ -46,6 +46,7 @@ export interface Discussion {
   topic: string;
   status: "active" | "paused" | "completed";
   settings: DiscussionSettings;
+  note?: string;
   createdAt: Date;
   updatedAt: Date;
   lastMessageTime?: Date;  // 最新消息时间
