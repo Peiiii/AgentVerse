@@ -11,7 +11,7 @@ import { useIsPaused } from "@/core/hooks/useDiscussionRuntime";
 import { useState } from "react";
 
 export function ChatPage() {
-  const { isDesktop } = useBreakpointContext();
+  const { isDesktop, isLessThan } = useBreakpointContext();
   // agents/messages 由内部业务组件直连 presenter/store，无需在此处传递
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
@@ -52,6 +52,10 @@ export function ChatPage() {
                     status={status}
                     onToggleMembers={handleToggleMembers}
                     enableSettings={false}
+                    showSidebarToggle={isLessThan("lg")}
+                    onToggleSidebar={() =>
+                      setShowMobileSidebar((prev) => !prev)
+                    }
                   />
                 )}
                 <div className="flex-1 min-h-0">

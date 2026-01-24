@@ -24,6 +24,7 @@ import {
   MessageCircle,
   MessageSquare,
   Save,
+  Tag,
   TrendingUp,
   User
 } from "lucide-react";
@@ -47,6 +48,7 @@ export function AgentEmbeddedForm({
     role: initialData?.role || "participant",
     personality: initialData?.personality || "",
     expertise: initialData?.expertise || [],
+    tags: initialData?.tags || [],
     bias: initialData?.bias || "",
     responseStyle: initialData?.responseStyle || "",
   });
@@ -60,6 +62,7 @@ export function AgentEmbeddedForm({
         role: initialData.role,
         personality: initialData.personality,
         expertise: initialData.expertise,
+        tags: initialData.tags || [],
         bias: initialData.bias,
         responseStyle: initialData.responseStyle,
       });
@@ -212,6 +215,36 @@ export function AgentEmbeddedForm({
                   {formData.expertise.map((exp, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
                       {exp}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tags" className="flex items-center gap-2">
+                <Tag className="w-3 h-3" />
+                标签
+              </Label>
+              <Input
+                id="tags"
+                value={formData.tags?.join(", ")}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    tags: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                  })
+                }
+                placeholder="用逗号分隔标签，例如：deepseek, glm, openrouter"
+              />
+              {formData.tags && formData.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {formData.tags.map((tag, index) => (
+                    <Badge key={`${tag}-${index}`} variant="secondary" className="text-xs">
+                      {tag}
                     </Badge>
                   ))}
                 </div>

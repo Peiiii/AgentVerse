@@ -33,8 +33,9 @@ export function AgentDetailPage() {
   const [agent, setAgent] = useState<AgentDef | null>(null);
 
   // Determine the view mode from URL params, default to "profile"
-  const mode = (searchParams.get("mode") as ViewMode) || "profile";
-  const editTab = (searchParams.get("tab") as "configure" | "ai-create" | null) || "ai-create";
+  const mode = (searchParams.get("mode") as ViewMode) || "edit";
+  const editTab =
+    (searchParams.get("tab") as "configure" | "ai-create" | null) || "configure";
   const [sidebarTab, setSidebarTab] = useState<"configure" | "ai-create">(editTab);
 
   // 切换到编辑模式
@@ -51,7 +52,7 @@ export function AgentDetailPage() {
   // 返回 profile 模式
   const handleBackToProfile = useCallback(() => {
     const newParams = new URLSearchParams(searchParams);
-    newParams.delete("mode");
+    newParams.set("mode", "profile");
     newParams.delete("tab");
     setSearchParams(newParams);
   }, [searchParams, setSearchParams]);

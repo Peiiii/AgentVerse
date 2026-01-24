@@ -31,12 +31,12 @@ export function AgentsPage() {
 
   // 处理查看智能体详情
   const handleViewAgent = (agentId: string) => {
-    navigate(`/agents/${agentId}`);
+    navigate(`/agents/${agentId}?mode=edit&tab=configure`);
   };
 
   // 处理 AI 编辑智能体
   const handleEditAgentWithAI = useCallback((agent: AgentDef) => {
-    navigate(`/agents/${agent.id}?tab=ai-create`);
+    navigate(`/agents/${agent.id}?mode=edit&tab=ai-create`);
   }, [navigate]);
 
   // 获取所有角色和专长用于筛选

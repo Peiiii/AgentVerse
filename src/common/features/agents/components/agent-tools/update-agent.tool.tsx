@@ -9,6 +9,7 @@ interface AgentUpdateArgs {
   personality: string;
   role: "participant" | "moderator";
   expertise?: string[];
+  tags?: string[];
   bias?: string;
   responseStyle?: string;
   avatar?: string;
@@ -26,6 +27,7 @@ function AgentUpdateResult({ args }: { args: AgentUpdateArgs }) {
   const expertiseList = Array.isArray(args.expertise) ? args.expertise : [];
   const expertisePreview = expertiseList.slice(0, 2).join('、');
   const hasMoreExpertise = expertiseList.length > 2;
+  const tagList = Array.isArray(args.tags) ? args.tags : [];
 
   return (
     <div className="p-4 border rounded-lg bg-muted mt-2">
@@ -45,6 +47,9 @@ function AgentUpdateResult({ args }: { args: AgentUpdateArgs }) {
           <span className="ml-1">、{expertiseList.slice(2).join('、')}</span>
         )}
       </div>
+      {tagList.length > 0 && (
+        <div className="text-sm mb-1"><b>标签：</b>{tagList.join('、')}</div>
+      )}
       <div className="text-sm mb-1"><b>风格：</b>{args.responseStyle}</div>
       {expanded && (
         <div className="mt-2 text-xs text-muted-foreground space-y-1">
@@ -118,6 +123,13 @@ export function createUpdateAgentTool(onAgentCreate?: (agent: Omit<AgentDef, "id
           },
           description: "智能体的专业技能和知识领域列表"
         },
+        tags: {
+          type: "array",
+          items: {
+            type: "string"
+          },
+          description: "智能体标签列表，用于路由或分类"
+        },
         bias: {
           type: "string",
           description: "智能体的倾向性或偏好"
@@ -142,6 +154,7 @@ export function createUpdateAgentTool(onAgentCreate?: (agent: Omit<AgentDef, "id
           personality: args.personality,
           role: args.role,
           expertise: args.expertise || [],
+          tags: Array.isArray(args.tags) ? args.tags : [],
           bias: args.bias || "",
           responseStyle: args.responseStyle || "友好专业",
           avatar: args.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(args.name)}`,

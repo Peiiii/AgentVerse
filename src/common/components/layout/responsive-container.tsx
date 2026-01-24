@@ -21,7 +21,10 @@ export function ResponsiveContainer({
   const { isLessThan } = useBreakpointContext();
 
   return (
-    <div className={cn("h-full w-full overflow-hidden flex", className)} data-component="responsive-container">
+    <div
+      className={cn("relative h-full w-full overflow-hidden flex", className)}
+      data-component="responsive-container"
+    >
       {sidebarContent && (
         <>
           {/* 移动端遮罩 */}
@@ -38,8 +41,12 @@ export function ResponsiveContainer({
             className={cn(
               "w-[280px] h-full border-r border-border bg-card flex-shrink-0",
               "transition-transform duration-300 ease-in-out",
+              isLessThan("lg") &&
+                "absolute inset-y-0 left-0 z-50 shadow-lg",
               // 移动端：隐藏或显示
-              isLessThan("lg") && !showMobileSidebar ? "-translate-x-full" : "translate-x-0",
+              isLessThan("lg") && !showMobileSidebar
+                ? "-translate-x-full"
+                : "translate-x-0",
               // 桌面端：始终显示
               "lg:translate-x-0"
             )}

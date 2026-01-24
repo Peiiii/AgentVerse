@@ -39,6 +39,7 @@ export function AgentForm({
     role: initialData?.role || "participant",
     personality: initialData?.personality || "",
     expertise: initialData?.expertise || [],
+    tags: initialData?.tags || [],
     bias: initialData?.bias || "",
     responseStyle: initialData?.responseStyle || "",
   });
@@ -52,6 +53,7 @@ export function AgentForm({
         role: initialData.role,
         personality: initialData.personality,
         expertise: initialData.expertise,
+        tags: initialData.tags || [],
         bias: initialData.bias,
         responseStyle: initialData.responseStyle,
       });
@@ -148,10 +150,34 @@ export function AgentForm({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    expertise: e.target.value.split(",").map((s) => s.trim()),
+                    expertise: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
                   })
                 }
                 placeholder="用逗号分隔多个领域"
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="tags" className="text-right">
+                标签
+              </Label>
+              <Input
+                id="tags"
+                value={formData.tags?.join(", ")}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    tags: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                  })
+                }
+                placeholder="用逗号分隔多个标签"
                 className="col-span-3"
               />
             </div>

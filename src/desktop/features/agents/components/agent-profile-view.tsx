@@ -10,6 +10,7 @@ import {
     Edit3,
     MessageSquare,
     Sparkles,
+    Tag,
     Target,
     User,
     Zap
@@ -168,6 +169,27 @@ export function AgentProfileView({
                                     <span>回复风格</span>
                                 </div>
                                 <p className="text-sm leading-relaxed">{agent.responseStyle}</p>
+                            </div>
+                        )}
+
+                        {/* Tags */}
+                        {agent.tags && agent.tags.length > 0 && (
+                            <div className="bg-card border rounded-xl p-4 space-y-3">
+                                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                    <Tag className="w-4 h-4" />
+                                    <span>标签</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {agent.tags.map((tag, index) => (
+                                        <Badge
+                                            key={`${tag}-${index}`}
+                                            variant="secondary"
+                                            className="px-3 py-1"
+                                        >
+                                            {tag}
+                                        </Badge>
+                                    ))}
+                                </div>
                             </div>
                         )}
 

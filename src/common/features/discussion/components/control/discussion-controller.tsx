@@ -3,7 +3,7 @@ import { UI_PERSIST_KEYS, createUIPersistOptions } from "@/core/config/ui-persis
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { usePersistedState } from "@/core/hooks/usePersistedState";
 import { cn } from "@/common/lib/utils";
-import { PauseCircle, PlayCircle } from "lucide-react";
+import { Menu, PauseCircle, PlayCircle } from "lucide-react";
 import { useCallback } from "react";
 import { MemberToggleButton } from "../member/member-toggle-button";
 import { DiscussionSettingsButton } from "../settings/discussion-settings-button";
@@ -128,12 +128,16 @@ interface DiscussionControllerProps {
   status: "active" | "paused" | "completed";
   onToggleMembers?: () => void;
   enableSettings?: boolean;
+  onToggleSidebar?: () => void;
+  showSidebarToggle?: boolean;
 }
 
 export function DiscussionController({
   status,
   onToggleMembers,
   enableSettings = true,
+  onToggleSidebar,
+  showSidebarToggle = false,
 }: DiscussionControllerProps) {
   const {
     settings,
@@ -165,6 +169,21 @@ export function DiscussionController({
       <div className="px-4 py-2.5">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
+            {showSidebarToggle && onToggleSidebar && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "shrink-0 transition-all duration-200",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  "rounded-md"
+                )}
+                onClick={onToggleSidebar}
+                title="打开会话列表"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            )}
             <ControlButton 
               isActive={isActive} 
               onClick={() => handleStatusChange(!isActive)} 
