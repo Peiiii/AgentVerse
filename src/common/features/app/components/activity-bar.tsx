@@ -25,6 +25,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
   // 按组筛选
   const mainGroupItems = items.filter((item) => item.group === "main");
   const footerItems = items.filter((item) => item.group === "footer");
+  const hasFooterItems = footerItems.length > 0;
 
   const handleExpandedChange = (newExpanded: boolean) => {
     presenter.activityBar.setExpanded(newExpanded);
@@ -72,19 +73,21 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       </ActivityBar.GroupList>
 
       <ActivityBar.Footer>
-        <ActivityBar.Separator />
-        <ActivityBar.Group>
-          {footerItems.map((item: ActivityItem) => (
-            <ActivityBar.Item
-              key={item.id}
-              id={item.id}
-              icon={<IconRegistry id={item.icon} />}
-              label={item.label}
-              title={item.title}
-            />
-          ))}
-        </ActivityBar.Group>
-        <ActivityBar.Separator />
+        {hasFooterItems && <ActivityBar.Separator />}
+        {hasFooterItems && (
+          <ActivityBar.Group>
+            {footerItems.map((item: ActivityItem) => (
+              <ActivityBar.Item
+                key={item.id}
+                id={item.id}
+                icon={<IconRegistry id={item.icon} />}
+                label={item.label}
+                title={item.title}
+              />
+            ))}
+          </ActivityBar.Group>
+        )}
+        {hasFooterItems && <ActivityBar.Separator />}
         <div className="px-3 py-2 space-y-2">
           <LanguageToggle className="w-full" />
           <ThemeToggle className="w-full" />
