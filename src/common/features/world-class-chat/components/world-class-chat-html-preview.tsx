@@ -62,9 +62,9 @@ export function WorldClassChatHtmlPreview({
   };
 
   return (
-    <div className="flex-1 min-w-0 overflow-hidden bg-white shadow-xl flex flex-col relative animate-fadeInRight h-full">
+    <div className="flex-1 min-w-0 overflow-hidden bg-transparent flex flex-col relative animate-fadeInRight h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100 bg-white/80 backdrop-blur sticky top-0 z-20">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-100/30 bg-white/40 backdrop-blur-md sticky top-0 z-20">
         <div className="flex items-center gap-2">
           <button
             className={`flex items-center gap-1 px-3 py-1 rounded-lg font-medium text-sm transition-colors duration-150 ${tab === 'preview' ? 'bg-indigo-50 text-indigo-600 shadow' : 'hover:bg-slate-100 text-slate-500'}`}
@@ -113,8 +113,8 @@ export function WorldClassChatHtmlPreview({
         </div>
       )}
       {/* 内容区 */}
-      <div className="flex-1 overflow-auto p-4 h-full">
-        <div className="rounded-xl shadow-lg overflow-hidden bg-white h-full border border-slate-100 flex flex-col">
+      <div className="flex-1 overflow-auto p-6 h-full">
+        <div className="rounded-2xl shadow-2xl shadow-indigo-500/10 overflow-hidden bg-white h-full border border-indigo-100/30 flex flex-col">
           {tab === 'preview' ? (
             <iframe
               ref={iframeRef}

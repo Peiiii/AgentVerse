@@ -197,17 +197,21 @@ export const WorldClassChatContainer = forwardRef<
       >
         {/* 左侧：聊天主界面，宽度动画与右侧面板同步 */}
         <div
-          className={`flex flex-col h-full min-w-0 transition-all duration-350 ease-[cubic-bezier(.4,0,.2,1)] ${
+          className={`flex flex-col h-full min-w-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
             sidePanelActive ? "basis-1/2" : "basis-full"
-          } p-0`}
+          } p-0 relative`}
           style={{
             boxSizing: "border-box",
             transition:
-              "width 0.35s cubic-bezier(.4,0,.2,1), flex-basis 0.35s cubic-bezier(.4,0,.2,1)",
+              "width 0.5s cubic-bezier(0.23,1,0.32,1), flex-basis 0.5s cubic-bezier(0.23,1,0.32,1)",
             width: sidePanelActive ? "50%" : "100%",
             flexBasis: sidePanelActive ? "50%" : "100%",
           }}
         >
+          {/* 垂直分割线，仅在右侧面板激活时显示 */}
+          <div 
+            className={`absolute right-0 top-0 bottom-0 w-[1px] bg-indigo-200/20 z-10 transition-opacity duration-300 ${sidePanelActive ? 'opacity-100' : 'opacity-0'}`}
+          />
           <WorldClassChatTopBar
             agentDef={agentDef}
             onClear={handleClear}

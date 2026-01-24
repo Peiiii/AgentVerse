@@ -4,7 +4,7 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { MessageSquare } from "lucide-react";
+import { MessagesSquare } from "lucide-react";
 import { ChatPage } from "@/mobile/features/chat/pages/chat-page";
 import { i18n } from "@/core/hooks/use-i18n";
 
@@ -19,7 +19,7 @@ export const mobileChatExtension = defineExtension({
     },
     activate: ({ subscriptions }) => {
         subscriptions.push(Disposable.from(useIconStore.getState().addIcons({
-            "message": MessageSquare,
+            "message": MessagesSquare,
         })))
         subscriptions.push(Disposable.from(getPresenter().activityBar.addItem({
             id: "chat",

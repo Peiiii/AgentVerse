@@ -55,7 +55,7 @@ export function MemberList({
   const renderHeader = () => (
     <header
       className={cn(
-        "flex-none flex flex-col gap-3 sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-3.5 mb-3 border-b border-border/40",
+        "flex-none flex flex-col gap-3 sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-4 px-4 mb-3 border-b border-border/40",
         headerClassName
       )}
     >
@@ -164,7 +164,7 @@ export function MemberList({
     <>
       <div className={cn("flex flex-col h-full overflow-hidden", className)}>
         {renderHeader()}
-        <div className={cn("flex-1 min-h-0 overflow-y-auto px-1", listClassName)}>
+        <div className={cn("flex-1 min-h-0 overflow-y-auto px-4", listClassName)}>
           <div className="space-y-2.5 pb-4">
             {renderContent()}
           </div>

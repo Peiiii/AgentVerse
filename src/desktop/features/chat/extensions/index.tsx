@@ -1,6 +1,6 @@
 import { getPresenter } from "@/core/presenter/presenter";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { MessageSquare } from "lucide-react";
+import { MessagesSquare } from "lucide-react";
 import { ChatPage } from "@/desktop/features/chat/pages/chat-page";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { RedirectToChat } from "@/common/components/common/redirect";
@@ -20,7 +20,7 @@ export const desktopChatExtension = defineExtension({
     activate: ({ subscriptions }) => {
         const presenter = getPresenter();
         subscriptions.push(Disposable.from(presenter.icon.addIcons({
-            "message": MessageSquare,
+            "message": MessagesSquare,
         })))
         subscriptions.push(Disposable.from(presenter.activityBar.addItem({
             id: "chat",

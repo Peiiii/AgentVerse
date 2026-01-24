@@ -2,7 +2,7 @@ import { cn } from "@/common/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { getAllSettings, getSettingById } from "./settings-registry";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown, ArrowRight, X } from "lucide-react";
 
 export interface WorldClassSettingsPanelProps {
   onClose: () => void;
@@ -40,9 +40,9 @@ export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProp
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full h-full flex flex-col bg-white shadow-lg relative overflow-hidden"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="w-full h-full flex flex-col relative overflow-hidden bg-transparent"
     >
       <AnimatePresence mode="wait">
         {!activeSetting ? (
@@ -54,14 +54,14 @@ export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProp
             exit={{ opacity: 0, x: 20 }}
             className="w-full h-full flex flex-col p-6 overflow-y-auto"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold">设置</h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">设置</h2>
               <button
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-accent rounded-md transition-colors"
+                className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white/50 backdrop-blur-sm rounded-xl transition-all duration-300 border border-transparent hover:border-indigo-100"
                 onClick={onClose}
                 title="关闭"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -74,9 +74,9 @@ export function WorldClassSettingsPanel({ onClose }: WorldClassSettingsPanelProp
                   <div
                     key={setting.id}
                     className={cn(
-                      "border rounded-xl overflow-hidden transition-all duration-200",
-                      "hover:border-indigo-300 hover:shadow-md",
-                      isExpanded && "border-indigo-300 shadow-md bg-indigo-50/20"
+                      "group border border-indigo-100/50 rounded-2xl overflow-hidden transition-all duration-300 bg-white/40 backdrop-blur-sm",
+                      "hover:border-indigo-300/50 hover:shadow-lg hover:shadow-indigo-500/5 hover:translate-y-[-2px]",
+                      isExpanded && "border-indigo-300/50 shadow-xl shadow-indigo-500/10 bg-white/60 translate-y-[-2px]"
                     )}
                   >
                     {/* 设置项头部 */}
