@@ -5,7 +5,8 @@ export enum SupportedAIProvider {
   DOBRAIN = "dobrain",
   OPENAI = "openai",
   DASHSCOPE = "dashscope",
-  OPENROUTER = "openrouter",  
+  OPENROUTER = "openrouter",
+  GLM = "glm",
 }
 
 export interface BaseProviderConfig {

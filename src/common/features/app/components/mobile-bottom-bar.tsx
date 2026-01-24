@@ -3,11 +3,10 @@ import {
   Github,
   LayoutGrid,
   MessageSquare,
-  Settings,
   Users
 } from "lucide-react";
 
-type Scene = "discussions" | "chat" | "agents" | "settings";
+type Scene = "discussions" | "chat" | "agents";
 
 interface MobileBottomBarProps {
   className?: string;
@@ -36,11 +35,6 @@ export function MobileBottomBar({
       scene: "agents" as const,
       label: "智能体",
       icon: Users
-    },
-    {
-      scene: "settings" as const,
-      label: "设置",
-      icon: Settings
     }
   ];
 

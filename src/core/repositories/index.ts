@@ -7,4 +7,3 @@ export * from "./agent.repository";
 export * from "./discussion.repository";
 export * from "./message.repository";
 export * from "./discussion-member.repository";
-export * from "./settings.repository";

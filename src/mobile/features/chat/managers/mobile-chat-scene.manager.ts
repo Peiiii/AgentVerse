@@ -20,10 +20,6 @@ export class MobileChatSceneManager {
     this.setScene("agents");
   };
 
-  toSettings = () => {
-    this.setScene("settings");
-  };
-
   handleDiscussionChange = (discussionId?: string | null) => {
     if (!discussionId) {
       return;

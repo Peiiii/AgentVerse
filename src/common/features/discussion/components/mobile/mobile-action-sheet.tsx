@@ -1,11 +1,10 @@
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { Button } from "@/common/components/ui/button";
-import { Settings, Eraser, Moon, Sun, X } from "lucide-react";
+import { Eraser, Moon, Sun, X } from "lucide-react";
 import { useTheme } from "@/common/components/common/theme";
 import { Separator } from "@/common/components/ui/separator";
 import { cn } from "@/common/lib/utils";
 import { useModal } from "@/common/components/ui/modal";
-import { usePresenter } from "@/core/presenter";
 import { useTranslation } from "@/core/hooks/use-i18n";
 
 interface MobileActionSheetProps {
@@ -22,7 +21,6 @@ export function MobileActionSheet({
   const { t } = useTranslation();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const modal = useModal();
-  const presenter = usePresenter();
 
   const handleClearMessages = () => {
     modal.confirm({
@@ -82,14 +80,6 @@ export function MobileActionSheet({
           </Button>
         </div>
         <div className="px-2 py-1">
-          <ActionItem
-            icon={Settings}
-            label={t("discussion.discussionSettings")}
-            onClick={() => {
-              presenter.settings.open();
-              onOpenChange(false);
-            }}
-          />
           <ActionItem
             icon={isDarkMode ? Sun : Moon}
             label={isDarkMode ? t("theme.switchToLight") : t("theme.switchToDark")}

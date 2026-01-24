@@ -1,13 +1,10 @@
 import { AddAgentDialogContent } from "@/common/features/agents/components/add-agent-dialog/add-agent-dialog-content";
 import { ChatArea } from "@/common/features/chat/components/chat-area";
 import { useTheme } from "@/common/components/common/theme";
-import { ThemeToggle } from "@/common/components/common/theme-toggle";
 import { DiscussionList } from "@/common/features/discussion/components/list/discussion-list";
 import { MobileMemberDrawer } from "@/common/features/discussion/components/member/mobile-member-drawer";
 import { MobileBottomBar } from "@/common/features/app/components/mobile-bottom-bar";
 import { MobileHeader } from "@/common/features/discussion/components/mobile/mobile-header";
-import { Button } from "@/common/components/ui/button";
-import { Switch } from "@/common/components/ui/switch";
 import { cn } from "@/common/lib/utils";
 import { Discussion } from "@/common/types/discussion";
 import { useDiscussions } from "@/core/hooks/useDiscussions";
@@ -32,7 +29,7 @@ export function ChatPage() {
   
   const [showMobileMemberDrawer, setShowMobileMemberDrawer] = useState(false);
   const scene = useMobileChatSceneStore((state) => state.scene);
-  const { toChat, toDiscussions, toAgents, toSettings } = mobileChatSceneManager;
+  const { toChat, toDiscussions, toAgents } = mobileChatSceneManager;
   const handleToggleMembers = () => {
     setShowMobileMemberDrawer(!showMobileMemberDrawer);
   };
@@ -57,7 +54,6 @@ export function ChatPage() {
             status={status}
             onStatusChange={handleStatusChange}
             onManageMembers={handleToggleMembers}
-            // 移除非必要的 prop 透传：设置入口统一用 presenter.settings.open
             onClearMessages={() => {
               if (currentDiscussion) {
                 presenter.discussions.clearMessages(currentDiscussion.id);
@@ -85,76 +81,6 @@ export function ChatPage() {
             <div className="h-full p-4 overflow-y-auto">
               <AddAgentDialogContent />
             </div>
-          ) : scene === "settings" ? (
-            <div className="h-full overflow-y-auto">
-              <div className="space-y-6 p-4">
-                {/* 通用 */}
-                <div className="space-y-3">
-                  <h2 className="text-lg font-medium">通用</h2>
-                  <div className="space-y-4 rounded-lg border bg-card/50 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">深色模式</div>
-                        <div className="text-sm text-muted-foreground">
-                          切换深色/浅色主题
-                        </div>
-                      </div>
-                      <ThemeToggle />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 讨论设置 */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-medium">讨论设置</h2>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => presenter.settings.open()}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      高级设置
-                    </Button>
-                  </div>
-                  <div className="space-y-4 rounded-lg border bg-card/50 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">自动滚动</div>
-                        <div className="text-sm text-muted-foreground">
-                          新消息时自动滚动到底部
-                        </div>
-                      </div>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">自动标题</div>
-                        <div className="text-sm text-muted-foreground">
-                          根据首条消息自动设置讨论标题
-                        </div>
-                      </div>
-                      <Switch />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 关于 */}
-                <div className="space-y-3">
-                  <h2 className="text-lg font-medium">关于</h2>
-                  <div className="space-y-4 rounded-lg border bg-card/50 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">版本</div>
-                        <div className="text-sm text-muted-foreground">
-                          当前版本 1.0.0
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           ) : (
             <DiscussionList />
           )}
@@ -173,9 +99,6 @@ export function ChatPage() {
                   break;
                 case "agents":
                   toAgents();
-                  break;
-                case "settings":
-                  toSettings();
                   break;
               }
             }}

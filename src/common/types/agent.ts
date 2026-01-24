@@ -12,6 +12,7 @@ export interface AgentDef {
   expertise: string[];
   bias: string;
   responseStyle: string;
+  tags?: string[];
 }
 
 export interface CombinationParticipant {

@@ -5,5 +5,4 @@ export enum ModuleOrderEnum {
   MCP = 30,
   INDEXEDDB = 40,
   FILE_MANAGER = 50,
-  SETTINGS = 100,
 }

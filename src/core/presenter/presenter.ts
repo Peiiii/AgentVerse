@@ -7,7 +7,6 @@ import {
   AgentsManager,
   MessagesManager,
   DiscussionMembersManager,
-  SettingsManager,
 } from "@/core/managers";
 import { DiscussionControlManager } from "@/core/managers/discussion-control.manager";
 
@@ -23,7 +22,6 @@ export class Presenter {
   readonly messages = new MessagesManager();
   readonly discussionMembers = new DiscussionMembersManager();
   readonly discussionControl = new DiscussionControlManager();
-  readonly settings = new SettingsManager();
 
   constructor() {
     this.messages.init(this.discussionControl);

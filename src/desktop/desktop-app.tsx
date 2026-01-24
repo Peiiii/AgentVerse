@@ -2,7 +2,6 @@ import { PluginRouter } from "@/common/components/common/plugin-router";
 import { useTheme } from "@/common/components/common/theme";
 import { ActivityBarComponent } from "@/common/features/app/components/activity-bar";
 import { allInOneAgentExtension } from "@/common/features/all-in-one-agent";
-import { settingsExtension } from "@/common/features/settings/extensions";
 import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import { useAppBootstrap } from "@/core/hooks/use-app-bootstrap";
@@ -18,7 +17,6 @@ export function DesktopAppInner() {
       allInOneAgentExtension,
       desktopChatExtension,
       desktopAgentsExtension,
-      settingsExtension,
       // desktopIndexedDBExtension,
       // desktopFileManagerExtension,
       // desktopPortalDemoExtension

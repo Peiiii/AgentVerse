@@ -8,7 +8,8 @@ import { DEFAULT_SETTINGS } from "@/core/config/settings";
 import { BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
 import { AgentDef } from "@/common/types/agent";
-import { aiService } from "@/core/repositories/ai.client";
+import { resolveLLMProviderConfigByTags } from "@/core/config/ai";
+import { createAIServiceForProvider } from "@/core/repositories/ai.client";
 import { messageRepository } from "@/core/repositories/message.repository";
 import { MentionResolver } from "./discussion/mention-resolver";
 import { NextSpeakerSelector } from "./discussion/next-speaker";
@@ -212,6 +213,11 @@ export class DiscussionControlManager {
 
     let finalMessage: AgentMessage | null = null;
     try {
+      const { providerType, providerConfig } = resolveLLMProviderConfigByTags(
+        current.tags
+      );
+      const aiService = createAIServiceForProvider(providerType, providerConfig);
+
       finalMessage = await streamAgentResponse(
         { aiService, messageRepo: messageRepository, reload: () => this.reloadMessages() },
         {

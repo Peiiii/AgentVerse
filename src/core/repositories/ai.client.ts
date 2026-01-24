@@ -1,4 +1,5 @@
 import { getLLMProviderConfig } from "@/core/config/ai";
+import type { ProviderConfig, SupportedAIProvider } from "@/common/types/ai";
 import {
   BaseConfig,
   ChatMessage,
@@ -65,6 +66,25 @@ export function createAIService(): AIService {
   const { useProxy, proxyUrl, providerType, providerConfig } =
     getLLMProviderConfig();
 
+  return createAIServiceForProvider(providerType, providerConfig, {
+    useProxy,
+    proxyUrl,
+  });
+}
+
+// 默认实例
+export const aiService = createAIService();
+
+export function createAIServiceForProvider(
+  providerType: SupportedAIProvider,
+  providerConfig: ProviderConfig,
+  options?: { useProxy?: boolean; proxyUrl?: string }
+): AIService {
+  const useProxy =
+    options?.useProxy ?? getLLMProviderConfig().useProxy;
+  const proxyUrl =
+    options?.proxyUrl ?? getLLMProviderConfig().proxyUrl;
+
   const adapter = useProxy
     ? new ProxyAPIAdapter(proxyUrl)
     : new DirectAPIAdapter(providerConfig.apiKey, providerConfig.baseUrl);
@@ -72,6 +92,3 @@ export function createAIService(): AIService {
   const provider = new StandardProvider(providerConfig, adapter, providerType);
   return new AIService(provider);
 }
-
-// 默认实例
-export const aiService = createAIService();

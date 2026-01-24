@@ -7,5 +7,4 @@ export async function bootstrapApp() {
   const presenter = getPresenter();
   await presenter.agents.load();
   await presenter.discussions.load();
-  await presenter.settings.load();
 }

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type MobileScene = "discussions" | "chat" | "agents" | "settings";
+export type MobileScene = "discussions" | "chat" | "agents";
 
 interface MobileChatSceneState {
   scene: MobileScene;
