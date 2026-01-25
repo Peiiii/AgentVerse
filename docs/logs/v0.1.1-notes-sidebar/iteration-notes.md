@@ -20,6 +20,7 @@
 - 删除未使用的 ChatClient 抽象与 message.toolCalls 字段，减少冗余
 - 群聊中等宽度下右侧成员/笔记面板改为抽屉式展示，动效与左侧列表一致
 - 新增 Cloudflare Pages 部署脚本 `pnpm deploy:pages`
+- 初始化 Project OS：补齐 AGENTS.md 总则/负面清单/规则
 
 ## 测试/验证/验收
 

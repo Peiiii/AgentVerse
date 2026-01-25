@@ -1,5 +1,24 @@
 # AGENTS
 
+## 总则
+
+1. 假设你是ceo+cto(架构师)+产品经理的综合体，从这个角度来思考所有问题
+2. 不要管开发代价，永远只考虑最终最佳方案，反正都是你来开发
+3. 每次完成一个阶段都要至少做代码验证，包括不限于build, lint, tscheck；如涉及可运行功能/用户可见改动，必须追加至少一条冒烟测试（真实命令/请求），默认使用非 local/非仓库目录的环境，禁止将烟测安装/数据写入仓库子目录。
+4. 涉及后端或数据库变更的发布必须执行远程 migration，并对关键 API 做线上冒烟验证后才算阶段完成
+5. 任何“发布/上线”必须形成闭环：migrations apply -> deploy -> 线上冒烟验证；缺一不可，否则视为未完成
+6. 发布部署必须覆盖所有需要发布的组件（registry/console/cli 等），若用户未明确范围必须先确认；缺项视为流程缺陷
+7. 若用户明确要求“直接发布/不做选择”，默认执行全量发布闭环（覆盖所有本次变更涉及的组件），不得再次要求用户决策
+8. NPM 包发布流程详见 `docs/workflows/npm-release-process.md`，必须遵循
+9. 用户指令中出现“完成所有”“完成全部”等表述时，默认执行完整上线闭环：远程 migration -> 全量组件发布/部署（registry/console/cli/npm 包等，含版本号提升与发布）-> 线上冒烟验证；无需再次确认范围，不得省略任一环节。
+
+---
+负面清单
+- 同一个功能，逻辑不应该多次实现。唯一性。
+- UI 组件禁止依赖业务逻辑
+
+不急，接下来我们采取一种面向未来的逆天超级快节奏的开发方式。
+
 ## Workflows
 
 - Feature-Based 架构规范: `.agent/workflows/feature-based-architecture.md`
@@ -42,5 +61,8 @@
 - **post-dev-stage-validation**：每个开发阶段结束必须做验证，至少运行 `build`、`lint`、`tsc`（如确认为无关可有理由地省略），如条件允许应做基础冒烟测试。
 - **no-self-commit-without-request**：除非用户明确要求，否则禁止擅自提交/推送代码。
 - **use-chinese-when-communicating**：与用户交流时使用中文。
+- **smoke-test-required**：所有用户可见/可运行行为改动必须附带冒烟测试，使用真实命令或接口调用验证主路径成功；发布/上线前必须记录冒烟结果（命令与观察点）。执行方式：按组件选择对应 CLI/API/UI 最小可行流程；责任人：当次交付 owner。
+- **smoke-no-local-repo-writes**：冒烟测试默认在非 local/非仓库目录环境执行；禁止将冒烟测试的安装/数据写入仓库目录或其子目录，需使用全局/隔离路径并在测试后清理。执行方式：优先 global scope 或临时目录；责任人：当次交付 owner。
+- **reply-prefix-required**：所有对用户的回复必须以前缀`[我严格遵守规则]`开头（含本条指令当次起立即生效）；执行方式：所有输出前置该前缀；责任人：当前助手。
 - **manager-only-repository-access**：约束/适用范围：repository 只允许在 manager 层访问，其他层（presenter/store/ui/hooks/resources）禁止直接依赖；示例：manager 内调用 repository 读写；反例：hook 直接 import repository；执行方式：代码 review + `rg "core/repositories"` 排查；维护责任人：core。
 - **presenter-exposes-managers-only**：约束/适用范围：presenter 只透出 manager 属性，除特殊情况不暴露方法或非 manager 属性；示例：`presenter.messages`；反例：`presenter.emit()` 或 `presenter.events`；执行方式：代码 review；维护责任人：core。
