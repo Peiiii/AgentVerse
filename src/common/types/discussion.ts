@@ -21,29 +21,29 @@ export interface NormalMessage extends BaseMessage {
   toolCalls?: ToolCall[]; // 标准 tool call 列表
 }
 
+export type ToolInvocationStatus = "pending" | "success" | "error";
+
 export type MessageSegment =
   | { type: "text"; content: string }
-  | { type: "tool_call"; key: string; call: ToolCall };
+  | {
+      type: "tool_invocation";
+      key: string;
+      call: ToolCall;
+      status?: ToolInvocationStatus;
+      result?: unknown;
+      error?: string;
+      startTime?: number;
+      endTime?: number;
+    };
 
-// Tool 执行结果消息
-export interface ToolResultMessage extends BaseMessage {
-  type: "tool_result";
-  originMessageId: string; // 关联到触发 tool call 的原始消息
-  toolCallId: string;
-  toolName: string;
-  status: "success" | "error";
-  result?: unknown;
-  error?: string;
-  startTime?: number;
-  endTime?: number;
-}
+export type ToolInvocationSegment = Extract<
+  MessageSegment,
+  { type: "tool_invocation" }
+>;
 
-// 带有 tool 结果的消息
-export interface MessageWithTools extends NormalMessage {
-  toolResults?: Record<string, ToolResultMessage>;
-}
+export type MessageWithTools = NormalMessage;
 
-export type AgentMessage = NormalMessage | ToolResultMessage;
+export type AgentMessage = NormalMessage;
 
 export interface Discussion {
   id: string;

@@ -1,4 +1,4 @@
-import { AgentMessage, ToolResultMessage } from "@/common/types/discussion";
+import { AgentMessage } from "@/common/types/discussion";
 import { MessageDataProvider } from "@/common/types/storage";
 import { dataProviders } from "@/core/repositories/data-providers";
 import { discussionRepository } from "@/core/repositories/discussion.repository";
@@ -41,12 +41,6 @@ export class MessageRepository {
     await discussionRepository.updateLastMessage(newMessage.discussionId, newMessage);
 
     return newMessage;
-  }
-
-  async createToolResult(
-    data: Omit<ToolResultMessage, "id">
-  ): Promise<ToolResultMessage> {
-    return (await this.createMessage(data)) as ToolResultMessage;
   }
 
   async updateMessage(

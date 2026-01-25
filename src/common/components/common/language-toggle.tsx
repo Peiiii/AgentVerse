@@ -27,7 +27,7 @@ export function LanguageToggle({ className }: LanguageToggleProps) {
         <Button
           variant="ghost"
           size="icon"
-          className={cn("hover:bg-muted/80", className)}
+          className={cn("bg-transparent hover:bg-muted/80", className)}
           title={t("settings.language.label")}
         >
           <Globe className="h-[1.2rem] w-[1.2rem]" />

@@ -214,10 +214,12 @@ export class DiscussionControlManager {
     let finalMessage: AgentMessage | null = null;
     try {
       const discussionNote = getPresenter().discussions.getCurrent()?.note || "";
-      const { providerType, providerConfig } = resolveLLMProviderConfigByTags(
+      const { providerType, providerConfig, model } = resolveLLMProviderConfigByTags(
         current.tags
       );
-      const aiService = createAIServiceForProvider(providerType, providerConfig);
+      const aiService = createAIServiceForProvider(providerType, providerConfig, {
+        model,
+      });
 
       finalMessage = await streamAgentResponse(
         { aiService, messageRepo: messageRepository, reload: () => this.reloadMessages() },

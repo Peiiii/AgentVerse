@@ -63,12 +63,13 @@ export class AIService {
 
 // 工厂函数
 export function createAIService(): AIService {
-  const { useProxy, proxyUrl, providerType, providerConfig } =
+  const { useProxy, proxyUrl, providerType, providerConfig, model } =
     getLLMProviderConfig();
 
   return createAIServiceForProvider(providerType, providerConfig, {
     useProxy,
     proxyUrl,
+    model,
   });
 }
 
@@ -78,17 +79,34 @@ export const aiService = createAIService();
 export function createAIServiceForProvider(
   providerType: SupportedAIProvider,
   providerConfig: ProviderConfig,
-  options?: { useProxy?: boolean; proxyUrl?: string }
+  options?: { useProxy?: boolean; proxyUrl?: string; model?: string }
 ): AIService {
   const useProxy =
     options?.useProxy ?? getLLMProviderConfig().useProxy;
   const proxyUrl =
     options?.proxyUrl ?? getLLMProviderConfig().proxyUrl;
+  const model =
+    options?.model ||
+    providerConfig.models[0] ||
+    "";
 
   const adapter = useProxy
     ? new ProxyAPIAdapter(proxyUrl)
     : new DirectAPIAdapter(providerConfig.apiKey, providerConfig.baseUrl);
 
-  const provider = new StandardProvider(providerConfig, adapter, providerType);
+  const config = {
+    apiKey: providerConfig.apiKey,
+    baseUrl: providerConfig.baseUrl,
+    model,
+    maxTokens: providerConfig.maxTokens,
+    ...("topP" in providerConfig ? { topP: providerConfig.topP } : {}),
+    ...("presencePenalty" in providerConfig
+      ? { presencePenalty: providerConfig.presencePenalty }
+      : {}),
+    ...("frequencyPenalty" in providerConfig
+      ? { frequencyPenalty: providerConfig.frequencyPenalty }
+      : {}),
+  };
+  const provider = new StandardProvider(config, adapter, providerType);
   return new AIService(provider);
 }

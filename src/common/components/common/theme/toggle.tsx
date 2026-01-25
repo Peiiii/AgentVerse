@@ -17,7 +17,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       variant="ghost" 
       size="icon"
       onClick={toggleDarkMode}
-      className={cn("hover:bg-muted/80", className)}
+      className={cn("bg-transparent hover:bg-muted/80", className)}
       title={isDarkMode ? t("theme.switchToLight") : t("theme.switchToDark")}
     >
       {isDarkMode ? (

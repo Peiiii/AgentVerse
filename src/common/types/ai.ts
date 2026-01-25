@@ -12,7 +12,7 @@ export enum SupportedAIProvider {
 export interface BaseProviderConfig {
   apiKey: string;
   baseUrl: string;
-  model: string;
+  models: string[];
   maxTokens: number;
 }
 

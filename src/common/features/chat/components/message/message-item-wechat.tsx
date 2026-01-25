@@ -60,8 +60,7 @@ export function MessageItemWechat({
 
   const hasToolContent =
     (message.segments && message.segments.length > 0) ||
-    (message.toolCalls && message.toolCalls.length > 0) ||
-    (message.toolResults && Object.keys(message.toolResults).length > 0);
+    (message.toolCalls && message.toolCalls.length > 0);
   // 检查消息是否为空
   const isEmpty =
     (!message.content || message.content.trim() === "") && !hasToolContent;

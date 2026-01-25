@@ -51,10 +51,10 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
 }, ref) => {
   const agentDef$ = useObservableFromState(agentDef);
   const [initialAgent] = useState(() => {
-    const { providerConfig } = getLLMProviderConfig();
+    const { providerConfig, model } = getLLMProviderConfig();
     return new ExperimentalInBrowserAgent({
       ...agentDef,
-      model: providerConfig.model,
+      model,
       baseURL: providerConfig.baseUrl,
       apiKey: providerConfig.apiKey,
     });
@@ -63,10 +63,10 @@ export const AgentChatContainer = forwardRef<AgentChatContainerRef, AgentChatCon
     () =>
       agentDef$.pipe(
         map((agentDef) => {
-          const { providerConfig } = getLLMProviderConfig();
+          const { providerConfig, model } = getLLMProviderConfig();
           return new ExperimentalInBrowserAgent({
             ...agentDef,
-            model: providerConfig.model,
+            model,
             baseURL: providerConfig.baseUrl,
             apiKey: providerConfig.apiKey,
           });

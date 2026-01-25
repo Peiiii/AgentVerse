@@ -1,8 +1,6 @@
 import {
   AgentMessage,
   NormalMessage,
-  MessageWithTools,
-  ToolResultMessage,
   MessageSegment,
 } from "@/common/types/discussion";
 
@@ -41,91 +39,17 @@ function shouldMergeMessages(
   return true;
 }
 
-// type ActionResultType = {
-//   capability: string;
-//   params: Record<string, unknown>;
-//   status: "success" | "error";
-//   result?: unknown;
-//   error?: string;
-//   description: string;
-// };
-
-type ToolResultMap = Record<string, ToolResultMessage>;
-
-/**
- * 第一阶段：合并消息和其对应的 tool 结果
- */
-function mergeToolResults(messages: AgentMessage[]): MessageWithTools[] {
-  const result: MessageWithTools[] = [];
-  const messageIndex = new Map<string, number>();
-  const toolResultsByOrigin = new Map<string, ToolResultMap>();
-
-  const updateToolResults = (
-    originMessageId: string,
-    patch: ToolResultMap
-  ) => {
-    const current = toolResultsByOrigin.get(originMessageId) ?? {};
-    const next = { ...current, ...patch };
-    toolResultsByOrigin.set(originMessageId, next);
-    return next;
-  };
-
-  for (const message of messages) {
-    if (message.type === "tool_result") {
-      const toolResult = message as ToolResultMessage;
-      const nextToolResults = updateToolResults(toolResult.originMessageId, {
-        [toolResult.toolCallId]: toolResult,
-      });
-      const targetIndex = messageIndex.get(toolResult.originMessageId);
-      if (targetIndex !== undefined) {
-        const current = result[targetIndex];
-        result[targetIndex] = {
-          ...current,
-          toolResults: nextToolResults,
-        };
-      }
-      continue;
-    }
-
-    const toolResults = toolResultsByOrigin.get(message.id);
-    result.push({
-      ...(message as NormalMessage),
-      toolResults: toolResults ? { ...toolResults } : undefined,
-    });
-    messageIndex.set(message.id, result.length - 1);
-  }
-
-  return result;
-}
-
-/**
- * 合并两个消息的 toolResults
- */
-function mergeToolResultObjects(
-  current: MessageWithTools["toolResults"],
-  next: MessageWithTools["toolResults"]
-): MessageWithTools["toolResults"] {
-  if (!current) return next;
-  if (!next) return current;
-
-  return {
-    ...current,
-    ...next,
-  };
-}
-
 /**
  * 第二阶段：合并相邻的消息
  */
 function mergeAdjacentMessages(
-  messages: MessageWithTools[]
-): MessageWithTools[] {
-  const result: MessageWithTools[] = [];
+  messages: NormalMessage[]
+): NormalMessage[] {
+  const result: NormalMessage[] = [];
 
   for (let i = 0; i < messages.length; i++) {
     const current = messages[i];
     let mergedContent = current.content;
-    let mergedToolResults = current.toolResults;
     let mergedSegments: MessageSegment[] | null = current.segments?.length
       ? [...current.segments]
       : null;
@@ -138,10 +62,6 @@ function mergeAdjacentMessages(
     ) {
       const next = messages[nextIndex];
       mergedContent += "\n\n" + next.content;
-      mergedToolResults = mergeToolResultObjects(
-        mergedToolResults,
-        next.toolResults
-      );
       if (mergedSegments || next.segments?.length) {
         if (!mergedSegments) {
           mergedSegments = current.content
@@ -166,7 +86,6 @@ function mergeAdjacentMessages(
       result.push({
         ...current,
         content: mergedContent,
-        toolResults: mergedToolResults,
         segments: mergedSegments?.length ? mergedSegments : undefined,
       });
       i = nextIndex - 1; // 跳过已合并的消息
@@ -213,10 +132,6 @@ function mergeSegmentsWithSeparator(
  */
 export function reorganizeMessages(
   messages: AgentMessage[]
-): MessageWithTools[] {
-  // 第一阶段：合并 tool 结果
-  const messagesWithTools = mergeToolResults(messages);
-
-  // 第二阶段：合并相邻消息
-  return mergeAdjacentMessages(messagesWithTools);
+): NormalMessage[] {
+  return mergeAdjacentMessages(messages as NormalMessage[]);
 }

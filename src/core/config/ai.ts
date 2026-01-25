@@ -9,21 +9,21 @@ export const AI_PROVIDER_CONFIG: ProviderConfigs = {
   [SupportedAIProvider.DEEPSEEK]: {
     apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
     baseUrl: "https://api.deepseek.com/v1",
-    model: "deepseek-chat",
+    models: ["deepseek-chat"],
     maxTokens: 1000,
   },
 
   [SupportedAIProvider.MOONSHOT]: {
     apiKey: import.meta.env.VITE_MOONSHOT_API_KEY,
     baseUrl: "https://api.moonshot.cn/v1",
-    model: "kimi-k2-0711-preview",
+    models: ["kimi-k2-0711-preview"],
     maxTokens: 3000,
   },
 
   [SupportedAIProvider.DOBRAIN]: {
     apiKey: import.meta.env.VITE_DOBRAIN_API_KEY,
     baseUrl: "https://ark.cn-beijing.volces.com/api/v3",
-    model: "dobrain-v1",
+    models: ["dobrain-v1"],
     maxTokens: 1000,
     topP: 0.7,
     presencePenalty: 0,
@@ -33,28 +33,28 @@ export const AI_PROVIDER_CONFIG: ProviderConfigs = {
   [SupportedAIProvider.OPENAI]: {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
     baseUrl: "https://api.openai.com/v1",
-    model: "gpt-3.5-turbo",
+    models: ["gpt-3.5-turbo"],
     maxTokens: 1000,
   },
 
   [SupportedAIProvider.DASHSCOPE]: {
     apiKey: import.meta.env.VITE_DASHSCOPE_API_KEY,
     baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    model: "qwen3-max",
+    models: ["qwen3-max"],
     maxTokens: 1000,
   },
 
   [SupportedAIProvider.OPENROUTER]: {
     apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
     baseUrl: "https://openrouter.ai/api/v1",
-    model: "google/gemini-2.0-flash-001",
+    models: ["google/gemini-2.0-flash-001"],
     maxTokens: 3000,
   },
 
   [SupportedAIProvider.GLM]: {
     apiKey: import.meta.env.VITE_GLM_API_KEY,
     baseUrl: "https://open.bigmodel.cn/api/paas/v4",
-    model: "glm-4-flash",
+    models: ["glm-4-flash"],
     maxTokens: 1000,
   },
 };
@@ -65,6 +65,9 @@ export const BasicAIConfig = {
   AI_PROXY_URL: import.meta.env.VITE_AI_PROXY_URL,
 };
 
+const getDefaultProviderModel = (config: ProviderConfig) =>
+  config.models[0] || "";
+
 export const getLLMProviderConfig = () => {
   const useProxy = BasicAIConfig.AI_USE_PROXY;
   const proxyUrl = BasicAIConfig.AI_PROXY_URL;
@@ -74,12 +77,14 @@ export const getLLMProviderConfig = () => {
       ? (preferredProvider as SupportedAIProvider)
       : SupportedAIProvider.OPENAI;
   const providerConfig = AI_PROVIDER_CONFIG[providerType];
+  const model = getDefaultProviderModel(providerConfig);
 
   return {
     useProxy,
     proxyUrl,
     providerType,
     providerConfig,
+    model,
   };
 };
 
@@ -99,15 +104,20 @@ export const resolveLLMProviderConfigByTags = (tags?: string[]) => {
     return {
       providerType: defaultProviderType,
       providerConfig: defaultProviderConfig as ProviderConfig,
+      model: getDefaultProviderModel(defaultProviderConfig),
     };
   }
 
-  const candidates = Object.entries(AI_PROVIDER_CONFIG).map(
-    ([provider, config]) => ({
-      providerType: provider as SupportedAIProvider,
-      providerConfig: config,
-      identifier: `${provider}:${config.model}`.toLowerCase(),
-    })
+  const candidates = Object.entries(AI_PROVIDER_CONFIG).flatMap(
+    ([provider, config]) =>
+      (config.models.length > 0 ? config.models : [getDefaultProviderModel(config)]).map(
+        (model) => ({
+          providerType: provider as SupportedAIProvider,
+          providerConfig: config,
+          model,
+          identifier: `${provider}:${model}`.toLowerCase(),
+        })
+      )
   );
 
   for (const tag of normalizedTags) {
@@ -118,6 +128,7 @@ export const resolveLLMProviderConfigByTags = (tags?: string[]) => {
       return {
         providerType: match.providerType,
         providerConfig: match.providerConfig as ProviderConfig,
+        model: match.model,
       };
     }
   }
@@ -125,5 +136,6 @@ export const resolveLLMProviderConfigByTags = (tags?: string[]) => {
   return {
     providerType: defaultProviderType,
     providerConfig: defaultProviderConfig as ProviderConfig,
+    model: getDefaultProviderModel(defaultProviderConfig),
   };
 };

@@ -116,10 +116,10 @@ export const WorldClassChatContainer = forwardRef<
   }), [openPanel, addPanel, suggestionsManager, iframeManager]);
 
   // 2. Agent & Message
-  const { providerConfig } = getLLMProviderConfig();
+  const { providerConfig, model } = getLLMProviderConfig();
   const agent = new ExperimentalInBrowserAgent({
     ...agentDef,
-    model: providerConfig.model,
+    model,
     baseURL: providerConfig.baseUrl,
     apiKey: providerConfig.apiKey,
   });

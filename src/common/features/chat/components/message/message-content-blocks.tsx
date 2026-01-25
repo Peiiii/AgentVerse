@@ -21,10 +21,6 @@ export function MessageContentBlocks({
     return (
       <div className={cn("space-y-2", className)}>
         <MessageMarkdownContent content={message.content} />
-        <ToolResultList
-          toolCalls={message.toolCalls}
-          toolResults={message.toolResults}
-        />
       </div>
     );
   }
@@ -43,13 +39,8 @@ export function MessageContentBlocks({
         }
         return (
           <ToolResultList
-            key={segment.key || segment.call.id || `tool-${index}`}
-            toolCalls={[segment.call]}
-            toolResults={
-              message.toolResults && segment.call.id
-                ? { [segment.call.id]: message.toolResults[segment.call.id] }
-                : undefined
-            }
+            key={`${segment.key || segment.call.id || "tool"}-${index}`}
+            invocations={[segment]}
           />
         );
       })}

@@ -51,10 +51,10 @@ function AgentConfigurationAssistantInner({ onAgentCreate, className, editingAge
 
   // 使用useState缓存agent实例，避免无限重新创建
   const [agentCreatorAgent] = useState(() => {
-    const { providerConfig } = getLLMProviderConfig();
+    const { providerConfig, model } = getLLMProviderConfig();
     return new ExperimentalInBrowserAgent({
       ...agentCreatorDef,
-      model: providerConfig.model,
+      model,
       baseURL: providerConfig.baseUrl,
       apiKey: providerConfig.apiKey,
     });
