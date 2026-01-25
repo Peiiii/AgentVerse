@@ -45,7 +45,11 @@ export function MessageContentBlocks({
           <ToolResultList
             key={segment.key || segment.call.id || `tool-${index}`}
             toolCalls={[segment.call]}
-            toolResults={message.toolResults}
+            toolResults={
+              message.toolResults && segment.call.id
+                ? { [segment.call.id]: message.toolResults[segment.call.id] }
+                : undefined
+            }
           />
         );
       })}
