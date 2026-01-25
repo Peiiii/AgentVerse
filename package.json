@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "deploy": "pnpm build && ossutil64 cp -r -u dist oss://apps-eiooie-com/muti-chat -c ./.ossutilconfig.local",
     "deploy2": "pnpm build && ossutil cp -r -u dist oss://agentverse -c ./.ossutilconfig2.local",
+    "deploy:pages": "pnpm build && wrangler pages deploy dist",
     "git:update": "git add . && git commit -m 'update' && git push",
     "updateAll": "pnpm git:update && pnpm run deploy2",
     "test": "jest",
@@ -124,6 +125,7 @@
     "vite": "^6.0.3",
     "vite-plugin-babel": "^1.3.0",
     "vite-plugin-remove-console": "^2.2.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "wrangler": "^3.114.0"
   }
 }

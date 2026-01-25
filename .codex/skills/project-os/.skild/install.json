@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "name": "project-os",
+  "platform": "codex",
+  "scope": "project",
+  "source": "peiiii/skild/skills/project-os",
+  "sourceType": "degit-shorthand",
+  "installedAt": "2026-01-25T11:50:19.363Z",
+  "installDir": "/Users/tongwenwen/Projects/Peiiii/AgentVerse/.codex/skills/project-os",
+  "contentHash": "4a7c96587d5001c7707a44a5ed4bbc3fcaa6ee056a0daac27aca8582368cb3c3",
+  "hasSkillMd": true,
+  "skill": {
+    "frontmatter": {
+      "name": "project-os",
+      "description": "AI project OS for autonomous loop, automated orchestration, and rule-driven execution.",
+      "version": "0.1.1",
+      "author": "Peiiii",
+      "license": "MIT",
+      "tags": [
+        "governance",
+        "process",
+        "release",
+        "logs"
+      ]
+    },
+    "validation": {
+      "ok": true,
+      "issues": [],
+      "frontmatter": {
+        "name": "project-os",
+        "description": "AI project OS for autonomous loop, automated orchestration, and rule-driven execution.",
+        "version": "0.1.1",
+        "author": "Peiiii",
+        "license": "MIT",
+        "tags": [
+          "governance",
+          "process",
+          "release",
+          "logs"
+        ]
+      }
+    }
+  }
+}
