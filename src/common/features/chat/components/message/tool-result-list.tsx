@@ -1,6 +1,7 @@
 import { cn } from "@/common/lib/utils";
 import type { ToolCall } from "@/common/lib/ai-service";
 import { ToolResultMessage } from "@/common/types/discussion";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useState } from "react";
 
 interface ToolResultListProps {
@@ -75,14 +76,20 @@ export function ToolResultList({
     <div className={cn("space-y-2 text-xs", className)}>
       {items.map((item) => {
         const status = item.result?.status ?? "pending";
-        const statusText =
-          status === "success" ? "success" : status === "error" ? "error" : "pending";
+        const statusLabel =
+          status === "success" ? "成功" : status === "error" ? "失败" : "等待";
         const statusClass =
           status === "success"
             ? "text-emerald-600 dark:text-emerald-400"
             : status === "error"
               ? "text-rose-600 dark:text-rose-400"
               : "text-gray-400 dark:text-gray-500";
+        const StatusIcon =
+          status === "success"
+            ? CheckCircle2
+            : status === "error"
+              ? XCircle
+              : Loader2;
         const isExpanded = Boolean(expanded[item.id]);
 
         return (
@@ -101,7 +108,15 @@ export function ToolResultList({
               <span className="font-medium text-gray-600 dark:text-gray-300">
                 {item.name}
               </span>
-              <span className={statusClass}>{statusText}</span>
+              <span className={cn("inline-flex items-center", statusClass)} title={statusLabel}>
+                <StatusIcon
+                  className={cn(
+                    "h-3.5 w-3.5",
+                    status === "pending" && "animate-spin"
+                  )}
+                />
+                <span className="sr-only">{statusLabel}</span>
+              </span>
               <span className="ml-auto text-[11px] text-gray-400 dark:text-gray-500">
                 {isExpanded ? "收起" : "展开"}
               </span>
