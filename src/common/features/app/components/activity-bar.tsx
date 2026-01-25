@@ -1,23 +1,33 @@
+import { useCallback, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IconRegistry } from "@/common/components/common/icon-registry";
 import { ThemeToggle } from "@/common/components/common/theme";
 import { LanguageToggle } from "@/common/components/common/language";
 import { cn } from "@/common/lib/utils";
 import { usePresenter } from "@/core/presenter";
 import { useActivityBarStore, type ActivityItem } from "@/core/stores/activity-bar.store";
+import { useAuth } from "@/core/hooks/use-auth";
 import { ActivityBar } from "composite-kit";
-import { LayoutDashboard } from "lucide-react";
+import { CircleUserRound, LayoutDashboard } from "lucide-react";
 interface ActivityBarProps {
   className?: string;
 }
+
+const AUTH_ITEM_ID = "auth-entry";
 
 export function ActivityBarComponent({ className }: ActivityBarProps) {
   // subscribe state directly from zustand store (MVP: view subscribes state)
   const expanded = useActivityBarStore((s) => s.expanded);
   const activeId = useActivityBarStore((s) => s.activeId);
   const rawItems = useActivityBarStore((s) => s.items);
+  const { status } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirectRef = useRef("");
 
   // actions are exposed via manager on presenter (MVP: actions via manager)
   const presenter = usePresenter();
+  const activityBar = presenter.activityBar;
 
   // sort items by order without mutating store state
   const items = [...rawItems].sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -39,9 +49,49 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       try { clicked.onClick(); } catch { /* no-op */ }
     }
 
+    if (clicked?.id === AUTH_ITEM_ID) {
+      return;
+    }
+
     // update active state after handling side effects
     presenter.activityBar.setActiveId(nextActiveId);
   };
+
+  useEffect(() => {
+    presenter.icon.addIcons({ [AUTH_ITEM_ID]: CircleUserRound });
+  }, [presenter]);
+
+  useEffect(() => {
+    redirectRef.current = `${location.pathname}${location.search}`;
+  }, [location.pathname, location.search]);
+
+  const handleAuthClick = useCallback(() => {
+    const redirect = redirectRef.current || "/chat";
+    navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
+  }, [navigate]);
+
+  useEffect(() => {
+    const shouldShowAuthEntry = status !== "authenticated";
+    const existing = activityBar.getItems().some((item) => item.id === AUTH_ITEM_ID);
+    if (!shouldShowAuthEntry) {
+      if (existing) {
+        activityBar.removeItem(AUTH_ITEM_ID);
+      }
+      return;
+    }
+
+    if (!existing) {
+      activityBar.addItem({
+        id: AUTH_ITEM_ID,
+        icon: AUTH_ITEM_ID,
+        label: "登录 / 注册",
+        title: "登录或注册",
+        group: "footer",
+        order: 999,
+        onClick: handleAuthClick,
+      });
+    }
+  }, [activityBar, handleAuthClick, status]);
 
   return (
     <ActivityBar.Root
