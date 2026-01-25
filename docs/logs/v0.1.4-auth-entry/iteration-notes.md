@@ -10,10 +10,11 @@
 
 - `pnpm lint`（存在既有 warnings，未阻塞）
 - `pnpm tsc`
-- `pnpm build`
-- `pnpm deploy:pages`
+- `pnpm build`（CSS minify warning 与包体积提示）
+- `pnpm deploy:pages`（包含 Functions 构建）
 - 冒烟测试（非仓库目录）：`node -e "const https=require('https');https.get('https://agentverse.pages.dev',res=>{console.log(res.statusCode);console.log(res.headers['content-type']||'');res.resume();}).on('error',err=>{console.error(err.message);process.exit(1);});"`（返回 200）
 
 ## 发布/部署
 
 - Cloudflare Pages：`pnpm deploy:pages`
+- 访问地址：`https://agentverse.pages.dev`（生产域名），`https://9ed89d65.agentverse.pages.dev`（本次部署）
