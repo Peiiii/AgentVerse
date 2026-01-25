@@ -19,7 +19,7 @@
 - 工具轮次上限调整为 100，避免连续创建时提前中断
 - 删除未使用的 ChatClient 抽象与 message.toolCalls 字段，减少冗余
 - 群聊中等宽度下右侧成员/笔记面板改为抽屉式展示，动效与左侧列表一致
-- 新增 Cloudflare Pages 部署脚本 `pnpm deploy:pages`
+- 新增 Cloudflare Pages 部署脚本 `pnpm deploy:pages`（强制使用 `main` 分支部署到生产域名）
 - 初始化 Project OS：补齐 AGENTS.md 总则/负面清单/规则
 
 ## 测试/验证/验收
@@ -27,7 +27,9 @@
 - `pnpm lint`（存在既有 warnings，未阻塞）
 - `pnpm tsc`
 - `pnpm build`（CSS minify warning 与包体积提示）
+- 冒烟测试（非仓库目录）：`node -e "const https=require('https');https.get('https://agentverse.pages.dev',res=>{console.log(res.statusCode);console.log(res.headers['content-type']||'');res.resume();}).on('error',err=>{console.error(err.message);process.exit(1);});"`（返回 200）
 
 ## 发布/部署
 
-- 无需发布/部署（前端交互与能力补全）
+- Cloudflare Pages 部署：`pnpm deploy:pages`
+- 访问地址：`https://agentverse.pages.dev`（生产域名），`https://dcbcabe4.agentverse.pages.dev`（本次部署）
