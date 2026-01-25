@@ -2,6 +2,7 @@ import { ChatArea } from "@/common/features/chat/components/chat-area";
 import { useBreakpointContext } from "@/common/components/common/breakpoint-provider";
 import { DiscussionController } from "@/common/features/discussion/components/control/discussion-controller";
 import { DiscussionList } from "@/common/features/discussion/components/list/discussion-list";
+import { MobileMemberDrawer } from "@/common/features/discussion/components/member/mobile-member-drawer";
 import { DiscussionSidebar } from "@/common/features/discussion/components/sidebar/discussion-sidebar";
 import { ResponsiveContainer } from "@/common/components/layout/responsive-container";
 import { UI_PERSIST_KEYS } from "@/core/config/ui-persist";
@@ -14,6 +15,7 @@ export function ChatPage() {
   const { isDesktop, isLessThan } = useBreakpointContext();
   // agents/messages 由内部业务组件直连 presenter/store，无需在此处传递
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [showMemberDrawer, setShowMemberDrawer] = useState(false);
   const [showMembersForDesktop, setShowMembersForDesktop] = usePersistedState(
     false,
     {
@@ -29,6 +31,10 @@ export function ChatPage() {
   const status = isPaused ? "paused" : "active";
 
   const handleToggleMembers = () => {
+    if (isLessThan("lg")) {
+      setShowMemberDrawer((prev) => !prev);
+      return;
+    }
     setShowMembersForDesktop(!showMembersForDesktop);
   };
 
@@ -75,6 +81,12 @@ export function ChatPage() {
         <div className="w-80 flex-none border-l border-border bg-card">
           <DiscussionSidebar />
         </div>
+      )}
+      {isLessThan("lg") && (
+        <MobileMemberDrawer
+          open={showMemberDrawer}
+          onOpenChange={setShowMemberDrawer}
+        />
       )}
     </>
   );
