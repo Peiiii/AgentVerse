@@ -6,8 +6,7 @@ import { MessageWithTools } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { MessageMarkdownContent } from "./message-markdown-content";
-import { ToolResultList } from "./tool-result-list";
+import { MessageContentBlocks } from "./message-content-blocks";
 
 interface MessageItemWechatProps {
   message: MessageWithTools;
@@ -59,8 +58,13 @@ export function MessageItemWechat({
   const shouldShowTime = !previousMessageTimestamp || 
     (currentTimestamp - previousMessageTimestamp > TIME_DISPLAY_THRESHOLD);
 
+  const hasToolContent =
+    (message.segments && message.segments.length > 0) ||
+    (message.toolCalls && message.toolCalls.length > 0) ||
+    (message.toolResults && Object.keys(message.toolResults).length > 0);
   // 检查消息是否为空
-  const isEmpty = !message.content || message.content.trim() === '';
+  const isEmpty =
+    (!message.content || message.content.trim() === "") && !hasToolContent;
 
   return (
     <div className="py-1.5 group">
@@ -116,14 +120,7 @@ export function MessageItemWechat({
               {isEmpty ? (
                 <span className="opacity-0">&nbsp;</span>
               ) : (
-                <>
-                  <MessageMarkdownContent content={message.content} />
-                  <ToolResultList
-                    className="mt-2"
-                    toolCalls={message.toolCalls}
-                    toolResults={message.toolResults}
-                  />
-                </>
+                <MessageContentBlocks message={message} />
               )}
             </div>
             

@@ -7,8 +7,7 @@ import { MessageWithTools } from "@/common/types/discussion";
 import { AgentDef } from "@/common/types/agent";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { MessageMarkdownContent } from "./message-markdown-content";
-import { ToolResultList } from "./tool-result-list";
+import { MessageContentBlocks } from "./message-content-blocks";
 import { AgentHoverCard } from "@/common/features/agents/components/cards/agent-hover-card";
 
 interface MessageItemProps {
@@ -193,12 +192,8 @@ export function MessageItem({
               isUserMessage && "bg-blue-50/50 dark:bg-blue-900/10"
             )}
           >
-            <div className={cn("space-y-2", isUserMessage && "pr-6")}>
-              <MessageMarkdownContent content={message.content} />
-              <ToolResultList
-                toolCalls={message.toolCalls}
-                toolResults={message.toolResults}
-              />
+            <div className={cn(isUserMessage && "pr-6")}>
+              <MessageContentBlocks message={message} />
               {/* 复制按钮 */}
               {isUserMessage ? (
                 <button

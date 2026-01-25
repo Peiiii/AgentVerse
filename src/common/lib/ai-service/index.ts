@@ -88,7 +88,15 @@ type ToolDelta = {
 const createToolCallCollector = () => {
   const calls = new Map<
     string,
-    { id?: string; name?: string; args: string; order: number; index?: number }
+    {
+      id?: string;
+      name?: string;
+      args: string;
+      order: number;
+      index?: number;
+      key: string;
+      fallbackId: string;
+    }
   >();
   let order = 0;
   let lastKey: string | null = null;
@@ -117,6 +125,8 @@ const createToolCallCollector = () => {
       args: "",
       order,
       index: delta.index,
+      key,
+      fallbackId: `toolcall-${delta.index ?? order}`,
     };
     calls.set(key, entry);
     lastKey = key;
@@ -133,6 +143,22 @@ const createToolCallCollector = () => {
         entry.args += delta.function.arguments;
       }
     },
+    update(delta: ToolDelta) {
+      const entry = ensureEntry(delta);
+      if (delta.id) entry.id = delta.id;
+      if (delta.function?.name) entry.name = delta.function.name;
+      if (delta.function?.arguments) {
+        entry.args += delta.function.arguments;
+      }
+      return {
+        key: entry.key,
+        call: {
+          id: entry.id ?? entry.fallbackId,
+          name: entry.name || "unknown_tool",
+          arguments: parseToolArguments(entry.args),
+        },
+      };
+    },
     flush() {
       const now = Date.now();
       return Array.from(calls.values())
@@ -143,7 +169,7 @@ const createToolCallCollector = () => {
           return a.order - b.order;
         })
         .map((data, idx) => ({
-          id: data.id || `toolcall-${data.index ?? idx}-${now}`,
+          id: data.id || data.fallbackId || `toolcall-${data.index ?? idx}-${now}`,
           name: data.name || "unknown_tool",
           arguments: parseToolArguments(data.args),
         }));
@@ -274,6 +300,7 @@ export abstract class BaseLLMProvider implements LLMProvider {
 
 export type StreamEvent =
   | { type: "delta"; content: string }
+  | { type: "tool_call_delta"; key: string; call: ToolCall }
   | { type: "tool_calls"; calls: ToolCall[] }
   | { type: "done" };
 
@@ -347,7 +374,12 @@ export class DirectAPIAdapter implements APIAdapter {
             }
             const toolDeltas = delta?.tool_calls ?? [];
             for (const toolDelta of toolDeltas) {
-              toolCalls.push(toolDelta);
+              const snapshot = toolCalls.update(toolDelta);
+              subscriber.next({
+                type: "tool_call_delta",
+                key: snapshot.key,
+                call: snapshot.call,
+              });
             }
           }
           const calls = toolCalls.flush();
@@ -443,7 +475,12 @@ export class ProxyAPIAdapter implements APIAdapter {
           }
           const toolDeltas = delta?.tool_calls ?? [];
           for (const toolDelta of toolDeltas) {
-            toolCalls.push(toolDelta);
+            const snapshot = toolCalls.update(toolDelta);
+            subscriber.next({
+              type: "tool_call_delta",
+              key: snapshot.key,
+              call: snapshot.call,
+            });
           }
         } catch (error) {
           console.error("Error parsing SSE message:", error);

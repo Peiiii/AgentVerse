@@ -3,10 +3,16 @@ import {
   NormalMessage,
   MessageWithTools,
   ToolResultMessage,
+  MessageSegment,
 } from "@/common/types/discussion";
 
 // 定义消息合并的时间阈值（毫秒）
 const MESSAGE_MERGE_THRESHOLD = 3 * 60 * 1000; // 3分钟
+
+const createTextSegment = (content: string): MessageSegment => ({
+  type: "text",
+  content,
+});
 
 /**
  * 判断两条消息是否应该合并
@@ -120,6 +126,9 @@ function mergeAdjacentMessages(
     const current = messages[i];
     let mergedContent = current.content;
     let mergedToolResults = current.toolResults;
+    let mergedSegments: MessageSegment[] | null = current.segments?.length
+      ? [...current.segments]
+      : null;
     let nextIndex = i + 1;
 
     // 检查并合并后续消息
@@ -133,6 +142,22 @@ function mergeAdjacentMessages(
         mergedToolResults,
         next.toolResults
       );
+      if (mergedSegments || next.segments?.length) {
+        if (!mergedSegments) {
+          mergedSegments = current.content
+            ? [createTextSegment(current.content)]
+            : [];
+        }
+        const nextSegments: MessageSegment[] = next.segments?.length
+          ? [...next.segments]
+          : next.content
+            ? [createTextSegment(next.content)]
+            : [];
+        mergedSegments = mergeSegmentsWithSeparator(
+          mergedSegments,
+          nextSegments
+        );
+      }
       nextIndex++;
     }
 
@@ -142,6 +167,7 @@ function mergeAdjacentMessages(
         ...current,
         content: mergedContent,
         toolResults: mergedToolResults,
+        segments: mergedSegments?.length ? mergedSegments : undefined,
       });
       i = nextIndex - 1; // 跳过已合并的消息
     } else {
@@ -151,6 +177,35 @@ function mergeAdjacentMessages(
   }
 
   return result;
+}
+
+function mergeSegmentsWithSeparator(
+  current: MessageSegment[],
+  next: MessageSegment[]
+): MessageSegment[] {
+  if (next.length === 0) return current;
+  const merged = [...current];
+  if (merged.length === 0) return next;
+
+  const last = merged[merged.length - 1];
+  if (last.type === "text") {
+    last.content += "\n\n";
+  } else {
+    merged.push({ type: "text", content: "\n\n" });
+  }
+
+  const firstNext = next[0];
+  if (firstNext && firstNext.type === "text") {
+    const lastMerged = merged[merged.length - 1];
+    if (lastMerged.type === "text") {
+      lastMerged.content += firstNext.content;
+      merged.push(...next.slice(1));
+      return merged;
+    }
+  }
+
+  merged.push(...next);
+  return merged;
 }
 
 /**

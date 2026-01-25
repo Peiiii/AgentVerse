@@ -3,7 +3,7 @@ import { PromptBuilder } from "@/common/lib/agent/prompt/prompt-builder";
 import { AgentDef } from "@/common/types/agent";
 import { ChatMessage, StreamEvent, ToolCall, ToolDefinition } from "@/common/lib/ai-service";
 import type { IAgentConfig } from "@/common/types/agent-config";
-import { AgentMessage, NormalMessage, ToolResultMessage } from "@/common/types/discussion";
+import { AgentMessage, MessageSegment, NormalMessage, ToolResultMessage } from "@/common/types/discussion";
 
 type Deps = {
   aiService: {
@@ -82,11 +82,49 @@ export async function streamAgentResponse(
     const stream = aiService.streamChatCompletion({ messages: chatMessages, tools });
     let content = "";
     let toolCalls: ToolCall[] = [];
+    let segments: MessageSegment[] = [];
+    const toolSegmentIndex = new Map<string, number>();
+
+    const appendTextSegment = (chunk: string) => {
+      const last = segments[segments.length - 1];
+      if (last?.type === "text") {
+        last.content += chunk;
+        return;
+      }
+      segments = [...segments, { type: "text", content: chunk }];
+    };
+
+    const upsertToolSegment = (key: string, call: ToolCall) => {
+      const existingIndex = toolSegmentIndex.get(key);
+      if (existingIndex !== undefined) {
+        const existing = segments[existingIndex];
+        if (existing?.type === "tool_call") {
+          segments = segments.map((segment, index) =>
+            index === existingIndex ? { ...segment, call } : segment
+          );
+        }
+        return;
+      }
+      segments = [...segments, { type: "tool_call", key, call }];
+      toolSegmentIndex.set(key, segments.length - 1);
+    };
     try {
       await consumeObservable(stream, params.signal, async (event) => {
         if (event.type === "delta") {
           content += event.content;
-          await messageRepo.updateMessage(created.id, { content, lastUpdateTime: new Date() });
+          appendTextSegment(event.content);
+          await messageRepo.updateMessage(created.id, {
+            content,
+            segments: segments.length ? segments : undefined,
+            lastUpdateTime: new Date(),
+          });
+          await reload();
+        } else if (event.type === "tool_call_delta") {
+          upsertToolSegment(event.key, event.call);
+          await messageRepo.updateMessage(created.id, {
+            segments: segments.length ? segments : undefined,
+            lastUpdateTime: new Date(),
+          });
           await reload();
         } else if (event.type === "tool_calls") {
           toolCalls = event.calls;
@@ -97,6 +135,7 @@ export async function streamAgentResponse(
         lastUpdateTime: new Date(),
         toolCalls: toolCalls.length ? toolCalls : undefined,
         content,
+        segments: segments.length ? segments : undefined,
       });
       await reload();
     } catch (e) {
