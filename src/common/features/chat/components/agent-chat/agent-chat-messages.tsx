@@ -6,6 +6,7 @@ import { AgentDef } from "@/common/types/agent";
 import type { UIMessage } from "@ai-sdk/ui-utils";
 import { ChevronDown, MessageSquare, Bot, User } from "lucide-react";
 import { forwardRef, useImperativeHandle, ReactNode } from "react";
+import { MessageMarkdownContent } from "../message/message-markdown-content";
 import { ToolCallRenderer } from "./tool-call-renderer";
 
 // 消息样式主题配置
@@ -256,24 +257,36 @@ export const AgentChatMessages = forwardRef<AgentChatMessagesRef, AgentChatMessa
                           : `${messageStyle.assistantBubble.background} ${messageStyle.assistantBubble.textColor} ${messageStyle.assistantBubble.border} ${messageStyle.assistantBubble.hover || ""} transition-colors`
                       )}
                     >
-                      <div className="text-sm leading-relaxed whitespace-pre-line">
+                      <div className="text-sm leading-relaxed space-y-2">
                         {/* 新增：支持tool-invocation渲染 */}
-                        {Array.isArray(message.parts)
-                          ? message.parts.map((part, idx) => {
-                              if (part.type === "tool-invocation") {
-                                return (
+                        {Array.isArray(message.parts) ? (
+                          message.parts.map((part, idx) => {
+                            if (part.type === "tool-invocation") {
+                              return (
+                                <div key={`tool-${idx}`}>
                                   <ToolCallRenderer
-                                    key={idx}
                                     toolInvocation={part.toolInvocation}
                                   />
-                                );
-                              }
-                              if (part.type === "text") {
-                                return <span key={idx}>{part.text}</span>;
-                              }
-                              return null;
-                            })
-                          : message.content}
+                                </div>
+                              );
+                            }
+                            if (part.type === "text") {
+                              return (
+                                <MessageMarkdownContent
+                                  key={`text-${idx}`}
+                                  content={part.text}
+                                  className="prose-sm max-w-none"
+                                />
+                              );
+                            }
+                            return null;
+                          })
+                        ) : (
+                          <MessageMarkdownContent
+                            content={message.content}
+                            className="prose-sm max-w-none"
+                          />
+                        )}
                       </div>
                     </div>
                     {message.role === "user" && renderAvatar("user")}
