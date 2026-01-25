@@ -2,6 +2,7 @@
 
 - `docs/logs/v0.0.1-mvp/README.md`
 - `docs/logs/v0.1.0-headless/README.md`
+- `docs/logs/v0.1.2-auth-email/iteration-notes.md`
 
 ## 写日志的标准
 

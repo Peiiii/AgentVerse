@@ -1,0 +1,13 @@
+name = "agentverse"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "agentverse-auth"
+database_id = "b474f86d-f35b-4502-a2fa-e21c0248c524"
+
+[vars]
+APP_URL = "https://agentverse.pages.dev"
+APP_URLS = "https://agent.dimstack.com, https://bibo.bot, https://agentverse.pages.dev"
+EMAIL_FROM = "AgentVerse <noreply@bibo.bot>"

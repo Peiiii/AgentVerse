@@ -9,6 +9,7 @@ import { useViewportHeight } from "@/core/hooks/useViewportHeight";
 import { desktopAgentsExtension } from "@/desktop/features/agents/extensions";
 import { desktopChatExtension } from "@/desktop/features/chat/extensions";
 import { HashRouter } from "react-router-dom";
+import { AuthGate } from "@/common/features/auth/components/auth-gate";
 
 export function DesktopAppInner() {
   useAppBootstrap();
@@ -33,10 +34,12 @@ export function DesktopAppInner() {
   ) : (
     <div className="fixed inset-0 flex flex-col" style={{ height }}>
       <div className={cn(rootClassName, "flex flex-col h-full")}>
-        <div className="flex-1 min-h-0 flex">
-          <ActivityBarComponent className="flex" />
-          <PluginRouter />
-        </div>
+        <AuthGate>
+          <div className="flex-1 min-h-0 flex">
+            <ActivityBarComponent className="flex" />
+            <PluginRouter />
+          </div>
+        </AuthGate>
       </div>
     </div>
   );

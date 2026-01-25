@@ -25,6 +25,7 @@ import { HashRouter } from "react-router-dom";
 import { getPresenter } from "@/core/presenter/presenter";
 import { useMobileChatSceneStore } from "@/mobile/features/chat/stores/mobile-chat-scene.store";
 import { mobileChatSceneManager } from "@/mobile/features/chat/managers/mobile-chat-scene.manager";
+import { AuthGate } from "@/common/features/auth/components/auth-gate";
 
 // 场景类型
 export function MobileAppInner() {
@@ -151,11 +152,15 @@ export function MobileAppInner() {
   return (
     <div className="fixed inset-0 flex flex-col" style={{ height }}>
       <div className={cn(rootClassName, "flex flex-col h-full")}>
-        {renderSceneContent()}
-        <MobileMemberDrawer
-          open={showMobileMemberDrawer}
-          onOpenChange={setShowMobileMemberDrawer}
-        />
+        <AuthGate>
+          <>
+            {renderSceneContent()}
+            <MobileMemberDrawer
+              open={showMobileMemberDrawer}
+              onOpenChange={setShowMobileMemberDrawer}
+            />
+          </>
+        </AuthGate>
       </div>
     </div>
   );
