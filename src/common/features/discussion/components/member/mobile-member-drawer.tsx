@@ -1,8 +1,8 @@
 import { Button } from "@/common/components/ui/button";
-import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
 import { DiscussionNotesPanel } from "@/common/features/discussion/components/notes/discussion-notes-panel";
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
+import { cn } from "@/common/lib/utils";
 import { X } from "lucide-react";
 import { MobileMemberList } from "./mobile-member-list";
 
@@ -17,11 +17,21 @@ export function MobileMemberDrawer({
 }: MobileMemberDrawerProps) {
   const { members } = useDiscussionMembers();
   return (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <SheetContent side="right" className="w-full sm:w-[400px] p-0">
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          onClick={() => onOpenChange(false)}
+        />
+      )}
+      <div
+        className={cn(
+          "fixed inset-y-0 right-0 z-50 h-full border-l border-border bg-card shadow-lg",
+          "transition-transform duration-300 ease-in-out",
+          "w-full sm:w-[400px] p-0",
+          open ? "translate-x-0" : "translate-x-full pointer-events-none"
+        )}
+      >
         <Tabs defaultValue="members" className="flex-1 min-h-0 flex flex-col h-full">
           <div className="flex items-center gap-3 px-4 py-3 border-b">
             <TabsList className="flex-1 grid grid-cols-2 h-9 rounded-full bg-muted/70 p-1">
@@ -50,7 +60,7 @@ export function MobileMemberDrawer({
             <DiscussionNotesPanel />
           </TabsContent>
         </Tabs>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </>
   );
 }
