@@ -193,7 +193,6 @@ export async function streamAgentResponse(
       await messageRepo.updateMessage(created.id, {
         status: "completed",
         lastUpdateTime: new Date(),
-        toolCalls: toolCalls.length ? toolCalls : undefined,
         content,
         segments: segments.length ? segments : undefined,
       });

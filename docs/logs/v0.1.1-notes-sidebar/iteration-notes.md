@@ -17,6 +17,7 @@
 - 工具调用结束后同步分段 ID，避免并行调用卡在 pending
 - 工具结果写回同一 tool_invocation 分段，按分段顺序渲染，去掉 tool_result 兼容链路
 - 工具轮次上限调整为 100，避免连续创建时提前中断
+- 删除未使用的 ChatClient 抽象与 message.toolCalls 字段，减少冗余
 
 ## 测试/验证/验收
 

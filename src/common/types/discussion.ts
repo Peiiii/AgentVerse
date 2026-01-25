@@ -18,7 +18,6 @@ export interface NormalMessage extends BaseMessage {
   replyTo?: string;      // 回复某条消息的ID
   status?: 'pending' | 'streaming' | 'completed' | 'error';  // 消息状态
   lastUpdateTime?: Date;  // 最后更新时间，用于判断是否超时
-  toolCalls?: ToolCall[]; // 标准 tool call 列表
 }
 
 export type ToolInvocationStatus = "pending" | "success" | "error";
