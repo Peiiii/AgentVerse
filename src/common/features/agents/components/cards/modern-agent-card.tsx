@@ -30,14 +30,14 @@ export interface ModernAgentCardProps {
 // 为每个agent生成独特的渐变色彩
 const getAgentGradient = (agentId: string) => {
   const gradients = [
-    "from-purple-500/20 via-pink-500/20 to-rose-500/20",
-    "from-blue-500/20 via-cyan-500/20 to-teal-500/20",
-    "from-emerald-500/20 via-green-500/20 to-lime-500/20",
-    "from-orange-500/20 via-red-500/20 to-pink-500/20",
-    "from-indigo-500/20 via-purple-500/20 to-violet-500/20",
-    "from-yellow-500/20 via-orange-500/20 to-red-500/20",
-    "from-teal-500/20 via-cyan-500/20 to-blue-500/20",
-    "from-rose-500/20 via-pink-500/20 to-purple-500/20",
+    "from-purple-500/10 via-pink-500/10 to-rose-500/10",
+    "from-blue-500/10 via-cyan-500/10 to-teal-500/10",
+    "from-emerald-500/10 via-green-500/10 to-lime-500/10",
+    "from-orange-500/10 via-red-500/10 to-pink-500/10",
+    "from-indigo-500/10 via-purple-500/10 to-violet-500/10",
+    "from-yellow-500/10 via-orange-500/10 to-red-500/10",
+    "from-teal-500/10 via-cyan-500/10 to-blue-500/10",
+    "from-rose-500/10 via-pink-500/10 to-purple-500/10",
   ];
 
   const index = agentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % gradients.length;
@@ -202,8 +202,8 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
       className={cn(
         "group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer",
         "bg-gradient-to-br", gradientClass,
-        "border-0 shadow-md backdrop-blur-sm",
-        "hover:bg-gradient-to-br hover:from-opacity-30 hover:to-opacity-30",
+        "border border-border/50 shadow-sm backdrop-blur-sm",
+        "hover:border-border hover:shadow-md",
         "flex flex-col h-full", // 确保卡片占满高度
         className
       )}
@@ -225,8 +225,8 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
             {/* 头像 */}
             <div className="relative flex-shrink-0">
               <Avatar className={cn(
-                "w-16 h-16 ring-4 ring-white/30 shadow-xl transition-all duration-300",
-                isHovered && "ring-white/50 scale-110"
+                "w-14 h-14 ring-2 ring-border shadow-md transition-all duration-300",
+                isHovered && "ring-primary/30 scale-105"
               )}>
                 <AvatarImage src={safeAvatar} alt={safeName} />
                 <AvatarFallback className="bg-gradient-to-br from-primary/30 to-primary/50 text-primary-foreground font-bold text-lg">
@@ -247,12 +247,14 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
 
             {/* 基本信息 */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-bold truncate flex-1 min-w-0">{safeName}</h3>
+              <div className="flex items-center gap-2 mb-1.5">
+                <h3 className="text-base font-bold truncate flex-1 min-w-0">{safeName}</h3>
+              </div>
+              <div className="flex items-center gap-2 mb-1">
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-xs px-3 py-1 border-2 whitespace-nowrap flex-shrink-0",
+                    "text-xs px-2 py-0.5 border whitespace-nowrap flex-shrink-0",
                     roleConfig.borderColor, roleConfig.bgColor
                   )}
                 >
@@ -272,107 +274,92 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
           {/* 专长领域 */}
           {agent.expertise && agent.expertise.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-sm font-semibold mb-2 flex items-center gap-1">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                专长领域
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {agent.expertise.map((expertise, index) => (
+              <h4 className="text-xs font-medium text-muted-foreground mb-2">专长</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {agent.expertise.slice(0, 4).map((expertise, index) => (
                   <span
                     key={index}
                     className={cn(
-                      "text-xs px-3 py-1 rounded-full transition-all duration-300",
-                      "bg-white/20 text-white/90 backdrop-blur-sm border border-white/30",
-                      "hover:bg-white/30 hover:scale-105"
+                      "text-xs px-2 py-0.5 rounded-md transition-all duration-200",
+                      "bg-primary/10 text-primary border border-primary/20",
+                      "hover:bg-primary/20"
                     )}
                   >
                     {expertise}
                   </span>
                 ))}
+                {agent.expertise.length > 4 && (
+                  <span className="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+                    +{agent.expertise.length - 4}
+                  </span>
+                )}
               </div>
             </div>
           )}
 
           {/* 详细信息 */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 text-xs">
             {agent.bias && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Star className="w-4 h-4 text-yellow-500" />
-                <span className="truncate">{agent.bias}</span>
+              <div className="flex items-start gap-2 text-muted-foreground">
+                <Star className="w-3 h-3 text-yellow-500 mt-0.5 flex-shrink-0" />
+                <span className="line-clamp-1">{agent.bias}</span>
               </div>
             )}
             {agent.responseStyle && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MessageCircle className="w-4 h-4 text-blue-500" />
-                <span className="truncate">{agent.responseStyle}</span>
+              <div className="flex items-start gap-2 text-muted-foreground">
+                <MessageCircle className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                <span className="line-clamp-1">{agent.responseStyle}</span>
               </div>
             )}
           </div>
         </div>
 
         {/* 底部操作区域 - 固定贴底 */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-3">
           {/* 分割线 */}
-          <div className="border-t border-white/20 mb-3" />
+          <div className="border-t border-border/30 mb-3" />
 
           {/* 操作按钮和提示 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Eye className="w-3 h-3" />
+          <div className="flex items-center justify-between h-7">
+            {/* 左侧：hover前显示详情提示，hover后隐藏 */}
+            <div className={cn(
+              "flex items-center gap-1.5 text-xs text-muted-foreground/50 transition-opacity duration-200",
+              isHovered && showActions ? "opacity-0" : "opacity-100"
+            )}>
+              <Eye className="w-3.5 h-3.5" />
               <span>点击查看详情</span>
             </div>
 
-            {/* 操作按钮组 */}
+            {/* 右侧：操作按钮组 - hover后从左侧滑入 */}
             {showActions && (
               <div className={cn(
-                "flex items-center gap-1 transition-all duration-300",
-                isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                "absolute left-0 right-0 px-6 flex items-center justify-end gap-2 transition-all duration-300",
+                isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
               )}>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLiked(!isLiked);
-                  }}
-                  className={cn(
-                    "h-7 w-7 p-0 transition-all duration-300",
-                    isLiked
-                      ? "text-red-500 hover:text-red-600"
-                      : "text-muted-foreground hover:text-red-500"
-                  )}
-                >
-                  <Heart className={cn("w-3 h-3", isLiked && "fill-current")} />
-                </Button>
-                <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     onEditWithAI?.(agent);
                   }}
-                  className="h-7 w-7 p-0 hover:bg-primary/20 hover:text-primary"
+                  className="h-7 px-3 text-xs gap-1.5 bg-background/80 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
                   title="AI 编辑"
                 >
-                  <Zap className="w-3 h-3" />
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>AI编辑</span>
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete?.(agent.id);
                   }}
-                  className="h-7 w-7 p-0 hover:bg-red-500/20 hover:text-red-500"
+                  className="h-7 px-3 text-xs gap-1.5 bg-background/80 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
                 >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-xs hover:bg-white/20 hover:text-white"
-                >
-                  <MoreHorizontal className="w-3 h-3" />
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>删除</span>
                 </Button>
               </div>
             )}
