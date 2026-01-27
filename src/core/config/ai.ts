@@ -40,7 +40,7 @@ export const AI_PROVIDER_CONFIG: ProviderConfigs = {
   [SupportedAIProvider.DASHSCOPE]: {
     apiKey: import.meta.env.VITE_DASHSCOPE_API_KEY,
     baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    models: ["qwen3-max"],
+    models: ["qwen3-max", "glm-4.7"],
     maxTokens: 1000,
   },
 
