@@ -13,6 +13,9 @@
 - `docs/logs/v0.1.10-stream-normalizer-robust/iteration-notes.md`
 - `docs/logs/v0.1.11-mention-self-guard/iteration-notes.md`
 - `docs/logs/v0.1.12-message-merge-safety/iteration-notes.md`
+- `docs/logs/v0.1.13-v2ex-post/iteration-notes.md`
+- `docs/logs/v0.1.14-sidebar-github/iteration-notes.md`
+- `docs/logs/v0.1.15-activitybar-github/iteration-notes.md`
 
 ## 写日志的标准
 

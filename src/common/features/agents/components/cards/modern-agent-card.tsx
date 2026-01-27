@@ -7,9 +7,7 @@ import { AgentDef } from "@/common/types/agent";
 import {
   Brain,
   Eye,
-  Heart,
   MessageCircle,
-  MoreHorizontal,
   Sparkles,
   Star,
   Trash2,
@@ -84,7 +82,6 @@ export const ModernAgentCard: React.FC<ModernAgentCardProps> = ({
   className,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
 
   const safeAvatar = agent.avatar || "/avatars/default.png";
   const safeName = agent.name || "未命名";

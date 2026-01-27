@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui
 import { useDiscussionMembers } from "@/core/hooks/useDiscussionMembers";
 import { MemberList } from "@/common/features/discussion/components/member/member-list";
 import { DiscussionNotesPanel } from "@/common/features/discussion/components/notes/discussion-notes-panel";
+import { Github } from "lucide-react";
 
 export function DiscussionSidebar() {
   const { members } = useDiscussionMembers();
@@ -32,6 +33,18 @@ export function DiscussionSidebar() {
       <TabsContent value="notes" className="flex-1 min-h-0 m-0">
         <DiscussionNotesPanel />
       </TabsContent>
+
+      <div className="px-5 py-3 border-t border-border/40 bg-muted/20">
+        <a
+          href="https://github.com/Peiiii/AgentVerse"
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Github className="h-4 w-4" />
+          GitHub
+        </a>
+      </div>
     </Tabs>
   );
 }

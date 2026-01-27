@@ -8,12 +8,13 @@ import { usePresenter } from "@/core/presenter";
 import { useActivityBarStore, type ActivityItem } from "@/core/stores/activity-bar.store";
 import { useAuth } from "@/core/hooks/use-auth";
 import { ActivityBar } from "composite-kit";
-import { CircleUserRound, LayoutDashboard } from "lucide-react";
+import { CircleUserRound, Github, LayoutDashboard } from "lucide-react";
 interface ActivityBarProps {
   className?: string;
 }
 
 const AUTH_ITEM_ID = "auth-entry";
+const GITHUB_ITEM_ID = "github-entry";
 
 export function ActivityBarComponent({ className }: ActivityBarProps) {
   // subscribe state directly from zustand store (MVP: view subscribes state)
@@ -49,7 +50,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       try { clicked.onClick(); } catch { /* no-op */ }
     }
 
-    if (clicked?.id === AUTH_ITEM_ID) {
+    if (clicked?.id === AUTH_ITEM_ID || clicked?.id === GITHUB_ITEM_ID) {
       return;
     }
 
@@ -58,7 +59,10 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
   };
 
   useEffect(() => {
-    presenter.icon.addIcons({ [AUTH_ITEM_ID]: CircleUserRound });
+    presenter.icon.addIcons({
+      [AUTH_ITEM_ID]: CircleUserRound,
+      [GITHUB_ITEM_ID]: Github,
+    });
   }, [presenter]);
 
   useEffect(() => {
@@ -69,6 +73,10 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     const redirect = redirectRef.current || "/chat";
     navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
   }, [navigate]);
+
+  const handleGithubClick = useCallback(() => {
+    window.open("https://github.com/Peiiii/AgentVerse", "_blank", "noopener,noreferrer");
+  }, []);
 
   useEffect(() => {
     const shouldShowAuthEntry = status !== "authenticated";
@@ -92,6 +100,21 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
       });
     }
   }, [activityBar, handleAuthClick, status]);
+
+  useEffect(() => {
+    const existing = activityBar.getItems().some((item) => item.id === GITHUB_ITEM_ID);
+    if (existing) return;
+
+    activityBar.addItem({
+      id: GITHUB_ITEM_ID,
+      icon: GITHUB_ITEM_ID,
+      label: "GitHub",
+      title: "查看项目仓库",
+      group: "footer",
+      order: 950,
+      onClick: handleGithubClick,
+    });
+  }, [activityBar, handleGithubClick]);
 
   return (
     <ActivityBar.Root
