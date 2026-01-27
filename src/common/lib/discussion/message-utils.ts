@@ -47,12 +47,19 @@ function mergeAdjacentMessages(
 ): NormalMessage[] {
   const result: NormalMessage[] = [];
 
+  const cloneSegments = (segments?: MessageSegment[] | null) => {
+    if (!segments?.length) return null;
+    return segments.map((segment) =>
+      segment.type === "text"
+        ? { ...segment }
+        : { ...segment, call: { ...segment.call } }
+    );
+  };
+
   for (let i = 0; i < messages.length; i++) {
     const current = messages[i];
     let mergedContent = current.content;
-    let mergedSegments: MessageSegment[] | null = current.segments?.length
-      ? [...current.segments]
-      : null;
+    let mergedSegments: MessageSegment[] | null = cloneSegments(current.segments);
     let nextIndex = i + 1;
 
     // 检查并合并后续消息
@@ -69,7 +76,7 @@ function mergeAdjacentMessages(
             : [];
         }
         const nextSegments: MessageSegment[] = next.segments?.length
-          ? [...next.segments]
+          ? (cloneSegments(next.segments) ?? [])
           : next.content
             ? [createTextSegment(next.content)]
             : [];

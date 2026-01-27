@@ -5,6 +5,14 @@
 - `docs/logs/v0.1.2-auth-email/iteration-notes.md`
 - `docs/logs/v0.1.3-auth-optional/iteration-notes.md`
 - `docs/logs/v0.1.4-auth-entry/iteration-notes.md`
+- `docs/logs/v0.1.5-poop-impact/iteration-notes.md`
+- `docs/logs/v0.1.6-stream-dedupe/iteration-notes.md`
+- `docs/logs/v0.1.7-streaming-delta-normalization/iteration-notes.md`
+- `docs/logs/v0.1.8-streaming-mode-normalization/iteration-notes.md`
+- `docs/logs/v0.1.9-poop-impact-drama/iteration-notes.md`
+- `docs/logs/v0.1.10-stream-normalizer-robust/iteration-notes.md`
+- `docs/logs/v0.1.11-mention-self-guard/iteration-notes.md`
+- `docs/logs/v0.1.12-message-merge-safety/iteration-notes.md`
 
 ## 写日志的标准
 

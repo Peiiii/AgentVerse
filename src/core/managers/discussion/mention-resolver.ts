@@ -32,7 +32,11 @@ export class MentionResolver {
     }
   }
 
-  takeNext(members: { agentId: string }[], defs: AgentDef[]): string | null {
+  takeNext(
+    members: { agentId: string }[],
+    defs: AgentDef[],
+    excludeAgentId?: string
+  ): string | null {
     if (!this.pending.length) return null;
 
     while (this.pending.length) {
@@ -43,6 +47,9 @@ export class MentionResolver {
       // 1) Prefer exact slug match on the first token (stable across renames / i18n)
       const bySlug = defs.find((a) => a.slug && a.slug.toLowerCase() === firstTokenLower);
       if (bySlug && members.find((m) => m.agentId === bySlug.id)) {
+        if (excludeAgentId && bySlug.id === excludeAgentId) {
+          continue;
+        }
         if (!this.pending.length) {
           this.sourceId = null;
         }
@@ -59,6 +66,9 @@ export class MentionResolver {
         return this.isBoundaryChar(nextChar);
       });
       if (byName && members.find((m) => m.agentId === byName.id)) {
+        if (excludeAgentId && byName.id === excludeAgentId) {
+          continue;
+        }
         if (!this.pending.length) {
           this.sourceId = null;
         }

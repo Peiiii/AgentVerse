@@ -18,7 +18,11 @@ export class NextSpeakerSelector {
     // 1) @mention takes priority for text messages
     if (trigger.type === "text") {
       this.mention.feed(trigger);
-      const mentionTarget = this.mention.takeNext(members, defs);
+      const mentionTarget = this.mention.takeNext(
+        members,
+        defs,
+        trigger.agentId
+      );
       if (mentionTarget) return mentionTarget;
     }
 

@@ -304,6 +304,81 @@ export type StreamEvent =
   | { type: "tool_calls"; calls: ToolCall[] }
   | { type: "done" };
 
+type StreamDeltaNormalizer = {
+  normalize: (incoming: string) => string;
+  reset: () => void;
+};
+
+type StreamDeltaMode = "unknown" | "full" | "delta";
+
+const createStreamDeltaNormalizer = (): StreamDeltaNormalizer => {
+  let full = "";
+  let mode: StreamDeltaMode = "unknown";
+  const maxOverlap = 512;
+
+  const findOverlap = (prev: string, next: string) => {
+    const limit = Math.min(prev.length, next.length, maxOverlap);
+    for (let len = limit; len > 0; len -= 1) {
+      if (prev.slice(prev.length - len) === next.slice(0, len)) {
+        return len;
+      }
+    }
+    return 0;
+  };
+
+  const normalize = (incoming: string) => {
+    if (!incoming) return "";
+
+    if (!full) {
+      full = incoming;
+      return incoming;
+    }
+
+    if (incoming.startsWith(full)) {
+      mode = "full";
+      const delta = incoming.slice(full.length);
+      full = incoming;
+      return delta;
+    }
+
+    if (full.startsWith(incoming) || full.endsWith(incoming)) {
+      return "";
+    }
+
+    const overlap = findOverlap(full, incoming);
+    if (overlap > 0) {
+      const delta = incoming.slice(overlap);
+      full += delta;
+      mode = "delta";
+      return delta;
+    }
+
+    if (mode === "unknown") {
+      mode = "delta";
+      full += incoming;
+      return incoming;
+    }
+
+    if (incoming.length <= Math.max(12, full.length * 0.3)) {
+      mode = "delta";
+      full += incoming;
+      return incoming;
+    }
+
+    mode = "full";
+    full = incoming;
+    return incoming;
+  };
+
+  return {
+    normalize,
+    reset: () => {
+      full = "";
+      mode = "unknown";
+    },
+  };
+};
+
 // 通用适配器实现
 export class DirectAPIAdapter implements APIAdapter {
   private client: OpenAI;
@@ -354,6 +429,7 @@ export class DirectAPIAdapter implements APIAdapter {
     return new Observable<StreamEvent>((subscriber) => {
       const { messages, temperature, maxTokens, model, tools } = params;
       const toolCalls = createToolCallCollector();
+      const deltaNormalizer = createStreamDeltaNormalizer();
 
       const processStream = async () => {
         try {
@@ -370,7 +446,10 @@ export class DirectAPIAdapter implements APIAdapter {
             const delta = chunk.choices[0]?.delta;
             const content = delta?.content;
             if (content) {
-              subscriber.next({ type: "delta", content });
+              const normalized = deltaNormalizer.normalize(content);
+              if (normalized) {
+                subscriber.next({ type: "delta", content: normalized });
+              }
             }
             const toolDeltas = delta?.tool_calls ?? [];
             for (const toolDelta of toolDeltas) {
@@ -387,8 +466,10 @@ export class DirectAPIAdapter implements APIAdapter {
             subscriber.next({ type: "tool_calls", calls });
           }
           subscriber.next({ type: "done" });
+          deltaNormalizer.reset();
           subscriber.complete();
         } catch (error) {
+          deltaNormalizer.reset();
           subscriber.error(
             new AIServiceError(
               error instanceof Error ? error.message : "Stream request failed",
@@ -450,6 +531,7 @@ export class ProxyAPIAdapter implements APIAdapter {
       });
 
       const toolCalls = createToolCallCollector();
+      const deltaNormalizer = createStreamDeltaNormalizer();
       const eventSource = new EventSource(
         `${this.baseURL}/api/ai/chat/stream?${searchParams.toString()}`
       );
@@ -461,6 +543,7 @@ export class ProxyAPIAdapter implements APIAdapter {
             subscriber.next({ type: "tool_calls", calls });
           }
           subscriber.next({ type: "done" });
+          deltaNormalizer.reset();
           subscriber.complete();
           eventSource.close();
           return;
@@ -471,7 +554,10 @@ export class ProxyAPIAdapter implements APIAdapter {
           const delta = parsed.choices[0]?.delta;
           const content = delta?.content;
           if (content) {
-            subscriber.next({ type: "delta", content });
+            const normalized = deltaNormalizer.normalize(content);
+            if (normalized) {
+              subscriber.next({ type: "delta", content: normalized });
+            }
           }
           const toolDeltas = delta?.tool_calls ?? [];
           for (const toolDelta of toolDeltas) {
@@ -488,6 +574,7 @@ export class ProxyAPIAdapter implements APIAdapter {
       };
 
       eventSource.onerror = () => {
+        deltaNormalizer.reset();
         subscriber.error(new AIServiceError("SSE connection failed"));
         eventSource.close();
       };
