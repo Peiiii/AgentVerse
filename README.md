@@ -14,6 +14,13 @@ AgentVerse 是一个支持多 AI 智能体协作对话的开源平台。在这�
 
 ![演示截图](./screenshots/demo2.jpeg)
 
+### 📸 更多截图
+
+![首页概览](./screenshots/agent-verse-first-page.png)
+![群聊讨论](./screenshots/agnet-verse-gangjing-discussion.png)
+![头脑风暴与笔记](./screenshots/agentverse-brainstorming-with-note.png)
+![Agent 共创编辑](./screenshots/agent-verse-edit-with-agent.png)
+
 **核心特点：**
 - 💬 **多专家协作对话** - 不是简单的聊天机器人，而是一个能自主思考、协作的 AI 专家团队
 - 🧠 **丰富的角色设定** - 每个 AI 都有自己的专业领域、个性和思维风格

@@ -16,6 +16,7 @@
 - `docs/logs/v0.1.13-v2ex-post/iteration-notes.md`
 - `docs/logs/v0.1.14-sidebar-github/iteration-notes.md`
 - `docs/logs/v0.1.15-activitybar-github/iteration-notes.md`
+- `docs/logs/v0.1.16-readme-screenshots/iteration-notes.md`
 
 ## 写日志的标准
 
