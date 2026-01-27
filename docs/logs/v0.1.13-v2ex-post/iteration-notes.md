@@ -7,6 +7,7 @@
 - 补充内置角色与组合示例，突出多样化群聊场景
 - 补充项目定位、使用场景与亮点描述，强化完整性
 - 补充项目启动时间的说明与 “Agent 配 Agent” 能力描述
+- 调整帖文的 Markdown 结构与层次，便于在 V2EX 阅读
 
 ## 测试/验证/验收
 
@@ -14,7 +15,7 @@
 - `pnpm exec tsc -b`
 - `pnpm run build`（CSS minify warning 与包体积提示）
 - 冒烟测试（非仓库目录）：
-  - `python3 -m http.server 4187 --directory /Users/peiwang/Projects/AgentVerse/dist > /tmp/agentverse-smoke-4187.log 2>&1 & server_pid=$!; sleep 1; curl -I http://127.0.0.1:4187/ | head -n 1; kill $server_pid`
+  - `python3 -m http.server 4188 --directory /Users/peiwang/Projects/AgentVerse/dist > /tmp/agentverse-smoke-4188.log 2>&1 & server_pid=$!; sleep 1; curl -I http://127.0.0.1:4188/ | head -n 1; kill $server_pid`
   - 观察点：HTTP 200
 
 ## 发布/部署
